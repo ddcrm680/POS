@@ -82,3 +82,107 @@ export const CustomerSchema = z.object({
   createdAt: z.date().default(() => new Date()),
   updatedAt: z.date().default(() => new Date()),
 });
+
+export type JobCard = z.infer<typeof JobCardSchema>;
+
+// Job Card Schema
+export const JobCardSchema = z.object({
+  id: z.string().max(20),
+  customerId: z.string().uuid(),
+  vehicleId: z.string().uuid(),
+  jobCardNumber: z.number().int(),
+  status: z.string().optional().nullable(),
+  
+  // Enterprise Service Information
+  serviceType: z.string().max(50).optional().nullable(),
+  serviceCategory: z.string().max(20).default("Basic"),
+  priority: z.string().max(20).default("Normal"),
+  serviceAdvisor: z.string().max(100).optional().nullable(),
+  estimatedCompletionTime: z.string().optional().nullable(),
+  actualCompletionTime: z.number().int().optional().nullable(),
+  
+  // Workflow and status
+  serviceStatus: z.string().max(20).default("check-in"),
+  paymentStatus: z.string().max(20).default("pending"),
+  
+  // Operations tracking
+  keyTag: z.string().max(20).optional().nullable(),
+  parkingLocation: z.string().max(50).optional().nullable(),
+  promisedReadyAt: z.date().optional().nullable(),
+  bayId: z.string().max(20).optional().nullable(),
+  intakePhotos: z.array(z.string()).optional().nullable(),
+  beforePhotos: z.array(z.string()).optional().nullable(),
+  afterPhotos: z.array(z.string()).optional().nullable(),
+  materialsAllocated: z.array(z.any()).optional().nullable(),
+  
+  // Enterprise Vehicle Information
+  odometerReading: z.string().optional().nullable(),
+  odometerPhotos: z.array(z.string()).optional().nullable(),
+  vehicleCondition: z.string().optional().nullable(),
+  existingDamage: z.array(z.any()).optional().nullable(),
+  
+  // Enterprise Customer Communication
+customerCommunicationPrefs: z.record(z.string(), z.boolean()).optional().nullable(),
+
+  communicationLog: z.array(z.any()).optional().nullable(),
+  specialInstructions: z.string().optional().nullable(),
+  customerRequests: z.string().optional().nullable(),
+  
+  // SOP Checklist System
+  sopChecklists: z.array(z.any()).optional().nullable(),
+  sopProgress: z.string().default("0.00"),
+  sopTemplateId: z.string().max(50).optional().nullable(),
+  sopRequiredPhotos: z.number().int().default(0),
+  sopCompletedPhotos: z.number().int().default(0),
+  
+  // Financial
+  totalAmount: z.string().default("0.00"),
+  finalAmount: z.string().default("0.00"),
+  services: z.array(z.any()).optional().nullable(),
+  addOnServices: z.array(z.any()).optional().nullable(),
+  discountPercent: z.string().default("0.00"),
+  discountAmount: z.string().default("0.00"),
+  discountReason: z.string().max(100).optional().nullable(),
+  cgst: z.string().default("0.00"),
+  sgst: z.string().default("0.00"),
+  materialCost: z.string().default("0.00"),
+  laborCost: z.string().default("0.00"),
+  
+  // Enterprise Warranty & Quality
+  warrantyPeriod: z.string().optional().nullable(),
+  warrantyTerms: z.string().optional().nullable(),
+  qualityRating: z.string().optional().nullable(),
+  qualityNotes: z.string().optional().nullable(),
+  customerSatisfactionRating: z.string().optional().nullable(),
+  
+  // Enterprise Tracking
+  techniciansAssigned: z.array(z.object({
+    id: z.string().optional(),
+    name: z.string().optional().nullable(),
+    role: z.string().optional().nullable(),
+  })).optional().nullable(),
+  timeTracking: z.array(z.any()).optional().nullable(),
+  serviceHistoryReference: z.string().max(50).optional().nullable(),
+  
+  notes: z.string().optional().nullable(),
+  internalNotes: z.string().optional().nullable(),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
+});
+
+
+export type Vehicle = z.infer<typeof VehicleSchema>;
+// Vehicle Schema
+export const VehicleSchema = z.object({
+  id: z.string().uuid().default(() => crypto.randomUUID()),
+  customerId: z.string().uuid(),
+  registrationNumber: z.string().max(20),
+  make: z.string().max(50),
+  model: z.string().max(50),
+  currentOdometer: z.number().int().optional().nullable(),
+  vehicleType: z.string().max(50),
+  year: z.number().int(),
+  color: z.string().max(30).default(""),
+  fuelType: z.string().max(20).default("Petrol"),
+  createdAt: z.date().default(() => new Date()),
+});
