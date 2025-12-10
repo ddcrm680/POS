@@ -83,6 +83,14 @@ export const CustomerSchema = z.object({
   updatedAt: z.date().default(() => new Date()),
 });
 
+
+// Insert Schemas (for forms/API validation - omitting auto-generated fields)
+export const InsertCustomerSchema = CustomerSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type JobCard = z.infer<typeof JobCardSchema>;
 
 // Job Card Schema
@@ -186,3 +194,9 @@ export const VehicleSchema = z.object({
   fuelType: z.string().max(20).default("Petrol"),
   createdAt: z.date().default(() => new Date()),
 });
+
+export const InsertVehicleSchema = VehicleSchema.omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertCustomer = z.infer<typeof InsertCustomerSchema>;
