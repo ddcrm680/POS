@@ -233,16 +233,14 @@ export default function Dashboard() {
 
   if (metricsLoading) {
     return (
-      <POSLayout>
         <div className="flex items-center justify-center h-full">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </POSLayout>
     );
   }
 
   return (
-    <POSLayout>
+    <>
       {/* Top Status Bar */}
       <div className="bg-card border-b border-border px-6 py-4 flex items-center justify-between shadow-sm">
         <div>
@@ -352,6 +350,6 @@ export default function Dashboard() {
         open={isCustomerModalOpen}
         onOpenChange={setIsCustomerModalOpen}
       />
-    </POSLayout>
+    </>
   );
 }

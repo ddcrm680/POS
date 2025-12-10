@@ -1,11 +1,11 @@
 import { useState } from "react";
-import POSLayout from "@/components/layout/pos-layout";
-  import KanbanBoard from "@/components/dashboard/kanban-board";
-  import JobCardDetail from "@/components/forms/job-card-detail";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import POSLayout from "../components/layout/pos-layout";
+  import KanbanBoard from "../components/dashboard/kanban-board";
+  import JobCardDetail from "../components/forms/job-card-detail";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Input } from "../components/ui/input";
 import { type JobCard } from "@/schema";
 import { 
   Plus, 
@@ -204,7 +204,7 @@ export default function JobCards() {
   );
 
   return (
-    <POSLayout>
+    <>
       <div className="p-6">
         <div className="mb-6">
           <div className="flex items-center justify-between">
@@ -258,6 +258,6 @@ onCreateService={() => window.location.href = '/pos-job-creation'}
 
         {viewMode === 'list' && renderJobCardsList()}
       </div>
-    </POSLayout>
+    </>
   );
 }
