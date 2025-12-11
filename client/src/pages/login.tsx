@@ -72,18 +72,12 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header logo centered with separator */}
-      <header className="w-full bg-transparent bg-['#ff0000">
-        <div className="       flex flex-col items-start">
-          <img src={LOGO_URL} alt="Detailing Devils" className="h-10 pl-4 object-contain my-4" />
-          <hr className="w-full border-t border-slate-200" />
-        </div>
-      </header>
-
       {/* Main content: left images, right login */}
-      <main >
-        <HStack gap={0} align="stretch" className="w-full" style={{ minHeight: "calc(100vh - 96px)" }}>
-          {/* LEFT: stacked images area */}
+    <HStack
+      gap={0}
+      align="stretch"
+      className="w-full h-screen"  // <-- this makes HStack full height
+    >        {/* LEFT: stacked images area */}
           <Box
             w={{ base: "100%", md: "60%" }}
             display="flex"
@@ -93,7 +87,7 @@ export default function LoginPage() {
             style={{ borderRight: "1px solid rgba(226,232,240,0.8)" }}
           >
             {/* background / bottom image (full area) */}
-            <div className="w-full h-full relative overflow-hidden">
+            <div className="w-full h-full relative overflow-hidden bg-[#eff6ff]">
                  <div
                 style={{
                   position: "absolute",
@@ -152,54 +146,61 @@ export default function LoginPage() {
             <div className="w-full max-w-md mx-4 z-10">
               <Card className="shadow-xl">
                 <CardHeader className="pt-6">
+                    <img src={LOGO_URL} alt="Detailing Devils" className="h-10 pl-4 object-contain my-4" />
+      
                   <CardTitle className="text-xl text-center">Login</CardTitle>
                 </CardHeader>
 
                 <CardContent className="px-8 pb-8">
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                  <Mail size={16} />
-                                </span>
-                                <Input
-                                  {...field}
-                                  placeholder="official@example.com"
-                                  className="pl-10"
-                                  data-testid="input-email"
-                                  autoComplete="email"
-                                />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  <FormField
+  control={form.control}
+  name="email"
+  render={({ field }) => {
+    const hasError = !!form.formState.errors.email;
+    return (
+      <FormItem>
+        {/* force black label even when error present */}
+        <FormLabel style={{ color: "#000" }} className="text-sm font-medium">
+          Email
+        </FormLabel>
+
+        <FormControl>
+          <div className="relative group">
+          
+
+            <Input
+              {...field}
+              placeholder="official@example.com"
+              className="pl-4"
+              data-testid="input-email"
+              autoComplete="email"
+            />
+          </div>
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    );
+  }}
+/>
+
 
                       <FormField
                         control={form.control}
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Password</FormLabel>
+                         <FormLabel style={{ color: "#000" }} className="text-sm font-medium">
+      Password</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                  <Lock size={16} />
-                                </span>
-
+                          
                                 <Input
                                   {...field}
                                   type={showPwd ? "text" : "password"}
                                   placeholder="Enter your password"
-                                  className="pl-10 pr-10"
+                                  className="pl-4 pr-4"
                                   autoComplete="current-password"
                                   data-testid="input-password"
                                 />
@@ -222,8 +223,8 @@ export default function LoginPage() {
                      
 
                       <div>
-                        <Button type="submit" className="w-full" data-testid="button-login">
-                          Login
+                        <Button type="submit" className="w-full bg-[#FE0000] border border-[#000] stroke-logo" data-testid="button-login">
+                          <p>Login</p>
                         </Button>
                       </div>
                     </form>
@@ -234,7 +235,6 @@ export default function LoginPage() {
             </div>
           </Box>
         </HStack>
-      </main>
     </div>
   );
 }
