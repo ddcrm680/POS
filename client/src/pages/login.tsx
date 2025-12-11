@@ -79,7 +79,7 @@ export default function LoginPage() {
       className="w-full h-screen"  // <-- this makes HStack full height
     >        {/* LEFT: stacked images area */}
           <Box
-            w={{ base: "100%", md: "60%" }}
+            w={{ base: "100%", md: "65%" }}
             display="flex"
             justifyContent="center"
             alignItems="center"
@@ -87,7 +87,7 @@ export default function LoginPage() {
             style={{ borderRight: "1px solid rgba(226,232,240,0.8)" }}
           >
             {/* background / bottom image (full area) */}
-            <div className="w-full h-full relative overflow-hidden bg-[#eff6ff]">
+            <div className="w-full h-full relative overflow-hidden bg-[#fff2f2]">
                  <div
                 style={{
                   position: "absolute",
@@ -137,7 +137,7 @@ export default function LoginPage() {
 
           {/* RIGHT: login form (on small screens this is full width) */}
           <Box
-            w={{ base: "100%", md: "40%" }}
+            w={{ base: "100%", md: "35%" }}
             display="flex"
             justifyContent="center"
             alignItems="center"
@@ -223,9 +223,22 @@ export default function LoginPage() {
                      
 
                       <div>
-                        <Button type="submit" className="w-full bg-[#FE0000] border border-[#000] stroke-logo" data-testid="button-login">
-                          <p>Login</p>
-                        </Button>
+                      <Button
+  type="submit"
+  className="
+    w-full 
+    bg-[#FE0000] 
+    border border-[#000] 
+    stroke-logo
+    hover:bg-[rgb(238,6,6)]      /* hover effect */
+    hover:border-black        /* optional — keeps border strong */
+    transition-all duration-200
+  "
+  data-testid="button-login"
+>
+  <p>Login</p>
+</Button>
+
                       </div>
                     </form>
                   </Form>
