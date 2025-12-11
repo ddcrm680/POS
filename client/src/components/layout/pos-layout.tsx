@@ -26,6 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
+import { CookieStorage, cookieStore } from "@/lib/cookie";
 
 interface POSLayoutProps {
   children: ReactNode;
@@ -104,7 +105,12 @@ export default function POSLayout({ children }: POSLayoutProps) {
       day: 'numeric' 
     });
   };
-
+function handleLogout(){
+  console.log("Logging out...");  
+localStorage.clear();
+cookieStore.clear()
+window.location.href="/login";
+}
   return (
     <div className="flex flex-col bg-red h-screen text-foreground overflow-hidden">
       {/* POS Header - Enterprise Terminal Style */}
@@ -190,7 +196,7 @@ export default function POSLayout({ children }: POSLayoutProps) {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive" data-testid="menu-logout">
+              <DropdownMenuItem className="text-destructive" data-testid="menu-logout" onClick={()=>{handleLogout()}}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </DropdownMenuItem>

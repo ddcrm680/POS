@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { format, addDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameDay, eachDayOfInterval } from "date-fns";
 import { toast } from "@/hooks/use-toast";
+import { CloseButton, ColorPicker, HStack, parseColor, Portal } from "@chakra-ui/react";
 
 // Mock Data - Advanced Appointment Dataset
 const MOCK_APPOINTMENTS = [
