@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 import { CookieStorage, cookieStore } from "@/lib/cookie";
+import { useAuth } from "@/lib/auth";
 
 interface POSLayoutProps {
   children: ReactNode;
@@ -97,7 +98,8 @@ export default function POSLayout({ children }: POSLayoutProps) {
       hour12: true 
     });
   };
-
+  const { logout } = useAuth();
+  const navigation = useLocation();
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', { 
       weekday: 'long', 
@@ -105,11 +107,9 @@ export default function POSLayout({ children }: POSLayoutProps) {
       day: 'numeric' 
     });
   };
-function handleLogout(){
-  console.log("Logging out...");  
-localStorage.clear();
-cookieStore.clear()
-window.location.href="/login";
+async function handleLogout(){
+ await logout();
+navigation[1]('/login');
 }
   return (
     <div className="flex flex-col bg-red h-screen text-foreground overflow-hidden">

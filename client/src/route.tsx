@@ -15,29 +15,35 @@ import WalkInEntry from "@/pages/walk-in-entry";
 import AppointmentsPage from "@/pages/appointments";
 import FacilityManagement from "@/pages/facility-management";
 import EmployeeManagement from "@/pages/employee-management";
-import { Route, Switch } from "wouter";
+import { Redirect, Route, Switch } from "wouter";
 import Login from "./pages/login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { login } from "./lib/api";
 export function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
-     <Route path="/appointments" component={AppointmentsPage} />
-      <Route path="/facility-management" component={FacilityManagement} />
-      <Route path="/employee-management" component={EmployeeManagement} />
-      <Route path="/manager" component={ManagerDashboard} />
-      <Route path="/customers" component={Customers} />
-      <Route path="/customers/:id" component={CustomerProfile} />
-      <Route path="/job-cards" component={JobCards} />
-      <Route path="/workflow" component={Workflow} />
-      <Route path="/inventory" component={Inventory} />
-      <Route path="/facility" component={Facility} />
-      <Route path="/expenses" component={Expenses} />
-      <Route path="/payments" component={Payments} />
-      <Route path="/reports" component={Reports} />
-      <Route path="/pos-job-creation" component={POSJobCreation} />
-      <Route path="/walk-in-entry" component={WalkInEntry} />
-       <Route path="/login" component={Login} />
-      <Route component={NotFound} />
+        <Route path="/login" component={Login}  />
+        <Route path="/">
+        <Redirect to="/login" />
+      </Route>
+       <Route path="/home" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/manager" component={() => <ProtectedRoute component={ManagerDashboard} />} />
+      <Route path="/customers" component={() => <ProtectedRoute component={Customers} />} />
+      <Route path="/job-cards" component={() => <ProtectedRoute component={JobCards} />} />
+     <Route path="/appointments" component={()=><ProtectedRoute component={AppointmentsPage}/>} />
+      <Route path="/facility-management"component={()=><ProtectedRoute component={FacilityManagement}/>} />
+      <Route path="/employee-management"component={()=><ProtectedRoute component={EmployeeManagement}/>}  />
+      <Route path="/customers/:id" component={()=><ProtectedRoute component={CustomerProfile}/>}  />
+      <Route path="/workflow" component={()=><ProtectedRoute component={Workflow}/>}  />
+      <Route path="/inventory" component={()=><ProtectedRoute component={Inventory}/>} />
+      <Route path="/facility" component={()=><ProtectedRoute component={Facility}/>}  />
+      <Route path="/expenses"component={()=><ProtectedRoute component={Expenses}/>}  />
+      <Route path="/payments" component={()=><ProtectedRoute component={Payments}/>}  />
+      <Route path="/reports" component={()=><ProtectedRoute component={Reports}/>}  />
+      <Route path="/pos-job-creation"component={()=><ProtectedRoute component={POSJobCreation}/>} />
+      <Route path="/walk-in-entry"component={()=><ProtectedRoute component={WalkInEntry}/>}  />
+     
+      <Route component={()=><ProtectedRoute component={NotFound}/>}  />
     </Switch>
   );
 }

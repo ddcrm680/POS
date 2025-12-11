@@ -200,3 +200,43 @@ export const InsertVehicleSchema = VehicleSchema.omit({
   createdAt: true,
 });
 export type InsertCustomer = z.infer<typeof InsertCustomerSchema>;
+// Zod schema (same as you had)
+export const loginSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Enter a valid email"),
+
+  password: z.string().min(8, "Password must be at least 8 characters")
+    .superRefine((val, ctx) => {
+      const regex = {
+        lowercase: /[a-z]/,
+        uppercase: /[A-Z]/,
+        number: /[0-9]/,
+        special: /[^A-Za-z0-9]/,
+      };
+
+      if (
+        !regex.lowercase.test(val) ||
+        !regex.uppercase.test(val) ||
+        !regex.number.test(val) ||
+        !regex.special.test(val)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Password must include uppercase, lowercase, number, and special character",
+        });
+      }
+    }),
+});
+
+export type LoginFormValues = z.infer<typeof loginSchema>;
+
+export type User = null | { id?: string; name?: string; email?: string; [k: string]: any };
+
+export interface AuthContextValue {
+  user: User | undefined; // undefined while loading
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (credentials: { email: string; password: string }) => Promise<any>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+}

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import POSLayout from "./components/layout/pos-layout";
 import { Router } from "./route";
+import { AuthProvider } from "./lib/auth";
 
 export default function App() {
   const [location] = useLocation();
@@ -13,6 +14,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+         <AuthProvider>
       <TooltipProvider>
         <Toaster />
 
@@ -24,6 +26,7 @@ export default function App() {
           </POSLayout>
         )}
       </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

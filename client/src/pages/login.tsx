@@ -1,11 +1,9 @@
 // src/pages/login.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import Employee from '@/lib/images/employee.png'
 import JobCard from '@/lib/images/job-card.png'
 import { toast as toastRaw, useToast } from "@/hooks/use-toast";
@@ -27,23 +25,21 @@ import {
 } from "@/components/ui/form";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Box, HStack, VStack, Image as ChakraImage } from "@chakra-ui/react";
-
-// Zod schema (same as you had)
-const loginSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Enter a valid email"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
-});
-type LoginFormValues = z.infer<typeof loginSchema>;
-
-const LOGO_URL = "https://mycrm.detailingdevils.com/assets/images/logo.png";
+import { LoginFormValues, loginSchema } from "@/schema";
+import { Constant } from "@/lib/constant";
+import { useAuth } from "@/lib/auth";
+import { useLocation } from "wouter";
 
 export default function LoginPage() {
+    const [location, setLocation] = useLocation();
+  const { user, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      setLocation("/home");
+    }
+  }, [isLoading, user, setLocation]);
+
   const [showPwd, setShowPwd] = useState(false);
   const { toast } = useToast();
 
@@ -51,33 +47,24 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
-
-  const loginMutation = useMutation({
-    mutationFn: async (data: LoginFormValues) => {
-      await new Promise((r) => setTimeout(r, 800));
-      if (data.email !== "admin@example.com" || data.password !== "Admin@123") {
-        throw new Error("Invalid credentials");
-      }
-      return { token: "demo-token", user: { name: "Admin" } };
-    },
-    onSuccess: (payload) => {
-      toast({ title: "Logged in", description: "Welcome back — redirecting..." });
-    },
-    onError: (err: any) => {
-      toast({ title: "Login failed", description: err?.message ?? "Unable to login", variant: "destructive" });
-    },
-  });
-
-  const onSubmit = (data: LoginFormValues) => loginMutation.mutate(data);
-
+  const { login } = useAuth();
+ const onSubmit = async (vals: { email: string; password: string }) => {
+    try {
+      await login(vals); 
+      setLocation("/home"); // redirect to home after login
+    } catch (err: any) {
+      // show toast / error
+      console.error(err);
+    }
+  };
   return (
     <div className="min-h-screen bg-white">
-      {/* Main content: left images, right login */}
+      
     <HStack
       gap={0}
       align="stretch"
-      className="w-full h-screen"  // <-- this makes HStack full height
-    >        {/* LEFT: stacked images area */}
+      className="w-full h-screen" 
+    >       
           <Box
             w={{ base: "100%", md: "65%" }}
             display="flex"
@@ -146,7 +133,7 @@ export default function LoginPage() {
             <div className="w-full max-w-md mx-4 z-10">
               <Card className="shadow-xl">
                 <CardHeader className="pt-6">
-                    <img src={LOGO_URL} alt="Detailing Devils" className="h-10 pl-4 object-contain my-4" />
+                    <img src={Constant.login.logoUrl} alt="Detailing Devils" className="h-10 pl-4 object-contain my-4" />
       
                   <CardTitle className="text-xl text-center">Login</CardTitle>
                 </CardHeader>
