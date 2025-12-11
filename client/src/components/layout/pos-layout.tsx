@@ -28,6 +28,7 @@ import {
 } from "../../components/ui/dropdown-menu";
 import { CookieStorage, cookieStore } from "@/lib/cookie";
 import { useAuth } from "@/lib/auth";
+import { RoleList } from "@/lib/constant";
 
 interface POSLayoutProps {
   children: ReactNode;
@@ -61,6 +62,11 @@ const quickActions = [
 export default function POSLayout({ children }: POSLayoutProps) {
   const [location] = useLocation();
   const [currentTime, setCurrentTime] = useState(new Date());
+ const { user, isLoading } = useAuth();
+  const [userInfo, setUserInfo] = useState<any>();
+  useEffect(() => {
+    setUserInfo(user || null);
+  }, [, user, ]);
 
   // Update clock every second
   useEffect(() => {
@@ -98,7 +104,7 @@ export default function POSLayout({ children }: POSLayoutProps) {
       hour12: true 
     });
   };
-  const { logout } = useAuth();
+  const { Logout } = useAuth();
   const navigation = useLocation();
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', { 
@@ -108,8 +114,8 @@ export default function POSLayout({ children }: POSLayoutProps) {
     });
   };
 async function handleLogout(){
- await logout();
-navigation[1]('/login');
+ await Logout();
+// navigation[1]('/login');
 }
   return (
     <div className="flex flex-col bg-red h-screen text-foreground overflow-hidden">
@@ -160,9 +166,12 @@ navigation[1]('/login');
         {/* Right: Status & Profile */}
         <div className="flex items-center gap-3">
           {/* System Status */}
-          <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 hidden sm:flex">
-            <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-            Online
+          <Badge variant="secondary" className={`${userInfo?.is_active?'bg-green-50 text-green-700 border-green-200':
+            'bg-red-50 text-red-700 border-red-200'
+          } hidden sm:flex`}>
+            <div className={`w-2 h-2 ${userInfo?.is_active ? 'bg-green-500':'bg-red-500'} rounded-full mr-2`} />
+              {userInfo?.is_active ?'Online' :'Offline'}  
+       
           </Badge>
 
           {/* Notifications */}
@@ -178,11 +187,13 @@ navigation[1]('/login');
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="pos-touch-target flex items-center gap-2" data-testid="user-menu-trigger">
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-primary-foreground font-medium text-sm">RK</span>
+                  <span className="text-primary-foreground font-medium text-sm">{userInfo?.name.split(' ').map((item:string)=>item.substr(0,1)).join('')}</span>
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="font-medium text-sm leading-tight" data-testid="cashier-name">Rajesh Kumar</p>
-                  <p className="text-muted-foreground text-xs leading-tight">Store Manager</p>
+                  <p className="font-medium text-sm leading-tight" data-testid="cashier-name">{userInfo?.name ??"-"}</p>
+                  <p className="text-muted-foreground text-xs leading-tight">{RoleList[userInfo?.role as keyof {'super-admin': "Super Admin",
+    STORE_MANAGER: 'Store Manager',
+   }] ??"-"}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>

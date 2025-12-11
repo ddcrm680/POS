@@ -7,3 +7,9 @@ export const Constant={
        loginFailureMessage: "Login failed. Unable to login.",
     }
 }
+
+export const RoleList={
+    'super-admin': "Super Admin",
+    STORE_MANAGER: 'Store Manager',
+  
+}

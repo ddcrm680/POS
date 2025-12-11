@@ -204,28 +204,28 @@ export type InsertCustomer = z.infer<typeof InsertCustomerSchema>;
 export const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Enter a valid email"),
 
-  password: z.string().min(8, "Password must be at least 8 characters")
-    .superRefine((val, ctx) => {
-      const regex = {
-        lowercase: /[a-z]/,
-        uppercase: /[A-Z]/,
-        number: /[0-9]/,
-        special: /[^A-Za-z0-9]/,
-      };
+  password: z.string().min(8, "Password must be at least 8 characters").max(32, "Password must be at most 32 characters")
+    // .superRefine((val, ctx) => {
+    //   const regex = {
+    //     lowercase: /[a-z]/,
+    //     uppercase: /[A-Z]/,
+    //     number: /[0-9]/,
+    //     special: /[^A-Za-z0-9]/,
+    //   };
 
-      if (
-        !regex.lowercase.test(val) ||
-        !regex.uppercase.test(val) ||
-        !regex.number.test(val) ||
-        !regex.special.test(val)
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            "Password must include uppercase, lowercase, number, and special character",
-        });
-      }
-    }),
+    //   if (
+    //     !regex.lowercase.test(val) ||
+    //     !regex.uppercase.test(val) ||
+    //     !regex.number.test(val) ||
+    //     !regex.special.test(val)
+    //   ) {
+    //     ctx.addIssue({
+    //       code: z.ZodIssueCode.custom,
+    //       message:
+    //         "Password must include uppercase, lowercase, number, and special character",
+    //     });
+    //   }
+    // }),
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
@@ -237,6 +237,6 @@ export interface AuthContextValue {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (credentials: { email: string; password: string }) => Promise<any>;
-  logout: () => Promise<void>;
+  Logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }

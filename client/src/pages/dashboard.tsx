@@ -18,10 +18,11 @@ import { Button } from "../components/ui/button";
 import { useLocation } from "wouter";
 import POSLayout from "../components/layout/pos-layout";
 import { DashboardMetrics } from "../lib/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CustomerLookupModal from "../components/modals/customer-lookup-modal";
 // import { InventoryItem, JobCard, FacilityAsset } from "../schema";
 import type { LucideProps } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 interface POSTile {
   id: string;
@@ -222,6 +223,11 @@ export default function Dashboard() {
       description: 'View analytics'
     }
   ];
+ const { user, isLoading } = useAuth();
+  const [userInfo, setUserInfo] = useState<any>();
+  useEffect(() => {
+    setUserInfo(user || null);
+  }, [, user, ]);
 
   const handleTileClick = (tile: POSTile) => {
     if (tile.action) {
@@ -255,9 +261,10 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
-            <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-            System Online
+          <Badge variant="secondary" className={` ${userInfo?.is_active ?'bg-green-50 text-green-700 border-green-200':
+            'bg-red-50 text-red-700 border-red-200'}`}>
+            <div className={`w-2 h-2 ${userInfo?.is_active ? 'bg-green-500':'bg-red-500'} rounded-full mr-2`} />
+          {userInfo?.is_active ?'System Online' :'System Offline'}  
           </Badge>
           <Button variant="ghost" className="h-12 w-12" data-testid="button-refresh">
             <RefreshCw size={20} />

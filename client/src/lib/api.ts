@@ -1,5 +1,6 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { Constant } from "./constant";
+import { cookieStore } from "./cookie";
 
 export const baseUrl =
   process.env.REACT_APP_BASE_URL || Constant.REACT_APP_BASE_URL;
@@ -7,7 +8,7 @@ export const baseUrl =
  
 const api = axios.create({
   baseURL:baseUrl,
-  withCredentials: true,   // send & receive cookies
+  // withCredentials: true,   // send & receive cookies
 });
 
 export async function login({
@@ -17,35 +18,41 @@ export async function login({
   email: string;
   password: string;
 }) {
+   const resp = await api.post("/api/login", { email, password });
+  const body = resp.data;
 
-  const response = await api.post(
-    "/api/login",
-    { email, password },
-  );
-  // localStorage.setItem("userInfo",JSON.stringify({ email, password }));
-  // const response={data:{ email,
-  // password,}};
-  return response.data;
+  if (!body?.success) {
+    throw new Error(body?.message || "Login failed");
+  }
+  if(body?.success===true){
+     if (body.token) {
+    // store 7 days
+    cookieStore.setItem("token", body.token, 7, "/");
+  }
+
+  localStorage.setItem("userInfo", JSON.stringify(body.data));
+
+  return body?.data;
+  }
+  throw new Error(body?.message || "Login failed");
 }
 
 export async function logout() {
   await fetch(`${baseUrl}/api/logout`, {
     method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
   });
-  // localStorage.removeItem("userInfo");
 }
 
 export async function fetchUserApi() {
-  //  const res = await  fetch(`${baseUrl}/api/user`, {
-  //   method: 'GET',
-  //   credentials: 'include',
-  //   headers: { 'Content-Type': 'application/json' },
-  // });
-  
- const user= localStorage.getItem("userInfo");
-  // if (res.status === 401 || res.status === 204) return null;
-  return user ? JSON.parse(user) : null;
+  const response :any= await api.get(
+    "/api/me",
+  );
+  console.log(response,'response');
+  if(response?.data?.success===true){
+  return response.data?.data;
+  }
+  throw new Error(response.data?.message || "Failed to fetch user");
 }
+
+
 

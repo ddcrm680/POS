@@ -1,8 +1,32 @@
 export class CookieStorage {
   // Set cookie (session cookie, no expiry)
-  setItem(name: string, value: string, path: string = "/") {
-    document.cookie = `${name}=${encodeURIComponent(value)}; path=${path}`;
+ setItem(
+  name: string,
+  value: string,
+  days?: number,
+  path = "/"
+) {
+  const attrs: string[] = [];
+
+  // if (typeof days === "number") {
+  //   const expiry = new Date();
+  //   expiry.setTime(expiry.getTime() + days * 24 * 60 * 60 * 1000);
+  //   attrs.push(`expires=${expiry.toUTCString()}`);
+  // }
+
+  attrs.push(`path=${path}`);
+  attrs.push("SameSite=Lax");
+
+  // Only enable Secure if https
+  if (window.location.protocol === "https:") {
+    attrs.push("Secure");
   }
+
+  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(
+    value
+  )}; ${attrs.join("; ")}`;
+}
+
 
   // Get cookie
   getItem(name: string): string | null {

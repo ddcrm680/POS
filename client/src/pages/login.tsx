@@ -36,6 +36,8 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    console.log(isLoading , user,'!isLoading && user');
+    
     if (!isLoading && user) {
       setLocation("/home");
     }
@@ -63,7 +65,7 @@ export default function LoginPage() {
       console.error(err);
       toast?.({
         title: "Login failed",
-        description: err?.message ?? Constant.login.loginFailureMessage,
+        description: err?.response?.data?.message ?? Constant.login.loginFailureMessage,
         variant: "error",
       });
     } finally {
@@ -117,6 +119,8 @@ export default function LoginPage() {
     top: "15%",
     height: "70%",
     boxShadow: "rgba(0, 0, 0, 0.18) 0px 20px 40px",
+
+                  
     borderRadius: "12px",
     overflow: "hidden",
     background: "white",
