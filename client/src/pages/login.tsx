@@ -33,6 +33,7 @@ import { useLocation } from "wouter";
 export default function LoginPage() {
     const [location, setLocation] = useLocation();
   const { user, isLoading } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -49,12 +50,24 @@ export default function LoginPage() {
   });
   const { login } = useAuth();
  const onSubmit = async (vals: { email: string; password: string }) => {
+    setIsSubmitting(true);
     try {
-      await login(vals); 
-      setLocation("/home"); // redirect to home after login
+      await login(vals);
+       toast?.({
+        title:"Login Success",
+        description:Constant.login.loginSuccessMessage,
+        variant: "success",
+      });
+      setLocation("/home");
     } catch (err: any) {
-      // show toast / error
       console.error(err);
+      toast?.({
+        title: "Login failed",
+        description: err?.message ?? Constant.login.loginFailureMessage,
+        variant: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   return (
@@ -131,7 +144,7 @@ export default function LoginPage() {
             p={{ base: 6, md: 12 }}
           >
             <div className="w-full max-w-md mx-4 z-10">
-              <Card className="shadow-xl">
+              <Card className="drop-shadow-[0_3px_8px_rgba(254,0,0,0.4)]">
                 <CardHeader className="pt-6">
                     <img src={Constant.login.logoUrl} alt="Detailing Devils" className="h-10 pl-4 object-contain my-4" />
       
@@ -209,24 +222,51 @@ export default function LoginPage() {
 
                      
 
-                      <div>
+                     <div>
                       <Button
-  type="submit"
-  className="
-    w-full 
-    bg-[#FE0000] 
-    border border-[#000] 
-    stroke-logo
-    hover:bg-[rgb(238,6,6)]      /* hover effect */
-    hover:border-black        /* optional — keeps border strong */
-    transition-all duration-200
-  "
-  data-testid="button-login"
->
-  <p>Login</p>
-</Button>
-
-                      </div>
+                        type="submit"
+                        className="
+                          w-full 
+                          bg-[#FE0000] 
+                          border border-[#000] 
+                          stroke-logo
+                          hover:bg-[rgb(238,6,6)]
+                          hover:border-black
+                          transition-all duration-200
+                          flex items-center justify-center gap-2
+                        "
+                        data-testid="button-login"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <svg
+                              className="h-4 w-4 animate-spin text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              />
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                              />
+                            </svg>
+                            <span className="text-white">Loading...</span>
+                          </>
+                        ) : (
+                          <span className="text-white">Login</span>
+                        )}
+                      </Button>
+                    </div>
                     </form>
                   </Form>
                 </CardContent>
