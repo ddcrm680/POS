@@ -131,8 +131,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.warn("logoutApi error (ignored):", e);
       }
 
-      clearClientAuth();
-      qc.invalidateQueries();
+      // clearClientAuth();
+      // qc.invalidateQueries();
     } finally {
       setIsLoading(false);
     }

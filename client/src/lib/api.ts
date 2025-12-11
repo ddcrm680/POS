@@ -1,15 +1,40 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
 
 export const baseUrl =
   process.env.REACT_APP_BASE_URL || Constant.REACT_APP_BASE_URL;
 
- 
-const api = axios.create({
-  baseURL:baseUrl,
-  // withCredentials: true,   // send & receive cookies
-});
+
+function getRawToken() {
+  // token may be stored as "Bearer abc..." or "abc..."
+  const fromCookie = cookieStore.getItem("token") || null;
+  const fromLS = localStorage.getItem("token") || null;
+  const raw = fromCookie || fromLS || "";
+  // strip existing "Bearer " prefix if present
+  return raw.startsWith("Bearer ") ? raw.slice(7) : raw;
+}
+
+function createInstance(): AxiosInstance {
+  const inst = axios.create({
+    baseURL:baseUrl,
+    // no withCredentials by default, you can set conditionally if needed
+    // withCredentials: true,
+  });
+
+  inst.interceptors.request.use((cfg) => {
+    const token = getRawToken();
+    if (token) {
+      cfg.headers = cfg.headers || {};
+      cfg.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return cfg;
+  });
+
+  return inst;
+}
+
+const api = createInstance();
 
 export async function login({
   email,
@@ -18,7 +43,7 @@ export async function login({
   email: string;
   password: string;
 }) {
-   const resp = await api.post("/api/login", { email, password });
+   const resp = await axios.post(`${baseUrl}/api/login`, { email, password });
   const body = resp.data;
 
   if (!body?.success) {
@@ -38,14 +63,36 @@ export async function login({
 }
 
 export async function logout() {
-  await fetch(`${baseUrl}/api/logout`, {
-    method: 'POST',
-  });
+  try {
+    console.log("Token being used:", getRawToken());
+    
+    // Try with exact same headers as working account call
+    const response = await api.post("/api/logout", {}, {
+      headers: {
+        'authorization': `Bearer ${getRawToken()}`, // lowercase like account
+      }
+    });
+    
+    console.log("Logout success:", response.data);
+    // return response.data;
+  } catch (error: any) {
+    console.error("Logout failed with details:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      headers: error.response?.headers,
+      message: error.message
+    });
+    throw error;
+  } finally {
+    // localStorage.removeItem("userInfo");
+    // cookieStore.removeItem("token");
+  }
 }
 
 export async function fetchUserApi() {
   const response :any= await api.get(
-    "/api/me",
+    "/api/account",
+
   );
   console.log(response,'response');
   if(response?.data?.success===true){
