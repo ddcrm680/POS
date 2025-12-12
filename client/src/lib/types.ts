@@ -3,6 +3,7 @@ export interface ServiceItem {
   name: string;
   price: number;
   description?: string;
+  category?:string;
 }
 
 export interface KanbanCard {
@@ -51,3 +52,4 @@ export interface FacilityMetric {
   status: 'good' | 'warning' | 'critical';
   trend?: 'up' | 'down' | 'stable';
 }
+

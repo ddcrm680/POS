@@ -28,13 +28,19 @@ function createInstance(): AxiosInstance {
       cfg.headers = cfg.headers || {};
       cfg.headers["Authorization"] = `Bearer ${token}`;
     }
+      try {
+    console.debug('[API Request]', cfg.method?.toUpperCase(), cfg.url, 'headers:', {
+      ...cfg.headers
+    });
+  } catch (e) {}
+
     return cfg;
   });
 
   return inst;
 }
 
-const api = createInstance();
+export const api = createInstance();
 
 export async function login({
   email,
@@ -96,6 +102,37 @@ export async function fetchUserApi() {
   }
   throw new Error(response.data?.message || "Failed to fetch user");
 }
+export async function EditProfile(fd:any) {
+  try{
+    const response :any= await api.post(
+    "/api/account/update-profile",fd
+  );
+  console.log(response,'response');
+  if(response?.data?.success===true){
+  return response.data?.data;
+  }
+  }catch(response:any){
+     console.log(response.response?.data?.message,'response');
+  
+  throw new Error(response.response?.data?.message || "Failed to update user details");
 
+  }
+ }
 
+export async function UpdatePassword(values:any) {
+  try{
+    const response :any= await api.post(
+    "/api/account/update-password",values
+  );
+  console.log(response,'response');
+  if(response?.data?.success===true){
+  return response.data?.data;
+  }
+  }catch(response:any){
+     console.log(response.response?.data?.message,'response');
+  
+  throw new Error(response.response?.data?.message || "Failed to update user details");
+
+  }
+ }
 

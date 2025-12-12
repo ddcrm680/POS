@@ -19,6 +19,7 @@ import { Redirect, Route, Switch } from "wouter";
 import Login from "./pages/login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { login } from "./lib/api";
+import ProfileDetails from "./pages/profile-details";
 export function Router() {
   return (
     <Switch>
@@ -27,6 +28,7 @@ export function Router() {
         <Redirect to="/login" />
       </Route>
        <Route path="/home" component={() => <ProtectedRoute component={Dashboard} />} />
+              <Route path="/profile" component={() => <ProtectedRoute component={ProfileDetails} />} />
       <Route path="/manager" component={() => <ProtectedRoute component={ManagerDashboard} />} />
       <Route path="/customers" component={() => <ProtectedRoute component={Customers} />} />
       <Route path="/job-cards" component={() => <ProtectedRoute component={JobCards} />} />

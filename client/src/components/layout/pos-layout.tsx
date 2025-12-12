@@ -115,7 +115,7 @@ export default function POSLayout({ children }: POSLayoutProps) {
   };
 async function handleLogout(){
  await Logout();
-navigation[1]('/login');
+  navigation[1]('/login');
 console.log('Logged out and redirected to login page');
 }
   return (
@@ -188,7 +188,7 @@ console.log('Logged out and redirected to login page');
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="pos-touch-target flex items-center gap-2" data-testid="user-menu-trigger">
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-primary-foreground font-medium text-sm">{userInfo?.name.split(' ').map((item:string)=>item.substr(0,1)).join('')}</span>
+                  <span className="text-primary-foreground font-medium text-sm">{userInfo?.name.split(' ').map((item:string)=>item.substr(0,1).toUpperCase()).join('')}</span>
                 </div>
                 <div className="hidden md:block text-left">
                   <p className="font-medium  text-foreground text-sm leading-tight" data-testid="cashier-name">{userInfo?.name ??"-"}</p>
@@ -199,7 +199,7 @@ console.log('Logged out and redirected to login page');
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem data-testid="menu-profile">
+              <DropdownMenuItem data-testid="menu-profile" onClick={()=>{  navigation[1]('/profile');}}>
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>

@@ -240,3 +240,124 @@ export interface AuthContextValue {
   Logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
+
+
+export const posJobSchema = z.object({
+  // Customer fields
+  customerName: z.string().min(1, "Customer name is required"),
+  customerPhone: z.string().min(10, "Valid phone number required"),
+  customerEmail: z.string().email().optional().or(z.literal("")),
+  // customerType: z.string().min(1, "Customer type is required"),
+  
+  // Vehicle fields
+  vehicleMake: z.string().min(1, "Vehicle make is required"),
+  vehicleModel: z.string().min(1, "Vehicle model is required"),
+  vehicleColor: z.string().min(1, "Vehicle color is required"),
+  registrationNumber: z.string().min(1, "Registration number is required"),
+  
+  // Job details
+  selectedServices: z.array(z.string()).min(1, "At least one service must be selected"),
+  discountPercent: z.string().optional(),
+  notes: z.string().optional(),
+  promisedReadyAt: z.string().min(1, "Promised ready time is required"),
+});
+
+export type POSJobData = z.infer<typeof posJobSchema>;
+
+export const profileSchema = z.object({ 
+  fullName: z.string()
+  .nonempty("Name is required")        // triggers when empty: ""
+  .min(3, "Name must be at least 3 characters").
+  max(50, "Name must be at most 50 characters")
+  ,
+  email: z.string().min(1, "Email is required").email("Enter a valid email"),
+  phoneNumber: z
+    .string()
+      .nonempty("Phone number is required") 
+    .min(10, "Phone number must be of 10 characters")
+    .regex(/^\d{10}$/, "Enter a valid 10-digit phone number"),
+  // keep avatar optional — we send as multipart if present
+});
+
+export type ProfileForm = z.infer<typeof profileSchema>;
+
+export const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(8, "Current password must be at least 8 characters").max(32, "Current password must be at most 32 characters")
+    .superRefine((val, ctx) => {
+      const regex = {
+        lowercase: /[a-z]/,
+        uppercase: /[A-Z]/,
+        number: /[0-9]/,
+        special: /[^A-Za-z0-9]/,
+      };
+
+      if (
+        !regex.lowercase.test(val) ||
+        !regex.uppercase.test(val) ||
+        !regex.number.test(val) ||
+        !regex.special.test(val)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Current password must include uppercase, lowercase, number, and special character",
+        });
+      }
+    }),
+    newPassword: z.string().min(8, "New password must be at least 8 characters").max(32, "New password must be at most 32 characters")
+    .superRefine((val, ctx) => {
+      const regex = {
+        lowercase: /[a-z]/,
+        uppercase: /[A-Z]/,
+        number: /[0-9]/,
+        special: /[^A-Za-z0-9]/,
+      };
+
+      if (
+        !regex.lowercase.test(val) ||
+        !regex.uppercase.test(val) ||
+        !regex.number.test(val) ||
+        !regex.special.test(val)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "New password must include uppercase, lowercase, number, and special character",
+        });
+      }
+    }),
+    confirmPassword: z.string().min(8, "Confirm password must be at least 8 characters").max(32, "Confirm password must be at most 32 characters")
+    .superRefine((val, ctx) => {
+      const regex = {
+        lowercase: /[a-z]/,
+        uppercase: /[A-Z]/,
+        number: /[0-9]/,
+        special: /[^A-Za-z0-9]/,
+      };
+
+      if (
+        !regex.lowercase.test(val) ||
+        !regex.uppercase.test(val) ||
+        !regex.number.test(val) ||
+        !regex.special.test(val)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Confirm password must include uppercase, lowercase, number, and special character",
+        });
+      }
+    }),
+  })
+  .superRefine((vals, ctx) => {
+    if (vals.newPassword !== vals.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+      });
+    }
+  });
+
+export type PasswordForm = z.infer<typeof passwordSchema>;
