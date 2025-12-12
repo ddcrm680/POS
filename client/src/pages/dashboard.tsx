@@ -282,7 +282,7 @@ export default function Dashboard() {
 
       {/* POS Tile Grid */}
       <div className="flex-1 overflow-auto p-6 bg-gradient-to-br from-background to-muted/20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6  mx-auto">
           {posTiles.map((tile) => {
             const Icon = tile.icon;
             return (
@@ -332,7 +332,7 @@ export default function Dashboard() {
         </div>
         
         {/* Quick Stats Bar */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 mx-auto">
           <div className="bg-card rounded-xl p-4 border border-border shadow-sm text-center" data-testid="stat-revenue">
             <p className="text-2xl font-bold text-primary">₹{metrics?.todayRevenue?.toLocaleString() || '0'}</p>
             <p className="text-sm text-muted-foreground">Today's Revenue</p>

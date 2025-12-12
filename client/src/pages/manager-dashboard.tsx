@@ -375,13 +375,10 @@ export default function ManagerDashboard() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Shield className="h-8 w-8 text-primary" />
-              Manager Dashboard
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              {format(new Date(), 'EEEE, MMMM do, yyyy')} - Complete daily operations management
-            </p>
+                  <h1 className="text-2xl font-semibold flex gap-2">  <Shield className="h-8 w-8 text-primary" />
+Manager Dashboard</h1>
+              <p className="text-muted-foreground">    {format(new Date(), 'EEEE, MMMM do, yyyy')} - Complete daily operations management
+        </p>
           </div>
           
           {metrics?.timeClockStatus && (
