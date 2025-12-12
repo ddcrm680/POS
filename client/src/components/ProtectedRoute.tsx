@@ -45,7 +45,7 @@ export default function ProtectedRoute({
       </div>
     );
   }
-console.log(user,'useruseruseruser');
+console.log(user,location,'useruseruseruser');
 
   // 2) Not authenticated -> redirect to /login (preserve intended path as ?next=...)
   if (!user) {

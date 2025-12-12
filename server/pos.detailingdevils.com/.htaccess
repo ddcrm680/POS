@@ -1,0 +1,61 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    ########################################
+    # CORS - whitelist + dynamic origin echo
+    # (Only allow origins in the list below)
+    ########################################
+
+    # Whitelist: add your production frontend domains here.
+    # Keep dev origin only while debugging; remove for final production.
+    SetEnvIf Origin "^https://pos\.detailingdevils\.com(:[0-9]+)?$" ORIGIN_ALLOW=$0
+    SetEnvIf Origin "^https://app\.detailingdevils\.com(:[0-9]+)?$" ORIGIN_ALLOW=$0
+    # Optional (dev) - uncomment only for local dev debugging, remove in prod:
+    # SetEnvIf Origin "^http://localhost:3000$" ORIGIN_ALLOW=$0
+    # SetEnvIf Origin "^http://127\.0\.0\.1:3000$" ORIGIN_ALLOW=$0
+
+    <IfModule mod_headers.c>
+        # Set CORS headers only when origin is allowed (prevents wildcard exposure)
+        Header always set Access-Control-Allow-Origin "%{ORIGIN_ALLOW}e" env=ORIGIN_ALLOW
+        Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" env=ORIGIN_ALLOW
+        Header always set Access-Control-Allow-Headers "Authorization, Content-Type, Accept, Origin, X-Requested-With" env=ORIGIN_ALLOW
+        Header always set Access-Control-Expose-Headers "Authorization" env=ORIGIN_ALLOW
+        Header always set Access-Control-Allow-Credentials "false" env=ORIGIN_ALLOW
+        Header always set Vary "Origin" env=ORIGIN_ALLOW
+    </IfModule>
+
+    # If method is OPTIONS and origin is allowed, return 204 immediately
+    RewriteCond %{REQUEST_METHOD} =OPTIONS
+    RewriteCond %{ENV:ORIGIN_ALLOW} .+
+    RewriteRule ^ - [R=204,L]
+
+    ########################################
+    # Existing app rules (kept & merged)
+    ########################################
+
+    # Prevent Direct Access to sensitive files and folders
+    RewriteCond %{REQUEST_URI} ^/(vendor|storage|.env|composer\.(json|lock)|config|database|resources|routes|tests)(/|$) [NC]
+    RewriteRule .* - [F,L]
+
+    # Remove index.php from URLs
+    RewriteCond %{THE_REQUEST} /index\.php [NC]
+    RewriteRule ^(.*?)index\.php(?:/(.*))?$ /$1$2? [L,R=302,NC,NE]
+
+    # Handle Authorization Header for APIs (so PHP gets Authorization)
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Fix Asset Access in Public Directory
+    RewriteCond %{REQUEST_FILENAME} -d [OR]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Redirect Static File Requests to the Public Directory
+    RewriteCond %{REQUEST_URI} (\.\w+$) [NC]
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # Redirect All Other Requests to index.php (Laravel front controller)
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>

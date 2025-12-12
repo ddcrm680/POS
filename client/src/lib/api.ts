@@ -67,11 +67,7 @@ export async function logout() {
     console.log("Token being used:", getRawToken());
     
     // Try with exact same headers as working account call
-    const response = await api.post("/api/logout", {}, {
-      headers: {
-        'authorization': `Bearer ${getRawToken()}`, // lowercase like account
-      }
-    });
+    const response = await api.post("/api/logout", {},);
     
     console.log("Logout success:", response.data);
     // return response.data;
@@ -84,8 +80,8 @@ export async function logout() {
     });
     throw error;
   } finally {
-    // localStorage.removeItem("userInfo");
-    // cookieStore.removeItem("token");
+    localStorage.removeItem("userInfo");
+    cookieStore.removeItem("token");
   }
 }
 

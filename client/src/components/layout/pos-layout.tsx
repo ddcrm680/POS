@@ -115,7 +115,8 @@ export default function POSLayout({ children }: POSLayoutProps) {
   };
 async function handleLogout(){
  await Logout();
-// navigation[1]('/login');
+navigation[1]('/login');
+console.log('Logged out and redirected to login page');
 }
   return (
     <div className="flex flex-col bg-red h-screen text-foreground overflow-hidden">
@@ -190,7 +191,7 @@ async function handleLogout(){
                   <span className="text-primary-foreground font-medium text-sm">{userInfo?.name.split(' ').map((item:string)=>item.substr(0,1)).join('')}</span>
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="font-medium text-sm leading-tight" data-testid="cashier-name">{userInfo?.name ??"-"}</p>
+                  <p className="font-medium  text-foreground text-sm leading-tight" data-testid="cashier-name">{userInfo?.name ??"-"}</p>
                   <p className="text-muted-foreground text-xs leading-tight">{RoleList[userInfo?.role as keyof {'super-admin': "Super Admin",
     STORE_MANAGER: 'Store Manager',
    }] ??"-"}</p>
