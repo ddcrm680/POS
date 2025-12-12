@@ -19,7 +19,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 export default function Password() {
   const { toast } = useToast();
-   const [isLoading, setIsLoading] = useState<boolean>(false);
+   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showNew, setShowNew] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -161,7 +161,7 @@ export default function Password() {
                 ← Back
               </Button>
               <Button type="submit"
-              //   disabled={changePasswordMutation.isLoading}
+                 disabled={isLoading}
               >
                {isLoading &&  <svg
             className="h-6 w-6 animate-spin text-[#fff]"
