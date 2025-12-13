@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Employee from '@/lib/images/employee.png'
 import JobCard from '@/lib/images/job-card.png'
+import Logo from '@/lib/images/logo.png'
 import { toast as toastRaw, useToast } from "@/hooks/use-toast";
 import {
   Card,
@@ -150,7 +151,7 @@ export default function LoginPage() {
             <div className="w-full max-w-md mx-4 z-10">
               <Card className="drop-shadow-[0_3px_8px_rgba(254,0,0,0.4)]">
                 <CardHeader className="pt-6">
-                    <img src={Constant.login.logoUrl} alt="Detailing Devils" className="h-10 pl-4 object-contain my-4" />
+                    <img src={Logo} alt="Detailing Devils" className="h-10 pl-4 object-contain my-4" />
       
                   <CardTitle className="text-xl text-center">Login</CardTitle>
                 </CardHeader>
