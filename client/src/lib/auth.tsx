@@ -115,6 +115,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(userData);
       }
       return userData;
+    } catch (e) {
+      throw e;
     } finally {
       setIsLoading(false);
     }
@@ -145,7 +147,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     Logout,
     refreshUser: async () => {
-      setIsLoading(true);
       try {
         const u = await fetchUserApi();
         if (u) {
@@ -155,8 +156,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           clearClientAuth();
         }
         return u;
-      } finally {
-        setIsLoading(false);
+      } catch (e) {
+        throw e;
       }
     },
   };
