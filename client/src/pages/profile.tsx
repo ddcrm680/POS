@@ -128,7 +128,7 @@ export default function Profile() {
         fd.append("name", vals.fullName);
         fd.append("phone", vals.phoneNumber);
         if(file){
-          fd.append("avatar",file);
+          fd.append("avatar", file);
         }
         await EditProfile(fd)
         
