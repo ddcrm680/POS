@@ -19,7 +19,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 export default function Password() {
   const { toast } = useToast();
-   const [isLoading, setIsLoading] = useState<boolean>(true);
+   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showNew, setShowNew] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -182,7 +182,7 @@ export default function Password() {
               fill="currentColor"
               d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
             />
-          </svg>}  {isLoading ? "Updating...":"Update Password"}
+          </svg>}  {isLoading ? "Updating...":"Update"}
               </Button>
             </div>
           </form>
