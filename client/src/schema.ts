@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { z } from "zod";
 export type Customer = z.infer<typeof CustomerSchema>;
 export const CustomerSchema = z.object({
@@ -361,3 +362,28 @@ export const passwordSchema = z
   });
 
 export type PasswordForm = z.infer<typeof passwordSchema>;
+
+export interface POSLayoutProps {
+  children: ReactNode;
+}
+
+export interface TabItem {
+  path: string;
+  icon: React.ComponentType<any>;
+  label: string;
+  badge?: number;
+}
+export interface CustomerAnalyticsOverview {
+  totalCustomers: number;
+  newCustomersThisMonth: number;
+  activeCustomers: number;
+  vipCustomers: number;
+  averageLifetimeValue: number;
+  customerRetentionRate: number;
+  topCustomerSource: string;
+  averageServiceInterval: number;
+}
+
+export interface CustomerStatsCardsProps {
+  className?: string;
+}

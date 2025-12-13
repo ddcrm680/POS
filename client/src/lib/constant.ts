@@ -1,4 +1,23 @@
+import { TabItem } from "@/schema";
 import { ServiceItem } from "./types";
+import { 
+  Home, 
+  Calculator, 
+  ClipboardList, 
+  Users, 
+  Package, 
+  CreditCard,
+  Menu,
+  Bell,
+  Settings,
+  LogOut,
+  User,
+  Clock,
+  Calendar,
+  Building,
+  UserCheck,
+  Layers
+} from "lucide-react";
 
 export const Constant={
      REACT_APP_BASE_URL: 'https://pos.detailingdevils.com',
@@ -38,4 +57,27 @@ export const availableServices: ServiceItem[] = [
   { id: '4', name: 'Paint Correction Service', price: 3000, description: 'Remove scratches and swirl marks', category: 'Correction' },
   { id: '5', name: 'Full Car PPF Installation', price: 18000, description: 'Complete paint protection film', category: 'Protection' },
   { id: '6', name: 'Engine Bay Cleaning', price: 800, description: 'Professional engine compartment cleaning', category: 'Detailing' }
+];
+
+export const bottomTabs: TabItem[] = [
+  { path: "/", icon: Home, label: "Dashboard" },
+   { path: "/master", icon: Layers, label: "Master", },
+  { path: "/manager", icon: Settings, label: "Manager" },
+  { path: "/appointments", icon: Calendar, label: "Appointments" },
+  { path: "/facility-management", icon: Building, label: "Facility" },
+  { path: "/employee-management", icon: UserCheck, label: "Team" },
+  { path: "/job-cards", icon: ClipboardList, label: "Jobs", badge: 3 },
+  { path: "/customers", icon: Users, label: "Customers" },
+  { path: "/payments", icon: CreditCard, label: "Payments" },
+  { path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
+];
+
+export const quickActions = [
+  { id: "new-job", label: "New Job", emoji: "📋", color: "bg-primary hover:bg-primary/90" },
+  { id: "customer-lookup", label: "Find Customer", emoji: "👤", color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "inventory-check", label: "Stock Check", emoji: "📦", color: "bg-orange-600 hover:bg-orange-700" },
+];
+export const masterTabList = [
+  { id: "users", label: "Users", emoji: Users, color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "products", label: "Products", emoji: Package , color: "bg-blue-600 hover:bg-blue-700" },
 ];

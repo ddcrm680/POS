@@ -127,8 +127,8 @@ export default function Profile() {
        const fd = new FormData();
         fd.append("name", vals.fullName);
         fd.append("phone", vals.phoneNumber);
-        if(avatarFile){
-          fd.append("avatar", avatarFile);
+        if(file){
+          fd.append("avatar",file);
         }
         await EditProfile(fd)
         

@@ -145,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     Logout,
     refreshUser: async () => {
-      setIsLoading(true);
+      // setIsLoading(true);
       try {
         const u = await fetchUserApi();
         if (u) {
@@ -155,8 +155,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           clearClientAuth();
         }
         return u;
-      } finally {
-        setIsLoading(false);
+      }catch (e) {
+        console.error("refreshUser error:", e);
+        throw e;
       }
     },
   };
