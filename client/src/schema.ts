@@ -281,7 +281,7 @@ export const profileSchema = z.object({
     .regex(/^\d{10}$/, "Enter a valid 10-digit phone number"),
   // keep avatar optional — we send as multipart if present
 });
-export const userSchema = (mode: "create" | "edit") =>
+export const userSchema = (mode: "create" | "edit" | "view") =>
   z.object({
     name: z
       .string()
@@ -447,7 +447,7 @@ export type UserFormType = {
 }
 
 export interface userFormProp {
-  mode: "create" | "edit";
+  mode: "create" | "edit" | "view";
   roles: any[];
   id?: string;
   initialValues?: Partial<UserFormType>;

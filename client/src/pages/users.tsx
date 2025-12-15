@@ -13,7 +13,7 @@ import { ProfileForm, profileSchema, UserForm, UserFormType, } from "@/schema";
 import { Constant } from '@/lib/constant';
 import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton, Input, Textarea } from "@chakra-ui/react";
-import { DeleteIcon, EditIcon, Eye, EyeOff } from "lucide-react";
+import { DeleteIcon, EditIcon, Eye, EyeIcon, EyeOff } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { Form } from "@/components/ui/form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -281,6 +281,20 @@ console.log(page,PER_PAGE,'pagepage');
           actions={(row: any) => {
             return (
               <>
+                <IconButton
+                      size="xs"
+                      mr={2}
+                      aria-label="View"
+                      onClick={() =>
+                        setIsUserModalOpenInfo({
+                          open: true,
+                          type: "view",
+                          info: row,
+                        })
+                      }
+                    >
+                      <EyeIcon />
+                    </IconButton>
                 {Number(row.role_id) !== 1 ? (
                   <>
                     <IconButton
@@ -321,7 +335,7 @@ console.log(page,PER_PAGE,'pagepage');
         <CommonModal
           isOpen={isUserModalOpenInfo.open}
           onClose={() => setIsUserModalOpenInfo({ open: false, type: 'create', info: {} })}
-          title={isUserModalOpenInfo.type === 'create' ? "Add User" : "Edit User"}
+          title={isUserModalOpenInfo.type === 'view' ?"View User" :isUserModalOpenInfo.type === 'create' ? "Add User" : "Edit User"}
           isLoading={isLoading}
           primaryText={isUserModalOpenInfo.type === 'create' ? "Add" : "Edit"}
           cancelTextClass='hover:bg-[#E3EDF6] hover:text-[#000]'
@@ -330,12 +344,12 @@ console.log(page,PER_PAGE,'pagepage');
           <UserFormInfo
             id="user-form"
             initialValues={
-              isUserModalOpenInfo.type === "edit"
+              isUserModalOpenInfo.type === "edit" ||    isUserModalOpenInfo.type === "view"
                 ? isUserModalOpenInfo.info
                 : {}
             }
             isLoading={isLoading}
-            mode={isUserModalOpenInfo.type === "create" ? "create" : "edit"}
+            mode={isUserModalOpenInfo.type === 'view' ?"view" :isUserModalOpenInfo.type === "create" ? "create" : "edit"}
             onClose={() =>
               setIsUserModalOpenInfo({ open: false, type: "create", info: {} })
             }

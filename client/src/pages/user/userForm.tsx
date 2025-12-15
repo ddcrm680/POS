@@ -26,7 +26,7 @@ export default function UserFormInfo({
   isLoading = false,
   onSubmit,
 }: userFormProp) {
-  console.log(initialValues, 'rolesw34532');
+  console.log(initialValues,mode, 'rolesw34532');
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -46,7 +46,7 @@ const form = useForm<UserFormType>({
 
   // Reset form when initialValues change (important for edit)
   useEffect(() => {
-    if (mode==='edit') {
+    if (mode==='edit'|| mode==="view") {
       console.log('came inside default');
       
       form.reset({
@@ -72,9 +72,10 @@ const form = useForm<UserFormType>({
       >  <div className="p-6 space-y-6">
           {/* Row 1 */}
           <Box className="flex gap-3 ">
-            <Box w={`${mode==='edit'?'50%':'33%'}`}>
+            <Box w={`${mode==='edit' ||  mode==="view"?'50%':'33%'}`}>
               <FormField
                 control={form.control}
+                disabled={mode==='view'}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
@@ -88,10 +89,11 @@ const form = useForm<UserFormType>({
               />
             </Box>
 
-            <Box w={`${mode==='edit'?'50%':'33%'}`}>
+            <Box w={`${mode==='edit' ||  mode==="view"?'50%':'33%'}`}>
               <FormField
                 control={form.control}
                 name="email"
+                 disabled={mode==='view'}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>Email</FormLabel>
@@ -133,10 +135,11 @@ const form = useForm<UserFormType>({
 
           {/* Row 2 */}
           <Box className="flex gap-3">
-             {mode==='edit' && <Box w="50%">
+             {(mode==='edit' || mode==="view" )&& <Box w="50%">
               <FormField
                 control={form.control}
                 name="phone"
+                disabled={mode==='view'}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>Phone</FormLabel>
@@ -193,6 +196,7 @@ const form = useForm<UserFormType>({
               <FormField
                 control={form.control}
                 name="role_id"
+                 disabled={mode==='view'}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>Role</FormLabel>
@@ -220,6 +224,7 @@ const form = useForm<UserFormType>({
           <Box>
             <FormField
               control={form.control}
+               disabled={mode==='view'}
               name="address"
               render={({ field }) => (
                 <FormItem>
@@ -239,7 +244,7 @@ const form = useForm<UserFormType>({
           </Box>
         </div>
         {/* Submit */}
-        <div className="">
+       {mode!=='view' &&  <div className="">
           <div className="flex justify-end gap-3 pb-6 pr-6  border-t pt-[24px]">
             <Button
               variant="outline"
@@ -280,7 +285,7 @@ const form = useForm<UserFormType>({
                   ? "Add "
                   : "Update "}
             </Button>
-          </div></div>
+          </div></div>}
       </form>
     </Form>
   );
