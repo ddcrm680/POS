@@ -34,7 +34,7 @@ export function ColumnFilter({
   }, []);
 
   const filteredOptions = options.filter(o =>
-    o.label.toLowerCase().includes(search.toLowerCase())
+   o.label.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -69,7 +69,8 @@ export function ColumnFilter({
               </div>
             )}
 
-            {filteredOptions.map(opt => (
+            {filteredOptions.map(opt => {
+                return (
               <button
                 key={opt.value}
                 onClick={() => {
@@ -77,15 +78,11 @@ export function ColumnFilter({
                   setOpen(false);
                   setSearch("");
                 }}
-                className={`w-full text-left px-3 py-2 font-[400] hover:bg-gray-100 ${
-                  value === opt.value
-                    ? "font-semibold text-blue-600"
-                    : ""
-                }`}
+                className={`w-full text-left px-3 py-2 font-[400] hover:bg-gray-100 `}
               >
                 {opt.label}
               </button>
-            ))}
+            )})}
           </div>
         </div>
       )}

@@ -79,7 +79,7 @@ export default function Users() {
           setFilters(f => ({ ...f, role_id: val }));
           setPage(1);
         }}
-        options={roles.map(r => ({
+        options={[{name:'All',id:''},...roles].map(r => ({
           label: r.name,
           value: r.id,
         }))}
@@ -106,6 +106,7 @@ export default function Users() {
         setPage(1);
       }}
       options={[
+        {label:'All',value:''},
         { label: "Active", value: 1 },
         { label: "Inactive", value: 0 },
       ]}
