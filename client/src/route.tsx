@@ -21,7 +21,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { login } from "./lib/api";
 import ProfileDetails from "./pages/profile-details";
 import Master from "./pages/master";
-import UserList from "./pages/list";
 export function Router() {
   return (
     <Switch>
@@ -29,7 +28,6 @@ export function Router() {
       <Route path="/">
         <Redirect to="/login" />
       </Route>
-       <Route path="/list" component={() => <ProtectedRoute component={UserList} />} />
       <Route path="/home" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/profile" component={() => <ProtectedRoute component={ProfileDetails} />} />
     <Route path="/master" component={() => <ProtectedRoute component={Master} />} />

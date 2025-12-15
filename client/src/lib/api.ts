@@ -18,7 +18,7 @@ export function getRawToken() {
 
 function createInstance(): AxiosInstance {
   const inst = axios.create({
-    baseURL:baseUrl,
+    baseURL: baseUrl,
     // no withCredentials by default, you can set conditionally if needed
     // withCredentials: true,
   });
@@ -29,11 +29,11 @@ function createInstance(): AxiosInstance {
       cfg.headers = cfg.headers || {};
       cfg.headers["Authorization"] = `Bearer ${token}`;
     }
-      try {
-    console.debug('[API Request]', cfg.method?.toUpperCase(), cfg.url, 'headers:', {
-      ...cfg.headers
-    });
-  } catch (e) {}
+    try {
+      console.debug('[API Request]', cfg.method?.toUpperCase(), cfg.url, 'headers:', {
+        ...cfg.headers
+      });
+    } catch (e) { }
 
     return cfg;
   });
@@ -50,33 +50,31 @@ export async function login({
   email: string;
   password: string;
 }) {
-   const resp = await axios.post(`${baseUrl}/api/login`, { email, password });
+  const resp = await axios.post(`${baseUrl}/api/login`, { email, password });
   const body = resp.data;
 
   if (!body?.success) {
     throw new Error(body?.message || "Login failed");
   }
-  if(body?.success===true){
-     if (body.token) {
-    // store 7 days
-    cookieStore.setItem("token", body.token, 7, "/");
-  }
+  if (body?.success === true) {
+    if (body.token) {
+      // store 7 days
+      cookieStore.setItem("token", body.token, 7, "/");
+    }
 
-  localStorage.setItem("userInfo", JSON.stringify(body.data));
+    localStorage.setItem("userInfo", JSON.stringify(body.data));
 
-  return body?.data;
+    return body?.data;
   }
   throw new Error(body?.message || "Login failed");
 }
 
 export async function logout() {
   try {
-    console.log("Token being used:", getRawToken());
-    
+
     // Try with exact same headers as working account call
     const response = await api.post("/api/logout", {},);
-    
-    console.log("Logout success:", response.data);
+
     // return response.data;
   } catch (error: any) {
     console.error("Logout failed with details:", {
@@ -93,66 +91,60 @@ export async function logout() {
 }
 
 export async function fetchUserApi() {
-  const response :any= await api.get(
+  const response: any = await api.get(
     "/api/account",
 
   );
-  console.log(response,'response');
-  if(response?.data?.success===true){
-  return response.data?.data;
+  if (response?.data?.success === true) {
+    return response.data?.data;
   }
   throw new Error(response.data?.message || "Failed to fetch user");
 }
-export async function EditProfile(fd:any) {
-  try{
-    const response :any= await api.post(
-    "/api/account/update-profile",fd
-  );
-  console.log(response,'response');
-  if(response?.data?.success===true){
-  return response.data?.data;
-  }
-  }catch(response:any){
-     console.log(response.response?.data?.message,'response');
-  
-  throw new Error(response.response?.data?.message || "Failed to update user details");
+export async function EditProfile(fd: any) {
+  try {
+    const response: any = await api.post(
+      "/api/account/update-profile", fd
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+  } catch (response: any) {
+
+    throw new Error(response.response?.data?.message || "Failed to update user details");
 
   }
- }
+}
 
-export async function UpdatePassword(values:any) {
-  try{
-    const response :any= await api.post(
-    "/api/account/update-password",values
-  );
-  if(response?.data?.success===true){
-  return response.data?.data;
-  }
-  }catch(response:any){
-  
-  throw new Error(response.response?.data?.message || "Failed to update user details");
+export async function UpdatePassword(values: any) {
+  try {
+    const response: any = await api.post(
+      "/api/account/update-password", values
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+  } catch (response: any) {
 
-  }
- }
-
-export async function SaveUser(values:UserFormType) {
-  try{
-    const response :any= await api.post(
-    "/api/admin/add-user",values
-  );
-  console.log(response,'response');
-  if(response?.data?.success===true){
-  return response.data?.data;
-  }
-  console.log('came in');
-  
-  }catch(response:any){
-    console.log('came in catch',response);
-  throw response
+    throw new Error(response.response?.data?.message || "Failed to update user details");
 
   }
- }
- export async function DeleteUser(id: string) {
+}
+
+export async function SaveUser(values: UserFormType) {
+  try {
+    const response: any = await api.post(
+      "/api/admin/add-user", values
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
+
+  }
+}
+export async function DeleteUser(id: string) {
   try {
     const response = await api.delete(`/api/admin/delete-user/${id}`);
 
@@ -165,46 +157,53 @@ export async function SaveUser(values:UserFormType) {
   }
 }
 
- export async function EditUser(editFormValue:editUserReq) {
-  console.log(editFormValue,'editFormValue');
-  
-  try{
-    const response :any= await api.post(
-    `/api/admin/update-user/${editFormValue.id}`,editFormValue.info
-  );
-  console.log(response,'response');
-  if(response?.data?.success===true){
-  return response.data?.data;
-  }
-  console.log('came in');
-  
-  }catch(response:any){
-    console.log('came in catch',response);
-  throw response
+export async function EditUser(editFormValue: editUserReq) {
+
+  try {
+    const response: any = await api.post(
+      `/api/admin/update-user/${editFormValue.id}`, editFormValue.info
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
 
   }
- }
+}
 export async function fetchRoleList() {
-  console.log(api,'apiapiapi');
-  
-  const response :any= await api.get(
+
+  const response: any = await api.get(
     "/api/utility/roles",
   );
-  console.log(response,'response');
-  if(response?.data?.success===true){
-  return response.data?.data;
+  if (response?.data?.success === true) {
+    return response.data?.data;
   }
   throw new Error(response.data?.message || "Failed to fetch role list");
 }
-export async function fetchUserList({page,search}: {page:number,search:string}) {
-  console.log(api,'apiapiapi');
-  
+export async function fetchUserList({ page, search }: { page: number, search: string }) {
+
   const response = await api.get(
-        `/api/admin/users?page=${page}&search=${search}`
-      );
-  console.log(response,'response');
-  if(response?.data?.success===true){
-  return response.data;
+    `/api/admin/users?page=${page}&search=${search}`
+  );
+  if (response?.data?.success === true) {
+    return response.data;
   }
   throw new Error(response.data?.message || "Failed to fetch user list");
+}
+export async function UpdateUserStatus(statusInfo: { id: number, status: number }) {
+
+  try {
+    const response: any = await api.post(
+      `/api/admin/user/status/${statusInfo.id}`, { status: statusInfo.status }
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
+
+  }
 }

@@ -1,19 +1,38 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 
 export default function NotFound() {
+  const [, setLocation] = useLocation();
+
   return (
     <div className="h-full w-full flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md mx-4">
-        <CardContent className="pt-6">
-          <div className="flex mb-4 gap-2">
+        <CardContent className="pt-6 text-center">
+          <div className="flex items-center justify-center mb-4 gap-2">
             <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl font-bold text-gray-900">404 Page Not Found</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              404 Page Not Found
+            </h1>
           </div>
 
-          <p className="mt-4 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-600">
             Did you forget to add the page to the router?
           </p>
+
+          {/* 👇 Go Home Button */}
+          <div className="mt-6">
+            <Button
+              onClick={() => setLocation("/home")}
+              className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex items-center gap-2 mx-auto"
+            >
+              <ArrowLeft size={16} />
+              Go to Home
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

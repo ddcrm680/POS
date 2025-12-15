@@ -1,6 +1,6 @@
 // src/components/profile/profile.tsx
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, UseFormSetError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,12 +8,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteUser, EditProfile, EditUser, fetchUserList, SaveUser } from "@/lib/api";
-import { ProfileForm, profileSchema, UserForm, UserFormType, } from "@/schema";
+import { DeleteUser, EditProfile, EditUser, fetchUserList, SaveUser, UpdateUserStatus } from "@/lib/api";
+import { ProfileForm, profileSchema, UserApiType, UserForm, UserFormType, } from "@/schema";
 import { Constant } from '@/lib/constant';
 import CommonTable from "@/components/common/CommonTable";
-import { Box, IconButton, Input, Textarea } from "@chakra-ui/react";
-import { DeleteIcon, EditIcon, Eye, EyeIcon, EyeOff } from "lucide-react";
+import { Box, IconButton, Input, Switch, Textarea } from "@chakra-ui/react";
+import { DeleteIcon, EditIcon, Eye, EyeIcon, EyeOff, Trash2 } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { Form } from "@/components/ui/form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -28,15 +28,7 @@ export default function Users() {
   const qc = useQueryClient();
   const { user, refreshUser, roles } = useAuth();
   const [users, setUsers] = useState<Array<any>>([]);
-  const [mode, setMode] = useState<'view' | 'edit'>('view');
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    try {
-      // if user exists and has avatar url (your API returns avatar path)
-      return (user as any)?.avatar || null;
-    } catch { return null; }
-  });
+
   const [isUserModalOpenInfo, setIsUserModalOpenInfo] = useState<{ open: boolean, type: string, info: any }>({
     open: false,
     type: 'create',
@@ -46,8 +38,6 @@ export default function Users() {
     open: false,
     info: {}
   });
-  const [file, setFile] = useState<File | null>(null);
-
 
   const [lastPage, setLastPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -55,33 +45,22 @@ export default function Users() {
 
   const [isListLoading, setIsListLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    if (!file) return;
-    const objectUrl = URL.createObjectURL(file);
-    // release previous blob url if it was a blob
-    if (previewUrl && previewUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setPreviewUrl(objectUrl);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file]);
   const PER_PAGE = 10;
   const columns = useMemo(() => [
-    {
-      key: "id",
-      label: "Id",
-      width: "80px",
-      render: (_value: any, _row: any, index: number) => {
-        console.log(page, PER_PAGE, 'pagepage');
+    // {
+    //   key: "id",
+    //   label: "Id",
+    //   width: "80px",
+    //   render: (_value: any, _row: any, index: number) => {
 
-        return (
-          <span className="text-sm font-medium text-gray-700">
-            {((PER_PAGE * (page - 1)) + index) + 1}
-          </span>
-        );
-      },
-    },
+    //     return (
+    //       <span className="text-sm font-medium text-gray-700">
+    //         {((PER_PAGE * (page - 1)) + index) + 1}
+    //       </span>
+    //     );
+    //   },
+    // },
 
     { key: "name", label: "Full Name", width: "150px" },
     { key: "email", label: "Email", width: "150px" },
@@ -102,7 +81,7 @@ export default function Users() {
       label: "Status",
       width: "120px",
       render: (value: string) => {
-        const isActive = value === "Active";
+        const isActive = Number(value) === 1;
 
         return (
           <span
@@ -114,12 +93,34 @@ export default function Users() {
                 : "bg-red-100 text-red-700"}
           `}
           >
-            {value}
+            {Number(value) === 1 ? "Active" : 'InActive'}
           </span>
         );
       },
     },
+    {
+      key: "change_Status",
+      label: "Change Status",
+      width: "120px",
+      render: (value: string, _row: any,) => {
+        const isActive = Number(value) === 1;
 
+        return (
+          <Switch.Root checked={isActive}
+            onCheckedChange={(e: any) => UserStatusUpdateHandler(_row)}
+            size="sm">
+            <Switch.HiddenInput />
+            <Switch.Control
+              bg="#ffa9a9"          // unchecked color
+              _checked={{
+                bg: "#FE0000",     // checked color
+              }}
+            />
+          </Switch.Root>
+
+        );
+      },
+    },
     {
       key: "createdAt", label: "Created At", width: "150px", render: (_value: any,) => {
 
@@ -132,11 +133,47 @@ export default function Users() {
     },
   ], [roles, page, PER_PAGE]);
 
+const UserStatusUpdateHandler = useCallback(async (u: any) => {
+  try {
+    const newStatus = u.change_Status ? 0 : 1;
 
-  useEffect(() => {
-    console.log("Is User Modal Open:", roles);
-  }, [roles]);
+    setUsers(prevUsers => {
+      console.log("prevUsers (always correct):", prevUsers);
 
+      return prevUsers.map(item =>
+        item.id === u.id
+          ? {
+              ...item,
+              change_Status: newStatus,
+              status: newStatus,
+            }
+          : item
+      );
+    });
+
+    await UpdateUserStatus({ id: u.id, status: newStatus });
+
+    toast({
+      title: "Status Update",
+      description: "User status updated successfully",
+      variant: "success",
+    });
+  } catch (err: any) {
+    toast({
+      title: "Error",
+      description:
+        err?.response?.data?.message ||
+        err.message ||
+        "Failed to update user status",
+      variant: "destructive",
+    });
+  }
+}, []);
+
+ useEffect(()=>{
+  console.log(users,'usersusderd');
+  
+ },[users])
   const UserCommonHandler = async (
     value: UserFormType,
     setError: UseFormSetError<UserFormType>
@@ -150,6 +187,7 @@ export default function Users() {
           info: {
             name: value.name,
             email: value.email,
+            password:null,
             phone: value.phone,
             role_id: Number(value.role_id),
             address: value.address,
@@ -172,7 +210,7 @@ export default function Users() {
       }
 
       setIsUserModalOpenInfo({ open: false, type: "create", info: {} });
-      fetchUsers();
+      fetchUsers(false);
     } catch (err: any) {
       const apiErrors = err?.response?.data?.errors;
       console.log(apiErrors, 'apiErrors');
@@ -208,7 +246,7 @@ export default function Users() {
       await DeleteUser(isUserDeleteModalInfo?.info?.id);
       toast({ title: `Delete User`, description: "User deleted successfully", variant: "success", });
       setIsUserDeleteModalOpenInfo({ open: false, info: {} });
-      fetchUsers()
+      fetchUsers(false)
 
     } catch (err: any) {
       console.log(err, 'errorr message');
@@ -224,37 +262,37 @@ export default function Users() {
       setIsLoading(false);
     }
   };
-  const fetchUsers = async () => {
+  const fetchUsers = async (isLoaderHide = false) => {
     try {
-      setIsListLoading(true);
+      if (!isLoaderHide)
+        setIsListLoading(true);
       const res = await fetchUserList({
         page,
         search,
       });
-      console.log(res, 'resbytrewert');
 
-      const mappedUsers = res.data.map((u: any) => ({
+      const mappedUsers = res.data.map((u: UserApiType) => ({
         id: u.id,
         name: u.full_name || u.name,
         email: u.email,
         phone: u.phone,
         role_id: u.role_id,
-        status: Number(u.is_active) === 1 ? "Active" : "InActive",
+        change_Status:u.is_active,
+        status: u.is_active,
         createdAt: u.created_at,
       }));
 
       setUsers(mappedUsers);
       setLastPage(res.last_page);
     } finally {
-      setIsListLoading(false);
+      if (!isLoaderHide)
+        setIsListLoading(false);
     }
   };
 
 
   useEffect(() => {
-    console.log(search, page, 'search, page');
-
-    fetchUsers();
+    fetchUsers(false);
   }, [search, page]);
   return (
     <Card className="w-full">
@@ -271,8 +309,8 @@ export default function Users() {
           searchValue={search}
           onSearch={(value: string) => {
             // if (value) {
-              setSearch(value);
-              setPage(1); // reset page on new search
+            setSearch(value);
+            setPage(1); // reset page on new search
             // }
           }}
           setIsModalOpen={(value: boolean) =>
@@ -281,37 +319,37 @@ export default function Users() {
           actions={(row: any) => {
             return (
               <>
-              
+
                 {(
                   <Box className="gap-3">
                     <IconButton
-                  size="xs"
-                  mr={2}
-                  aria-label="View"
-                  onClick={() =>
-                    setIsUserModalOpenInfo({
-                      open: true,
-                      type: "view",
-                      info: row,
-                    })
-                  }
-                >
-                  <EyeIcon />
-                </IconButton>
-                  {Number(row.role_id) !== 1 && <IconButton
-                    size="xs"
-                    mr={2}
-                    aria-label="Edit"
-                    onClick={() =>
-                      setIsUserModalOpenInfo({
-                        open: true,
-                        type: "edit",
-                        info: row,
-                      })
-                    }
-                  >
-                    <EditIcon />
-                  </IconButton>}
+                      size="xs"
+                      mr={2}
+                      aria-label="View"
+                      onClick={() =>
+                        setIsUserModalOpenInfo({
+                          open: true,
+                          type: "view",
+                          info: row,
+                        })
+                      }
+                    >
+                      <EyeIcon />
+                    </IconButton>
+                    {Number(row.role_id) !== 1 && <IconButton
+                      size="xs"
+                      mr={2}
+                      aria-label="Edit"
+                      onClick={() =>
+                        setIsUserModalOpenInfo({
+                          open: true,
+                          type: "edit",
+                          info: row,
+                        })
+                      }
+                    >
+                      <EditIcon />
+                    </IconButton>}
 
                     {Number(row.role_id) !== 1 && <IconButton
                       size="xs"
@@ -322,11 +360,11 @@ export default function Users() {
                         setIsUserDeleteModalOpenInfo({ open: true, info: row });
                       }}
                     >
-                      <DeleteIcon />
-                    </IconButton> }
+                   <Trash2 size={16} />
+                    </IconButton>}
 
                   </Box>
-                ) }
+                )}
               </>
             );
           }}
