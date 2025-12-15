@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Table } from "@chakra-ui/react";
 import { Plus, Search } from "lucide-react";
 import { Input } from "../ui/input";
@@ -21,7 +21,7 @@ export default function CommonTable({
   searchValue = "",
   onSearch,
   className = "",
-  debounceDelay = 2000, // 👈 default 2 seconds
+  debounceDelay = 300, // 👈 default 3 ms
 }: any) {
   const [localSearch, setLocalSearch] = useState(searchValue);
 
@@ -31,25 +31,39 @@ export default function CommonTable({
   }, [searchValue]);
 
   // ⏳ Debounce logic
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onSearch?.(localSearch);
-    }, debounceDelay);
+useEffect(() => {
+  if (!hasUserTyped.current) return;
 
-    return () => clearTimeout(timer);
-  }, [localSearch, debounceDelay, onSearch]);
+  const timer = setTimeout(() => {
+    onSearch?.(localSearch);
 
+    // ✅ RESET after firing search
+    hasUserTyped.current = false;
+  }, debounceDelay);
+
+  return () => clearTimeout(timer);
+}, [localSearch, debounceDelay, onSearch]);
+
+  const hasUserTyped = useRef(false);
   return (
     <div className={`w-full space-y-4 pt-6 ${className}`}>
       {/* Search Bar */}
       {searchable && (
         <div className="flex justify-between">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2
+             text-gray-400 w-4 h-4
+             z-10 pointer-events-none"
+            />
+
             <Input
               placeholder={`Search ${tabType}...`}
               value={localSearch}
-              onChange={(e) => setLocalSearch(e.target.value)}
+              onChange={(e) => {
+                hasUserTyped.current = true;   // 👈 user action
+                setLocalSearch(e.target.value);
+              }}
               className="pl-10"
             />
           </div>
@@ -67,7 +81,7 @@ export default function CommonTable({
       {/* Table */}
       <div className="overflow-hidden rounded-lg border">
         <Table.Root size="sm" striped>
-        <Table.Header>
+          <Table.Header>
             <Table.Row className="!bg-gray-100 border-b border-gray-200">
               {columns.map((col: any) => (
                 <Table.ColumnHeader
@@ -92,7 +106,7 @@ export default function CommonTable({
           </Table.Header>
 
           <Table.Body>
-               {isLoading && (
+            {isLoading && (
               <Table.Row>
                 <Table.Cell
                   colSpan={columns.length + (actions ? 1 : 0)}
@@ -164,7 +178,7 @@ export default function CommonTable({
           </Table.Body>
         </Table.Root>
       </div>
-       {lastPage > 1 && (
+      {lastPage > 1 && (
         <div className="flex items-center justify-end gap-3">
           <Button
             variant="outline"

@@ -73,11 +73,11 @@ export default function Users() {
       label: "Id",
       width: "80px",
       render: (_value: any, _row: any, index: number) => {
-console.log(page,PER_PAGE,'pagepage');
+        console.log(page, PER_PAGE, 'pagepage');
 
         return (
           <span className="text-sm font-medium text-gray-700">
-            {((PER_PAGE * (page-1)) + index) + 1}
+            {((PER_PAGE * (page - 1)) + index) + 1}
           </span>
         );
       },
@@ -130,7 +130,7 @@ console.log(page,PER_PAGE,'pagepage');
         );
       },
     },
-  ], [roles,page,PER_PAGE]);
+  ], [roles, page, PER_PAGE]);
 
 
   useEffect(() => {
@@ -270,10 +270,10 @@ console.log(page,PER_PAGE,'pagepage');
           lastPage={lastPage}
           searchValue={search}
           onSearch={(value: string) => {
-            if (value) {
+            // if (value) {
               setSearch(value);
               setPage(1); // reset page on new search
-            }
+            // }
           }}
           setIsModalOpen={(value: boolean) =>
             setIsUserModalOpenInfo({ open: value, type: "create", info: {} })
@@ -281,38 +281,39 @@ console.log(page,PER_PAGE,'pagepage');
           actions={(row: any) => {
             return (
               <>
-                <IconButton
-                      size="xs"
-                      mr={2}
-                      aria-label="View"
-                      onClick={() =>
-                        setIsUserModalOpenInfo({
-                          open: true,
-                          type: "view",
-                          info: row,
-                        })
-                      }
-                    >
-                      <EyeIcon />
-                    </IconButton>
-                {Number(row.role_id) !== 1 ? (
-                  <>
+              
+                {(
+                  <Box className="gap-3">
                     <IconButton
-                      size="xs"
-                      mr={2}
-                      aria-label="Edit"
-                      onClick={() =>
-                        setIsUserModalOpenInfo({
-                          open: true,
-                          type: "edit",
-                          info: row,
-                        })
-                      }
-                    >
-                      <EditIcon />
-                    </IconButton>
+                  size="xs"
+                  mr={2}
+                  aria-label="View"
+                  onClick={() =>
+                    setIsUserModalOpenInfo({
+                      open: true,
+                      type: "view",
+                      info: row,
+                    })
+                  }
+                >
+                  <EyeIcon />
+                </IconButton>
+                  {Number(row.role_id) !== 1 && <IconButton
+                    size="xs"
+                    mr={2}
+                    aria-label="Edit"
+                    onClick={() =>
+                      setIsUserModalOpenInfo({
+                        open: true,
+                        type: "edit",
+                        info: row,
+                      })
+                    }
+                  >
+                    <EditIcon />
+                  </IconButton>}
 
-                    <IconButton
+                    {Number(row.role_id) !== 1 && <IconButton
                       size="xs"
                       mr={2}
                       colorScheme="red"
@@ -322,11 +323,10 @@ console.log(page,PER_PAGE,'pagepage');
                       }}
                     >
                       <DeleteIcon />
-                    </IconButton>
-                  </>
-                ) : (
-                  "-"
-                )}
+                    </IconButton> }
+
+                  </Box>
+                ) }
               </>
             );
           }}
@@ -335,7 +335,7 @@ console.log(page,PER_PAGE,'pagepage');
         <CommonModal
           isOpen={isUserModalOpenInfo.open}
           onClose={() => setIsUserModalOpenInfo({ open: false, type: 'create', info: {} })}
-          title={isUserModalOpenInfo.type === 'view' ?"View User" :isUserModalOpenInfo.type === 'create' ? "Add User" : "Edit User"}
+          title={isUserModalOpenInfo.type === 'view' ? "View User" : isUserModalOpenInfo.type === 'create' ? "Add User" : "Edit User"}
           isLoading={isLoading}
           primaryText={isUserModalOpenInfo.type === 'create' ? "Add" : "Edit"}
           cancelTextClass='hover:bg-[#E3EDF6] hover:text-[#000]'
@@ -344,12 +344,12 @@ console.log(page,PER_PAGE,'pagepage');
           <UserFormInfo
             id="user-form"
             initialValues={
-              isUserModalOpenInfo.type === "edit" ||    isUserModalOpenInfo.type === "view"
+              isUserModalOpenInfo.type === "edit" || isUserModalOpenInfo.type === "view"
                 ? isUserModalOpenInfo.info
                 : {}
             }
             isLoading={isLoading}
-            mode={isUserModalOpenInfo.type === 'view' ?"view" :isUserModalOpenInfo.type === "create" ? "create" : "edit"}
+            mode={isUserModalOpenInfo.type === 'view' ? "view" : isUserModalOpenInfo.type === "create" ? "create" : "edit"}
             onClose={() =>
               setIsUserModalOpenInfo({ open: false, type: "create", info: {} })
             }

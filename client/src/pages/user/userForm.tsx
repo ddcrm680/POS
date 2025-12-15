@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Input, Textarea } from "@chakra-ui/react";
+// import { Box, Input, Textarea } from "@chakra-ui/react";
 import { Eye, EyeOff } from "lucide-react";
 
 import { Form } from "@/components/ui/form";
@@ -16,7 +16,9 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { userFormProp, UserForm as UserFormType, userSchema } from "@/schema";
-
+import { Input } from "@/components/ui/input";
+import { Box } from "@chakra-ui/react";
+import { Textarea } from "@/components/ui/textarea";
 export default function UserFormInfo({
   mode,
   roles,
