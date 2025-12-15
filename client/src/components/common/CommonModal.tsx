@@ -1,0 +1,54 @@
+"use client";
+
+import * as Dialog from "@radix-ui/react-dialog";
+import { IconButton } from "@chakra-ui/react";
+import { X } from "lucide-react";
+import { Button } from "../ui/button";
+
+export default function CommonModal({
+  isOpen,
+  onClose,
+  isLoading = false,
+  title = "Modal Title",
+   width,
+  maxWidth,
+  children,
+  showCloseIcon = true,
+}: any) {
+  return (
+    <Dialog.Root open={isOpen} onOpenChange={(open) => {
+         if (!open && isLoading) return;
+        if (!open) onClose();
+    }}>
+      <Dialog.Portal>
+        {/* Overlay */}
+        <Dialog.Overlay className="fixed inset-0 bg-black/50 z-[9999]" />
+
+        {/* Content */}
+        <Dialog.Content 
+        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[60%] rounded-lg bg-white shadow-xl z-[10000]"
+          style={{
+    width: width ?? "100%",
+    maxWidth: maxWidth ?? "500px",
+  }}>
+          
+          {/* Header */}
+          <div className="flex items-center justify-between border-b px-5 py-4">
+            <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+
+            {showCloseIcon && (
+              <Dialog.Close asChild>
+                <IconButton aria-label="Close" size="sm" variant="ghost"  disabled={isLoading}>
+                  <X size={18} />
+                </IconButton>
+              </Dialog.Close>
+            )}
+          </div>
+
+          {/* Body */}
+          <div className="">{children}</div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}

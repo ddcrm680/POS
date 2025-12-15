@@ -161,6 +161,13 @@ export default function Password() {
                 ← Back
               </Button>
               <Button type="submit"
+               className="
+                          bg-[#FE0000] 
+                          hover:bg-[rgb(238,6,6)]
+                          hover:border-black
+                          transition-all duration-200
+                          flex items-center justify-center gap-2
+                        "
                  disabled={isLoading}
               >
                {isLoading &&  <svg

@@ -182,7 +182,7 @@ export default function Master() {
 
                 {/* Overview Tab */}
                 <TabsContent value="users" className="space-y-6">
-                  <Users tabType={"users"}/>
+                  <Users />
                 </TabsContent>
 
                 {/* Vehicle Information Tab */}

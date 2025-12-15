@@ -1,12 +1,13 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
+import { editUserReq, UserFormType } from "@/schema";
 
 export const baseUrl =
   process.env.REACT_APP_BASE_URL || Constant.REACT_APP_BASE_URL;
 
 
-function getRawToken() {
+export function getRawToken() {
   // token may be stored as "Bearer abc..." or "abc..."
   const fromCookie = cookieStore.getItem("token") || null;
   const fromLS = localStorage.getItem("token") || null;
@@ -124,15 +125,86 @@ export async function UpdatePassword(values:any) {
     const response :any= await api.post(
     "/api/account/update-password",values
   );
-  console.log(response,'response');
   if(response?.data?.success===true){
   return response.data?.data;
   }
   }catch(response:any){
-     console.log(response.response?.data?.message,'response');
   
   throw new Error(response.response?.data?.message || "Failed to update user details");
 
   }
  }
 
+export async function SaveUser(values:UserFormType) {
+  try{
+    const response :any= await api.post(
+    "/api/admin/add-user",values
+  );
+  console.log(response,'response');
+  if(response?.data?.success===true){
+  return response.data?.data;
+  }
+  console.log('came in');
+  
+  }catch(response:any){
+    console.log('came in catch',response);
+  throw response
+
+  }
+ }
+ export async function DeleteUser(id: string) {
+  try {
+    const response = await api.delete(`/api/admin/delete-user/${id}`);
+
+    if (response.data?.success === true) {
+      return response.data.data;
+    }
+  } catch (error) {
+    console.error("Delete user failed", error);
+    throw error;
+  }
+}
+
+ export async function EditUser(editFormValue:editUserReq) {
+  console.log(editFormValue,'editFormValue');
+  
+  try{
+    const response :any= await api.post(
+    `/api/admin/update-user/${editFormValue.id}`,editFormValue.info
+  );
+  console.log(response,'response');
+  if(response?.data?.success===true){
+  return response.data?.data;
+  }
+  console.log('came in');
+  
+  }catch(response:any){
+    console.log('came in catch',response);
+  throw response
+
+  }
+ }
+export async function fetchRoleList() {
+  console.log(api,'apiapiapi');
+  
+  const response :any= await api.get(
+    "/api/utility/roles",
+  );
+  console.log(response,'response');
+  if(response?.data?.success===true){
+  return response.data?.data;
+  }
+  throw new Error(response.data?.message || "Failed to fetch role list");
+}
+export async function fetchUserList({page,search}: {page:number,search:string}) {
+  console.log(api,'apiapiapi');
+  
+  const response = await api.get(
+        `/api/admin/users?page=${page}&search=${search}`
+      );
+  console.log(response,'response');
+  if(response?.data?.success===true){
+  return response.data;
+  }
+  throw new Error(response.data?.message || "Failed to fetch user list");
+}
