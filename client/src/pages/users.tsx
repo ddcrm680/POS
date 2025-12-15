@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import UserFormInfo from "./user/userForm";
 import { formatDate } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
+import { ColumnFilter } from "@/components/common/ColumnFilter";
 
 export default function Users() {
   const { toast } = useToast();
@@ -47,6 +48,11 @@ export default function Users() {
   const [isLoading, setIsLoading] = useState(false);
 
   const PER_PAGE = 10;
+  const [filters, setFilters] = useState({
+  role_id: "",
+  status: "",
+});
+
   const columns = useMemo(() => [
     // {
     //   key: "id",
@@ -65,7 +71,20 @@ export default function Users() {
     { key: "name", label: "Full Name", width: "150px" },
     { key: "email", label: "Email", width: "150px" },
     {
-      key: "role_id", label: "Role", width: "150px",
+      key: "role_id", label: (
+      <ColumnFilter
+        label="Role"
+        value={filters.role_id}
+        onChange={(val) => {
+          setFilters(f => ({ ...f, role_id: val }));
+          setPage(1);
+        }}
+        options={roles.map(r => ({
+          label: r.name,
+          value: r.id,
+        }))}
+      />
+    ),width: "150px",
       render: (_value: any,) => {
 
         return (
@@ -78,7 +97,20 @@ export default function Users() {
 
     {
       key: "status",
-      label: "Status",
+       label: (
+    <ColumnFilter
+      label="Status"
+      value={filters.status}
+      onChange={(val) => {
+        setFilters(f => ({ ...f, status: val }));
+        setPage(1);
+      }}
+      options={[
+        { label: "Active", value: 1 },
+        { label: "Inactive", value: 0 },
+      ]}
+    />
+  ),
       width: "120px",
       render: (value: string) => {
         const isActive = Number(value) === 1;
@@ -269,6 +301,8 @@ const UserStatusUpdateHandler = useCallback(async (u: any) => {
       const res = await fetchUserList({
         page,
         search,
+          role_id: filters.role_id,
+  status: filters.status,
       });
 
       const mappedUsers = res.data.map((u: UserApiType) => ({
@@ -290,10 +324,10 @@ const UserStatusUpdateHandler = useCallback(async (u: any) => {
     }
   };
 
+useEffect(() => {
+  fetchUsers(false);
+}, [search, page, filters]);
 
-  useEffect(() => {
-    fetchUsers(false);
-  }, [search, page]);
   return (
     <Card className="w-full">
       <CardContent>

@@ -182,16 +182,33 @@ export async function fetchRoleList() {
   }
   throw new Error(response.data?.message || "Failed to fetch role list");
 }
-export async function fetchUserList({ page, search }: { page: number, search: string }) {
+export async function fetchUserList({
+  page,
+  search,
+  role_id,
+  status,
+}: {
+  page: number;
+  search: string;
+  role_id?: string | number;
+  status?: string | number;
+}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    search,
+  });
 
-  const response = await api.get(
-    `/api/admin/users?page=${page}&search=${search}`
-  );
+  if (role_id) params.append("role_id", String(role_id));
+  if (status !== "") params.append("status", String(status));
+
+  const response = await api.get(`/api/admin/users?${params.toString()}`);
+
   if (response?.data?.success === true) {
     return response.data;
   }
-  throw new Error(response.data?.message || "Failed to fetch user list");
+  throw new Error("Failed to fetch user list");
 }
+
 export async function UpdateUserStatus(statusInfo: { id: number, status: number }) {
 
   try {
