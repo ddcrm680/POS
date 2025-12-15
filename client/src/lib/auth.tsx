@@ -7,15 +7,16 @@ import React, {
   useState,
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { fetchUserApi, login as loginApi, logout as logoutApi } from "./api";
+import { api, fetchRoleList, fetchUserApi, getRawToken, login as loginApi, logout as logoutApi } from "./api";
 import { AuthContextValue, User } from "@/schema";
 import { cookieStore } from "./cookie"; // your cookie helper
+import { log } from "node:console";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
-
+  const [roles, setRoles] = useState<{id:number,name:string,slug:string}[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     localStorage.removeItem("userInfo");
     localStorage.removeItem("token");
+    localStorage.removeItem("roleList");
     setUser(null);
   };
 
@@ -47,6 +49,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
 
       try {
+        const cachedRoles = localStorage.getItem("roleList");
+        if (cachedRoles) {
+          try {
+            const parsed = JSON.parse(cachedRoles);
+            if (mounted) setRoles(parsed);
+          } catch {
+            localStorage.removeItem("roleList");
+          }
+        }
+
         // 1) Quick boot from localStorage so UI doesn't flash
         const raw = localStorage.getItem("userInfo");
         if (raw) {
@@ -94,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (mounted) setIsLoading(false);
       }
     }
-
+    fetchRoles()
     boot();
 
     return () => {
@@ -113,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (userData) {
         localStorage.setItem("userInfo", JSON.stringify(userData));
         setUser(userData);
+            fetchRoles()
       }
       return userData;
     } catch (e) {
@@ -121,7 +134,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
+  useEffect(()=>{
+console.log(roles,'rolesroles');
 
+  },[roles])
+  const fetchRoles = async () => {
+    try {
+      const res = await fetchRoleList();
+      console.log(res,'resresres');
+      if (res && Array.isArray(res)) {
+        setRoles(res || []);
+        localStorage.setItem("roleList", JSON.stringify(res));
+      } else {
+        localStorage.setItem("roleList", JSON.stringify([]));
+        setRoles([]);
+      }
+    } catch {
+      localStorage.setItem("roleList", JSON.stringify([]));
+      setRoles([]);
+    }
+  };
   // logout wrapper — call server, then clear client
   const Logout = async () => {
     setIsLoading(true);
@@ -139,10 +171,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
-
+useEffect(()=>{
+  console.log(roles,'roles45323');
+  
+},[roles])
   const value: AuthContextValue = {
     user,
     isLoading,
+    roles,
     isAuthenticated: !!user,
     login,
     Logout,

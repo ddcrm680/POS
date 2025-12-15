@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+import { UseFormSetError } from "react-hook-form";
 import { z } from "zod";
 export type Customer = z.infer<typeof CustomerSchema>;
 export const CustomerSchema = z.object({
@@ -235,6 +237,7 @@ export type User = null | { id?: string; name?: string; email?: string; [k: stri
 export interface AuthContextValue {
   user: User | undefined; // undefined while loading
   isLoading: boolean;
+  roles: any[];
   isAuthenticated: boolean;
   login: (credentials: { email: string; password: string }) => Promise<any>;
   Logout: () => Promise<void>;
@@ -266,9 +269,9 @@ export type POSJobData = z.infer<typeof posJobSchema>;
 
 export const profileSchema = z.object({ 
   fullName: z.string()
-  .nonempty("Name is required")        // triggers when empty: ""
-  .min(3, "Name must be at least 3 characters").
-  max(50, "Name must be at most 50 characters")
+  .nonempty("Full Name is required")        // triggers when empty: ""
+  .min(3, "Full Name must be at least 3 characters").
+  max(50, "Full Name must be at most 50 characters")
   ,
   email: z.string().min(1, "Email is required").email("Enter a valid email"),
   phoneNumber: z
@@ -278,7 +281,46 @@ export const profileSchema = z.object({
     .regex(/^\d{10}$/, "Enter a valid 10-digit phone number"),
   // keep avatar optional — we send as multipart if present
 });
+export const userSchema = (mode: "create" | "edit" | "view") =>
+  z.object({
+    name: z
+      .string()
+      .nonempty("Full Name is required")
+      .min(3)
+      .max(50),
 
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Enter a valid email"),
+
+    phone: z
+      .string()
+      .regex(/^\d{10}$/, "Enter a valid 10-digit phone number"),
+
+   password:
+      mode === "create"
+        ? z.string().min(8).max(32).superRefine(passwordStrength)
+        : z.string().optional(),
+role_id: z.coerce.number().refine(
+  (val) => {
+    console.log("role_id value from form:", val);
+    return val !== 0 && val!==-1;
+  },
+  "Role is required"
+),
+
+    address: z
+      .string()
+      .trim()
+      .min(10)
+      .max(300)
+      .optional()
+      .or(z.literal("")),
+  });
+
+
+export type UserForm = z.infer<ReturnType<typeof userSchema>>;
 export type ProfileForm = z.infer<typeof profileSchema>;
 
 export const passwordSchema = z
@@ -361,3 +403,105 @@ export const passwordSchema = z
   });
 
 export type PasswordForm = z.infer<typeof passwordSchema>;
+
+export interface POSLayoutProps {
+  children: ReactNode;
+}
+
+export interface TabItem {
+  path: string;
+  icon: React.ComponentType<any>;
+  label: string;
+  badge?: number;
+}
+export interface CustomerAnalyticsOverview {
+  totalCustomers: number;
+  newCustomersThisMonth: number;
+  activeCustomers: number;
+  vipCustomers: number;
+  averageLifetimeValue: number;
+  customerRetentionRate: number;
+  topCustomerSource: string;
+  averageServiceInterval: number;
+}
+
+export interface CustomerStatsCardsProps {
+  className?: string;
+}
+
+export type Props = {
+  mode: "create" | "edit";
+  roles: Array<{ id: number; name: string }>;
+  initialValues?: Partial<UserFormType>;
+  isLoading?: boolean;
+  id:string
+  onSubmit: (values: UserFormType) => void;
+};
+export type UserFormType = {
+    name: string;
+    email: string;
+    phone: string;
+    password?: string;
+    role_id: number;
+    address?: string | undefined;
+}
+
+export interface userFormProp {
+  mode: "create" | "edit" | "view";
+  roles: any[];
+  id?: string;
+  initialValues?: Partial<UserFormType>;
+  isLoading?: boolean;
+  onClose: () => void;
+
+  // 👇 IMPORTANT
+  onSubmit: (
+    values: UserFormType,
+    setError: UseFormSetError<UserFormType>
+  ) => void;
+}
+export const passwordStrength = (val: string, ctx: z.RefinementCtx) => {
+  const regex = {
+    lowercase: /[a-z]/,
+    uppercase: /[A-Z]/,
+    number: /[0-9]/,
+    special: /[^A-Za-z0-9]/,
+  };
+
+  if (
+    !regex.lowercase.test(val) ||
+    !regex.uppercase.test(val) ||
+    !regex.number.test(val) ||
+    !regex.special.test(val)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "Password must include uppercase, lowercase, number, and special character",
+    });
+  }
+};
+
+export type editUserReq = {
+  id: string;
+  info:{
+    name: string;
+    email: string;
+    phone: string;
+    role_id: number;
+    address?: string | undefined;
+};
+}
+
+export interface CommonDeleteModalProps {
+  isOpen: boolean;
+  title?: string;
+  width?:string
+  maxWidth?:string
+  description?: string;
+  confirmText?: string;
+  cancelText?: string;
+  isLoading?: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}

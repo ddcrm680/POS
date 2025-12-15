@@ -12,21 +12,7 @@ import {
   MapPin,
   Clock
 } from "lucide-react";
-
-interface CustomerAnalyticsOverview {
-  totalCustomers: number;
-  newCustomersThisMonth: number;
-  activeCustomers: number;
-  vipCustomers: number;
-  averageLifetimeValue: number;
-  customerRetentionRate: number;
-  topCustomerSource: string;
-  averageServiceInterval: number;
-}
-
-interface CustomerStatsCardsProps {
-  className?: string;
-}
+import { CustomerAnalyticsOverview, CustomerStatsCardsProps } from "@/schema";
 
 export default function CustomerStatsCards({ className = "" }: CustomerStatsCardsProps) {
   const { data: analytics, isLoading, error } = useQuery<CustomerAnalyticsOverview>({

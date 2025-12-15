@@ -1,21 +1,10 @@
 import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { 
-  Home, 
-  Calculator, 
-  ClipboardList, 
-  Users, 
-  Package, 
-  CreditCard,
-  Menu,
   Bell,
   Settings,
   LogOut,
   User,
-  Clock,
-  Calendar,
-  Building,
-  UserCheck
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
@@ -26,38 +15,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
-import { CookieStorage, cookieStore } from "@/lib/cookie";
+import dummyProfile from '@/lib/images/dummy-Profile.webp'
 import { useAuth } from "@/lib/auth";
-import { RoleList } from "@/lib/constant";
-
-interface POSLayoutProps {
-  children: ReactNode;
-}
-
-interface TabItem {
-  path: string;
-  icon: React.ComponentType<any>;
-  label: string;
-  badge?: number;
-}
-
-const bottomTabs: TabItem[] = [
-  { path: "/", icon: Home, label: "Dashboard" },
-  { path: "/manager", icon: Settings, label: "Manager" },
-  { path: "/appointments", icon: Calendar, label: "Appointments" },
-  { path: "/facility-management", icon: Building, label: "Facility" },
-  { path: "/employee-management", icon: UserCheck, label: "Team" },
-  { path: "/job-cards", icon: ClipboardList, label: "Jobs", badge: 3 },
-  { path: "/customers", icon: Users, label: "Customers" },
-  { path: "/payments", icon: CreditCard, label: "Payments" },
-  { path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
-];
-
-const quickActions = [
-  { id: "new-job", label: "New Job", emoji: "📋", color: "bg-primary hover:bg-primary/90" },
-  { id: "customer-lookup", label: "Find Customer", emoji: "👤", color: "bg-blue-600 hover:bg-blue-700" },
-  { id: "inventory-check", label: "Stock Check", emoji: "📦", color: "bg-orange-600 hover:bg-orange-700" },
-];
+import { bottomTabs, Constant, quickActions, RoleList } from "@/lib/constant";
+import { POSLayoutProps } from "@/schema";
 
 export default function POSLayout({ children }: POSLayoutProps) {
   const [location] = useLocation();
@@ -95,6 +56,13 @@ export default function POSLayout({ children }: POSLayoutProps) {
         break;
     }
   };
+  const [previewUrl, setPreviewUrl] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      // if user exists and has avatar url (your API returns avatar path)
+      return (user as any)?.avatar || null;
+    } catch { return null; }
+  });
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', { 
@@ -118,6 +86,9 @@ async function handleLogout(){
   navigation[1]('/login');
 console.log('Logged out and redirected to login page');
 }
+  useEffect(() => {
+     setPreviewUrl((user as any)?.avatar || null);
+  }, [user]);
   return (
     <div className="flex flex-col bg-red h-screen text-foreground overflow-hidden">
       {/* POS Header - Enterprise Terminal Style */}
@@ -187,8 +158,16 @@ console.log('Logged out and redirected to login page');
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="pos-touch-target flex items-center gap-2" data-testid="user-menu-trigger">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-primary-foreground font-medium text-sm">{userInfo?.name.split(' ').map((item:string)=>item.substr(0,1).toUpperCase()).join('')}</span>
+                <div className="w-8 h-8 bg-gray border-[0.5px] border border-gray overflow-hidden rounded-full flex items-center justify-center">
+                  <img
+                     src={
+                      previewUrl &&  previewUrl.startsWith("blob:")
+                          ? previewUrl
+                          : `${process.env.REACT_APP_BASE_URL ?? Constant.REACT_APP_BASE_URL}/${previewUrl}`
+                      }  className={`w-full h-full object-cover ${previewUrl===dummyProfile?'scale-125':''}`}
+                   
+                  />
+                  {/* <span className="text-primary-foreground font-medium text-sm">{userInfo?.name.split(' ').map((item:string)=>item.substr(0,1).toUpperCase()).join('')}</span> */}
                 </div>
                 <div className="hidden md:block text-left">
                   <p className="font-medium  text-foreground text-sm leading-tight" data-testid="cashier-name">{userInfo?.name ??"-"}</p>
