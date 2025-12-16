@@ -59,7 +59,7 @@ export default function CommonTable({
             />
 
             <Input
-              placeholder={`Search ${tabType}...`}
+              placeholder={`${tabType? "Search...":  `Search ${tabType}...`}`}
               value={localSearch}
               onChange={(e) => {
                 hasUserTyped.current = true;   // 👈 user action

@@ -15,11 +15,18 @@ export function formatDate(dateString: string) {
     year: "numeric",
   });
 
+  return `${datePart}`;
+}
+export function formatTime(dateString: string) {
+  if (!dateString) return "-";
+
+  const date = new Date(dateString);
+
   const timePart = date.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
   });
 
-  return `${datePart}\n${timePart}`;
+  return `${timePart}`;
 }

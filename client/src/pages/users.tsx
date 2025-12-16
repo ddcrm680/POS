@@ -19,7 +19,7 @@ import { Form } from "@/components/ui/form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import UserFormInfo from "./user/userForm";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 
@@ -55,12 +55,16 @@ export default function Users() {
 
   const columns = useMemo(() => [
      {
-      key: "createdAt", label: "Created At", width: "150px", render: (_value: any,) => {
+      key: "createdAt", label: "Created On", align: "center", width: "100px", render: (_value: any,) => {
 
         return (
-          <span className="text-sm font-medium text-gray-700">
+        <Box className="flex flex-col justify-center items-center">
+          <span className="text-sm font-medium text-sm  ">
             {formatDate(_value)}
           </span>
+          <span className="text-sm font-medium  text-gray-700">
+            {formatTime(_value)}
+          </span></Box>
         );
       },
     },
@@ -265,7 +269,7 @@ const UserStatusUpdateHandler = useCallback(async (u: any) => {
 
       await DeleteUser(isUserDeleteModalInfo?.info?.id);
       toast({ title: `Delete User`, description: "User deleted successfully", variant: "success", });
-      setIsUserDeleteModalOpenInfo({ open: false, info: {} });
+      
       fetchUsers(false)
 
     } catch (err: any) {
@@ -279,6 +283,7 @@ const UserStatusUpdateHandler = useCallback(async (u: any) => {
         variant: "destructive",
       });
     } finally {
+      setIsUserDeleteModalOpenInfo({ open: false, info: {} });
       setIsLoading(false);
     }
   };
@@ -334,7 +339,7 @@ function resetFilter(){
           data={users}
           resetFilter={resetFilter}
           isLoading={isListLoading}
-          tabType="name or phone"
+          tabType=""
           tabDisplayName="User"
           page={page}                 // ✅
           setPage={setPage}           // ✅
@@ -384,7 +389,9 @@ function resetFilter(){
                       <EditIcon />
                     </IconButton>}
 
-                    {Number(row.role_id) !== 1 && <IconButton
+                    {
+                    Number(row.role_id) !== 1 && 
+                    <IconButton
                       size="xs"
                       mr={2}
                       colorScheme="red"
