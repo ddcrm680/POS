@@ -172,10 +172,6 @@ export default function Users() {
     }
   }, []);
 
-  useEffect(() => {
-    console.log(users, 'usersusderd');
-
-  }, [users])
   const UserCommonHandler = async (
     value: UserFormType,
     setError: UseFormSetError<UserFormType>
@@ -189,7 +185,7 @@ export default function Users() {
           info: {
             name: value.name,
             email: value.email,
-            password: null,
+            password: value.password ??null,
             phone: value.phone,
             role_id: Number(value.role_id),
             address: value.address,

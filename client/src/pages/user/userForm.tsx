@@ -19,6 +19,9 @@ import { userFormProp, UserForm as UserFormType, userSchema } from "@/schema";
 import { Input } from "@/components/ui/input";
 import { Box } from "@chakra-ui/react";
 import { Textarea } from "@/components/ui/textarea";
+export const RequiredMark = ({ show }: { show: boolean }) =>
+  show ? <span className="text-red-500 ml-1">*</span> : null;
+
 export default function UserFormInfo({
   mode,
   roles,
@@ -28,7 +31,6 @@ export default function UserFormInfo({
   isLoading = false,
   onSubmit,
 }: userFormProp) {
-  console.log(initialValues,mode, 'rolesw34532');
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -62,7 +64,8 @@ const form = useForm<UserFormType>({
       });
     }
   }, [mode]);
-
+const isView = mode === "view";
+const isCreate = mode === "create";
   return (
     <Form {...form}>
       <form
@@ -81,7 +84,7 @@ const form = useForm<UserFormType>({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Full Name</FormLabel>
+                    <FormLabel style={{ color: "#000" }}>Full Name<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="Enter full name" />
                     </FormControl>
@@ -98,7 +101,7 @@ const form = useForm<UserFormType>({
                  disabled={mode==='view'}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Email</FormLabel>
+                    <FormLabel style={{ color: "#000" }}>Email<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="Enter email" />
                     </FormControl>
@@ -108,13 +111,13 @@ const form = useForm<UserFormType>({
               />
             </Box>
 
-           {mode==='create' && <Box w="33%">
+           {mode!=='view' && <Box w="33%">
               <FormField
                 control={form.control}
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Phone</FormLabel>
+                    <FormLabel style={{ color: "#000" }}>Phone<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -137,7 +140,7 @@ const form = useForm<UserFormType>({
 
           {/* Row 2 */}
           <Box className="flex gap-3">
-             {(mode==='edit' || mode==="view" )&& <Box w="50%">
+             {( mode==="view" )&& <Box w="50%">
               <FormField
                 control={form.control}
                 name="phone"
@@ -163,14 +166,14 @@ const form = useForm<UserFormType>({
                 )}
               />
             </Box>}
-            {mode==='create'&&<Box w="50%">
+            {mode!=='view'&&<Box w="50%">
               <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>
-                      {mode === "create" ? "Password" : "Current Password"}
+                      { "Password"}<RequiredMark show={isCreate} />
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
@@ -201,7 +204,7 @@ const form = useForm<UserFormType>({
                  disabled={mode==='view'}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Role</FormLabel>
+                    <FormLabel style={{ color: "#000" }}>Role<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
                       <select
                         {...field}

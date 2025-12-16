@@ -285,38 +285,62 @@ export const userSchema = (mode: "create" | "edit" | "view") =>
   z.object({
     name: z
       .string()
-      .nonempty("Full Name is required")
-      .min(3)
-      .max(50),
+      .trim()
+      .min(3, "Full name must be at least 3 characters")
+      .max(50, "Full name must not exceed 50 characters"),
 
     email: z
       .string()
+      .trim()
       .min(1, "Email is required")
-      .email("Enter a valid email"),
+      .email("Please enter a valid email address"),
 
     phone: z
       .string()
-      .regex(/^\d{10}$/, "Enter a valid 10-digit phone number"),
+      .regex(/^\d{10}$/, "Phone number must be exactly 10 digits"),
 
     password:
       mode === "create"
-        ? z.string().min(8).max(32).superRefine(passwordStrength)
-        : z.string().optional(),
-    role_id: z.coerce.number().refine(
-      (val) => {
-        console.log("role_id value from form:", val);
-        return val !== 0 && val !== -1;
-      },
-      "Role is required"
-    ),
+        ? z
+          .string()
+          .min(8, "Password must be at least 8 characters")
+          .max(32, "Password must not exceed 32 characters")
+          .superRefine(passwordStrength)
+        : z
+          .string()
+          .optional()
+          .refine(
+            (val) => {
+              return !val || val.length >= 8
+            },
+            "Password must be at least 8 characters"
+          )
+          .refine(
+            (val) => !val || val.length <= 32,
+            "Password must not exceed 32 characters"
+          )
+          .superRefine((val, ctx) => {
+            if (val) passwordStrength(val, ctx);
+          }),
+
+    role_id: z
+      .coerce
+      .number({
+        invalid_type_error: "Role is required",
+      })
+      .refine(
+        (val) => val !== 0 && val !== -1,
+        { message: "Please select a role" }
+      ),
 
     address: z
       .string()
       .trim()
-      .min(10)
-      .max(300)
+      .min(10, "Address must be at least 10 characters")
+      .max(300, "Address must not exceed 300 characters")
       .optional()
       .or(z.literal("")),
+
   });
 
 
@@ -486,7 +510,7 @@ export type editUserReq = {
   id: string;
   info: {
     name: string;
-    password?:null
+    password?: string | null
     email: string;
     phone: string;
     role_id: number;
