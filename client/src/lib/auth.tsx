@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
-  const [roles, setRoles] = useState<{id:number,name:string,slug:string}[]>([]);
+  const [roles, setRoles] = useState<{ id: number, name: string, slug: string }[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -106,7 +106,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (mounted) setIsLoading(false);
       }
     }
-    fetchRoles()
+    console.log(user && Object.keys(user).length>0,user,'sfdgwASD');
+    
+    if (user && Object.keys(user).length>0)
+      fetchRoles()
     boot();
 
     return () => {
@@ -125,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (userData) {
         localStorage.setItem("userInfo", JSON.stringify(userData));
         setUser(userData);
-            fetchRoles()
+        fetchRoles()
       }
       return userData;
     } catch (e) {
@@ -134,14 +137,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
-  useEffect(()=>{
-console.log(roles,'rolesroles');
+  useEffect(() => {
+    console.log(roles, 'rolesroles');
 
-  },[roles])
+  }, [roles])
   const fetchRoles = async () => {
     try {
       const res = await fetchRoleList();
-      console.log(res,'resresres');
+      console.log(res, 'resresres');
       if (res && Array.isArray(res)) {
         setRoles(res || []);
         localStorage.setItem("roleList", JSON.stringify(res));
@@ -171,10 +174,10 @@ console.log(roles,'rolesroles');
       setIsLoading(false);
     }
   };
-useEffect(()=>{
-  console.log(roles,'roles45323');
-  
-},[roles])
+  useEffect(() => {
+    console.log(roles, 'roles45323');
+
+  }, [roles])
   const value: AuthContextValue = {
     user,
     isLoading,

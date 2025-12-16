@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Table } from "@chakra-ui/react";
+import { Box, Table } from "@chakra-ui/react";
 import { Plus, Search } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -18,6 +18,7 @@ export default function CommonTable({
   lastPage,
   setPage,
   page,
+  resetFilter,
   searchValue = "",
   onSearch,
   className = "",
@@ -31,18 +32,18 @@ export default function CommonTable({
   }, [searchValue]);
 
   // ⏳ Debounce logic
-useEffect(() => {
-  if (!hasUserTyped.current) return;
+  useEffect(() => {
+    if (!hasUserTyped.current) return;
 
-  const timer = setTimeout(() => {
-    onSearch?.(localSearch);
+    const timer = setTimeout(() => {
+      onSearch?.(localSearch);
 
-    // ✅ RESET after firing search
-    hasUserTyped.current = false;
-  }, debounceDelay);
+      // ✅ RESET after firing search
+      hasUserTyped.current = false;
+    }, debounceDelay);
 
-  return () => clearTimeout(timer);
-}, [localSearch, debounceDelay, onSearch]);
+    return () => clearTimeout(timer);
+  }, [localSearch, debounceDelay, onSearch]);
 
   const hasUserTyped = useRef(false);
   return (
@@ -67,14 +68,22 @@ useEffect(() => {
               className="pl-10"
             />
           </div>
-
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Add {tabDisplayName || "Item"}
-          </Button>
+          <Box className="flex gap-3">
+            <Button
+              variant="outline"
+              className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+              onClick={() => { resetFilter() }}
+            >
+              {'Clear'}
+            </Button>
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add {tabDisplayName || "Item"}
+            </Button>
+          </Box>
         </div>
       )}
 

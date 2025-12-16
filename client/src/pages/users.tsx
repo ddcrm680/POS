@@ -54,20 +54,16 @@ export default function Users() {
 });
 
   const columns = useMemo(() => [
-    // {
-    //   key: "id",
-    //   label: "Id",
-    //   width: "80px",
-    //   render: (_value: any, _row: any, index: number) => {
+     {
+      key: "createdAt", label: "Created At", width: "150px", render: (_value: any,) => {
 
-    //     return (
-    //       <span className="text-sm font-medium text-gray-700">
-    //         {((PER_PAGE * (page - 1)) + index) + 1}
-    //       </span>
-    //     );
-    //   },
-    // },
-
+        return (
+          <span className="text-sm font-medium text-gray-700">
+            {formatDate(_value)}
+          </span>
+        );
+      },
+    },
     { key: "name", label: "Full Name", width: "150px" },
     { key: "email", label: "Email", width: "150px" },
     {
@@ -154,17 +150,8 @@ export default function Users() {
         );
       },
     },
-    {
-      key: "createdAt", label: "Created At", width: "150px", render: (_value: any,) => {
-
-        return (
-          <span className="text-sm font-medium text-gray-700">
-            {formatDate(_value)}
-          </span>
-        );
-      },
-    },
-  ], [roles, page, PER_PAGE]);
+   
+  ], [roles, page, PER_PAGE,filters]);
 
 const UserStatusUpdateHandler = useCallback(async (u: any) => {
   try {
@@ -319,6 +306,9 @@ const UserStatusUpdateHandler = useCallback(async (u: any) => {
 
       setUsers(mappedUsers);
       setLastPage(res.last_page);
+    }catch(e){
+      console.log(e);
+      
     } finally {
       if (!isLoaderHide)
         setIsListLoading(false);
@@ -328,13 +318,21 @@ const UserStatusUpdateHandler = useCallback(async (u: any) => {
 useEffect(() => {
   fetchUsers(false);
 }, [search, page, filters]);
-
+function resetFilter(){
+  setSearch('')
+  setPage(1)
+  setFilters({
+ role_id: "",
+ status: "",
+})
+}
   return (
     <Card className="w-full">
       <CardContent>
         <CommonTable
           columns={columns}
           data={users}
+          resetFilter={resetFilter}
           isLoading={isListLoading}
           tabType="name or phone"
           tabDisplayName="User"
