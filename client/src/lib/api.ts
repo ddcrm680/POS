@@ -196,6 +196,8 @@ export async function EditUser(editFormValue: editUserReq) {
     }
 
   } catch (response: any) {
+    console.log(response,'responseresponse');
+    
     throw response
 
   }

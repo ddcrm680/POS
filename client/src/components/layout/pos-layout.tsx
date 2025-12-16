@@ -23,12 +23,16 @@ import { POSLayoutProps } from "@/schema";
 export default function POSLayout({ children }: POSLayoutProps) {
   const [location] = useLocation();
   const [currentTime, setCurrentTime] = useState(new Date());
- const { user, isLoading } = useAuth();
+ const { user, isLoading,roles } = useAuth();
   const [userInfo, setUserInfo] = useState<any>();
+    const [roleList, setRoleList] = useState<any>();
   useEffect(() => {
     setUserInfo(user || null);
+ 
   }, [, user, ]);
-
+useEffect(()=>{
+     setRoleList(roles || [])
+},[roles])
   // Update clock every second
   useEffect(() => {
     const timer = setInterval(() => {
@@ -89,6 +93,8 @@ console.log('Logged out and redirected to login page');
   useEffect(() => {
      setPreviewUrl((user as any)?.avatar || null);
   }, [user]);
+  console.log(roleList,userInfo,'roleList ');
+  
   return (
     <div className="flex flex-col bg-red h-screen text-foreground overflow-hidden">
       {/* POS Header - Enterprise Terminal Style */}
@@ -171,9 +177,7 @@ console.log('Logged out and redirected to login page');
                 </div>
                 <div className="hidden md:block text-left">
                   <p className="font-medium  text-foreground text-sm leading-tight" data-testid="cashier-name">{userInfo?.name ??"-"}</p>
-                  <p className="text-muted-foreground text-xs leading-tight">{RoleList[userInfo?.role as keyof {'super-admin': "Super Admin",
-    STORE_MANAGER: 'Store Manager',
-   }] ??"-"}</p>
+                  <p className="text-muted-foreground text-xs leading-tight">{roleList && roleList.length >0 ? roleList.find((role:{name:string,id:number,slug:string})=>role.slug===userInfo?.role).name :"-"}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>

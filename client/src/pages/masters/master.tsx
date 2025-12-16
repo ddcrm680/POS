@@ -19,10 +19,8 @@ import {
 } from "lucide-react";
 import { availableServices, masterTabList } from "@/lib/constant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Password from "./password";
-import Profile from "./profile";
-import Product from "./product";
-import Users from "./users";
+import Users from "./user/users";
+import Product from "../product";
 
 export default function Master() {
   const { toast } = useToast();

@@ -16,11 +16,11 @@ import AppointmentsPage from "@/pages/appointments";
 import FacilityManagement from "@/pages/facility-management";
 import EmployeeManagement from "@/pages/employee-management";
 import { Redirect, Route, Switch } from "wouter";
-import Login from "./pages/login";
+import Login from "./pages/login/login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { login } from "./lib/api";
-import ProfileDetails from "./pages/profile-details";
-import Master from "./pages/master";
+import ProfileDetails from "./pages/profile/profile-details";
+import Master from "./pages/masters/master";
 export function Router() {
   return (
     <Switch>

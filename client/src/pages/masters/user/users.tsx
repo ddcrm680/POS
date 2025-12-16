@@ -18,7 +18,7 @@ import CommonModal from "@/components/common/CommonModal";
 import { Form } from "@/components/ui/form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import UserFormInfo from "./user/userForm";
+import UserFormInfo from "./userForm";
 import { formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
@@ -210,11 +210,12 @@ export default function Users() {
       setIsUserModalOpenInfo({ open: false, type: "create", info: {} });
       fetchUsers(false);
     } catch (err: any) {
+       console.log(err, '4324532');   
       const apiErrors = err?.response?.data?.errors;
-      console.log(apiErrors, 'apiErrors');
+     
 
       // 👇 THIS IS THE KEY PART
-      if (apiErrors) {
+      if (apiErrors && err?.response?.status === 422) {
         Object.entries(apiErrors).forEach(([field, messages]) => {
           setError(field as keyof UserFormType, {
             type: "server",
@@ -223,7 +224,10 @@ export default function Users() {
         });
         return;
       }
-
+      if(err?.response?.status === 403){
+        
+      setIsUserModalOpenInfo({ open: false, type: "create", info: {} });
+      }
       toast({
         title: "Error",
         description:
