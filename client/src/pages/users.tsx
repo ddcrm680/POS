@@ -49,42 +49,40 @@ export default function Users() {
 
   const PER_PAGE = 10;
   const [filters, setFilters] = useState({
-  role_id: "",
-  status: "",
-});
+    role_id: "",
+    status: "",
+  });
 
   const columns = useMemo(() => [
-     {
+    {
       key: "createdAt", label: "Created On", align: "center", width: "100px", render: (_value: any,) => {
 
         return (
-        <Box className="flex flex-col justify-center items-center">
-          <span className="text-sm font-medium text-sm  ">
-            {formatDate(_value)}
-          </span>
-          <span className="text-sm font-medium  text-gray-700">
-            {formatTime(_value)}
-          </span></Box>
+          <Box className="flex flex-col justify-center items-center">
+            <span className="text-sm font-medium text-sm  ">
+              {formatDate(_value)}
+            </span>
+            <span className="text-sm font-medium  text-gray-700">
+              {formatTime(_value)}
+            </span></Box>
         );
       },
     },
-    { key: "name", label: "Full Name", width: "150px" },
-    { key: "email", label: "Email", width: "150px" },
-    {
+      {
       key: "role_id", label: (
-      <ColumnFilter
-        label="Role"
-        value={filters.role_id}
-        onChange={(val) => {
-          setFilters(f => ({ ...f, role_id: val }));
-          setPage(1);
-        }}
-        options={[{name:'All',id:''},...roles].map(r => ({
-          label: r.name,
-          value: r.id,
-        }))}
-      />
-    ),width: "150px",
+        <ColumnFilter
+          label="Role"
+          value={filters.role_id}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, role_id: val }));
+            setPage(1);
+          }}
+          options={[{ name: 'All', id: '' }, ...roles].map(r => ({
+            label: r.name,
+            value: r.id,
+          }))}
+        />
+      ), width: "150px",
       render: (_value: any,) => {
 
         return (
@@ -94,24 +92,27 @@ export default function Users() {
         );
       }
     },
+    { key: "name", label: "Full Name", width: "150px" },
+    { key: "email", label: "Email", width: "150px" },
+  
 
     {
       key: "status",
-       label: (
-    <ColumnFilter
-      label="Status"
-      value={filters.status}
-      onChange={(val) => {
-        setFilters(f => ({ ...f, status: val }));
-        setPage(1);
-      }}
-      options={[
-        {label:'All',value:''},
-        { label: "Active", value: 1 },
-        { label: "Inactive", value: 0 },
-      ]}
-    />
-  ),
+      label: (
+        <ColumnFilter
+          label="Status"
+          value={filters.status}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, status: val }));
+            setPage(1);
+          }}
+          options={[
+            { label: 'All', value: '' },
+            { label: "Active", value: 1 },
+            { label: "Inactive", value: 0 },
+          ]}
+        />
+      ),
       width: "120px",
       render: (value: string) => {
         const isActive = Number(value) === 1;
@@ -154,50 +155,50 @@ export default function Users() {
         );
       },
     },
-   
-  ], [roles, page, PER_PAGE,filters]);
 
-const UserStatusUpdateHandler = useCallback(async (u: any) => {
-  try {
-    const newStatus = u.change_Status ? 0 : 1;
+  ], [roles, page, PER_PAGE, filters]);
 
-    setUsers(prevUsers => {
-      console.log("prevUsers (always correct):", prevUsers);
+  const UserStatusUpdateHandler = useCallback(async (u: any) => {
+    try {
+      const newStatus = u.change_Status ? 0 : 1;
 
-      return prevUsers.map(item =>
-        item.id === u.id
-          ? {
+      setUsers(prevUsers => {
+        console.log("prevUsers (always correct):", prevUsers);
+
+        return prevUsers.map(item =>
+          item.id === u.id
+            ? {
               ...item,
               change_Status: newStatus,
               status: newStatus,
             }
-          : item
-      );
-    });
+            : item
+        );
+      });
 
-    await UpdateUserStatus({ id: u.id, status: newStatus });
+      await UpdateUserStatus({ id: u.id, status: newStatus });
 
-    toast({
-      title: "Status Update",
-      description: "User status updated successfully",
-      variant: "success",
-    });
-  } catch (err: any) {
-    toast({
-      title: "Error",
-      description:
-        err?.response?.data?.message ||
-        err.message ||
-        "Failed to update user status",
-      variant: "destructive",
-    });
-  }
-}, []);
+      toast({
+        title: "Status Update",
+        description: "User status updated successfully",
+        variant: "success",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description:
+          err?.response?.data?.message ||
+          err.message ||
+          "Failed to update user status",
+        variant: "destructive",
+      });
+    }
+  }, []);
 
- useEffect(()=>{
-  console.log(users,'usersusderd');
-  
- },[users])
+  useEffect(() => {
+    console.log(users, 'usersusderd');
+
+  }, [users])
   const UserCommonHandler = async (
     value: UserFormType,
     setError: UseFormSetError<UserFormType>
@@ -211,7 +212,7 @@ const UserStatusUpdateHandler = useCallback(async (u: any) => {
           info: {
             name: value.name,
             email: value.email,
-            password:null,
+            password: null,
             phone: value.phone,
             role_id: Number(value.role_id),
             address: value.address,
@@ -269,7 +270,7 @@ const UserStatusUpdateHandler = useCallback(async (u: any) => {
 
       await DeleteUser(isUserDeleteModalInfo?.info?.id);
       toast({ title: `Delete User`, description: "User deleted successfully", variant: "success", });
-      
+
       fetchUsers(false)
 
     } catch (err: any) {
@@ -294,8 +295,8 @@ const UserStatusUpdateHandler = useCallback(async (u: any) => {
       const res = await fetchUserList({
         page,
         search,
-          role_id: filters.role_id,
-  status: filters.status,
+        role_id: filters.role_id,
+        status: filters.status,
       });
 
       const mappedUsers = res.data.map((u: UserApiType) => ({
@@ -304,33 +305,33 @@ const UserStatusUpdateHandler = useCallback(async (u: any) => {
         email: u.email,
         phone: u.phone,
         role_id: u.role_id,
-        change_Status:u.is_active,
+        change_Status: u.is_active,
         status: u.is_active,
         createdAt: u.created_at,
       }));
 
       setUsers(mappedUsers);
-      setLastPage(res.last_page);
-    }catch(e){
+      setLastPage(res.meta.last_page);
+    } catch (e) {
       console.log(e);
-      
+
     } finally {
       if (!isLoaderHide)
         setIsListLoading(false);
     }
   };
 
-useEffect(() => {
-  fetchUsers(false);
-}, [search, page, filters]);
-function resetFilter(){
-  setSearch('')
-  setPage(1)
-  setFilters({
- role_id: "",
- status: "",
-})
-}
+  useEffect(() => {
+    fetchUsers(false);
+  }, [search, page, filters]);
+  function resetFilter() {
+    setSearch('')
+    setPage(1)
+    setFilters({
+      role_id: "",
+      status: "",
+    })
+  }
   return (
     <Card className="w-full">
       <CardContent>
@@ -374,7 +375,7 @@ function resetFilter(){
                     >
                       <EyeIcon />
                     </IconButton>
-                    {Number(row.role_id) !== 1 && <IconButton
+                    {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
                       size="xs"
                       mr={2}
                       aria-label="Edit"
@@ -390,18 +391,18 @@ function resetFilter(){
                     </IconButton>}
 
                     {
-                    Number(row.role_id) !== 1 && 
-                    <IconButton
-                      size="xs"
-                      mr={2}
-                      colorScheme="red"
-                      aria-label="Delete"
-                      onClick={() => {
-                        setIsUserDeleteModalOpenInfo({ open: true, info: row });
-                      }}
-                    >
-                   <Trash2 size={16} />
-                    </IconButton>}
+                      Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id &&
+                      <IconButton
+                        size="xs"
+                        mr={2}
+                        colorScheme="red"
+                        aria-label="Delete"
+                        onClick={() => {
+                          setIsUserDeleteModalOpenInfo({ open: true, info: row });
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </IconButton>}
 
                   </Box>
                 )}

@@ -49,18 +49,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
 
       try {
+        // 1) Quick boot from localStorage so UI doesn't flash
+        const raw = localStorage.getItem("userInfo");
         const cachedRoles = localStorage.getItem("roleList");
         if (cachedRoles) {
+
           try {
             const parsed = JSON.parse(cachedRoles);
             if (mounted) setRoles(parsed);
           } catch {
             localStorage.removeItem("roleList");
           }
+        } else {
+          if (raw)
+            fetchRoles()
         }
 
-        // 1) Quick boot from localStorage so UI doesn't flash
-        const raw = localStorage.getItem("userInfo");
         if (raw) {
           try {
             const parsed = JSON.parse(raw) as User;
@@ -106,10 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (mounted) setIsLoading(false);
       }
     }
-    console.log(user && Object.keys(user).length>0,user,'sfdgwASD');
-    
-    if (user && Object.keys(user).length>0)
-      fetchRoles()
+    console.log(user && Object.keys(user).length > 0, user, 'sfdgwASD');
+
+    // if (user && Object.keys(user).length>0)
+
     boot();
 
     return () => {
