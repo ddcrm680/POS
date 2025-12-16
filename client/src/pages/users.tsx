@@ -95,46 +95,23 @@ export default function Users() {
     { key: "name", label: "Full Name", width: "150px" },
     { key: "email", label: "Email", width: "150px" },
   
-
-    // {
-    //   key: "status",
-    //   label: (
-    //     <ColumnFilter
-    //       label="Status"
-    //       value={filters.status}
-    //       onChange={(val) => {
-    //         setFilters(f => ({ ...f, status: val }));
-    //         setPage(1);
-    //       }}
-    //       options={[
-    //         { label: 'All', value: '' },
-    //         { label: "Active", value: 1 },
-    //         { label: "Inactive", value: 0 },
-    //       ]}
-    //     />
-    //   ),
-    //   width: "120px",
-    //   render: (value: string) => {
-    //     const isActive = Number(value) === 1;
-
-    //     return (
-    //       <span
-    //         className={`
-    //         inline-flex items-center
-    //         px-2.5 py-1 rounded-full text-xs font-medium
-    //         ${isActive
-    //             ? "bg-green-100 text-green-700"
-    //             : "bg-red-100 text-red-700"}
-    //       `}
-    //       >
-    //         {Number(value) === 1 ? "Active" : 'InActive'}
-    //       </span>
-    //     );
-    //   },
-    // },
     {
       key: "change_Status",
-      label: "Status",
+    label: (
+        <ColumnFilter
+          label="Status"
+          value={filters.status}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, status: val }));
+            setPage(1);
+          }}
+          options={[
+            { label: 'All', value: '' },
+            { label: "Active", value: 1 },
+            { label: "Inactive", value: 0 },
+          ]}
+        />
+      ),
       width: "120px",
       render: (value: string, _row: any,) => {
         const isActive = Number(value) === 1;
