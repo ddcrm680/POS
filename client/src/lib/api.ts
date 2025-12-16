@@ -5,41 +5,69 @@ import { editUserReq, UserFormType } from "@/schema";
 
 export const baseUrl =
   process.env.REACT_APP_BASE_URL || Constant.REACT_APP_BASE_URL;
-
+const API_TIMEOUT =
+  Number(process.env.REACT_APP_API_TIMEOUT) || Constant.REACT_APP_API_TIMEOUT;
+const API_RETRY_COUNT = Number(process.env.REACT_APP_API_RETRY_COUNT) || Constant.REACT_APP_API_RETRY_COUNT
 
 export function getRawToken() {
-  // token may be stored as "Bearer abc..." or "abc..."
   const fromCookie = cookieStore.getItem("token") || null;
   const fromLS = localStorage.getItem("token") || null;
   const raw = fromCookie || fromLS || "";
-  // strip existing "Bearer " prefix if present
   return raw.startsWith("Bearer ") ? raw.slice(7) : raw;
 }
 
 function createInstance(): AxiosInstance {
   const inst = axios.create({
     baseURL: baseUrl,
-    // no withCredentials by default, you can set conditionally if needed
-    // withCredentials: true,
+    timeout: API_TIMEOUT,
   });
 
+  // Attach token
   inst.interceptors.request.use((cfg) => {
     const token = getRawToken();
     if (token) {
       cfg.headers = cfg.headers || {};
       cfg.headers["Authorization"] = `Bearer ${token}`;
     }
-    try {
-      console.debug('[API Request]', cfg.method?.toUpperCase(), cfg.url, 'headers:', {
-        ...cfg.headers
-      });
-    } catch (e) { }
+
+    // 👇 init retry counter
+    (cfg as any).__retryCount = (cfg as any).__retryCount || 0;
 
     return cfg;
   });
 
+  // 🔁 Retry interceptor
+  inst.interceptors.response.use(
+    (res) => res,
+    async (error) => {
+      const cfg = error.config;
+
+      // ❌ No config = can't retry
+      if (!cfg) return Promise.reject(error);
+
+      const isTimeout = error.code === "ECONNABORTED";
+      const isNetwork = !error.response;
+
+      const shouldRetry = isTimeout || isNetwork;
+
+      if (shouldRetry && cfg.__retryCount < API_RETRY_COUNT) {
+        cfg.__retryCount += 1;
+
+        console.warn(
+          `Retrying request (${cfg.__retryCount}/${API_RETRY_COUNT})`,
+          cfg.url
+        );
+
+        return inst(cfg); // 🔁 retry request
+      }
+
+      return Promise.reject(error);
+    }
+  );
+
   return inst;
 }
+
 
 export const api = createInstance();
 

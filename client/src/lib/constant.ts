@@ -21,7 +21,8 @@ import {
 
 export const Constant={
      REACT_APP_BASE_URL: 'https://pos.detailingdevils.com',
-
+REACT_APP_API_TIMEOUT:3000,
+REACT_APP_API_RETRY_COUNT:2,
     login:{
         logoUrl: "https://mycrm.detailingdevils.com/assets/images/logo.png",
        loginSuccessMessage: "Login successful! Welcome back.",
