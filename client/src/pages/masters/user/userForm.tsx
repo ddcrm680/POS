@@ -51,7 +51,6 @@ const form = useForm<UserFormType>({
   // Reset form when initialValues change (important for edit)
   useEffect(() => {
     if (mode==='edit'|| mode==="view") {
-      console.log('came inside default');
       
       form.reset({
         name: "",

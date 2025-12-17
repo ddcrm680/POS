@@ -110,7 +110,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (mounted) setIsLoading(false);
       }
     }
-    console.log(user && Object.keys(user).length > 0, user, 'sfdgwASD');
 
     // if (user && Object.keys(user).length>0)
 
@@ -141,14 +140,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    console.log(roles, 'rolesroles');
-
-  }, [roles])
+ 
   const fetchRoles = async () => {
     try {
       const res = await fetchRoleList();
-      console.log(res, 'resresres');
       if (res && Array.isArray(res)) {
         setRoles(res || []);
         localStorage.setItem("roleList", JSON.stringify(res));
@@ -178,10 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    console.log(roles, 'roles45323');
-
-  }, [roles])
+ 
   const value: AuthContextValue = {
     user,
     isLoading,

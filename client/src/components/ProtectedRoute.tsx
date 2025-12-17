@@ -45,15 +45,12 @@ export default function ProtectedRoute({
       </div>
     );
   }
-console.log(user,location,'useruseruseruser');
 
   // 2) Not authenticated -> redirect to /login (preserve intended path as ?next=...)
   if (!user) {
     
-console.log(location,'location');
     // avoid redirect loop if already on /login
     if (location !== "/login") {
-      console.log('cameinside');
       
       setLocation(`/login`);
       return null;

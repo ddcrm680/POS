@@ -45,7 +45,6 @@ export function ColumnFilter({
     );
 
     const rect = triggerRef.current?.getBoundingClientRect();
-    console.log(value, 'valuevalue');
 
     return (
         <div ref={triggerRef} className="relative inline-flex items-center gap-1">

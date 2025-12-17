@@ -44,7 +44,6 @@ useEffect(()=>{
 
   const handleQuickAction = (actionId: string) => {
     // Handle quick actions
-    console.log("Quick action:", actionId);
     
     switch (actionId) {
       case "new-job":
@@ -88,12 +87,10 @@ useEffect(()=>{
 async function handleLogout(){
  await Logout();
   navigation[1]('/login');
-console.log('Logged out and redirected to login page');
 }
   useEffect(() => {
      setPreviewUrl((user as any)?.avatar || null);
   }, [user]);
-  console.log(roleList,userInfo,'roleList ');
   
   return (
     <div className="flex flex-col bg-red h-screen text-foreground overflow-hidden">

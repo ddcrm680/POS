@@ -109,7 +109,6 @@ function JobCardComponent({ jobCard, customer, vehicle, onCardClick, onStatusCha
   const handleNextClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     // Advance to next status logic would go here
-    console.log('Advance status for:', jobCard.id);
   };
 
   return (

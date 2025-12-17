@@ -37,7 +37,6 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    console.log(isLoading , user,'!isLoading && user');
     
     if (!isLoading && user) {
       setLocation("/home");
@@ -52,6 +51,19 @@ export default function LoginPage() {
     defaultValues: { email: "", password: "" },
   });
   const { login } = useAuth();
+    useEffect(() => {
+    const expired = sessionStorage.getItem("sessionExpired");
+
+    if (expired) {
+      toast({
+        title: "Session expired",
+        description: "Your session has expired. Please log in again.",
+        variant: "error",
+      });
+
+      sessionStorage.removeItem("sessionExpired");
+    }
+  }, []);
  const onSubmit = async (vals: { email: string; password: string }) => {
     setIsSubmitting(true);
     try {

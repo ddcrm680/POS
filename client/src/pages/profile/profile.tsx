@@ -99,9 +99,7 @@ export default function Profile() {
       openFilePicker();
     }
   }
-  useEffect(() => {
-    console.log(`${process.env.REACT_APP_BASE_URL ?? Constant.REACT_APP_BASE_URL}/${previewUrl}`, 'user in profile component');
-  }, [previewUrl])
+
   useEffect(() => {
     // update defaults if user changes after refresh
     form.reset({
@@ -134,7 +132,6 @@ export default function Profile() {
 
     },
     onSuccess: async (data: any) => {
-      console.log(data, 'datadata');
 
       toast({ title: "Profile updated", description: "Your profile was saved.", variant: "success" });
 
@@ -149,7 +146,6 @@ export default function Profile() {
       }
     },
     onError: (err: any) => {
-      console.log(err, 'erraewrtewq');
 
       toast({
         title: "Update failed",
@@ -328,7 +324,6 @@ export default function Profile() {
                   type="button" onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Edit click (prevent default)'); // debug
                     setMode('edit');
                   }}>
                   {"Update "}
@@ -340,7 +335,6 @@ export default function Profile() {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Edit click (prevent default)'); // debug
                     setMode('view');
                   }}
                   disabled={isLoading}

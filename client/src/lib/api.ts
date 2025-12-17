@@ -40,8 +40,22 @@ function createInstance(): AxiosInstance {
   inst.interceptors.response.use(
     (res) => res,
     async (error) => {
-      const cfg = error.config;
+      const status = error?.status;
+      console.log(error, 'status');
 
+      if (status === 401) {
+        sessionStorage.setItem("sessionExpired", "1");
+
+        // clear auth
+        localStorage.clear();
+        cookieStore.removeItem("token");
+
+        window.location.href = "/login";
+
+        return Promise.reject(error);
+      }
+
+      const cfg = error.config;
       // ❌ No config = can't retry
       if (!cfg) return Promise.reject(error);
 
@@ -52,11 +66,6 @@ function createInstance(): AxiosInstance {
 
       if (shouldRetry && cfg.__retryCount < API_RETRY_COUNT) {
         cfg.__retryCount += 1;
-
-        console.warn(
-          `Retrying request (${cfg.__retryCount}/${API_RETRY_COUNT})`,
-          cfg.url
-        );
 
         return inst(cfg); // 🔁 retry request
       }
@@ -113,7 +122,7 @@ export async function logout() {
     });
     throw error;
   } finally {
-    localStorage.removeItem("userInfo");
+    localStorage.clear();
     cookieStore.removeItem("token");
   }
 }
@@ -196,8 +205,7 @@ export async function EditUser(editFormValue: editUserReq) {
     }
 
   } catch (response: any) {
-    console.log(response,'responseresponse');
-    
+
     throw response
 
   }

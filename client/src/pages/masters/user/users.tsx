@@ -140,7 +140,6 @@ export default function Users() {
       const newStatus = u.change_Status ? 0 : 1;
 
       setUsers(prevUsers => {
-        console.log("prevUsers (always correct):", prevUsers);
 
         return prevUsers.map(item =>
           item.id === u.id
@@ -210,7 +209,6 @@ export default function Users() {
       setIsUserModalOpenInfo({ open: false, type: "create", info: {} });
       fetchUsers(false);
     } catch (err: any) {
-       console.log(err, '4324532');   
       const apiErrors = err?.response?.data?.errors;
      
 
@@ -251,7 +249,6 @@ export default function Users() {
       fetchUsers(false)
 
     } catch (err: any) {
-      console.log(err, 'errorr message');
 
       toast({
         title: "Error",
@@ -290,7 +287,7 @@ export default function Users() {
       setUsers(mappedUsers);
       setLastPage(res.meta.last_page);
     } catch (e) {
-      console.log(e);
+      console.error(e);
 
     } finally {
       if (!isLoaderHide)
