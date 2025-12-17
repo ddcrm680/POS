@@ -2,9 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Box, Table } from "@chakra-ui/react";
-import { Plus, Search } from "lucide-react";
+import { ChevronRight, Plus, Search } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { Loader } from "./loader";
+import CommonModal from "./CommonModal";
+import { vehicleCardItem, vehicleType } from "@/schema";
+import { VehicleCardInfo } from "@/pages/masters/vehicleMaster/vehicleCardInfo";
 
 export default function CommonTable({
   columns,
@@ -16,6 +21,7 @@ export default function CommonTable({
   hasNext,
   tabDisplayName,
   tabType,
+  setIsUserModalOpenInfo,
   searchable = true,
   lastPage,
   setPage,
@@ -26,7 +32,8 @@ export default function CommonTable({
   searchValue = "",
   perPage = 2,
   setPerPage,
-  perPageOptions = [10, 25, 50, 100],
+  isCard = false,
+  perPageOptions = [9, 18, 54, 99],
   onSearch,
   className = "",
   debounceDelay = 300,
@@ -53,6 +60,32 @@ export default function CommonTable({
   }, [localSearch, debounceDelay, onSearch]);
 
   const hasUserTyped = useRef(false);
+  const renderCardView = () => {
+    if (isLoading) {
+      return (
+        <div className="py-10 text-center text-gray-500"> <Loader /></div>
+      );
+    }
+
+    if (!isLoading && data.length === 0) {
+      return (
+        <div className="py-10 text-center text-gray-500">
+          No data found
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {data.map((item: any) => (
+          <VehicleCardInfo item={item} isInModal={false} setIsUserModalOpenInfo={(value) => setIsUserModalOpenInfo({ open: value, info: item })} />
+        ))}
+      </div>
+
+
+    );
+  };
+
   return (
     <div className={`w-full space-y-4 pt-6 ${className}`}>
       {/* Search Bar */}
@@ -95,7 +128,9 @@ export default function CommonTable({
       )}
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg border">
+      {isCard ? (
+        renderCardView()
+      ) : (<div className="overflow-hidden rounded-lg border">
         <Table.Root size="sm" striped>
           <Table.Header>
             <Table.Row className="!bg-gray-100 border-b border-gray-200">
@@ -128,29 +163,7 @@ export default function CommonTable({
                   colSpan={columns.length + (actions ? 1 : 0)}
                   className="py-10 text-center"
                 >
-                  <div className="flex items-center justify-center gap-3 text-gray-500">
-                    <svg
-                      className="h-5 w-5 animate-spin"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                      />
-                    </svg>
-                    <span className="text-sm">Loading...</span>
-                  </div>
+                  <Loader />
                 </Table.Cell>
               </Table.Row>
             )}
@@ -193,7 +206,8 @@ export default function CommonTable({
 
           </Table.Body>
         </Table.Root>
-      </div>
+      </div>)}
+
       {/* Pagination */}
       {(total > perPageOptions[0] || lastPage > 1) && (
         <div className="flex items-center justify-end gap-3">
@@ -244,6 +258,7 @@ export default function CommonTable({
           </div>
 
           {/* )} */}
+      
         </div>
       )}
     </div>

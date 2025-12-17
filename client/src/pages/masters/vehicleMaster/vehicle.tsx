@@ -10,6 +10,8 @@ import { fetchVehicleList } from "@/lib/api";
 import { vehicleType, } from "@/schema";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, } from "@chakra-ui/react";
+import CommonModal from "@/components/common/CommonModal";
+import { VehicleCardInfo } from "./vehicleCardInfo";
 
 
 export default function VehicleMaster() {
@@ -18,10 +20,13 @@ export default function VehicleMaster() {
   const qc = useQueryClient();
   const { user, refreshUser, roles } = useAuth();
   const [vehicles, setVehicle] = useState<Array<any>>([]);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(9);
   const [total, setTotal] = useState(0);
   const [has_next, setHasNext] = useState(false)
-
+  const [isUserModalOpenInfo, setIsUserModalOpenInfo] = useState<{ open: boolean, info: any }>({
+    open: false,
+    info: {}
+  });
   const [lastPage, setLastPage] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -99,6 +104,7 @@ export default function VehicleMaster() {
           columns={columns}
           data={vehicles}
           // resetFilter={resetFilter}
+          isCard={true}
           isLoading={isListLoading}
           tabType=""
           tabDisplayName="User"
@@ -109,6 +115,7 @@ export default function VehicleMaster() {
           lastPage={lastPage}
           searchValue={search}
           perPage={perPage}
+          setIsUserModalOpenInfo={setIsUserModalOpenInfo}
           setPerPage={setPerPage}
           onSearch={(value: string) => {
             // if (value) {
@@ -119,7 +126,18 @@ export default function VehicleMaster() {
 
         />
 
+    <CommonModal
+            isOpen={isUserModalOpenInfo.open}
+            onClose={() => setIsUserModalOpenInfo({ open: false, info: {} })}
+            title={isUserModalOpenInfo.info.company}
+            isLoading={isListLoading}
+            primaryText={""}
+            cancelTextClass='hover:bg-[#E3EDF6] hover:text-[#000]'
+            primaryColor="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
+          >
 
+            <VehicleCardInfo item={isUserModalOpenInfo.info} isInModal={true} />
+          </CommonModal>
       </CardContent>
     </Card>
   );

@@ -544,3 +544,10 @@ export interface vehicleType{
             "name": string
         }[]
 }
+export interface vehicleCardItem{
+    "company": string
+    "model":{
+            "id": number,
+            "name": string
+        }[]
+}
