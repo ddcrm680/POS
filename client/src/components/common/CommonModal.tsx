@@ -4,6 +4,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { IconButton } from "@chakra-ui/react";
 import { X } from "lucide-react";
 import { Button } from "../ui/button";
+import { useEffect } from "react";
 
 export default function CommonModal({
   isOpen,
@@ -15,6 +16,18 @@ export default function CommonModal({
   children,
   showCloseIcon = true,
 }: any) {
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      onClose();
+    };
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+
+    return () => {
+      window.removeEventListener("auth:unauthorized", handleUnauthorized);
+    };
+  }, [onClose]);
+
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => {
       if (!open && isLoading) return;

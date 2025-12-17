@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import CommonModal from "@/components/common/CommonModal";
 import { CommonDeleteModalProps } from "@/schema";
+import { useEffect } from "react";
 
 export default function CommonDeleteModal({
   isOpen,
@@ -16,6 +17,17 @@ export default function CommonDeleteModal({
   onConfirm,
   onCancel,
 }: CommonDeleteModalProps) {
+  useEffect(() => {
+      const handleUnauthorized = () => {
+        onCancel();
+      };
+  
+      window.addEventListener("auth:unauthorized", handleUnauthorized);
+  
+      return () => {
+        window.removeEventListener("auth:unauthorized", handleUnauthorized);
+      };
+    }, [onCancel]);
   return (
     <CommonModal
       isOpen={isOpen}

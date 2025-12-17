@@ -54,6 +54,9 @@ function createInstance(): AxiosInstance {
 
         return Promise.reject(error);
       }
+      if(status === 403){
+         window.dispatchEvent(new Event("auth:unauthorized"));
+      }
 
       const cfg = error.config;
       // ❌ No config = can't retry
