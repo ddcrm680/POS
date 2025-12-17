@@ -1,27 +1,16 @@
 // src/components/profile/profile.tsx
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useForm, UseFormSetError } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteUser, EditProfile, EditUser, fetchUserList, fetchVehicleList, SaveUser, UpdateUserStatus } from "@/lib/api";
-import { ProfileForm, profileSchema, UserApiType, UserForm, UserFormType, vehicleType, } from "@/schema";
-import { Constant } from '@/lib/constant';
+import { fetchVehicleList } from "@/lib/api";
+import { vehicleType, } from "@/schema";
 import CommonTable from "@/components/common/CommonTable";
-import { Box, IconButton, Input, Switch, Textarea } from "@chakra-ui/react";
-import { DeleteIcon, EditIcon, Eye, EyeIcon, EyeOff, Trash2 } from "lucide-react";
-import CommonModal from "@/components/common/CommonModal";
-import { Form } from "@/components/ui/form";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { formatDate, formatTime } from "@/lib/utils";
-import CommonDeleteModal from "@/components/common/CommonDeleteModal";
-import { ColumnFilter } from "@/components/common/ColumnFilter";
-import { vehicleListInfo } from "@/lib/mockData";
+import { Box, } from "@chakra-ui/react";
+
 
 export default function VehicleMaster() {
   const { toast } = useToast();
@@ -54,20 +43,13 @@ export default function VehicleMaster() {
             {_value?.map((r: { name: string }, idx: number) => (
               <Box
                 key={idx}
-                className="
-        px-3 py-1
-        text-xs font-semibold
-        rounded-full
-        bg-yellow-400
-        text-black
-        uppercase
-        tracking-wide
-      "
+                className={`px-3 py-1   rounded-full border-[#FE0000] border bg-[#ffa9a9]  uppercase tracking-wide`}
               >
                 {r.name}
               </Box>
-            ))}
-          </Box>
+            ))
+            }
+          </Box >
         );
       }
     },
@@ -121,7 +103,7 @@ export default function VehicleMaster() {
           tabType=""
           tabDisplayName="User"
           page={page}
-            total={total}
+          total={total}
           hasNext={has_next}
           setPage={setPage}
           lastPage={lastPage}
