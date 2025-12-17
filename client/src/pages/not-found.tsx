@@ -20,7 +20,7 @@ export default function NotFound() {
           </div>
 
           <p className="mt-2 text-sm text-gray-600">
-            Did you forget to add the page to the router?
+           We can’t seem to find the page you are looking for!
           </p>
 
           {/* 👇 Go Home Button */}
