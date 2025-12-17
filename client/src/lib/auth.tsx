@@ -1,5 +1,5 @@
 // src/lib/auth.tsx
-import React, {
+import {
   createContext,
   useContext,
   ReactNode,
@@ -7,10 +7,9 @@ import React, {
   useState,
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { api, fetchRoleList, fetchUserApi, getRawToken, login as loginApi, logout as logoutApi } from "./api";
+import { fetchRoleList, fetchUserApi, login as loginApi, logout as logoutApi } from "./api";
 import { AuthContextValue, User } from "@/schema";
 import { cookieStore } from "./cookie"; // your cookie helper
-import { log } from "node:console";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 

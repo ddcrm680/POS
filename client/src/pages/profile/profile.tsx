@@ -3,7 +3,6 @@
 import dummyProfile from '@/lib/images/dummy-Profile.webp'
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -11,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient"; // or adapt if using axios
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { Box } from "@chakra-ui/react";

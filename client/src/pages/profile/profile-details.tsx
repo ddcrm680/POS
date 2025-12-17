@@ -2,19 +2,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { type Customer, POSJobData, posJobSchema } from "@/schema";
 import {
-  Car,
-  CheckCircle,
-  Loader2,
   BarChart3,
-  EditIcon,
   Key
 } from "lucide-react";
 import { availableServices } from "@/lib/constant";

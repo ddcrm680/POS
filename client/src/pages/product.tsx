@@ -1,22 +1,9 @@
 // src/components/profile/password.tsx
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import {CustomerAnalyticsOverview} from '@/schema'
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { PasswordForm, passwordSchema } from "@/schema";
-import { UpdatePassword } from "@/lib/api";
-import { Box } from "@chakra-ui/react";
-import { Eye, EyeOff } from "lucide-react";
 
 export default function Product() {
  const { data: analytics, isLoading, error } = useQuery<CustomerAnalyticsOverview>({

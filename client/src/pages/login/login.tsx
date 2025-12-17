@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Employee from '@/lib/images/employee.png'
 import JobCard from '@/lib/images/job-card.png'
 import Logo from '@/lib/images/logo.png'
-import { toast as toastRaw, useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import {
   Card,
   CardContent,
@@ -24,8 +24,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { Box, HStack, VStack, Image as ChakraImage } from "@chakra-ui/react";
+import { Eye, EyeOff } from "lucide-react";
+import { Box, HStack } from "@chakra-ui/react";
 import { LoginFormValues, loginSchema } from "@/schema";
 import { Constant } from "@/lib/constant";
 import { useAuth } from "@/lib/auth";
