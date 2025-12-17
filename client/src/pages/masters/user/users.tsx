@@ -29,7 +29,9 @@ export default function Users() {
   const qc = useQueryClient();
   const { user, refreshUser, roles } = useAuth();
   const [users, setUsers] = useState<Array<any>>([]);
-
+  const [perPage, setPerPage] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [has_next, setHasNext] = useState(false)
   const [isUserModalOpenInfo, setIsUserModalOpenInfo] = useState<{ open: boolean, type: string, info: any }>({
     open: false,
     type: 'create',
@@ -68,7 +70,7 @@ export default function Users() {
         );
       },
     },
-      {
+    {
       key: "role_id", label: (
         <ColumnFilter
           label="Role"
@@ -94,10 +96,10 @@ export default function Users() {
     },
     { key: "name", label: "Full Name", width: "150px" },
     { key: "email", label: "Email", width: "150px" },
-  
+
     {
       key: "change_Status",
-    label: (
+      label: (
         <ColumnFilter
           label="Status"
           value={filters.status}
@@ -184,7 +186,7 @@ export default function Users() {
           info: {
             name: value.name,
             email: value.email,
-            password: value.password ??null,
+            password: value.password ?? null,
             phone: value.phone,
             role_id: Number(value.role_id),
             address: value.address,
@@ -210,7 +212,7 @@ export default function Users() {
       fetchUsers(false);
     } catch (err: any) {
       const apiErrors = err?.response?.data?.errors;
-     
+
 
       // 👇 THIS IS THE KEY PART
       if (apiErrors && err?.response?.status === 422) {
@@ -222,9 +224,9 @@ export default function Users() {
         });
         return;
       }
-      if(err?.response?.status === 403){
-        
-      setIsUserModalOpenInfo({ open: false, type: "create", info: {} });
+      if (err?.response?.status === 403) {
+
+        setIsUserModalOpenInfo({ open: false, type: "create", info: {} });
       }
       toast({
         title: "Error",
@@ -267,6 +269,7 @@ export default function Users() {
       if (!isLoaderHide)
         setIsListLoading(true);
       const res = await fetchUserList({
+        per_page: perPage,
         page,
         search,
         role_id: filters.role_id,
@@ -283,7 +286,8 @@ export default function Users() {
         status: u.is_active,
         createdAt: u.created_at,
       }));
-
+      setHasNext(res.meta.has_next)
+      setTotal(res.meta.total)
       setUsers(mappedUsers);
       setLastPage(res.meta.last_page);
     } catch (e) {
@@ -297,7 +301,7 @@ export default function Users() {
 
   useEffect(() => {
     fetchUsers(false);
-  }, [search, page, filters]);
+  }, [search, page, filters, perPage]);
   function resetFilter() {
     setSearch('')
     setPage(1)
@@ -312,12 +316,18 @@ export default function Users() {
         <CommonTable
           columns={columns}
           data={users}
+          isAdd={true}
+          isClear={true}
+          perPage={perPage}
+          setPerPage={setPerPage}
           resetFilter={resetFilter}
           isLoading={isListLoading}
+          total={total}
+          hasNext={has_next}
           tabType=""
           tabDisplayName="User"
-          page={page}                 // ✅
-          setPage={setPage}           // ✅
+          page={page}
+          setPage={setPage}
           lastPage={lastPage}
           searchValue={search}
           onSearch={(value: string) => {

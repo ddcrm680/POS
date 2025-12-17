@@ -16,7 +16,8 @@ import {
   Calendar,
   Building,
   UserCheck,
-  Layers
+  Layers,
+  Car
 } from "lucide-react";
 
 export const Constant={
@@ -80,5 +81,5 @@ export const quickActions = [
 ];
 export const masterTabList = [
   { id: "users", label: "Users", emoji: Users, color: "bg-blue-600 hover:bg-blue-700" },
-  { id: "products", label: "Products", emoji: Package , color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "vehicleMaster", label: "Vehicle Master", emoji: Car , color: "bg-blue-600 hover:bg-blue-700" },
 ];

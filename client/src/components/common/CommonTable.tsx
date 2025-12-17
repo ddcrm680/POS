@@ -10,19 +10,26 @@ export default function CommonTable({
   columns,
   data,
   actions,
+  total,
   isLoading,
   setIsModalOpen,
+  hasNext,
   tabDisplayName,
   tabType,
   searchable = true,
   lastPage,
   setPage,
+  isAdd = false,
+  isClear = false,
   page,
   resetFilter,
   searchValue = "",
+  perPage = 2,
+  setPerPage,
+  perPageOptions = [10, 25, 50, 100],
   onSearch,
   className = "",
-  debounceDelay = 300, // 👈 default 3 ms
+  debounceDelay = 300,
 }: any) {
   const [localSearch, setLocalSearch] = useState(searchValue);
 
@@ -59,7 +66,7 @@ export default function CommonTable({
             />
 
             <Input
-              placeholder={`${tabType? "Search...":  `Search ${tabType}...`}`}
+              placeholder={`${tabType ? "Search..." : `Search ${tabType}...`}`}
               value={localSearch}
               onChange={(e) => {
                 hasUserTyped.current = true;   // 👈 user action
@@ -69,20 +76,20 @@ export default function CommonTable({
             />
           </div>
           <Box className="flex gap-3">
-            <Button
+            {isClear && <Button
               variant="outline"
               className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
               onClick={() => { resetFilter() }}
             >
               {'Clear'}
-            </Button>
-            <Button
+            </Button>}
+            {isAdd && <Button
               onClick={() => setIsModalOpen(true)}
               className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex gap-2"
             >
               <Plus className="h-4 w-4" />
               Add {tabDisplayName || "Item"}
-            </Button>
+            </Button>}
           </Box>
         </div>
       )}
@@ -187,27 +194,56 @@ export default function CommonTable({
           </Table.Body>
         </Table.Root>
       </div>
-      {lastPage > 1 && (
+      {/* Pagination */}
+      {(total > perPageOptions[0] || lastPage > 1) && (
         <div className="flex items-center justify-end gap-3">
-          <Button
-            variant="outline"
-            disabled={page === 1}
-            onClick={() => setPage((p: number) => p - 1)}
-          >
-            Prev
-          </Button>
 
-          <span className="text-sm">
-            Page <strong>{page}</strong> of <strong>{lastPage}</strong>
-          </span>
+          {/* Per Page selector */}
+          {setPerPage && total > perPageOptions[0] && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Rows per page</span>
+              <select
+                value={perPage}
+                onChange={(e) => {
+                  setPerPage(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="border rounded px-2 py-1 text-sm"
+              >
+                {perPageOptions.map((size: number) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-          <Button
-            variant="outline"
-            disabled={page === lastPage}
-            onClick={() => setPage((p: number) => p + 1)}
-          >
-            Next
-          </Button>
+          {/* Pagination buttons */}
+          {/* {lastPage > 1 && ( */}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              disabled={page === 1}
+              onClick={() => setPage((p: number) => p - 1)}
+            >
+              Prev
+            </Button>
+
+            <span className="text-sm">
+              Page <strong>{page}</strong> of <strong>{lastPage}</strong>
+            </span>
+
+            <Button
+              variant="outline"
+              disabled={!hasNext || page === lastPage}
+              onClick={() => setPage((p: number) => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
+
+          {/* )} */}
         </div>
       )}
     </div>

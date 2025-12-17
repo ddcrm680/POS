@@ -228,7 +228,9 @@ export async function fetchUserList({
   search,
   role_id,
   status,
+  per_page
 }: {
+  per_page:number;
   page: number;
   search: string;
   role_id?: string | number;
@@ -237,6 +239,7 @@ export async function fetchUserList({
   const params = new URLSearchParams({
     page: String(page),
     search,
+    per_page:String(per_page)
   });
 
   if (role_id) params.append("role_id", String(role_id));
@@ -249,7 +252,28 @@ export async function fetchUserList({
   }
   throw new Error("Failed to fetch user list");
 }
+export async function fetchVehicleList({
+  page,
+  search,
+  per_page
+}: {
+  per_page:number;
+  page: number;
+  search: string;
+}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    search,
+    per_page:String(per_page)
+  });
 
+  const response = await api.get(`/api/utility/vehicle-companies?${params.toString()}`);
+
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error("Failed to fetch vehicle list");
+}
 export async function UpdateUserStatus(statusInfo: { id: number, status: number }) {
 
   try {

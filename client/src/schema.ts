@@ -536,3 +536,11 @@ export interface UserApiType {
   , role_id: number, is_active: number, created_at: string
 
 }
+export interface vehicleType{
+    "id": number
+    "name": string
+    "vehicle_models":{
+            "id": number,
+            "name": string
+        }[]
+}
