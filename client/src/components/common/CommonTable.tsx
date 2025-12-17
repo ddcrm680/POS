@@ -17,7 +17,7 @@ export default function CommonTable({
   actions,
   total,
   isLoading,
-  setIsModalOpen,
+  setIsModalOpen,CardComponent,
   hasNext,
   tabDisplayName,
   tabType,
@@ -60,31 +60,39 @@ export default function CommonTable({
   }, [localSearch, debounceDelay, onSearch]);
 
   const hasUserTyped = useRef(false);
-  const renderCardView = () => {
-    if (isLoading) {
-      return (
-        <div className="py-10 text-center text-gray-500"> <Loader /></div>
-      );
-    }
-
-    if (!isLoading && data.length === 0) {
-      return (
-        <div className="py-10 text-center text-gray-500">
-          No data found
-        </div>
-      );
-    }
-
+const renderCardView = () => {
+  if (isLoading) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {data.map((item: any) => (
-          <VehicleCardInfo item={item} isInModal={false} setIsUserModalOpenInfo={(value) => setIsUserModalOpenInfo({ open: value, info: item })} />
-        ))}
+      <div className="py-10 text-center text-gray-500">
+        <Loader />
       </div>
-
-
     );
-  };
+  }
+
+  if (!isLoading && data.length === 0) {
+    return (
+      <div className="py-10 text-center text-gray-500">
+        No data found
+      </div>
+    );
+  }
+
+  if (!CardComponent) return null;
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {data.map((item: any, idx: number) => (
+        <CardComponent
+          key={item.id ?? idx}
+          item={item}
+          isInModal={false}
+          setIsUserModalOpenInfo={(value:boolean) => setIsUserModalOpenInfo({ open: value, info: item })} 
+        />
+      ))}
+    </div>
+  );
+};
+
 
   return (
     <div className={`w-full space-y-4 pt-6 ${className}`}>

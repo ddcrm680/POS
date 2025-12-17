@@ -112,6 +112,7 @@ export default function VehicleMaster() {
           total={total}
           hasNext={has_next}
           setPage={setPage}
+          CardComponent={VehicleCardInfo}
           lastPage={lastPage}
           searchValue={search}
           perPage={perPage}
