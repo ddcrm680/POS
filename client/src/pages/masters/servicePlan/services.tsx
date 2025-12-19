@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { EditServicePlan, SaveServicePlan, UpdateServicePlanStatus } from "@/lib/api";
+import { EditServicePlan, fetchServicePlanList, SaveServicePlan, UpdateServicePlanStatus } from "@/lib/api";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton, Switch } from "@chakra-ui/react";
 import { EditIcon, EyeIcon } from "lucide-react";
@@ -47,7 +47,7 @@ export default function Services() {
 
   const columns = useMemo(() => [
     {
-      key: "date_created", label: "Created On", align: "center", width: "100px", render: (_value: any,) => {
+      key: "created_at", label: "Created On", align: "center", width: "100px", render: (_value: any,) => {
 
         return (
           <Box className="flex flex-col justify-center items-center">
@@ -133,8 +133,8 @@ export default function Services() {
         );
       }
     },
-    { key: "number_of_visit", label: "Visit", width: "150px" },
-    { key: "sac", label: "Sac", width: "150px" },
+    // { key: "number_of_visits", label: "Visit", width: "150px" },
+    // { key: "sac", label: "Sac", width: "150px" },
     {
       key: "price", label: "Price", width: "150px", render: (_value: any,) => {
 
@@ -145,20 +145,32 @@ export default function Services() {
         );
       }
     },
-    { key: "gst", label: "Gst(%)", width: "150px", },
-    { key: "duration", label: "Duration", width: "150px" },
-    {
-      key: "description", label: "Description", width: "150px",
-      render: (_value: any,) => {
+    { key: "gst", label: "Gst(%)", width: "150px", 
+
+    },
+
+    
+    { key: "duration", label: "Duration", width: "150px", 
+       render: (_value: any,row:any) => {
 
         return (
           <span className="text-sm font-medium text-gray-700">
-            * {_value}
+           {row.warranty_period} {row.warranty_in}
           </span>
         );
-      }
-    },
-    { key: "raw_materials", label: "	Raw Materials", width: "150px" },
+      }},
+    // {
+    //   key: "description", label: "Description", width: "150px",
+    //   render: (_value: any,) => {
+
+    //     return (
+    //       <span className="text-sm font-medium text-gray-700">
+    //         * {_value}
+    //       </span>
+    //     );
+    //   }
+    // },
+    // { key: "raw_materials", label: "	Raw Materials", width: "150px" },
     {
       key: "status",
       label: (
@@ -182,7 +194,7 @@ export default function Services() {
 
         return (
           <Switch.Root checked={isActive}
-            onCheckedChange={() => UserStatusUpdateHandler(_row)}
+            onCheckedChange={() => ServiceStatusUpdateHandler(_row)}
             size="sm">
             <Switch.HiddenInput />
             <Switch.Control
@@ -199,7 +211,7 @@ export default function Services() {
 
   ], [roles, page, PER_PAGE, filters]);
 
-  const UserStatusUpdateHandler = useCallback(async (u: any) => {
+  const ServiceStatusUpdateHandler = useCallback(async (u: any) => {
     try {
       const newStatus = u.change_Status ? 0 : 1;
 
@@ -235,27 +247,29 @@ export default function Services() {
     }
   }, []);
 
-  const UserCommonHandler = async (
+  const ServiceCommonHandler = async (
     value: serviceFormType,
     setError: UseFormSetError<serviceFormType>
   ) => {
+    console.log(value,'value67890-[');
+    
     try {
       setIsLoading(true);
 
       if (isServicePlanModalOpenInfo.type === "edit") {
         await EditServicePlan({
-          id: isServicePlanModalOpenInfo.info.id,
           info: {
+            id: isServicePlanModalOpenInfo.info.id,
             vehicle_type: value.vehicle_type,
             plan_name:value.plan_name,
             category_type:value.category_type,
             invoice_name:value.invoice_name,
             price:value.price,
-            number_of_visit:value.number_of_visit,
+            number_of_visits:value.number_of_visits,
             sac:value.sac,
             gst:value.gst,
             warranty_period:value.warranty_period,
-            warranty_type:value.warranty_type,
+            warranty_in:value.warranty_in,
             description:value.description,
             raw_materials:value.raw_materials
           },
@@ -314,18 +328,19 @@ export default function Services() {
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      const res = servicePlanMockResponse
-      // await fetchServicePlanList({
-      //   per_page: perPage,
-      //   page,
-      //   search,
-      //   vehicle_type: filters.vehicle_type,
-      //   plan_name: filters.plan_name,
-      //   category_type: filters.category_type,
-      //   status: filters.status,
-      // });
+      const res = 
+      await fetchServicePlanList({
+        per_page: perPage,
+        page,
+        search,
+        vehicle_type: filters.vehicle_type,
+        plan_name: filters.plan_name,
+        category_type: filters.category_type,
+        status: filters.status,
+      });
 
-      const mappedUsers = res.data
+      const mappedUsers = res.data.map((item:any)=>({...item,warranty_period:item.warranty_period.toString()
+        ,number_of_visits:item.number_of_visits.toString()}))
       setHasNext(res.meta.has_next)
       setTotal(res.meta.total)
       setUsers(mappedUsers);
@@ -447,7 +462,7 @@ export default function Services() {
             }
             roles={roles}
             onSubmit={(values, setError) => {
-              UserCommonHandler(values, setError);
+              ServiceCommonHandler(values, setError);
             }}
           />
 

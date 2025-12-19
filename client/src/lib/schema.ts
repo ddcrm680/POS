@@ -411,9 +411,9 @@ export const servicePlanSchema = (mode: "create" | "edit" | "view") =>
 
     plan_name: z.string().min(1, "Please select plan name"),
 
-    invoice_name: z.string().optional(),
+    invoice_name: z.string().min(1, "Invoice name is required"),
 
-    number_of_visit: z.string().min(1, "Please select number of visits"),
+    number_of_visits: z.string().min(1, "Please select number of visits"),
 
     price: z
       .coerce
@@ -427,11 +427,11 @@ export const servicePlanSchema = (mode: "create" | "edit" | "view") =>
       .number()
       .min(0, "GST cannot be negative")
       .max(100, "GST cannot exceed 100")
-      .optional(),
-
+      // .optional(),
+,
     warranty_period: z.string().min(1, "Please select warranty period"),
 
-    warranty_type: z.enum(["month", "year"], {
+    warranty_in: z.enum(["months", "years"], {
       required_error: "Warranty type is required",
     }),
 

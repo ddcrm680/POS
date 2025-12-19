@@ -1,4 +1,4 @@
-import { UseFormSetError } from "react-hook-form";
+import { ControllerRenderProps, UseFormSetError } from "react-hook-form";
 import { CustomerSchema, InsertCustomerSchema, JobCardSchema, loginSchema, passwordSchema, posJobSchema, profileSchema, userSchema, VehicleSchema } from "./schema";
 import z from "zod";
 import { ReactNode } from "react";
@@ -70,21 +70,21 @@ export type editUserReq = {
   };
 }
 export type editServicePlanReq = {
-  id: string;
-  info: {
+  
+  info: {id: string;
       vehicle_type: string;
   category_type: string;
   plan_name: string;
   invoice_name?: string;
 
-  number_of_visit: string;
+  number_of_visits: string;
   price: number;
 
   sac?: string;
   gst?: number;
 
   warranty_period: string;
-  warranty_type: "month" | "year";
+  warranty_in: "months" | "years";
 
   description?: string;
   raw_materials: string[];
@@ -173,16 +173,16 @@ export type serviceFormType = {
   vehicle_type: string;
   category_type: string;
   plan_name: string;
-  invoice_name?: string;
+  invoice_name: string;
 
-  number_of_visit: string;
+  number_of_visits: string;
   price: number;
 
   sac?: string;
-  gst?: number;
+  gst: number;
 
   warranty_period: string;
-  warranty_type: "month" | "year";
+  warranty_in: "months" | "years";
 
   description?: string;
   raw_materials: string[];
@@ -244,3 +244,16 @@ export type JobCard = z.infer<typeof JobCardSchema>;
 
 export type Customer = z.infer<typeof CustomerSchema>;
 
+export type Option = {
+  value: string;
+  label: string;
+};
+
+export type RHFSelectProps = {
+  field: ControllerRenderProps<any, any>;
+  options: Option[];
+  creatable:boolean
+  isMulti?: boolean;
+  isDisabled?: boolean;
+  placeholder?: string;
+};

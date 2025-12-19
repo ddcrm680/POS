@@ -187,7 +187,7 @@ export async function SaveUser(values: UserFormType) {
 export async function SaveServicePlan(values: serviceFormType) {
   try {
     const response: any = await api.post(
-      "/api/admin/add-user", values
+      "/api/service-plans/save", values
     );
     if (response?.data?.success === true) {
       return response.data?.data;
@@ -231,7 +231,7 @@ export async function EditServicePlan(editFormValue: editServicePlanReq) {
 
   try {
     const response: any = await api.post(
-      `/api/admin/update-user/${editFormValue.id}`, editFormValue.info
+      `/api/service-plans/update/`, editFormValue.info
     );
     if (response?.data?.success === true) {
       return response.data?.data;
@@ -310,12 +310,12 @@ export async function fetchServicePlanList({
   if (category_type) params.append("category_type", String(category_type));
   if (status !== "") params.append("status", String(status));
 
-  const response = await api.get(`/api/admin/users?${params.toString()}`);
+  const response = await api.get(`/api/service-plans?${params.toString()}`);
 
   if (response?.data?.success === true) {
     return response.data;
   }
-  throw new Error("Failed to fetch user list");
+  throw new Error("Failed to fetch service plan list");
 }
 export async function fetchVehicleList({
   page,
@@ -358,7 +358,7 @@ export async function UpdateServicePlanStatus(statusInfo: { id: number, status: 
 
   try {
     const response: any = await api.post(
-      `/api/admin/user/status/${statusInfo.id}`, { status: statusInfo.status }
+      `/api/service-plans/status/${statusInfo.id}`, { status: statusInfo.status }
     );
     if (response?.data?.success === true) {
       return response.data?.data;

@@ -43,10 +43,10 @@ export const servicePlanMockResponse = {
 
       plan_name: "Bonnet Coating",
       category_type: "Bonnet Protection",
-      number_of_visit: 1,
+      number_of_visits: 1,
       sac: "9997",
        warranty_period: "1",
-  warranty_type: "month" ,
+  warranty_in: "months" ,
 
       price: 2000,
       gst: 18,
@@ -63,10 +63,10 @@ export const servicePlanMockResponse = {
 
       plan_name: "Bonnet Coating",
       category_type: "Bonnet Protection",
-      number_of_visit: 1,
+      number_of_visits: 1,
       sac: "9997",
        warranty_period: "1",
-  warranty_type: "month" ,
+  warranty_in: "months" ,
 
       price: 2000,
       gst: 18,
@@ -83,10 +83,10 @@ export const servicePlanMockResponse = {
 
       plan_name: "Bonnet Coating",
       category_type: "Bonnet Protection",
-      number_of_visit: 1,
+      number_of_visits: 1,
       sac: "9997",
        warranty_period: "1",
-  warranty_type: "month" ,
+  warranty_in: "months" ,
 
       price: 2000,
       gst: 18,
@@ -169,11 +169,11 @@ export const warrantyPeriod = [
 export const warrantyType = [
   {
     name: "Month",
-    id: "month"
+    id: "months"
   },
   {
     name: "Year",
-    id: "year"
+    id: "years"
   },
 ]
 export const numberOfVisit  = [

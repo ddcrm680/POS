@@ -36,7 +36,8 @@ export const Constant = {
       vehicleType:"Vehicle Type",
       selectVehicleType:"Select vehicle type",
       selectWarrantyPeriod:"Select warranty period",
-      noOfVisit:"Select no. of visit"
+      noOfVisit:"Select no. of visit",
+      mentionRawMaterial:"Mention raw material"
 
     }
   }

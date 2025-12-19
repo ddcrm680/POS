@@ -19,6 +19,7 @@ import { Constant } from "@/lib/constant";
 import { categoryType, numberOfVisit, planName, vehicleType, warrantyPeriod, warrantyType } from "@/lib/mockData";
 import { serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
 import { servicePlanSchema, userSchema } from "@/lib/schema";
+import RHFSelect from "@/components/RHFSelect";
 export const RequiredMark = ({ show }: { show: boolean }) =>
   show ? <span className="text-red-500 ml-1">*</span> : null;
 
@@ -40,14 +41,14 @@ console.log(initialValues,'initialValues');
       plan_name: "",
       invoice_name: "",
 
-      number_of_visit: "",
+      number_of_visits: "",
       price: 0,
 
       sac: "",
-      gst: undefined,
+      gst: 0,
 
       warranty_period: "",
-      warranty_type: "month",
+      warranty_in: "months",
 
       description: "",
       raw_materials: [],
@@ -67,40 +68,21 @@ console.log(initialValues,'initialValues');
         plan_name: "",
         invoice_name: "",
 
-        number_of_visit: "",
+        number_of_visits: "",
         price: 0,
 
         sac: "",
         gst: undefined,
 
         warranty_period: "",
-        warranty_type: "month",
+        warranty_in: "months",
 
         description: "",
         raw_materials: [],
         // ...(mode === "create" ? { password: "" } : {}),
         ...initialValues,
       });
-      console.log({
-        vehicle_type: "",
-        category_type: "",
-        plan_name: "",
-        invoice_name: "",
 
-        number_of_visit: "",
-        price: 0,
-
-        sac: "",
-        gst: undefined,
-
-        warranty_period: "",
-        warranty_type: "month",
-
-        description: "",
-        raw_materials: [],
-        // ...(mode === "create" ? { password: "" } : {}),
-        ...initialValues,
-      },'initialValues234')
     }
   }, [mode]);
   const isView = mode === "view";
@@ -113,7 +95,7 @@ console.log(initialValues,'initialValues');
           onSubmit(values, form.setError)
         )}
         className="space-y-6 "
-      >  <div className="p-6 space-y-6">
+      >  <div className="p-6 space-y-6 max-h-[50vh] overflow-y-auto">
           {/* Row 1 */}
           <Box className="flex gap-3 ">
             <Box w="33%">
@@ -125,50 +107,47 @@ console.log(initialValues,'initialValues');
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.planName}<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
-                      <select
-                        {...field}
-                        className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
-                      >
-                        <option value="">{Constant.master.servicePlan.selectPlanName}</option>
-                        {planName.map((r) => (
-                          <option key={r.id} value={r.id}>
-                            {r.name}
-                          </option>
-                        ))}
-                      </select>
+                      <RHFSelect
+                        field={field}
+                        options={planName.map(p => ({
+                          value: String(p.id),
+                          label: p.name,
+                        }))}
+                        placeholder={Constant.master.servicePlan.selectPlanName}
+                        isDisabled={isView}
+                      />
+
+
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </Box>
-            <Box w="33%">
-
+            <Box w={'33%'}>
               <FormField
                 control={form.control}
-                name="vehicle_type"
-                disabled={mode === 'view'}
+                name="invoice_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.vehicleType}<RequiredMark show={!isView} /></FormLabel>
+                    <FormLabel style={{ color: "#000" }}>
+                      Invoice Name<RequiredMark show={!isView} />
+                    </FormLabel>
                     <FormControl>
-                      <select
+                      <Input
+                        type="text"
+                        placeholder="Enter invoice name"
                         {...field}
-                        className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
-                      >
-                        <option value="">{Constant.master.servicePlan.selectVehicleType}</option>
-                        {vehicleType.map((r) => (
-                          <option key={r.id} value={r.id}>
-                            {r.name}
-                          </option>
-                        ))}
-                      </select>
+                        disabled={isView}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
             </Box>
+          
             <Box w="33%">
 
               <FormField
@@ -181,19 +160,17 @@ console.log(initialValues,'initialValues');
                       'Category'
                     )}<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
-                      <select
-                        {...field}
-                        className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
-                      >
-                        <option value="">{Constant.master.servicePlan.selectVehicleType.replace('vehicle',
+                       <RHFSelect
+                        field={field}
+                        options={categoryType.map(p => ({
+                          value: String(p.id),
+                          label: p.name,
+                        }))}
+                        placeholder={Constant.master.servicePlan.selectVehicleType.replace('vehicle',
                           'category'
-                        )}</option>
-                        {categoryType.map((r) => (
-                          <option key={r.id} value={r.id}>
-                            {r.name}
-                          </option>
-                        ))}
-                      </select>
+                        )}
+                        isDisabled={isView}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -211,7 +188,7 @@ console.log(initialValues,'initialValues');
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
+                    <FormLabel style={{ color: "#000" }}>
                       Price (₹)<RequiredMark show={!isView} />
                     </FormLabel>
                     <FormControl>
@@ -247,21 +224,21 @@ console.log(initialValues,'initialValues');
               name="warranty_period"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel style={{ color: "#000" }}>
 
                     Warranty Period<RequiredMark show={!isView} />
                   </FormLabel>
                   <FormControl>
-                    <select
-                      {...field}
-                      className="w-full h-10 rounded-md border px-3"
-                      disabled={isView}
-                    >
-                      <option value="">{Constant.master.servicePlan.selectWarrantyPeriod}</option>
-                      {warrantyPeriod.map((period) => {
-                        return <option value={period.id}>{period.name}</option>
-                      })}
-                    </select>
+                    <RHFSelect
+                        field={field}
+                        creatable={false}
+                        options={warrantyPeriod.map(p => ({
+                          value: String(p.id),
+                          label: p.name,
+                        }))}
+                        placeholder={Constant.master.servicePlan.selectWarrantyPeriod}
+                        isDisabled={isView}
+                      />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -270,26 +247,26 @@ console.log(initialValues,'initialValues');
             </Box>
             <Box w={'33%'}> <FormField
               control={form.control}
-              name="warranty_type"
+              name="warranty_in"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel style={{ color: "#000" }}>
                     Warranty Type<RequiredMark show={!isView} />
                   </FormLabel>
                   <FormControl>
-                    <select
-                      {...field}
-                      className="w-full h-10 rounded-md border px-3"
-                      disabled={isView}
-                    >
-                      <option value="">{Constant.master.servicePlan.selectVehicleType.replace('vehicle',
+                     <RHFSelect
+                        field={field}
+                        creatable={false}
+                        options={warrantyType.map(p => ({
+                          value: String(p.id),
+                          label: p.name,
+                        }))}
+                        placeholder={Constant.master.servicePlan.selectVehicleType.replace('vehicle',
                         'warranty'
-                      )}</option>
-                      {warrantyType.map((period) => {
-                        return <option value={period.id}>{period.name}</option>
-                      })}
-
-                    </select>
+                      )}
+                        isDisabled={isView}
+                      />
+                    
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -301,23 +278,24 @@ console.log(initialValues,'initialValues');
             <Box w={'33%'}>
               <FormField
                 control={form.control}
-                name="number_of_visit"
+                name="number_of_visits"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Visit<RequiredMark show={!isView} />
+                  <FormItem >
+                    <FormLabel style={{ color: "#000" }}>
+                      Number of visit<RequiredMark show={!isView} />
                     </FormLabel>
                     <FormControl>
-                      <select
-                        {...field}
-                        className="w-full h-10 rounded-md border px-3"
-                        disabled={isView}
-                      >
-                        <option value="">{Constant.master.servicePlan.noOfVisit}</option>
-                        {numberOfVisit.map((visit) => {
-                          return <option value={visit.id}>{visit.name}</option>
-                        })}
-                      </select>
+                      <RHFSelect
+                        field={field}
+                        creatable={false}
+                        options={numberOfVisit.map(p => ({
+                          value: String(p.id),
+                          label: p.name,
+                        }))}
+                        placeholder={Constant.master.servicePlan.noOfVisit}
+                        isDisabled={isView}
+                      />
+                     
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -329,9 +307,9 @@ console.log(initialValues,'initialValues');
               name="sac"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel style={{ color: "#000" }}>
 
-                    Sac<RequiredMark show={!isView} />
+                    Sac
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -360,7 +338,7 @@ console.log(initialValues,'initialValues');
               name="gst"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel style={{ color: "#000" }}>
                     GST(%)<RequiredMark show={!isView} />
                   </FormLabel>
                   <FormControl>
@@ -418,9 +396,9 @@ console.log(initialValues,'initialValues');
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel style={{ color: "#000" }}>
 
-                    Description<RequiredMark show={!isView} />
+                    Description
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -435,29 +413,59 @@ console.log(initialValues,'initialValues');
               )}
             />
             </Box>
-             <Box w={'50%'}> <FormField
+              <Box w="50%">
+
+              <FormField
+                control={form.control}
+                name="vehicle_type"
+                disabled={mode === 'view'}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.vehicleType}<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                       <RHFSelect
+                        field={field}
+                        options={vehicleType.map(p => ({
+                          value: String(p.id),
+                          label: p.name,
+                        }))}
+                        placeholder={Constant.master.servicePlan.selectVehicleType}
+                        isDisabled={isView}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+           
+          </Box>
+          <Box className="flex gap-3">
+           <Box w={'100%'}> <FormField
               control={form.control}
               name="raw_materials"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel style={{ color: "#000" }}>
 
-                    Raw Material Consumption<RequiredMark show={!isView} />
+                    Raw Material Consumption
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter raw material consumption"
-                      {...field}
-                      disabled={isView}
-                    />
+                    <RHFSelect
+                        field={field}
+                        isMulti
+                        options={[]}
+                        placeholder={Constant.master.servicePlan.mentionRawMaterial}
+                        isDisabled={isView}
+                      />
+                    
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             </Box>
-          </Box>
+            </Box>
         </div>
         {/* Submit */}
         {mode !== 'view' && <div className="">
