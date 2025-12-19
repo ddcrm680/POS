@@ -204,7 +204,7 @@ useEffect(()=>{
       ),
       width: "120px",
       render: (value: string, _row: any,) => {
-        const isActive = Number(value) === 1;
+        const isActive = value;
 
         return (
           <Switch.Root checked={isActive}
@@ -227,7 +227,7 @@ useEffect(()=>{
 
   const ServiceStatusUpdateHandler = useCallback(async (u: any) => {
     try {
-      const newStatus = u.change_Status ? 0 : 1;
+      const newStatus = u.status ? 0 : 1;
 
       setUsers(prevUsers => {
 
@@ -235,7 +235,6 @@ useEffect(()=>{
           item.id === u.id
             ? {
               ...item,
-              change_Status: newStatus,
               status: newStatus,
             }
             : item
@@ -280,11 +279,11 @@ useEffect(()=>{
             invoice_name: value.invoice_name,
             price: value.price,
             number_of_visits: value.number_of_visits,
-            sac: value.sac,
+            sac: value.sac??"",
             gst: value.gst,
             warranty_period: value.warranty_period,
             warranty_in: value.warranty_in,
-            description: value.description,
+            description: value.description ??"",
             raw_materials: value.raw_materials
           },
         });

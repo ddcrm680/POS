@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Box } from "@chakra-ui/react";
 import { Constant } from "@/lib/constant";
-import {warrantyType } from "@/lib/mockData";
+import { warrantyType } from "@/lib/mockData";
 import { serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
 import { servicePlanSchema, userSchema } from "@/lib/schema";
 import RHFSelect from "@/components/RHFSelect";
@@ -32,10 +32,10 @@ export default function ServiceForm({
   isLoading = false,
   onSubmit,
 }: serviceFormProp) {
-console.log(initialValues,'initialValues');
+  console.log(initialValues, 'initialValues');
 
   const form = useForm<serviceFormType>({
-    resolver: zodResolver(servicePlanSchema(mode)),
+    resolver: zodResolver(servicePlanSchema(serviceMetaInfo)),
     defaultValues: {
       vehicle_type: "",
       category_type: "",
@@ -45,17 +45,18 @@ console.log(initialValues,'initialValues');
       number_of_visits: "",
       price: 0,
 
-      sac: "",
       gst: 0,
 
       warranty_period: "",
       warranty_in: "months",
 
-      description: "",
       raw_materials: [],
 
+      description: "",
+      sac: "",
       ...initialValues,
     },
+    shouldUnregister: false,
   });
 
 
@@ -72,17 +73,16 @@ console.log(initialValues,'initialValues');
         number_of_visits: "",
         price: 0,
 
-        sac: "",
-        gst: undefined,
+        gst: initialValues?.gst ?? 0,
 
         warranty_period: "",
         warranty_in: "months",
-
-        description: "",
+        description: initialValues?.description ?? "",
+        sac: initialValues?.sac ?? "",
         raw_materials: [],
         // ...(mode === "create" ? { password: "" } : {}),
         ...initialValues,
-      });
+      } as serviceFormType);
 
     }
   }, [mode]);
@@ -148,7 +148,7 @@ console.log(initialValues,'initialValues');
               />
 
             </Box>
-          
+
             <Box w="33%">
 
               <FormField
@@ -161,7 +161,7 @@ console.log(initialValues,'initialValues');
                       'Category'
                     )}<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
-                       <RHFSelect
+                      <RHFSelect
                         field={field}
                         options={serviceMetaInfo.categoryTypes.map(p => ({
                           value: String(p.value),
@@ -231,15 +231,15 @@ console.log(initialValues,'initialValues');
                   </FormLabel>
                   <FormControl>
                     <RHFSelect
-                        field={field}
-                        creatable={false}
-                        options={serviceMetaInfo.warrantyPeriods.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
-                        }))}
-                        placeholder={Constant.master.servicePlan.selectWarrantyPeriod}
-                        isDisabled={isView}
-                      />
+                      field={field}
+                      creatable={false}
+                      options={serviceMetaInfo.warrantyPeriods.map(p => ({
+                        value: String(p.value),
+                        label: p.label,
+                      }))}
+                      placeholder={Constant.master.servicePlan.selectWarrantyPeriod}
+                      isDisabled={isView}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -255,19 +255,19 @@ console.log(initialValues,'initialValues');
                     Warranty Type<RequiredMark show={!isView} />
                   </FormLabel>
                   <FormControl>
-                     <RHFSelect
-                        field={field}
-                        creatable={false}
-                        options={warrantyType.map(p => ({
-                          value: String(p.id),
-                          label: p.name,
-                        }))}
-                        placeholder={Constant.master.servicePlan.selectVehicleType.replace('vehicle',
+                    <RHFSelect
+                      field={field}
+                      creatable={false}
+                      options={warrantyType.map(p => ({
+                        value: String(p.id),
+                        label: p.name,
+                      }))}
+                      placeholder={Constant.master.servicePlan.selectVehicleType.replace('vehicle',
                         'warranty'
                       )}
-                        isDisabled={isView}
-                      />
-                    
+                      isDisabled={isView}
+                    />
+
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -296,7 +296,7 @@ console.log(initialValues,'initialValues');
                         placeholder={Constant.master.servicePlan.noOfVisit}
                         isDisabled={isView}
                       />
-                     
+
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -316,7 +316,9 @@ console.log(initialValues,'initialValues');
                     <Input
                       type="text"
                       placeholder="Enter sac"
+
                       {...field}
+                      value={field.value ?? ""}
                       onChange={(e) => {
                         let value = e.target.value;
 
@@ -406,6 +408,7 @@ console.log(initialValues,'initialValues');
                       type="text"
                       placeholder="Enter description"
                       {...field}
+                      value={field.value ?? ""}
                       disabled={isView}
                     />
                   </FormControl>
@@ -414,7 +417,7 @@ console.log(initialValues,'initialValues');
               )}
             />
             </Box>
-              <Box w="50%">
+            <Box w="50%">
 
               <FormField
                 control={form.control}
@@ -424,7 +427,7 @@ console.log(initialValues,'initialValues');
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.vehicleType}<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
-                       <RHFSelect
+                      <RHFSelect
                         field={field}
                         options={serviceMetaInfo.vehicleTypes.map(p => ({
                           value: String(p.value),
@@ -439,10 +442,10 @@ console.log(initialValues,'initialValues');
                 )}
               />
             </Box>
-           
+
           </Box>
           <Box className="flex gap-3">
-           <Box w={'100%'}> <FormField
+            <Box w={'100%'}> <FormField
               control={form.control}
               name="raw_materials"
               render={({ field }) => (
@@ -453,20 +456,20 @@ console.log(initialValues,'initialValues');
                   </FormLabel>
                   <FormControl>
                     <RHFSelect
-                        field={field}
-                        isMulti
-                        options={[]}
-                        placeholder={Constant.master.servicePlan.mentionRawMaterial}
-                        isDisabled={isView}
-                      />
-                    
+                      field={field}
+                      isMulti
+                      options={[]}
+                      placeholder={Constant.master.servicePlan.mentionRawMaterial}
+                      isDisabled={isView}
+                    />
+
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             </Box>
-            </Box>
+          </Box>
         </div>
         {/* Submit */}
         {mode !== 'view' && <div className="">

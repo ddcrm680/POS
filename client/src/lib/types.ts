@@ -87,7 +87,7 @@ export type editServicePlanReq = {
   warranty_in: "months" | "years";
 
   description?: string;
-  raw_materials: string[];
+  raw_materials?: string[];
   };
 }
 
@@ -178,14 +178,14 @@ export type serviceFormType = {
   number_of_visits: string;
   price: number;
 
-  sac?: string;
+  sac?: string | null ;
   gst: number;
 
   warranty_period: string;
   warranty_in: "months" | "years";
 
-  description?: string;
-  raw_materials: string[];
+  description?: string | null;
+  raw_materials?: string[];
 };
 
 export interface userFormProp {

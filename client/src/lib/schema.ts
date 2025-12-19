@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { serviceFormType, serviceMetaInfoType } from "./types";
 export const CustomerSchema = z.object({
   id: z.string().uuid().default(() => crypto.randomUUID()),
   phoneNumber: z.string().max(15),
@@ -403,15 +404,55 @@ export const passwordStrength = (val: string, ctx: z.RefinementCtx) => {
     });
   }
 };
-export const servicePlanSchema = (mode: "create" | "edit" | "view") =>
+export const servicePlanSchema = (serviceMetaInfo: serviceMetaInfoType) =>
   z.object({
-    vehicle_type: z.string().min(1, "Please select vehicle type"),
+    vehicle_type: z.string().min(1, "Please select vehicle type")
+      .refine((val) => {
+        // predefined value → always valid
+        if (serviceMetaInfo.vehicleTypes.find(item => item.value === val)) {
+          return true;
+        }
 
-    category_type: z.string().min(1, "Please select category type"),
+        // custom value → length between 3 and 150
+        return val.length >= 3 && val.length <= 150;
+      }, {
+        message: "Custom vehicle type must be between 3 and 150 characters",
+      }),
 
-    plan_name: z.string().min(1, "Please select plan name"),
+    category_type: z.string().min(1, "Please select category type")
+      .refine((val) => {
+        // predefined value → always valid
+        if (serviceMetaInfo.categoryTypes.find(item => item.value === val)) {
+          return true;
+        }
 
-    invoice_name: z.string().min(1, "Invoice name is required"),
+        // custom value → length between 3 and 150
+        return val.length >= 3 && val.length <= 150;
+      }, {
+        message: "Custom category type must be between 3 and 150 characters",
+      }),
+
+    plan_name: z
+      .string()
+      .min(1, "Please select plan name")
+      .refine((val) => {
+        // predefined value → always valid
+        if (serviceMetaInfo.servicePlans.find(item => item.value === val)) {
+          return true;
+        }
+
+        // custom value → length between 3 and 150
+        return val.length >= 3 && val.length <= 150;
+      }, {
+        message: "Custom plan name must be between 3 and 150 characters",
+      }),
+    invoice_name: z
+      .string()
+      .trim()
+      .min(3, "Invoice name must be at least 3 characters")
+      .max(150, "Invoice name must not exceed 150 characters")
+      .regex(/^[a-zA-Z0-9\s]+$/, "Only letters and numbers allowed"),
+
 
     number_of_visits: z.string().min(1, "Please select number of visits"),
 
@@ -420,22 +461,40 @@ export const servicePlanSchema = (mode: "create" | "edit" | "view") =>
       .number()
       .positive("Price must be greater than 0"),
 
-    sac: z.string().optional(),
+    sac: z
+      .string()
+      .max(20, "Sac must not exceed 20 characters")
+      .nullable()
+      .optional()
+      .transform((v) => v ?? undefined),
+
+    description: z
+      .string().max(200, "Description must not exceed 200 characters").nullable()
+      .optional()
+      .transform((v) => v ?? undefined),
 
     gst: z
       .coerce
       .number()
       .min(0, "GST cannot be negative")
       .max(100, "GST cannot exceed 100")
-      // .optional(),
-,
+    // .optional(),
+    ,
     warranty_period: z.string().min(1, "Please select warranty period"),
 
     warranty_in: z.enum(["months", "years"], {
       required_error: "Warranty type is required",
     }),
 
-    description: z.string().optional(),
 
-    raw_materials: z.array(z.string())
+
+    raw_materials: z
+      .array(
+        z
+          .string()
+          .trim()
+          .max(100, "Raw material must not exceed 100 characters")
+      )
+      .optional(),
+
   });
