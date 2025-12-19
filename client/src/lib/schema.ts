@@ -1,7 +1,4 @@
-import { ReactNode } from "react";
-import { UseFormSetError } from "react-hook-form";
 import { z } from "zod";
-export type Customer = z.infer<typeof CustomerSchema>;
 export const CustomerSchema = z.object({
   id: z.string().uuid().default(() => crypto.randomUUID()),
   phoneNumber: z.string().max(15),
@@ -93,7 +90,6 @@ export const InsertCustomerSchema = CustomerSchema.omit({
   updatedAt: true,
 });
 
-export type JobCard = z.infer<typeof JobCardSchema>;
 
 // Job Card Schema
 export const JobCardSchema = z.object({
@@ -181,7 +177,6 @@ export const JobCardSchema = z.object({
 });
 
 
-export type Vehicle = z.infer<typeof VehicleSchema>;
 // Vehicle Schema
 export const VehicleSchema = z.object({
   id: z.string().uuid().default(() => crypto.randomUUID()),
@@ -201,48 +196,13 @@ export const InsertVehicleSchema = VehicleSchema.omit({
   id: true,
   createdAt: true,
 });
-export type InsertCustomer = z.infer<typeof InsertCustomerSchema>;
 // Zod schema (same as you had)
 export const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Enter a valid email"),
 
   password: z.string().min(8, "Password must be at least 8 characters").max(32, "Password must be at most 32 characters")
-  // .superRefine((val, ctx) => {
-  //   const regex = {
-  //     lowercase: /[a-z]/,
-  //     uppercase: /[A-Z]/,
-  //     number: /[0-9]/,
-  //     special: /[^A-Za-z0-9]/,
-  //   };
 
-  //   if (
-  //     !regex.lowercase.test(val) ||
-  //     !regex.uppercase.test(val) ||
-  //     !regex.number.test(val) ||
-  //     !regex.special.test(val)
-  //   ) {
-  //     ctx.addIssue({
-  //       code: z.ZodIssueCode.custom,
-  //       message:
-  //         "Password must include uppercase, lowercase, number, and special character",
-  //     });
-  //   }
-  // }),
 });
-
-export type LoginFormValues = z.infer<typeof loginSchema>;
-
-export type User = null | { id?: string; name?: string; email?: string;[k: string]: any };
-
-export interface AuthContextValue {
-  user: User | undefined; // undefined while loading
-  isLoading: boolean;
-  roles: any[];
-  isAuthenticated: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<any>;
-  Logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
-}
 
 
 export const posJobSchema = z.object({
@@ -265,7 +225,6 @@ export const posJobSchema = z.object({
   promisedReadyAt: z.string().min(1, "Promised ready time is required"),
 });
 
-export type POSJobData = z.infer<typeof posJobSchema>;
 
 export const profileSchema = z.object({
   fullName: z.string()
@@ -342,10 +301,6 @@ export const userSchema = (mode: "create" | "edit" | "view") =>
       .or(z.literal("")),
 
   });
-
-
-export type UserForm = z.infer<ReturnType<typeof userSchema>>;
-export type ProfileForm = z.infer<typeof profileSchema>;
 
 export const passwordSchema = z
   .object({
@@ -426,64 +381,7 @@ export const passwordSchema = z
     }
   });
 
-export type PasswordForm = z.infer<typeof passwordSchema>;
 
-export interface POSLayoutProps {
-  children: ReactNode;
-}
-
-export interface TabItem {
-  path: string;
-  icon: React.ComponentType<any>;
-  label: string;
-  badge?: number;
-}
-export interface CustomerAnalyticsOverview {
-  totalCustomers: number;
-  newCustomersThisMonth: number;
-  activeCustomers: number;
-  vipCustomers: number;
-  averageLifetimeValue: number;
-  customerRetentionRate: number;
-  topCustomerSource: string;
-  averageServiceInterval: number;
-}
-
-export interface CustomerStatsCardsProps {
-  className?: string;
-}
-
-export type Props = {
-  mode: "create" | "edit";
-  roles: Array<{ id: number; name: string }>;
-  initialValues?: Partial<UserFormType>;
-  isLoading?: boolean;
-  id: string
-  onSubmit: (values: UserFormType) => void;
-};
-export type UserFormType = {
-  name: string;
-  email: string;
-  phone: string;
-  password?: string;
-  role_id: number;
-  address?: string | undefined;
-}
-
-export interface userFormProp {
-  mode: "create" | "edit" | "view";
-  roles: any[];
-  id?: string;
-  initialValues?: Partial<UserFormType>;
-  isLoading?: boolean;
-  onClose: () => void;
-
-  // 👇 IMPORTANT
-  onSubmit: (
-    values: UserFormType,
-    setError: UseFormSetError<UserFormType>
-  ) => void;
-}
 export const passwordStrength = (val: string, ctx: z.RefinementCtx) => {
   const regex = {
     lowercase: /[a-z]/,
@@ -505,49 +403,85 @@ export const passwordStrength = (val: string, ctx: z.RefinementCtx) => {
     });
   }
 };
+export const servicePlanSchema = (mode: "create" | "edit" | "view") =>
+  z.object({
+    plan_name:
+      z
+        .coerce
+        .string({
+          invalid_type_error: "Plan name is required",
+        })
+        .refine(
+          (val) => val !== '' ,
+          { message: "Please select a plan name" }
+        ),
+          vehicle_type:
+      z
+        .coerce
+        .string({
+          invalid_type_error: "Vehicle type is required",
+        })
+        .refine(
+          (val) => val !== '' ,
+          { message: "Please select a vehicle type" }
+        ),
+name:
+      z
+        .coerce
+        .string({
+          invalid_type_error: "Plan name is required",
+        })
+        ,
+    email: z
+      .string()
+      .trim()
+      .min(1, "Email is required")
+      .email("Please enter a valid email address"),
 
-export type editUserReq = {
-  id: string;
-  info: {
-    name: string;
-    password?: string | null
-    email: string;
-    phone: string;
-    role_id: number;
-    address?: string | undefined;
-  };
-}
+    phone: z
+      .string()
+      .regex(/^\d{10}$/, "Phone number must be exactly 10 digits"),
 
-export interface CommonDeleteModalProps {
-  isOpen: boolean;
-  title?: string;
-  width?: string
-  maxWidth?: string
-  description?: string;
-  confirmText?: string;
-  cancelText?: string;
-  isLoading?: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-}
+    password:
+      mode === "create"
+        ? z
+          .string()
+          .min(8, "Password must be at least 8 characters")
+          .max(32, "Password must not exceed 32 characters")
+          .superRefine(passwordStrength)
+        : z
+          .string()
+          .optional()
+          .refine(
+            (val) => {
+              return !val || val.length >= 8
+            },
+            "Password must be at least 8 characters"
+          )
+          .refine(
+            (val) => !val || val.length <= 32,
+            "Password must not exceed 32 characters"
+          )
+          .superRefine((val, ctx) => {
+            if (val) passwordStrength(val, ctx);
+          }),
 
-export interface UserApiType {
-  id: number, full_name?: string, name?: string, email: string, phone: string
-  , role_id: number, is_active: number, created_at: string
+    role_id: z
+      .coerce
+      .number({
+        invalid_type_error: "Role is required",
+      })
+      .refine(
+        (val) => val !== 0 && val !== -1,
+        { message: "Please select a role" }
+      ),
 
-}
-export interface vehicleType{
-    "id": number
-    "name": string
-    "vehicle_models":{
-            "id": number,
-            "name": string
-        }[]
-}
-export interface vehicleCardItem{
-    "company": string
-    "model":{
-            "id": number,
-            "name": string
-        }[]
-}
+    address: z
+      .string()
+      .trim()
+      .min(10, "Address must be at least 10 characters")
+      .max(300, "Address must not exceed 300 characters")
+      .optional()
+      .or(z.literal("")),
+
+  });

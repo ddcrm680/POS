@@ -27,7 +27,7 @@ import {
   AlertTriangle,
   Shield
 } from "lucide-react";
-import { type Customer } from "@/schema";
+import { type Customer } from "@/lib/types";
 
 // Import customer profile components
 import CustomerProfileHeader from "@/components/customer/customer-profile-header";

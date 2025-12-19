@@ -14,8 +14,9 @@ import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { Box } from "@chakra-ui/react";
 import { api, EditProfile } from "@/lib/api";
-import { ProfileForm, profileSchema } from "@/schema";
+import { ProfileForm,  } from "@/lib/types";
 import { Constant } from '@/lib/constant';
+import { profileSchema } from '@/lib/schema';
 
 export default function Profile() {
   const { toast } = useToast();

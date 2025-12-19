@@ -42,8 +42,9 @@ import {
   Bell,
   Heart
 } from "lucide-react";
-import { type Vehicle, type JobCard, InsertVehicleSchema } from "@/schema";
+import { type Vehicle, type JobCard,  } from "@/lib/types";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { InsertVehicleSchema } from "@/lib/schema";
 
 interface VehicleInformationPanelProps {
   customerId: string;

@@ -50,7 +50,7 @@ import {
   Eye,
   Download
 } from "lucide-react";
-import { type Customer } from "@/schema";
+import { type Customer } from "@/lib/types";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface CommunicationHistoryPanelProps {

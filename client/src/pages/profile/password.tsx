@@ -10,10 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { PasswordForm, passwordSchema } from "@/schema";
+import { PasswordForm,  } from "@/lib/types";
 import { UpdatePassword } from "@/lib/api";
 import { Box } from "@chakra-ui/react";
 import { Eye, EyeOff } from "lucide-react";
+import { passwordSchema } from "@/lib/schema";
 
 export default function Password() {
   const { toast } = useToast();

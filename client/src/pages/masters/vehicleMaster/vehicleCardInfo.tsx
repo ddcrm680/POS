@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { vehicleCardItem } from "@/schema";
+import { vehicleCardItem } from "@/lib/types";
 import { Box,  } from "@chakra-ui/react";
 
 export function VehicleCardInfo({ item, isInModal, setIsUserModalOpenInfo }: { item: vehicleCardItem, isInModal: boolean, setIsUserModalOpenInfo?: (value: any) => void }) {

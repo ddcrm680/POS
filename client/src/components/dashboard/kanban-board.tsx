@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { type JobCard, type Customer, type Vehicle } from "@/schema";
+import { type JobCard, type Customer, type Vehicle } from "@/lib/types";
 import { 
   Plus, 
   MoreHorizontal, 

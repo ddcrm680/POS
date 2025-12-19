@@ -8,7 +8,7 @@ import {
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { fetchRoleList, fetchUserApi, login as loginApi, logout as logoutApi } from "./api";
-import { AuthContextValue, User } from "@/schema";
+import { AuthContextValue, User } from "@/lib/types";
 import { cookieStore } from "./cookie"; // your cookie helper
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);

@@ -33,7 +33,7 @@ import {
   Timer,
   PlayCircle
 } from "lucide-react";
-import { JobCard } from "@/schema";
+import { JobCard } from "@/lib/types";
 import PhotoCaptureModal from "@/components/forms/photo-capture-modal";
 import { getSOPTemplate } from "@/lib/sop-templates";
 import { apiRequest } from "@/lib/queryClient";

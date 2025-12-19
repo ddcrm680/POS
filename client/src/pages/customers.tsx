@@ -19,7 +19,7 @@ import CustomerList from "@/components/customer/customer-list";
 import CustomerAnalyticsCharts from "@/components/customer/customer-analytics-charts";
 import CustomerFiltersSidebar from "@/components/customer/customer-filters-sidebar";
 import CustomerQuickActions from "@/components/customer/customer-quick-actions";
-import { type Customer } from "@/schema";
+import { type Customer } from "@/lib/types";
 
 interface CustomerFilters {
   search: string;

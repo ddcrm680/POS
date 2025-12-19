@@ -26,10 +26,11 @@ import {
 } from "@/components/ui/form";
 import { Eye, EyeOff } from "lucide-react";
 import { Box, HStack } from "@chakra-ui/react";
-import { LoginFormValues, loginSchema } from "@/schema";
+import { LoginFormValues,  } from "@/lib/types";
 import { Constant } from "@/lib/constant";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
+import { loginSchema } from "@/lib/schema";
 
 export default function LoginPage() {
     const [location, setLocation] = useLocation();

@@ -18,7 +18,7 @@ import {
 import dummyProfile from '@/lib/images/dummy-Profile.webp'
 import { useAuth } from "@/lib/auth";
 import { bottomTabs, Constant, quickActions, RoleList } from "@/lib/constant";
-import { POSLayoutProps } from "@/schema";
+import { POSLayoutProps } from "@/lib/types";
 
 export default function POSLayout({ children }: POSLayoutProps) {
   const [location] = useLocation();

@@ -3,6 +3,7 @@ import { masterTabList } from "@/lib/constant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Users from "./user/users";
 import VehicleMaster from "./vehicleMaster/vehicle";
+import Services from "./servicePlan/services";
 
 export default function Master() {
   const [activeTab, setActiveTab] = useState("users");
@@ -23,7 +24,7 @@ export default function Master() {
 
               {/* Main Content Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <TabsList className="grid w-full grid-cols-2  lg:w-max  lg:inline-grid">
+                <TabsList className="grid w-full grid-cols-3  lg:w-max  lg:inline-grid">
                   {masterTabList.map((tab) =>{
                      const Icon = tab.emoji;
                     return  (
@@ -46,6 +47,10 @@ export default function Master() {
                 {/* Vehicle Information Tab */}
                 <TabsContent value="vehicleMaster" className="space-y-6">
                   <VehicleMaster />
+                </TabsContent>
+
+                 <TabsContent value="servicePlan" className="space-y-6">
+                  <Services />
                 </TabsContent>
 
 

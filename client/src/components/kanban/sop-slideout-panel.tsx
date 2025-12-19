@@ -14,7 +14,7 @@ import {
   ArrowRight,
   X
 } from "lucide-react";
-import { JobCard } from "@/schema";
+import { JobCard } from "@/lib/types";
 import SOPChecklist from "@/components/forms/sop-checklist";
 import { getSOPTemplate, type SOPTemplate } from "@/lib/sop-templates";
 import { apiRequest } from "@/lib/queryClient";

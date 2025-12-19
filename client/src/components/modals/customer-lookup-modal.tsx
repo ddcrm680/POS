@@ -6,7 +6,7 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Search, Phone, Star } from "lucide-react";
-import { Customer } from "../../schema";
+import { Customer } from "../../lib/types";
 
 interface CustomerLookupModalProps {
   open: boolean;

@@ -29,7 +29,7 @@ import {
   Activity,
   Clock4
 } from "lucide-react";
-import { type Customer } from "@/schema";
+import { type Customer } from "@/lib/types";
 
 interface CustomerProfileHeaderProps {
   customer: Customer;

@@ -3,7 +3,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import {CustomerAnalyticsOverview} from '@/schema'
+import {CustomerAnalyticsOverview} from '@/lib/types'
 
 export default function Product() {
  const { data: analytics, isLoading, error } = useQuery<CustomerAnalyticsOverview>({
