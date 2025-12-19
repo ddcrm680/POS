@@ -405,83 +405,37 @@ export const passwordStrength = (val: string, ctx: z.RefinementCtx) => {
 };
 export const servicePlanSchema = (mode: "create" | "edit" | "view") =>
   z.object({
-    plan_name:
-      z
-        .coerce
-        .string({
-          invalid_type_error: "Plan name is required",
-        })
-        .refine(
-          (val) => val !== '' ,
-          { message: "Please select a plan name" }
-        ),
-          vehicle_type:
-      z
-        .coerce
-        .string({
-          invalid_type_error: "Vehicle type is required",
-        })
-        .refine(
-          (val) => val !== '' ,
-          { message: "Please select a vehicle type" }
-        ),
-name:
-      z
-        .coerce
-        .string({
-          invalid_type_error: "Plan name is required",
-        })
-        ,
-    email: z
-      .string()
-      .trim()
-      .min(1, "Email is required")
-      .email("Please enter a valid email address"),
+    vehicle_type: z.string().min(1, "Please select vehicle type"),
 
-    phone: z
-      .string()
-      .regex(/^\d{10}$/, "Phone number must be exactly 10 digits"),
+    category_type: z.string().min(1, "Please select category type"),
 
-    password:
-      mode === "create"
-        ? z
-          .string()
-          .min(8, "Password must be at least 8 characters")
-          .max(32, "Password must not exceed 32 characters")
-          .superRefine(passwordStrength)
-        : z
-          .string()
-          .optional()
-          .refine(
-            (val) => {
-              return !val || val.length >= 8
-            },
-            "Password must be at least 8 characters"
-          )
-          .refine(
-            (val) => !val || val.length <= 32,
-            "Password must not exceed 32 characters"
-          )
-          .superRefine((val, ctx) => {
-            if (val) passwordStrength(val, ctx);
-          }),
+    plan_name: z.string().min(1, "Please select plan name"),
 
-    role_id: z
+    invoice_name: z.string().optional(),
+
+    number_of_visit: z.string().min(1, "Please select number of visits"),
+
+    price: z
       .coerce
-      .number({
-        invalid_type_error: "Role is required",
-      })
-      .refine(
-        (val) => val !== 0 && val !== -1,
-        { message: "Please select a role" }
-      ),
+      .number()
+      .positive("Price must be greater than 0"),
 
-    address: z
-      .string()
-      .trim()
-      .min(10, "Address must be at least 10 characters")
-      .max(300, "Address must not exceed 300 characters")
-      .optional()
-      .or(z.literal("")),
+    sac: z.string().optional(),
 
+    gst: z
+      .coerce
+      .number()
+      .min(0, "GST cannot be negative")
+      .max(100, "GST cannot exceed 100")
+      .optional(),
+
+    warranty_period: z.string().min(1, "Please select warranty period"),
+
+    warranty_type: z.enum(["month", "year"], {
+      required_error: "Warranty type is required",
+    }),
+
+    description: z.string().optional(),
+
+    raw_materials: z.array(z.string())
   });

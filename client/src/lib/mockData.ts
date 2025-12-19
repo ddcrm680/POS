@@ -91,36 +91,91 @@ export const servicePlanMockResponse = {
     has_next: false,
   },
 };
-export const vehicleType=[
-  {name:"Sedan",
-    id:"Sedan"
+export const vehicleType = [
+  {
+    name: "Sedan",
+    id: "Sedan"
   },
-  {name:"Hatchback",
-    id:"Hatchback"
+  {
+    name: "Hatchback",
+    id: "Hatchback"
   },
-   {name:"SUV",
-    id:"SUV"
-  },
-]
-export const planName=[
-  {name:"Full Body Coating",
-    id:"Full Body Coating"
-  },
-  {name:"Interior Detailing",
-    id:"Interior Detailing"
-  },
-   {name:"Bonnet Coating",
-    id:"Bonnet Coating"
+  {
+    name: "SUV",
+    id: "SUV"
   },
 ]
-export const categoryType=[
-  {name:"Interior Care",
-    id:"Interior Care"
+export const planName = [
+  {
+    name: "Full Body Coating",
+    id: "Full Body Coating"
   },
-  {name:"Body Protection",
-    id:"Body Protection"
+  {
+    name: "Interior Detailing",
+    id: "Interior Detailing"
   },
-   {name:"Bonnet Protection",
-    id:"Bonnet Protection"
+  {
+    name: "Bonnet Coating",
+    id: "Bonnet Coating"
+  },
+]
+export const categoryType = [
+  {
+    name: "Interior Care",
+    id: "Interior Care"
+  },
+  {
+    name: "Body Protection",
+    id: "Body Protection"
+  },
+  {
+    name: "Bonnet Protection",
+    id: "Bonnet Protection"
+  },
+]
+export const warrantyPeriod = [
+  {
+    name: "1",
+    id: "1"
+  },
+  {
+    name: "2",
+    id: "2"
+  },
+  {
+    name: "3",
+    id: "3"
+  },
+  {
+    name: "4",
+    id: "4"
+  },
+]
+export const monthlyPeriod = [
+  {
+    name: "Month",
+    id: "month"
+  },
+  {
+    name: "Year",
+    id: "year"
+  },
+]
+export const numberOfVisit  = [
+  {
+    name: "1",
+    id: "1"
+  },
+  {
+    name: "2",
+    id: "2"
+  },
+  {
+    name: "3",
+    id: "3"
+  },
+  {
+    name: "4",
+    id: "4"
   },
 ]

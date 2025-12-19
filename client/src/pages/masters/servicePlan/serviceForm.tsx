@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-// import { Box, Input, Textarea } from "@chakra-ui/react";
-import { Eye, EyeOff } from "lucide-react";
 
 import { Form } from "@/components/ui/form";
 import {
@@ -17,9 +15,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Box } from "@chakra-ui/react";
-import { Textarea } from "@/components/ui/textarea";
 import { Constant } from "@/lib/constant";
-import { planName } from "@/lib/mockData";
+import { categoryType, numberOfVisit, planName, warrantyPeriod } from "@/lib/mockData";
 import { serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
 import { servicePlanSchema, userSchema } from "@/lib/schema";
 export const RequiredMark = ({ show }: { show: boolean }) =>
@@ -27,7 +24,6 @@ export const RequiredMark = ({ show }: { show: boolean }) =>
 
 export default function ServiceForm({
   mode,
-  roles,
   id,
   onClose,
   initialValues,
@@ -35,19 +31,26 @@ export default function ServiceForm({
   onSubmit,
 }: serviceFormProp) {
 
-  const [showPassword, setShowPassword] = useState(false);
-
   const form = useForm<serviceFormType>({
     resolver: zodResolver(servicePlanSchema(mode)),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      plan_name:"",
-      vehicle_type:"",
-      role_id: -1,
-      ...(mode === "create" ? { password: "" } : {}),
-      address: "",
+      vehicle_type: "",
+      category_type: "",
+      plan_name: "",
+      invoice_name: "",
+
+      number_of_visit: "",
+      price: 0,
+
+      sac: "",
+      gst: undefined,
+
+      warranty_period: "",
+      warranty_type: "month",
+
+      description: "",
+      raw_materials: [],
+
       ...initialValues,
     },
   });
@@ -58,15 +61,23 @@ export default function ServiceForm({
     if (mode === 'edit' || mode === "view") {
 
       form.reset({
-          plan_name:"",
-        vehicle_type:"",
-        name: "",
-        email: "",
-        phone: "",
-      
-        role_id: -1,
+        vehicle_type: "",
+        category_type: "",
+        plan_name: "",
+        invoice_name: "",
+
+        number_of_visit: "",
+        price: 0,
+
+        sac: "",
+        gst: undefined,
+
+        warranty_period: "",
+        warranty_type: "month",
+
+        description: "",
+        raw_materials: [],
         // ...(mode === "create" ? { password: "" } : {}),
-        address: "",
         ...initialValues,
       });
     }
@@ -84,7 +95,7 @@ export default function ServiceForm({
       >  <div className="p-6 space-y-6">
           {/* Row 1 */}
           <Box className="flex gap-3 ">
-              <Box w="33%">
+            <Box w="33%">
               <FormField
                 control={form.control}
                 name="plan_name"
@@ -110,7 +121,8 @@ export default function ServiceForm({
                 )}
               />
             </Box>
-               <Box w="33%">
+            <Box w="33%">
+
               <FormField
                 control={form.control}
                 name="vehicle_type"
@@ -123,7 +135,7 @@ export default function ServiceForm({
                         {...field}
                         className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
                       >
-                        <option value="">{Constant.master.servicePlan.selectPlanName}</option>
+                        <option value="">{Constant.master.servicePlan.selectVehicleType}</option>
                         {planName.map((r) => (
                           <option key={r.id} value={Number(r.id)}>
                             {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
@@ -136,141 +148,26 @@ export default function ServiceForm({
                 )}
               />
             </Box>
-            {/* <Box w={`${mode === 'edit' || mode === "view" ? '50%' : '33%'}`}>
-              <FormField
-                control={form.control}
-                disabled={mode === 'view'}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Full Name<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter full name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box> */}
+            <Box w="33%">
 
-            {/* <Box w={`${mode === 'edit' || mode === "view" ? '50%' : '33%'}`}>
               <FormField
                 control={form.control}
-                name="email"
+                name="category_type"
                 disabled={mode === 'view'}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Email<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter email" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box> */}
-
-            {/* {mode !== 'view' && <Box w="33%">
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Phone<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        inputMode="numeric"
-                        maxLength={10}
-                        placeholder="Enter phone number"
-                        onChange={(e) => {
-                          let value = e.target.value.replace(/\D/g, "");
-                          if (value.startsWith("0")) value = value.replace(/^0+/, "");
-                          field.onChange(value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>} */}
-          </Box>
-
-          {/* Row 2 */}
-          <Box className="flex gap-3">
-            {/* {(mode === "view") && <Box w="50%">
-              <FormField
-                control={form.control}
-                name="phone"
-                disabled={mode === 'view'}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Phone</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        inputMode="numeric"
-                        maxLength={10}
-                        placeholder="Enter phone number"
-                        onChange={(e) => {
-                          let value = e.target.value.replace(/\D/g, "");
-                          if (value.startsWith("0")) value = value.replace(/^0+/, "");
-                          field.onChange(value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>} */}
-            {/* {mode !== 'view' && <Box w="50%">
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>
-                      {"Password"}<RequiredMark show={isCreate} />
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          {...field}
-                          type={showPassword ? "text" : "password"}
-                          placeholder="Enter password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword((s) => !s)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2"
-                        >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>} */}
-
-            {/* <Box w="50%">
-              <FormField
-                control={form.control}
-                name="role_id"
-                disabled={mode === 'view'}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Role<RequiredMark show={!isView} /></FormLabel>
+                    <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.vehicleType.replace('Vehicle',
+                      'Category'
+                    )}<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
                       <select
                         {...field}
                         className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
                       >
-                        <option value="">Select role</option>
-                        {roles.map((r) => (
+                        <option value="">{Constant.master.servicePlan.selectVehicleType.replace('vehicle',
+                          'category'
+                        )}</option>
+                        {categoryType.map((r) => (
                           <option key={r.id} value={Number(r.id)}>
                             {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
                           </option>
@@ -281,31 +178,265 @@ export default function ServiceForm({
                   </FormItem>
                 )}
               />
-            </Box> */}
+            </Box>
+
           </Box>
 
-          {/* Address */}
-          {/* <Box>
-            <FormField
+          {/* Row 2 */}
+          <Box className="flex gap-3">
+            <Box w={'33%'}>
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Price (₹)<RequiredMark show={!isView} />
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Enter price"
+                        {...field}
+                        onChange={(e) => {
+                          let value = e.target.value;
+
+                          // 1️⃣ allow only digits
+                          value = value.replace(/\D/g, "");
+                          value = value.replace(/^0+/, "");
+
+                          // allow single zero
+                          if (value === "") {
+                            value = "0";
+                          }
+                          field.onChange(value);
+                        }}
+
+                        disabled={isView}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+            </Box>
+            <Box w={'33%'}> <FormField
               control={form.control}
-              disabled={mode === 'view'}
-              name="address"
+              name="warranty_period"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel style={{ color: "#000" }}>Address</FormLabel>
+                  <FormLabel>
+
+                    Warranty Period<RequiredMark show={!isView} />
+                  </FormLabel>
                   <FormControl>
-                    <Textarea
+                    <select
                       {...field}
-                      placeholder="Enter address (optional)"
-                      minLength={10}
-                      maxLength={300}
+                      className="w-full h-10 rounded-md border px-3"
+                      disabled={isView}
+                    >
+                      <option value="">{Constant.master.servicePlan.selectWarrantyPeriod}</option>
+                      {warrantyPeriod.map((period) => {
+                        return <option value={period.id}>{period.name}</option>
+                      })}
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            </Box>
+            <Box w={'33%'}> <FormField
+              control={form.control}
+              name="warranty_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Warranty Type<RequiredMark show={!isView} />
+                  </FormLabel>
+                  <FormControl>
+                    <select
+                      {...field}
+                      className="w-full h-10 rounded-md border px-3"
+                      disabled={isView}
+                    >
+                      <option value="">{Constant.master.servicePlan.selectVehicleType.replace('vehicle',
+                        'warranty'
+                      )}</option>
+                      {warrantyPeriod.map((period) => {
+                        return <option value={period.id}>{period.name}</option>
+                      })}
+
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            </Box>
+          </Box>
+          <Box className="flex gap-3">
+            <Box w={'33%'}>
+              <FormField
+                control={form.control}
+                name="number_of_visit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Visit<RequiredMark show={!isView} />
+                    </FormLabel>
+                    <FormControl>
+                      <select
+                        {...field}
+                        className="w-full h-10 rounded-md border px-3"
+                        disabled={isView}
+                      >
+                        <option value="">{Constant.master.servicePlan.noOfVisit}</option>
+                        {numberOfVisit.map((visit) => {
+                          return <option value={visit.id}>{visit.name}</option>
+                        })}
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+            <Box w={'33%'}> <FormField
+              control={form.control}
+              name="sac"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+
+                    Sac<RequiredMark show={!isView} />
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter sac"
+                      {...field}
+                      onChange={(e) => {
+                        let value = e.target.value;
+
+                        // allow only letters and numbers (no special characters)
+                        value = value.replace(/[^a-zA-Z0-9]/g, "");
+
+                        field.onChange(value);
+                      }}
+
+                      disabled={isView}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </Box> */}
+            </Box>
+            <Box w={'33%'}> <FormField
+              control={form.control}
+              name="gst"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    GST(%)<RequiredMark show={!isView} />
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter gst"
+                      {...field}
+                      onChange={(e) => {
+                        let value = e.target.value;
+
+                        // allow only digits and dot
+                        value = value.replace(/[^0-9.]/g, "");
+                        value = value.replace(/^0+/, "");
+
+                        // allow single zero
+                        if (value === "") {
+                          value = "0";
+                        }
+
+                        // allow only ONE decimal point
+                        if ((value.match(/\./g) || []).length > 1) {
+                          return;
+                        }
+
+                        // restrict to 2 decimal places
+                        if (value.includes(".")) {
+                          const [int, dec] = value.split(".");
+                          value = int + "." + dec.slice(0, 2);
+                        }
+
+                        // convert to number for validation
+                        const num = Number(value);
+
+                        // prevent negative
+                        if (num < 0) return;
+
+                        // max allowed is 100
+                        if (num > 100) return;
+
+                        field.onChange(value);
+                      }}
+
+                      disabled={isView}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            </Box>
+          </Box>
+          <Box className="flex gap-3">
+            <Box w={'50%'}> <FormField
+              control={form.control}
+              name="sac"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+
+                    Description<RequiredMark show={!isView} />
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter description"
+                      {...field}
+                      disabled={isView}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            </Box>
+             <Box w={'50%'}> <FormField
+              control={form.control}
+              name="sac"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+
+                    Raw Material Consumption<RequiredMark show={!isView} />
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter raw material consumption"
+                      {...field}
+                      disabled={isView}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            </Box>
+          </Box>
         </div>
         {/* Submit */}
         {mode !== 'view' && <div className="">

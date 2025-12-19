@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
-import { editServicePlanReq, editUserReq, UserFormType } from "./types";
+import { editServicePlanReq, editUserReq, serviceFormType, UserFormType } from "./types";
 
 export const baseUrl =
   process.env.REACT_APP_BASE_URL || Constant.REACT_APP_BASE_URL;
@@ -184,7 +184,7 @@ export async function SaveUser(values: UserFormType) {
 
   }
 }
-export async function SaveServicePlan(values: UserFormType) {
+export async function SaveServicePlan(values: serviceFormType) {
   try {
     const response: any = await api.post(
       "/api/admin/add-user", values

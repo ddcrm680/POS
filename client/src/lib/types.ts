@@ -72,13 +72,22 @@ export type editUserReq = {
 export type editServicePlanReq = {
   id: string;
   info: {
-    name: string;
-    password?: string | null
-    plan_name:string
-    email: string;
-    phone: string;
-    role_id: number;
-    address?: string | undefined;
+      vehicle_type: string;
+  category_type: string;
+  plan_name: string;
+  invoice_name?: string;
+
+  number_of_visit: string;
+  price: number;
+
+  sac?: string;
+  gst?: number;
+
+  warranty_period: string;
+  warranty_type: "month" | "year";
+
+  description?: string;
+  raw_materials: string[];
   };
 }
 
@@ -161,15 +170,23 @@ export type UserFormType = {
   address?: string | undefined;
 }
 export type serviceFormType = {
-  plan_name:string;
-  vehicle_type:string
-  name: string;
-  email: string;
-  phone: string;
-  password?: string;
-  role_id: number;
-  address?: string | undefined;
-}
+  vehicle_type: string;
+  category_type: string;
+  plan_name: string;
+  invoice_name?: string;
+
+  number_of_visit: string;
+  price: number;
+
+  sac?: string;
+  gst?: number;
+
+  warranty_period: string;
+  warranty_type: "month" | "year";
+
+  description?: string;
+  raw_materials: string[];
+};
 
 export interface userFormProp {
   mode: "create" | "edit" | "view";

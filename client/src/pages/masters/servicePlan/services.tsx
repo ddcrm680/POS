@@ -246,13 +246,18 @@ export default function Services() {
         await EditServicePlan({
           id: isServicePlanModalOpenInfo.info.id,
           info: {
-            name: value.name,
+            vehicle_type: value.vehicle_type,
             plan_name:value.plan_name,
-            email: value.email,
-            password: value.password ?? null,
-            phone: value.phone,
-            role_id: Number(value.role_id),
-            address: value.address,
+            category_type:value.category_type,
+            invoice_name:value.invoice_name,
+            price:value.price,
+            number_of_visit:value.number_of_visit,
+            sac:value.sac,
+            gst:value.gst,
+            warranty_period:value.warranty_period,
+            warranty_type:value.warranty_type,
+            description:value.description,
+            raw_materials:value.raw_materials
           },
         });
 
@@ -280,7 +285,7 @@ export default function Services() {
       // 👇 THIS IS THE KEY PART
       if (apiErrors && err?.response?.status === 422) {
         Object.entries(apiErrors).forEach(([field, messages]) => {
-          setError(field as keyof UserFormType, {
+          setError(field as keyof serviceFormType, {
             type: "server",
             message: (messages as string[])[0],
           });

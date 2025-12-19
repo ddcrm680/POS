@@ -6,8 +6,7 @@ import VehicleMaster from "./vehicleMaster/vehicle";
 import Services from "./servicePlan/services";
 
 export default function Master() {
-  const [activeTab, setActiveTab] = useState("users");
-  const [showServiceHistory, setShowServiceHistory] = useState(false);
+  const [activeTab, setActiveTab] = useState("servicePlan");
 
   return (
     <>
@@ -17,7 +16,7 @@ export default function Master() {
           <p className="text-gray-600">Centralize, organize, and control all master data settings</p>
         </div>
 
-        <div className={`grid gap-6 transition-all duration-300 ${showServiceHistory ? 'grid-cols-12' : 'grid-cols-1'
+        <div className={`grid gap-6 transition-all duration-300 ${ 'grid-cols-1'
           }`}>
           <div className="p-6">
             <div className=" mx-auto space-y-6 ">
