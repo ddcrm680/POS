@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
+import Logo from "@/lib/images/dd-logo.webp"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -99,15 +100,21 @@ async function handleLogout(){
         {/* Left: Business Info & Clock */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">DD</span>
-            </div>
-            <div>
+           
+            <div className="w-50 h-12  flex items-center justify-center">
+               <img 
+                src={Logo} 
+                alt="Captured"
+                className="max-w-full max-h-full object-contain"
+                data-testid="captured-photo"
+              />
+               </div>
+            {/* <div>
               <p className="font-bold text-sm leading-tight" data-testid="business-name">
                 Detailing Devils
               </p>
               <p className="text-muted-foreground text-sm leading-tight">Sector 18, Noida</p>
-            </div>
+            </div> */}
           </div>
           
           <div className="hidden md:block w-px h-10 bg-border" />

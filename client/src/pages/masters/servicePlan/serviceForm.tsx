@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Box } from "@chakra-ui/react";
 import { Constant } from "@/lib/constant";
-import { categoryType, numberOfVisit, planName, vehicleType, warrantyPeriod, warrantyType } from "@/lib/mockData";
+import {warrantyType } from "@/lib/mockData";
 import { serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
 import { servicePlanSchema, userSchema } from "@/lib/schema";
 import RHFSelect from "@/components/RHFSelect";
@@ -26,6 +26,7 @@ export const RequiredMark = ({ show }: { show: boolean }) =>
 export default function ServiceForm({
   mode,
   id,
+  serviceMetaInfo,
   onClose,
   initialValues,
   isLoading = false,
@@ -109,9 +110,9 @@ console.log(initialValues,'initialValues');
                     <FormControl>
                       <RHFSelect
                         field={field}
-                        options={planName.map(p => ({
-                          value: String(p.id),
-                          label: p.name,
+                        options={serviceMetaInfo.servicePlans.map(p => ({
+                          value: String(p.value),
+                          label: p.label,
                         }))}
                         placeholder={Constant.master.servicePlan.selectPlanName}
                         isDisabled={isView}
@@ -162,9 +163,9 @@ console.log(initialValues,'initialValues');
                     <FormControl>
                        <RHFSelect
                         field={field}
-                        options={categoryType.map(p => ({
-                          value: String(p.id),
-                          label: p.name,
+                        options={serviceMetaInfo.categoryTypes.map(p => ({
+                          value: String(p.value),
+                          label: p.label,
                         }))}
                         placeholder={Constant.master.servicePlan.selectVehicleType.replace('vehicle',
                           'category'
@@ -232,9 +233,9 @@ console.log(initialValues,'initialValues');
                     <RHFSelect
                         field={field}
                         creatable={false}
-                        options={warrantyPeriod.map(p => ({
-                          value: String(p.id),
-                          label: p.name,
+                        options={serviceMetaInfo.warrantyPeriods.map(p => ({
+                          value: String(p.value),
+                          label: p.label,
                         }))}
                         placeholder={Constant.master.servicePlan.selectWarrantyPeriod}
                         isDisabled={isView}
@@ -288,9 +289,9 @@ console.log(initialValues,'initialValues');
                       <RHFSelect
                         field={field}
                         creatable={false}
-                        options={numberOfVisit.map(p => ({
-                          value: String(p.id),
-                          label: p.name,
+                        options={serviceMetaInfo.numberOfVisits.map(p => ({
+                          value: String(p.value),
+                          label: p.label,
                         }))}
                         placeholder={Constant.master.servicePlan.noOfVisit}
                         isDisabled={isView}
@@ -425,9 +426,9 @@ console.log(initialValues,'initialValues');
                     <FormControl>
                        <RHFSelect
                         field={field}
-                        options={vehicleType.map(p => ({
-                          value: String(p.id),
-                          label: p.name,
+                        options={serviceMetaInfo.vehicleTypes.map(p => ({
+                          value: String(p.value),
+                          label: p.label,
                         }))}
                         placeholder={Constant.master.servicePlan.selectVehicleType}
                         isDisabled={isView}

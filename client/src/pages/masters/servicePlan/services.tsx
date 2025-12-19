@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { EditServicePlan, fetchServicePlanList, SaveServicePlan, UpdateServicePlanStatus } from "@/lib/api";
+import { EditServicePlan, fetchServicePlanList, fetchServicePlanMetaInfo, SaveServicePlan, UpdateServicePlanStatus } from "@/lib/api";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton, Switch } from "@chakra-ui/react";
 import { EditIcon, EyeIcon } from "lucide-react";
@@ -16,10 +16,18 @@ import { formatDate, formatTime } from "@/lib/utils";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { categoryType, planName, servicePlanMockResponse, vehicleType } from "@/lib/mockData";
 import ServiceForm from "./serviceForm";
-import { serviceFormType, UserFormType } from "@/lib/types";
+import { serviceFormType, serviceMetaInfoType, UserFormType } from "@/lib/types";
 
 export default function Services() {
   const { toast } = useToast();
+    const [serviceMetaInfo, setServiceMetaInfo] = useState<serviceMetaInfoType>({
+    categoryTypes: [],
+    numberOfVisits: [],
+    servicePlans: [],
+    vehicleTypes: [],
+    warrantyPeriods: []
+
+  })
   const { roles } = useAuth();
   const [users, setUsers] = useState<Array<any>>([]);
   const [perPage, setPerPage] = useState(10);
@@ -44,7 +52,10 @@ export default function Services() {
     category_type: "",
     status: ""
   });
-
+useEffect(()=>{
+  console.log(serviceMetaInfo,'serviceMetaInfo');
+  
+})
   const columns = useMemo(() => [
     {
       key: "created_at", label: "Created On", align: "center", width: "100px", render: (_value: any,) => {
@@ -69,9 +80,9 @@ export default function Services() {
             setFilters(f => ({ ...f, vehicle_type: val }));
             setPage(1);
           }}
-          options={[{ name: 'All', id: '' }, ...vehicleType].map(r => ({
-            label: r.name,
-            value: r.id,
+          options={[{ label: 'All', value: '' }, ...serviceMetaInfo.vehicleTypes].map(r => ({
+            label: r.label,
+            value: r.value,
           }))}
         />
       ), width: "150px",
@@ -79,7 +90,7 @@ export default function Services() {
 
         return (
           <span className="text-sm font-medium text-gray-700">
-            {(vehicleType && vehicleType?.find((r) => (r.id === _value))?.name) ?? "-"}
+            {(serviceMetaInfo.vehicleTypes && serviceMetaInfo.vehicleTypes?.find((r) => (r.value === _value))?.label) ?? "-"}
           </span>
         );
       }
@@ -93,9 +104,9 @@ export default function Services() {
             setFilters(f => ({ ...f, plan_name: val }));
             setPage(1);
           }}
-          options={[{ name: 'All', id: '' }, ...planName].map(r => ({
-            label: r.name,
-            value: r.id,
+          options={[{ label: 'All', value: '' }, ...serviceMetaInfo.servicePlans].map(r => ({
+            label: r.label,
+            value: r.value,
           }))}
         />
       ), width: "150px",
@@ -103,7 +114,7 @@ export default function Services() {
 
         return (
           <span className="text-sm font-medium text-gray-700">
-            {(planName && planName?.find((r) => (r.id === _value))?.name) ?? "-"}
+            {(serviceMetaInfo.servicePlans && serviceMetaInfo.servicePlans?.find((r) => (r.value === _value))?.label) ?? "-"}
           </span>
         );
       }
@@ -117,18 +128,18 @@ export default function Services() {
             setFilters(f => ({ ...f, category_type: val }));
             setPage(1);
           }}
-          options={[{ name: 'All', id: '' }, ...categoryType].map(r => ({
-            label: r.name,
-            value: r.id,
+          options={[{ label: 'All', value: '' }, ...serviceMetaInfo.categoryTypes].map(r => ({
+            label: r.label,
+            value: r.value,
           }))}
         />
       ), width: "150px",
       render: (_value: any,) => {
-        console.log(_value, categoryType, '_value_value');
+        console.log(_value, serviceMetaInfo.categoryTypes, '_value_value');
 
         return (
           <span className="text-sm font-medium text-gray-700">
-            {(categoryType && categoryType?.find((r) => (r.id === _value))?.name) ?? "-"}
+            {(serviceMetaInfo.categoryTypes && serviceMetaInfo.categoryTypes?.find((r) => (r.value === _value))?.label) ?? "-"}
           </span>
         );
       }
@@ -145,20 +156,23 @@ export default function Services() {
         );
       }
     },
-    { key: "gst", label: "Gst(%)", width: "150px", 
+    {
+      key: "gst", label: "Gst(%)", width: "150px",
 
     },
 
-    
-    { key: "duration", label: "Duration", width: "150px", 
-       render: (_value: any,row:any) => {
+
+    {
+      key: "duration", label: "Duration", width: "150px",
+      render: (_value: any, row: any) => {
 
         return (
           <span className="text-sm font-medium text-gray-700">
-           {row.warranty_period} {row.warranty_in}
+            {row.warranty_period} {row.warranty_in}
           </span>
         );
-      }},
+      }
+    },
     // {
     //   key: "description", label: "Description", width: "150px",
     //   render: (_value: any,) => {
@@ -209,7 +223,7 @@ export default function Services() {
       },
     },
 
-  ], [roles, page, PER_PAGE, filters]);
+  ], [roles, page, PER_PAGE, filters,serviceMetaInfo]);
 
   const ServiceStatusUpdateHandler = useCallback(async (u: any) => {
     try {
@@ -251,8 +265,8 @@ export default function Services() {
     value: serviceFormType,
     setError: UseFormSetError<serviceFormType>
   ) => {
-    console.log(value,'value67890-[');
-    
+    console.log(value, 'value67890-[');
+
     try {
       setIsLoading(true);
 
@@ -261,17 +275,17 @@ export default function Services() {
           info: {
             id: isServicePlanModalOpenInfo.info.id,
             vehicle_type: value.vehicle_type,
-            plan_name:value.plan_name,
-            category_type:value.category_type,
-            invoice_name:value.invoice_name,
-            price:value.price,
-            number_of_visits:value.number_of_visits,
-            sac:value.sac,
-            gst:value.gst,
-            warranty_period:value.warranty_period,
-            warranty_in:value.warranty_in,
-            description:value.description,
-            raw_materials:value.raw_materials
+            plan_name: value.plan_name,
+            category_type: value.category_type,
+            invoice_name: value.invoice_name,
+            price: value.price,
+            number_of_visits: value.number_of_visits,
+            sac: value.sac,
+            gst: value.gst,
+            warranty_period: value.warranty_period,
+            warranty_in: value.warranty_in,
+            description: value.description,
+            raw_materials: value.raw_materials
           },
         });
 
@@ -320,6 +334,7 @@ export default function Services() {
         variant: "destructive",
       });
     } finally {
+      getServiceMetaInfo()
       setIsLoading(false);
     }
   };
@@ -328,19 +343,21 @@ export default function Services() {
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      const res = 
-      await fetchServicePlanList({
-        per_page: perPage,
-        page,
-        search,
-        vehicle_type: filters.vehicle_type,
-        plan_name: filters.plan_name,
-        category_type: filters.category_type,
-        status: filters.status,
-      });
+      const res =
+        await fetchServicePlanList({
+          per_page: perPage,
+          page,
+          search,
+          vehicle_category: filters.vehicle_type,
+          plan_name: filters.plan_name,
+          category_name: filters.category_type,
+          status: filters.status,
+        });
 
-      const mappedUsers = res.data.map((item:any)=>({...item,warranty_period:item.warranty_period.toString()
-        ,number_of_visits:item.number_of_visits.toString()}))
+      const mappedUsers = res.data.map((item: any) => ({
+        ...item, warranty_period: item.warranty_period.toString()
+        , number_of_visits: item.number_of_visits.toString()
+      }))
       setHasNext(res.meta.has_next)
       setTotal(res.meta.total)
       setUsers(mappedUsers);
@@ -357,6 +374,14 @@ export default function Services() {
   useEffect(() => {
     fetchServicePlan(false);
   }, [search, page, filters, perPage]);
+     async function getServiceMetaInfo() {
+      const res = await fetchServicePlanMetaInfo()
+      setServiceMetaInfo(res)
+    }
+  useEffect(() => {
+ 
+    getServiceMetaInfo()
+  }, [])
   function resetFilter() {
     setSearch('')
     setPage(1)
@@ -450,6 +475,7 @@ export default function Services() {
         >
           <ServiceForm
             id="service-form"
+            serviceMetaInfo={serviceMetaInfo}
             initialValues={
               isServicePlanModalOpenInfo.type === "edit" || isServicePlanModalOpenInfo.type === "view"
                 ? isServicePlanModalOpenInfo.info

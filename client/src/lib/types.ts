@@ -202,10 +202,26 @@ export interface userFormProp {
     setError: UseFormSetError<UserFormType>
   ) => void;
 }
+export interface serviceMetaInfoType{
+    categoryTypes: {label:string,value:string}[],
+    numberOfVisits:  {label:string,value:string}[],
+    servicePlans:  {label:string,value:string}[],
+    vehicleTypes:  {label:string,value:string}[],
+    warrantyPeriods:  {label:string,value:string}[]
+
+  }
 export interface serviceFormProp {
   mode: "create" | "edit" | "view";
   roles: any[];
   id?: string;
+  serviceMetaInfo:{
+    categoryTypes: {label:string,value:string}[],
+    numberOfVisits:  {label:string,value:string}[],
+    servicePlans:  {label:string,value:string}[],
+    vehicleTypes:  {label:string,value:string}[],
+    warrantyPeriods:  {label:string,value:string}[]
+
+  }
   initialValues?: Partial<serviceFormType>;
   isLoading?: boolean;
   onClose: () => void;

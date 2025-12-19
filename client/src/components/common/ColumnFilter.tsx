@@ -41,7 +41,7 @@ export function ColumnFilter({
     }, []);
 
     const filteredOptions = options.filter(o =>
-        o.label.toLowerCase().includes(search.toLowerCase())
+        o.label?.toLowerCase().includes(search.toLowerCase())
     );
 
     const rect = triggerRef.current?.getBoundingClientRect();

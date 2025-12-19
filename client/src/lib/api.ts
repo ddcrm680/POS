@@ -285,18 +285,18 @@ export async function fetchUserList({
 export async function fetchServicePlanList({
   page,
   search,
-  vehicle_type,
+  vehicle_category,
   plan_name,
-  category_type,
+  category_name,
   status,
   per_page
 }: {
   per_page: number;
   page: number;
   search: string;
-  vehicle_type?: string | number;
+  vehicle_category?: string | number;
   plan_name?: string | number;
-  category_type?: string | number;
+  category_name?: string | number;
   status?: string | number;
 }) {
   const params = new URLSearchParams({
@@ -305,9 +305,9 @@ export async function fetchServicePlanList({
     per_page: String(per_page)
   });
   if (plan_name) params.append("plan_name", String(plan_name));
-  if (vehicle_type) params.append("vehicle_type", String(vehicle_type));
+  if (vehicle_category) params.append("vehicle_category", String(vehicle_category));
 
-  if (category_type) params.append("category_type", String(category_type));
+  if (category_name) params.append("category_name", String(category_name));
   if (status !== "") params.append("status", String(status));
 
   const response = await api.get(`/api/service-plans?${params.toString()}`);
@@ -316,6 +316,15 @@ export async function fetchServicePlanList({
     return response.data;
   }
   throw new Error("Failed to fetch service plan list");
+}
+export async function fetchServicePlanMetaInfo() {
+ 
+  const response = await api.get(`/api/service-plans/meta`);
+
+  if (response?.data?.success === true) {
+    return response.data.data;
+  }
+  throw new Error("Failed to fetch service plan meta info");
 }
 export async function fetchVehicleList({
   page,
