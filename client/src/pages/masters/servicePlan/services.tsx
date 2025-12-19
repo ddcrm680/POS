@@ -133,7 +133,7 @@ export default function Services() {
         );
       }
     },
-    { key: "visit", label: "Visit", width: "150px" },
+    { key: "number_of_visit", label: "Visit", width: "150px" },
     { key: "sac", label: "Sac", width: "150px" },
     {
       key: "price", label: "Price", width: "150px", render: (_value: any,) => {
@@ -145,7 +145,7 @@ export default function Services() {
         );
       }
     },
-    { key: "gst_percent", label: "Gst(%)", width: "150px", },
+    { key: "gst", label: "Gst(%)", width: "150px", },
     { key: "duration", label: "Duration", width: "150px" },
     {
       key: "description", label: "Description", width: "150px",

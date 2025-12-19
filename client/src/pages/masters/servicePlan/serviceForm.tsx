@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Box } from "@chakra-ui/react";
 import { Constant } from "@/lib/constant";
-import { categoryType, numberOfVisit, planName, warrantyPeriod } from "@/lib/mockData";
+import { categoryType, numberOfVisit, planName, vehicleType, warrantyPeriod, warrantyType } from "@/lib/mockData";
 import { serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
 import { servicePlanSchema, userSchema } from "@/lib/schema";
 export const RequiredMark = ({ show }: { show: boolean }) =>
@@ -30,6 +30,7 @@ export default function ServiceForm({
   isLoading = false,
   onSubmit,
 }: serviceFormProp) {
+console.log(initialValues,'initialValues');
 
   const form = useForm<serviceFormType>({
     resolver: zodResolver(servicePlanSchema(mode)),
@@ -80,6 +81,26 @@ export default function ServiceForm({
         // ...(mode === "create" ? { password: "" } : {}),
         ...initialValues,
       });
+      console.log({
+        vehicle_type: "",
+        category_type: "",
+        plan_name: "",
+        invoice_name: "",
+
+        number_of_visit: "",
+        price: 0,
+
+        sac: "",
+        gst: undefined,
+
+        warranty_period: "",
+        warranty_type: "month",
+
+        description: "",
+        raw_materials: [],
+        // ...(mode === "create" ? { password: "" } : {}),
+        ...initialValues,
+      },'initialValues234')
     }
   }, [mode]);
   const isView = mode === "view";
@@ -110,8 +131,8 @@ export default function ServiceForm({
                       >
                         <option value="">{Constant.master.servicePlan.selectPlanName}</option>
                         {planName.map((r) => (
-                          <option key={r.id} value={Number(r.id)}>
-                            {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
+                          <option key={r.id} value={r.id}>
+                            {r.name}
                           </option>
                         ))}
                       </select>
@@ -136,9 +157,9 @@ export default function ServiceForm({
                         className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
                       >
                         <option value="">{Constant.master.servicePlan.selectVehicleType}</option>
-                        {planName.map((r) => (
-                          <option key={r.id} value={Number(r.id)}>
-                            {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
+                        {vehicleType.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.name}
                           </option>
                         ))}
                       </select>
@@ -168,8 +189,8 @@ export default function ServiceForm({
                           'category'
                         )}</option>
                         {categoryType.map((r) => (
-                          <option key={r.id} value={Number(r.id)}>
-                            {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
+                          <option key={r.id} value={r.id}>
+                            {r.name}
                           </option>
                         ))}
                       </select>
@@ -264,7 +285,7 @@ export default function ServiceForm({
                       <option value="">{Constant.master.servicePlan.selectVehicleType.replace('vehicle',
                         'warranty'
                       )}</option>
-                      {warrantyPeriod.map((period) => {
+                      {warrantyType.map((period) => {
                         return <option value={period.id}>{period.name}</option>
                       })}
 
@@ -394,7 +415,7 @@ export default function ServiceForm({
           <Box className="flex gap-3">
             <Box w={'50%'}> <FormField
               control={form.control}
-              name="sac"
+              name="description"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
@@ -416,7 +437,7 @@ export default function ServiceForm({
             </Box>
              <Box w={'50%'}> <FormField
               control={form.control}
-              name="sac"
+              name="raw_materials"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>

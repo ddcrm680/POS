@@ -39,12 +39,17 @@ export const servicePlanMockResponse = {
       id: 1,
       date_created: "2024-04-10",
       vehicle_type: "Sedan",
+        invoice_name:"invoice",
+
       plan_name: "Bonnet Coating",
       category_type: "Bonnet Protection",
-      visit: 1,
+      number_of_visit: 1,
       sac: "9997",
+       warranty_period: "1",
+  warranty_type: "month" ,
+
       price: 2000,
-      gst_percent: 18,
+      gst: 18,
       duration: "6 Month",
       description: "Ceramic coating of bonnet of the car",
       raw_materials: ["PERFECTION FLUID"],
@@ -52,14 +57,19 @@ export const servicePlanMockResponse = {
     },
     {
       id: 2,
-      date_created: "2024-05-02",
-      vehicle_type: "SUV",
-      plan_name: "Full Body Coating",
-      category_type: "Body Protection",
-      visit: 1,
+      date_created: "2024-04-10",
+      vehicle_type: "Sedan",
+        invoice_name:"invoice",
+
+      plan_name: "Bonnet Coating",
+      category_type: "Bonnet Protection",
+      number_of_visit: 1,
       sac: "9997",
-      price: 12000,
-      gst_percent: 18,
+       warranty_period: "1",
+  warranty_type: "month" ,
+
+      price: 2000,
+      gst: 18,
       duration: "12 Month",
       description: "Complete ceramic coating for full car body",
       raw_materials: ["PERFECTION FLUID", "NANO SHIELD"],
@@ -67,14 +77,19 @@ export const servicePlanMockResponse = {
     },
     {
       id: 3,
-      date_created: "2024-06-15",
-      vehicle_type: "Hatchback",
-      plan_name: "Interior Detailing",
-      category_type: "Interior Care",
-      visit: 1,
-      sac: "9988",
-      price: 3500,
-      gst_percent: 18,
+       date_created: "2024-04-10",
+      vehicle_type: "Sedan",
+        invoice_name:"invoice",
+
+      plan_name: "Bonnet Coating",
+      category_type: "Bonnet Protection",
+      number_of_visit: 1,
+      sac: "9997",
+       warranty_period: "1",
+  warranty_type: "month" ,
+
+      price: 2000,
+      gst: 18,
       duration: "3 Month",
       description: "Deep interior cleaning and protection",
       raw_materials: ["INTERIOR FOAM", "LEATHER CONDITIONER"],
@@ -151,7 +166,7 @@ export const warrantyPeriod = [
     id: "4"
   },
 ]
-export const monthlyPeriod = [
+export const warrantyType = [
   {
     name: "Month",
     id: "month"
