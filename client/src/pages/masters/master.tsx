@@ -20,7 +20,7 @@ export default function Master() {
               {/* Main Content Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 ">
                 <div className=" mb-6 flex justify-between">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Master Details</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Master Details</h1>
          <TabsList className="grid w-full grid-cols-3  lg:w-max  lg:inline-grid">
                   {masterTabList.map((tab) =>{
                      const Icon = tab.emoji;

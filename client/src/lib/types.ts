@@ -268,8 +268,8 @@ export type Option = {
 export type RHFSelectProps = {
   field: ControllerRenderProps<any, any>;
   options: Option[];
-  creatable:boolean
   isMulti?: boolean;
   isDisabled?: boolean;
   placeholder?: string;
+  creatable?: boolean;
 };
