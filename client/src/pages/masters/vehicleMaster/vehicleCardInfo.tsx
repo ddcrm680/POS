@@ -1,69 +1,74 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
+import { Box } from "@chakra-ui/react";
 import { vehicleCardItem } from "@/lib/types";
-import { Box,  } from "@chakra-ui/react";
 
-export function VehicleCardInfo({ item, isInModal, setIsUserModalOpenInfo }: { item: vehicleCardItem, isInModal: boolean, setIsUserModalOpenInfo?: (value: any) => void }) {
+export function VehicleCardInfo({
+  item,
+  isInModal,
+  setIsUserModalOpenInfo,
+}: {
+  item: vehicleCardItem;
+  isInModal: boolean;
+  setIsUserModalOpenInfo?: (value: boolean) => void;
+}) {
+  const models = item.model ?? [];
+  const total = models.length;
+
+  const visibleModels = isInModal ? models : models.slice(0, 5);
+  const remainingCount = total - visibleModels.length;
+
   const content = (
-    <>
-     { !isInModal &&<div className="flex items-center justify-between mb-4">
-        { (
-          <h2 className="text-md font-semibold tracking-wide">
+    <div className="space-y-3">
+
+      {!isInModal && (
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold tracking-wide text-slate-900">
             {item.company}
           </h2>
-        )}
-      </div>}
+          <span className="text-xs text-slate-500">
+            {total} model{total !== 1 ? "s" : ""}
+          </span>
+        </div>
+      )}
 
-      <div className="flex flex-wrap gap-2 max-h-[200px] overflow-auto">
-        { !isInModal ? item.model?.slice(0, 5)?.map((r: { name: string }, idx: number) => (
+      <div className="flex flex-wrap gap-1.5">
+        {visibleModels.map((m) => (
           <Box
-            key={idx}
-            title={r.name}
-            className="px-3 w-[120px] py-1.5 text-xs font-semibold rounded-full
-                       border border-primary bg-[#ffa9a9] uppercase tracking-wide"
+            key={m.id}
+            title={m.name}
+            className="rounded-md border border-slate-300 bg-white
+                       px-2.5 py-1 text-xs font-medium text-slate-700"
           >
-            {r.name.length > 8 ? `${r.name.slice(0, 8)}…` : r.name}
+            {m.name.trim().length > 16
+              ? `${m.name.trim().slice(0, 16)}…`
+              : m.name.trim()}
           </Box>
-        )) :item.model?.map((r: { name: string }, idx: number) => (
-          <Box
-            key={idx}
-            title={r.name}
-            className="px-3 w-[120px] py-1.5 text-xs font-semibold rounded-full
-                       border border-primary bg-[#ffa9a9] uppercase tracking-wide"
-          >
-            {r.name.length > 8 ? `${r.name.slice(0, 8)}…` : r.name}
-          </Box>
-        ))  }
+        ))}
 
-        {!isInModal && item?.model?.length > 5 && (
-          <span
-            className="px-3 py-1.5 text-xs rounded-full cursor-pointer
-                       bg-primary text-primary-foreground"
+        {!isInModal && remainingCount > 0 && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 px-2 text-[11px] text-slate-500 hover:text-slate-900"
             onClick={() => setIsUserModalOpenInfo?.(true)}
           >
-            +{item.model.length - 5} more
-          </span>
+            +{remainingCount} more
+            <ChevronRight className="ml-0.5 h-3 w-3" />
+          </Button>
         )}
       </div>
-    </>
+    </div>
   );
 
   if (isInModal) {
-    // ❌ NO Card inside modal
     return <div className="p-4">{content}</div>;
   }
-
-  // ✅ Card outside modal
+  
   return (
-    <Card
-      className="
-        group min-h-[150px] max-h-[410px]
-        border border-[#cdd7e5]
-        rounded-2xl p-5
-        hover:border-primary transition
-      "
-    >
-      {content}
+    <Card className="rounded-xl border border-slate-200 bg-white hover:border-primary/60 transition">
+      <CardContent className="p-4">{content}</CardContent>
     </Card>
   );
-
 }
