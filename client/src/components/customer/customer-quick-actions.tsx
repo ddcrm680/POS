@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import CustomerForm from "@/components/forms/customer-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { type Customer } from "@/schema";
+import { type Customer } from "@/lib/types";
 
 interface QuickAction {
   id: string;

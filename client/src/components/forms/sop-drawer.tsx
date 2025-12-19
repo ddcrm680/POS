@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ClipboardCheck, Camera, CheckCircle2, AlertCircle, X } from "lucide-react";
-import { type JobCard } from "@/schema";
+import { type JobCard } from "@/lib/types";
 import { getSOPTemplate, type SOPTemplate, calculateSOPProgress } from "@/lib/sop-templates";
 import SOPChecklist from "./sop-checklist";
 

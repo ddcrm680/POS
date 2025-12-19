@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
-import { editUserReq, UserFormType } from "@/schema";
+import { editServicePlanReq, editUserReq, serviceFormType, UserFormType } from "./types";
 
 export const baseUrl =
   process.env.REACT_APP_BASE_URL || Constant.REACT_APP_BASE_URL;
@@ -54,8 +54,8 @@ function createInstance(): AxiosInstance {
 
         return Promise.reject(error);
       }
-      if(status === 403){
-         window.dispatchEvent(new Event("auth:unauthorized"));
+      if (status === 403) {
+        window.dispatchEvent(new Event("auth:unauthorized"));
       }
 
       const cfg = error.config;
@@ -184,6 +184,20 @@ export async function SaveUser(values: UserFormType) {
 
   }
 }
+export async function SaveServicePlan(values: serviceFormType) {
+  try {
+    const response: any = await api.post(
+      "/api/service-plans/save", values
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
+
+  }
+}
 export async function DeleteUser(id: string) {
   try {
     const response = await api.delete(`/api/admin/delete-user/${id}`);
@@ -213,6 +227,22 @@ export async function EditUser(editFormValue: editUserReq) {
 
   }
 }
+export async function EditServicePlan(editFormValue: editServicePlanReq) {
+
+  try {
+    const response: any = await api.post(
+      `/api/service-plans/update/`, editFormValue.info
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+
+    throw response
+
+  }
+}
 export async function fetchRoleList() {
 
   const response: any = await api.get(
@@ -230,7 +260,7 @@ export async function fetchUserList({
   status,
   per_page
 }: {
-  per_page:number;
+  per_page: number;
   page: number;
   search: string;
   role_id?: string | number;
@@ -239,7 +269,7 @@ export async function fetchUserList({
   const params = new URLSearchParams({
     page: String(page),
     search,
-    per_page:String(per_page)
+    per_page: String(per_page)
   });
 
   if (role_id) params.append("role_id", String(role_id));
@@ -252,19 +282,63 @@ export async function fetchUserList({
   }
   throw new Error("Failed to fetch user list");
 }
+export async function fetchServicePlanList({
+  page,
+  search,
+  vehicle_category,
+  plan_name,
+  category_name,
+  status,
+  per_page
+}: {
+  per_page: number;
+  page: number;
+  search: string;
+  vehicle_category?: string | number;
+  plan_name?: string | number;
+  category_name?: string | number;
+  status?: string | number;
+}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    search,
+    per_page: String(per_page)
+  });
+  if (plan_name) params.append("plan_name", String(plan_name));
+  if (vehicle_category) params.append("vehicle_category", String(vehicle_category));
+
+  if (category_name) params.append("category_name", String(category_name));
+  if (status !== "") params.append("status", String(status));
+
+  const response = await api.get(`/api/service-plans?${params.toString()}`);
+
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error("Failed to fetch service plan list");
+}
+export async function fetchServicePlanMetaInfo() {
+ 
+  const response = await api.get(`/api/service-plans/meta`);
+
+  if (response?.data?.success === true) {
+    return response.data.data;
+  }
+  throw new Error("Failed to fetch service plan meta info");
+}
 export async function fetchVehicleList({
   page,
   search,
   per_page
 }: {
-  per_page:number;
+  per_page: number;
   page: number;
   search: string;
 }) {
   const params = new URLSearchParams({
     page: String(page),
     search,
-    per_page:String(per_page)
+    per_page: String(per_page)
   });
 
   const response = await api.get(`/api/utility/vehicle-companies?${params.toString()}`);
@@ -279,6 +353,21 @@ export async function UpdateUserStatus(statusInfo: { id: number, status: number 
   try {
     const response: any = await api.post(
       `/api/admin/user/status/${statusInfo.id}`, { status: statusInfo.status }
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
+
+  }
+}
+export async function UpdateServicePlanStatus(statusInfo: { id: number, status: number }) {
+
+  try {
+    const response: any = await api.post(
+      `/api/service-plans/status/${statusInfo.id}`, { status: statusInfo.status }
     );
     if (response?.data?.success === true) {
       return response.data?.data;

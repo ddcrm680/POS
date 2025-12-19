@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { fetchVehicleList } from "@/lib/api";
-import { vehicleType, } from "@/schema";
+import { vehicleType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, } from "@chakra-ui/react";
 import CommonModal from "@/components/common/CommonModal";
@@ -107,6 +107,7 @@ export default function VehicleMaster() {
           isCard={true}
           isLoading={isListLoading}
           tabType=""
+          perPageOptions = {[9, 18, 54, 99]}
           tabDisplayName="User"
           page={page}
           total={total}

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import CommonModal from "@/components/common/CommonModal";
-import { CommonDeleteModalProps } from "@/schema";
+import { CommonDeleteModalProps } from "@/lib/types";
 import { useEffect } from "react";
 
 export default function CommonDeleteModal({

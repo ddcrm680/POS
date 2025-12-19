@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { type Customer, POSJobData, posJobSchema } from "@/schema";
+import { type Customer, POSJobData,  } from "@/lib/types";
 import {
   BarChart3,
   Key
@@ -13,6 +13,7 @@ import { availableServices } from "@/lib/constant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Password from "./password";
 import Profile from "./profile";
+import { posJobSchema } from "@/lib/schema";
 
 export default function ProfileDetails() {
   const { toast } = useToast();

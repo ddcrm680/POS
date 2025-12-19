@@ -1,7 +1,5 @@
-import { ReactNode } from "react";
-import { UseFormSetError } from "react-hook-form";
 import { z } from "zod";
-export type Customer = z.infer<typeof CustomerSchema>;
+import { serviceFormType, serviceMetaInfoType } from "./types";
 export const CustomerSchema = z.object({
   id: z.string().uuid().default(() => crypto.randomUUID()),
   phoneNumber: z.string().max(15),
@@ -93,7 +91,6 @@ export const InsertCustomerSchema = CustomerSchema.omit({
   updatedAt: true,
 });
 
-export type JobCard = z.infer<typeof JobCardSchema>;
 
 // Job Card Schema
 export const JobCardSchema = z.object({
@@ -181,7 +178,6 @@ export const JobCardSchema = z.object({
 });
 
 
-export type Vehicle = z.infer<typeof VehicleSchema>;
 // Vehicle Schema
 export const VehicleSchema = z.object({
   id: z.string().uuid().default(() => crypto.randomUUID()),
@@ -201,48 +197,13 @@ export const InsertVehicleSchema = VehicleSchema.omit({
   id: true,
   createdAt: true,
 });
-export type InsertCustomer = z.infer<typeof InsertCustomerSchema>;
 // Zod schema (same as you had)
 export const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Enter a valid email"),
 
   password: z.string().min(8, "Password must be at least 8 characters").max(32, "Password must be at most 32 characters")
-  // .superRefine((val, ctx) => {
-  //   const regex = {
-  //     lowercase: /[a-z]/,
-  //     uppercase: /[A-Z]/,
-  //     number: /[0-9]/,
-  //     special: /[^A-Za-z0-9]/,
-  //   };
 
-  //   if (
-  //     !regex.lowercase.test(val) ||
-  //     !regex.uppercase.test(val) ||
-  //     !regex.number.test(val) ||
-  //     !regex.special.test(val)
-  //   ) {
-  //     ctx.addIssue({
-  //       code: z.ZodIssueCode.custom,
-  //       message:
-  //         "Password must include uppercase, lowercase, number, and special character",
-  //     });
-  //   }
-  // }),
 });
-
-export type LoginFormValues = z.infer<typeof loginSchema>;
-
-export type User = null | { id?: string; name?: string; email?: string;[k: string]: any };
-
-export interface AuthContextValue {
-  user: User | undefined; // undefined while loading
-  isLoading: boolean;
-  roles: any[];
-  isAuthenticated: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<any>;
-  Logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
-}
 
 
 export const posJobSchema = z.object({
@@ -265,7 +226,6 @@ export const posJobSchema = z.object({
   promisedReadyAt: z.string().min(1, "Promised ready time is required"),
 });
 
-export type POSJobData = z.infer<typeof posJobSchema>;
 
 export const profileSchema = z.object({
   fullName: z.string()
@@ -342,10 +302,6 @@ export const userSchema = (mode: "create" | "edit" | "view") =>
       .or(z.literal("")),
 
   });
-
-
-export type UserForm = z.infer<ReturnType<typeof userSchema>>;
-export type ProfileForm = z.infer<typeof profileSchema>;
 
 export const passwordSchema = z
   .object({
@@ -426,64 +382,7 @@ export const passwordSchema = z
     }
   });
 
-export type PasswordForm = z.infer<typeof passwordSchema>;
 
-export interface POSLayoutProps {
-  children: ReactNode;
-}
-
-export interface TabItem {
-  path: string;
-  icon: React.ComponentType<any>;
-  label: string;
-  badge?: number;
-}
-export interface CustomerAnalyticsOverview {
-  totalCustomers: number;
-  newCustomersThisMonth: number;
-  activeCustomers: number;
-  vipCustomers: number;
-  averageLifetimeValue: number;
-  customerRetentionRate: number;
-  topCustomerSource: string;
-  averageServiceInterval: number;
-}
-
-export interface CustomerStatsCardsProps {
-  className?: string;
-}
-
-export type Props = {
-  mode: "create" | "edit";
-  roles: Array<{ id: number; name: string }>;
-  initialValues?: Partial<UserFormType>;
-  isLoading?: boolean;
-  id: string
-  onSubmit: (values: UserFormType) => void;
-};
-export type UserFormType = {
-  name: string;
-  email: string;
-  phone: string;
-  password?: string;
-  role_id: number;
-  address?: string | undefined;
-}
-
-export interface userFormProp {
-  mode: "create" | "edit" | "view";
-  roles: any[];
-  id?: string;
-  initialValues?: Partial<UserFormType>;
-  isLoading?: boolean;
-  onClose: () => void;
-
-  // 👇 IMPORTANT
-  onSubmit: (
-    values: UserFormType,
-    setError: UseFormSetError<UserFormType>
-  ) => void;
-}
 export const passwordStrength = (val: string, ctx: z.RefinementCtx) => {
   const regex = {
     lowercase: /[a-z]/,
@@ -505,49 +404,97 @@ export const passwordStrength = (val: string, ctx: z.RefinementCtx) => {
     });
   }
 };
+export const servicePlanSchema = (serviceMetaInfo: serviceMetaInfoType) =>
+  z.object({
+    vehicle_type: z.string().min(1, "Please select vehicle type")
+      .refine((val) => {
+        // predefined value → always valid
+        if (serviceMetaInfo.vehicleTypes.find(item => item.value === val)) {
+          return true;
+        }
 
-export type editUserReq = {
-  id: string;
-  info: {
-    name: string;
-    password?: string | null
-    email: string;
-    phone: string;
-    role_id: number;
-    address?: string | undefined;
-  };
-}
+        // custom value → length between 3 and 150
+        return val.length >= 3 && val.length <= 150;
+      }, {
+        message: "Custom vehicle type must be between 3 and 150 characters",
+      }),
 
-export interface CommonDeleteModalProps {
-  isOpen: boolean;
-  title?: string;
-  width?: string
-  maxWidth?: string
-  description?: string;
-  confirmText?: string;
-  cancelText?: string;
-  isLoading?: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-}
+    category_type: z.string().min(1, "Please select category type")
+      .refine((val) => {
+        // predefined value → always valid
+        if (serviceMetaInfo.categoryTypes.find(item => item.value === val)) {
+          return true;
+        }
 
-export interface UserApiType {
-  id: number, full_name?: string, name?: string, email: string, phone: string
-  , role_id: number, is_active: number, created_at: string
+        // custom value → length between 3 and 150
+        return val.length >= 3 && val.length <= 150;
+      }, {
+        message: "Custom category type must be between 3 and 150 characters",
+      }),
 
-}
-export interface vehicleType{
-    "id": number
-    "name": string
-    "vehicle_models":{
-            "id": number,
-            "name": string
-        }[]
-}
-export interface vehicleCardItem{
-    "company": string
-    "model":{
-            "id": number,
-            "name": string
-        }[]
-}
+    plan_name: z
+      .string()
+      .min(1, "Please select plan name")
+      .refine((val) => {
+        // predefined value → always valid
+        if (serviceMetaInfo.servicePlans.find(item => item.value === val)) {
+          return true;
+        }
+
+        // custom value → length between 3 and 150
+        return val.length >= 3 && val.length <= 150;
+      }, {
+        message: "Custom plan name must be between 3 and 150 characters",
+      }),
+    invoice_name: z
+      .string()
+      .trim()
+      .min(3, "Invoice name must be at least 3 characters")
+      .max(150, "Invoice name must not exceed 150 characters")
+      .regex(/^[a-zA-Z0-9\s]+$/, "Only letters and numbers allowed"),
+
+
+    number_of_visits: z.string().min(1, "Please select number of visits"),
+
+    price: z
+      .coerce
+      .number()
+      .positive("Price must be greater than 0"),
+
+    sac: z
+      .string()
+      .max(20, "Sac must not exceed 20 characters")
+      .nullable()
+      .optional()
+      .transform((v) => v ?? undefined),
+
+    description: z
+      .string().max(200, "Description must not exceed 200 characters").nullable()
+      .optional()
+      .transform((v) => v ?? undefined),
+
+    gst: z
+      .coerce
+      .number()
+      .min(0, "GST cannot be negative")
+      .max(100, "GST cannot exceed 100")
+    // .optional(),
+    ,
+    warranty_period: z.string().min(1, "Please select warranty period"),
+
+    warranty_in: z.enum(["months", "years"], {
+      required_error: "Warranty type is required",
+    }),
+
+
+
+    raw_materials: z
+      .array(
+        z
+          .string()
+          .trim()
+          .max(100, "Raw material must not exceed 100 characters")
+      )
+      .optional(),
+
+  });

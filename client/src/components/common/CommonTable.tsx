@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Loader } from "./loader";
 import CommonModal from "./CommonModal";
-import { vehicleCardItem, vehicleType } from "@/schema";
+import { vehicleCardItem, vehicleType } from "@/lib/types";
 import { VehicleCardInfo } from "@/pages/masters/vehicleMaster/vehicleCardInfo";
 
 export default function CommonTable({
@@ -33,7 +33,7 @@ export default function CommonTable({
   perPage = 2,
   setPerPage,
   isCard = false,
-  perPageOptions = [9, 18, 54, 99],
+  perPageOptions = [10,25,50,100],
   onSearch,
   className = "",
   debounceDelay = 300,

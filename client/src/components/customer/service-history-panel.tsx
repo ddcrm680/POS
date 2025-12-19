@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { apiRequest } from "@/lib/queryClient";
-import { type Customer, type JobCard, type Vehicle } from "@/schema";
+import { type Customer, type JobCard, type Vehicle } from "@/lib/types";
 import { 
   User, 
   Phone, 

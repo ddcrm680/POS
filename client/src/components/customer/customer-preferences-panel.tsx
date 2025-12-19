@@ -48,7 +48,7 @@ import {
   Plus,
   Trash2
 } from "lucide-react";
-import { type Customer } from "@/schema";
+import { type Customer } from "@/lib/types";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface CustomerPreferencesPanelProps {

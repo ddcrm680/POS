@@ -9,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { InsertCustomerSchema, type Customer } from "@/schema";
+import {  type Customer } from "@/lib/types";
 import { Loader2, User, Phone, Mail, CheckCircle, X } from "lucide-react";
 import { z } from "zod";
+import { InsertCustomerSchema } from "@/lib/schema";
 
 interface InlineCustomerFormProps {
   phoneNumber: string;

@@ -12,7 +12,7 @@ import {
   MapPin,
   Clock
 } from "lucide-react";
-import { CustomerAnalyticsOverview, CustomerStatsCardsProps } from "@/schema";
+import { CustomerAnalyticsOverview, CustomerStatsCardsProps } from "@/lib/types";
 
 export default function CustomerStatsCards({ className = "" }: CustomerStatsCardsProps) {
   const { data: analytics, isLoading, error } = useQuery<CustomerAnalyticsOverview>({

@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { DeleteUser, EditUser, fetchUserList, SaveUser, UpdateUserStatus } from "@/lib/api";
-import { UserApiType, UserFormType, } from "@/schema";
+import { UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton, Switch } from "@chakra-ui/react";
 import { EditIcon, EyeIcon, Trash2 } from "lucide-react";

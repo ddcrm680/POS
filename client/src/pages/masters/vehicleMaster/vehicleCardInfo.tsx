@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-import { vehicleCardItem } from "@/schema";
 import { Box } from "@chakra-ui/react";
+import { vehicleCardItem } from "@/lib/types";
 
 export function VehicleCardInfo({
   item,

@@ -10,8 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { InsertCustomerSchema, type InsertCustomer, type Customer } from "@/schema";
+import {  type InsertCustomer, type Customer } from "@/lib/types";
 import { Loader2, User, Phone, Mail, Star } from "lucide-react";
+import { InsertCustomerSchema } from "@/lib/schema";
 
 interface CustomerFormProps {
   customer?: Customer;

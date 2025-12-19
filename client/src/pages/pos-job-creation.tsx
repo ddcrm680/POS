@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import {  type Customer, type Vehicle, JobCard } from "@/schema";
+import {  type Customer, type Vehicle, JobCard } from "@/lib/types";
 import { 
   User, 
   Phone, 

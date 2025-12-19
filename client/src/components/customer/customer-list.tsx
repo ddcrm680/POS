@@ -25,7 +25,7 @@ import {
   Plus,
   Download
 } from "lucide-react";
-import { type Customer } from "@/schema";
+import { type Customer } from "@/lib/types";
 
 interface CustomerListResponse {
   customers: Customer[];

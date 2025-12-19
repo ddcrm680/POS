@@ -1,11 +1,10 @@
-import { TabItem } from "@/schema";
-import { ServiceItem } from "./types";
-import { 
-  Home, 
-  Calculator, 
-  ClipboardList, 
-  Users, 
-  Package, 
+import { ServiceItem, TabItem } from "./types";
+import {
+  Home,
+  Calculator,
+  ClipboardList,
+  Users,
+  Package,
   CreditCard,
   Menu,
   Bell,
@@ -17,24 +16,37 @@ import {
   Building,
   UserCheck,
   Layers,
-  Car
+  Car,
+  Wrench
 } from "lucide-react";
 
-export const Constant={
-     REACT_APP_BASE_URL: 'https://pos.detailingdevils.com',
-REACT_APP_API_TIMEOUT:3000,
-REACT_APP_API_RETRY_COUNT:2,
-    login:{
-        logoUrl: "https://mycrm.detailingdevils.com/assets/images/logo.png",
-       loginSuccessMessage: "Login successful! Welcome back.",
-       loginFailureMessage: "Login failed. Unable to login.",
+export const Constant = {
+  REACT_APP_BASE_URL: 'https://pos.detailingdevils.com',
+  REACT_APP_API_TIMEOUT: 3000,
+  REACT_APP_API_RETRY_COUNT: 2,
+  login: {
+    logoUrl: "https://mycrm.detailingdevils.com/assets/images/logo.png",
+    loginSuccessMessage: "Login successful! Welcome back.",
+    loginFailureMessage: "Login failed. Unable to login.",
+  },
+  master:{
+    servicePlan:{
+      planName:"Plan Name",
+      selectPlanName:"Select plan name",
+      vehicleType:"Vehicle Type",
+      selectVehicleType:"Select vehicle type",
+      selectWarrantyPeriod:"Select warranty period",
+      noOfVisit:"Select number of visit",
+      mentionRawMaterial:"Mention raw material"
+
     }
+  }
 }
 
-export const RoleList={
-    'super-admin': "Super Admin",
-    STORE_MANAGER: 'Store Manager',
-  
+export const RoleList = {
+  'super-admin': "Super Admin",
+  STORE_MANAGER: 'Store Manager',
+
 }
 
 // Vehicle makes and models
@@ -63,7 +75,7 @@ export const availableServices: ServiceItem[] = [
 
 export const bottomTabs: TabItem[] = [
   { path: "/", icon: Home, label: "Dashboard" },
-   { path: "/master", icon: Layers, label: "Master", },
+  { path: "/master", icon: Layers, label: "Master", },
   { path: "/manager", icon: Settings, label: "Manager" },
   { path: "/appointments", icon: Calendar, label: "Appointments" },
   { path: "/facility-management", icon: Building, label: "Facility" },
@@ -81,5 +93,6 @@ export const quickActions = [
 ];
 export const masterTabList = [
   { id: "users", label: "Users", emoji: Users, color: "bg-blue-600 hover:bg-blue-700" },
-  { id: "vehicleMaster", label: "Vehicle Master", emoji: Car , color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "vehicleMaster", label: "Vehicle Master", emoji: Car, color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "servicePlan", label: "Service Plan", emoji: Wrench, color: "bg-blue-600 hover:bg-blue-700" },
 ];
