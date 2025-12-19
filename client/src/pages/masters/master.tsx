@@ -6,7 +6,7 @@ import VehicleMaster from "./vehicleMaster/vehicle";
 import Services from "./servicePlan/services";
 
 export default function Master() {
-  const [activeTab, setActiveTab] = useState("servicePlan");
+  const [activeTab, setActiveTab] = useState("users");
 
   return (
     <>
