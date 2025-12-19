@@ -454,12 +454,12 @@ export const servicePlanSchema = (serviceMetaInfo: serviceMetaInfoType) =>
       .regex(/^[a-zA-Z0-9\s]+$/, "Only letters and numbers allowed"),
 
 
-    number_of_visits: z.string().min(1, "Please select number of visits"),
+    number_of_visits: z.string().min(1, "Please select number of visit"),
 
     price: z
       .coerce
       .number()
-      .positive("Price must be greater than 0"),
+      .min(0, "Price cannot be negative"),
 
     sac: z
       .string()
