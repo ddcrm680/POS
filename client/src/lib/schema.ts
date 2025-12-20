@@ -535,7 +535,7 @@ export const organizationSchema = z.object({
     .trim()
     .max(100, "Account type must not exceed 100 characters")
     .optional()
-    .transform(v => v || undefined),
+    .or(z.literal("")),
 
   ifsc_code: z
     .string()
@@ -550,7 +550,7 @@ export const organizationSchema = z.object({
     .trim()
     .max(100, "Branch name must not exceed 100 characters")
     .optional()
-    .transform(v => v || undefined),
+    .or(z.literal("")),
 
   bank_address: z
     .string()
@@ -581,7 +581,7 @@ export const organizationSchema = z.object({
       "Aadhaar number must be exactly 12 digits"
     )
     .optional()
-    .transform(v => v || undefined),
+    .or(z.literal("")),
 
   invoice_prefix: z
     .string()
@@ -624,9 +624,9 @@ export const organizationSchema = z.object({
       z
         .instanceof(File)
         .refine(
-          file => file.size <= 2 * 1024 * 1024,
+          file => file.size <= 1 * 1024 * 1024,
           {
-            message: "File size must be 2MB or less",
+            message: "File size must be 1MB or less",
           }
         )
 

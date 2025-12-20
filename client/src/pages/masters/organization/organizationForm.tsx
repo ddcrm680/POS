@@ -493,10 +493,11 @@ export default function OrganizationForm({
                 name="document"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Upload Document<RequiredMark show={!isView} /></FormLabel>
+                    <FormLabel style={{ color: "#000" }}>Upload Document ( Allowed: JPG, JPEG, PNG, WEBP. Max {1} MB)<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
                       <Input
                         type="file"
+                         accept="image/*"
                         disabled={isView}
                         placeholder={Constant.master.orgnaization.documentPlaceholder}
                         onChange={(e) =>
