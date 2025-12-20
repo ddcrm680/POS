@@ -498,3 +498,134 @@ export const servicePlanSchema = (serviceMetaInfo: serviceMetaInfoType) =>
       .optional(),
 
   });
+
+export const organizationSchema = z.object({
+  /* ================= BASIC INFO ================= */
+
+  company_name: z
+    .string()
+    .trim()
+    .min(3, "Company name must be at least 3 characters")
+    .max(150, "Company name must not exceed 150 characters"),
+
+  email: z
+    .string()
+    .trim()
+    .email("Please enter a valid email address"),
+
+  company_address: z
+    .string()
+    .trim()
+    .min(10, "Company address must be at least 10 characters")
+    .max(300, "Company address must not exceed 300 characters"),
+
+  /* ================= BANK DETAILS ================= */
+
+  bank_name: z
+    .string()
+    .trim()
+    .min(3, "Bank name must be at least 3 characters")
+    .max(150, "Bank name must not exceed 150 characters"),
+
+  company_name_in_bank: z
+    .string()
+    .trim()
+    .min(3, "Company name in bank must be at least 3 characters")
+    .max(150, "Company name in bank must not exceed 150 characters"),
+
+  account_no: z
+    .string()
+    .regex(/^\d{9,18}$/, "Account number must be 9–18 digits"),
+
+  account_type: z
+    .string()
+    .trim()
+    .max(50, "Account type must not exceed 50 characters")
+    .optional()
+    .nullable()
+    .transform(v => v ?? undefined),
+
+  ifsc_code: z
+    .string()
+    .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code"),
+
+  branch_name: z
+    .string()
+    .trim()
+    .max(150, "Branch name must not exceed 150 characters")
+    .optional()
+    .nullable()
+    .transform(v => v ?? undefined),
+
+  bank_address: z
+    .string()
+    .trim()
+    .min(10, "Bank address must be at least 10 characters")
+    .max(300, "Bank address must not exceed 300 characters"),
+
+  /* ================= TAX DETAILS ================= */
+
+  company_gstin: z
+    .string()
+    .regex(
+      /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/,
+      "Invalid GSTIN format"
+    ),
+
+  company_pan: z
+    .string()
+    .regex(/^[A-Z]{5}\d{4}[A-Z]$/, "Invalid PAN number"),
+
+  aadhar_number: z
+    .string()
+    .regex(/^\d{12}$/, "Aadhaar number must be 12 digits")
+    .optional()
+    .nullable()
+    .transform(v => v ?? undefined),
+
+  /* ================= INVOICE ================= */
+
+  invoice_prefix: z
+    .string()
+    .trim()
+    .min(2, "Invoice prefix must be at least 2 characters")
+    .max(10, "Invoice prefix must not exceed 10 characters")
+    .regex(/^[A-Z0-9]+$/, "Only uppercase letters and numbers allowed"),
+
+  service_prefix: z
+    .string()
+    .trim()
+    .min(2, "Service prefix must be at least 2 characters")
+    .max(10, "Service prefix must not exceed 10 characters")
+    .regex(/^[A-Z0-9]+$/, "Only uppercase letters and numbers allowed"),
+
+  /* ================= LOCATION ================= */
+
+  country: z
+    .string()
+    .min(1, "Country is required"),
+
+  state: z
+    .string()
+    .min(1, "State is required"),
+
+  city: z
+    .string()
+    .min(1, "City is required"),
+
+  district: z
+    .string()
+    .min(1, "District is required"),
+
+  pincode: z
+    .string()
+    .regex(/^\d{6}$/, "Pincode must be 6 digits"),
+
+  /* ================= FILE ================= */
+
+  logo: z
+    .any()
+    .refine(file => file instanceof File, {
+      message: "Logo file is required",
+    }),
+});
