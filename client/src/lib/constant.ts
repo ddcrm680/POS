@@ -29,18 +29,46 @@ export const Constant = {
     loginSuccessMessage: "Login successful! Welcome back.",
     loginFailureMessage: "Login failed. Unable to login.",
   },
-  master:{
-    servicePlan:{
-      planName:"Plan Name",
-      selectPlanName:"Select plan name",
-      vehicleType:"Vehicle Type",
-      selectVehicleType:"Select vehicle type",
-      selectWarrantyPeriod:"Select warranty period",
-      noOfVisit:"Select number of visit",
-      mentionRawMaterial:"Mention raw material"
+  master: {
+    servicePlan: {
+      planName: "Plan Name",
+      selectPlanName: "Select plan name",
+      vehicleType: "Vehicle Type",
+      selectVehicleType: "Select vehicle type",
+      selectWarrantyPeriod: "Select warranty period",
+      noOfVisit: "Select number of visit",
+      mentionRawMaterial: "Mention raw material"
 
+    },
+    orgnaization: {
+      emailPlaceholder: "Enter official email address",
+      bankNamePlaceholder: "Enter bank name",
+      companyNameInBank: "Enter company name in bank",
+      accountNoPlaceholder: "Enter account No.",
+      accountTypePlaceholder: "Enter account type",
+      ifscCodePlaceholder: "Enter IFSC code",
+      branchNamePlaceholder: "Enter branch name",
+      bankAddressPlaceholder: "Enter bank address",
+      companyAddressPlaceholder: "Enter company address",
+      companyGSTIN: "Enter company GSTIN",
+      companyPANPlaceholder: "Enter company PAN number",
+      aadharPlaceholder: "Enter Aadhaar number (optional)",
+
+      /* ================= INVOICE ================= */
+      invoicePrefixPlaceholder: "Eg: DD/INV",
+      servicePrefixPlaceholder: "Eg: DD/SRV",
+
+      /* ================= LOCATION ================= */
+      countryPlaceholder: "Country",
+      statePlaceholder: "Select state",
+      cityPlaceholder: "Select city",
+      districtPlaceholder: "Enter district",
+      pincodePlaceholder: "Enter pincode",
+
+      /* ================= FILE ================= */
+      documentPlaceholder: "Upload document"
     }
-  }
+  },
 }
 
 export const RoleList = {
@@ -95,4 +123,6 @@ export const masterTabList = [
   { id: "users", label: "Users", emoji: Users, color: "bg-blue-600 hover:bg-blue-700" },
   { id: "vehicleMaster", label: "Vehicle Master", emoji: Car, color: "bg-blue-600 hover:bg-blue-700" },
   { id: "servicePlan", label: "Service Plan", emoji: Wrench, color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "organization", label: "Organization", emoji: Building, color: "bg-blue-600 hover:bg-blue-700" },
+
 ];

@@ -41,8 +41,8 @@ export default function CommonModal({
         <Dialog.Content
           className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[60%] rounded-lg bg-white shadow-xl z-[10000]"
           style={{
-            width: width ?? "60%",
-            maxWidth: maxWidth ?? "60%",
+            width: width ?? "80%",
+            maxWidth: maxWidth ?? "80%",
           }}>
 
           {/* Header */}

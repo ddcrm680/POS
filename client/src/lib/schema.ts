@@ -498,3 +498,151 @@ export const servicePlanSchema = (serviceMetaInfo: serviceMetaInfoType) =>
       .optional(),
 
   });
+
+export const organizationSchema = z.object({
+  company_name: z
+    .string()
+    .trim()
+    .min(5, "Company name must be at least 5 characters")
+    .max(100, "Company name must not exceed 100 characters"),
+
+  company_name_in_bank: z
+    .string()
+    .trim()
+    .min(5, "Company name in bank must be at least 5 characters")
+    .max(100, "Company name in bank must not exceed 100 characters"),
+
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .trim()
+    .email("Please enter a valid email address"),
+
+  bank_name: z
+    .string()
+    .min(1, "Bank name is required")
+    .trim()
+    .min(3, "Bank name must be at least 3 characters")
+    .max(100, "Bank name must not exceed 100 characters"),
+
+  account_no: z
+    .string()
+    .min(1, "Account number is required")
+    .regex(/^\d{9,18}$/, "Account number must be between 9 and 18 digits"),
+
+  account_type: z
+    .string()
+    .trim()
+    .max(100, "Account type must not exceed 100 characters")
+    .optional()
+    .or(z.literal("")),
+
+  ifsc_code: z
+    .string()
+    .min(1, "IFSC code is required")
+    .regex(
+      /^[A-Z]{4}0[A-Z0-9]{6}$/,
+      "Invalid IFSC code format (e.g. SBIN0001234)"
+    ),
+
+  branch_name: z
+    .string()
+    .trim()
+    .max(100, "Branch name must not exceed 100 characters")
+    .optional()
+    .or(z.literal("")),
+
+  bank_address: z
+    .string()
+    .trim()
+    .min(10, "Bank address must be at least 10 characters")
+    .max(200, "Bank address must not exceed 200 characters"),
+
+  gstin: z
+    .string()
+    .min(1, "Company GSTIN is required")
+    .regex(
+      /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/,
+      "Invalid GSTIN format"
+    ),
+
+  pan_no: z
+    .string()
+    .min(1, "PAN number is required")
+    .regex(
+      /^[A-Z]{5}\d{4}[A-Z]$/,
+      "Invalid PAN number format (e.g. ABCDE1234F)"
+    ),
+
+  aadhar_no: z
+    .string()
+    .regex(
+      /^\d{12}$/,
+      "Aadhaar number must be exactly 12 digits"
+    )
+    .optional()
+    .or(z.literal("")),
+
+  invoice_prefix: z
+    .string()
+    .trim()
+    .min(1, "Invoice prefix must be at least 1 characters")
+    .max(10, "Invoice prefix must not exceed 10 characters")
+    .regex(
+      /^[A-Z0-9]+$/,
+      "Invoice prefix must contain only uppercase letters and numbers"
+    ),
+
+  service_prefix: z
+    .string()
+    .trim()
+    .min(1, "Service prefix must be at least 1 characters")
+    .max(10, "Service prefix must not exceed 10 characters")
+    .regex(
+      /^[A-Z0-9]+$/,
+      "Service prefix must contain only uppercase letters and numbers"
+    ),
+
+  country: z.string().min(1, "Please select country"),
+  state: z.string().min(1, "Please select state"),
+  city: z.string().min(1, "Please select city"),
+  district: z.string().min(2, "District must be at least 2 characters")
+    .max(100, "District must not exceed 100 characters"),
+  pincode: z
+    .string()
+    .min(1, "Pincode is required")
+    .regex(/^\d{6}$/, "Pincode must be exactly 6 digits"),
+
+  company_address: z
+    .string()
+    .trim()
+    .min(10, "Company address must be at least 10 characters")
+    .max(200, "Company address must not exceed 200 characters"),
+
+  document: z.union(
+    [
+      z
+        .instanceof(File)
+        .refine(
+          file => file.size <= 1 * 1024 * 1024,
+          {
+            message: "File size must be 1MB or less",
+          }
+        )
+
+        .refine(
+          file =>
+            ["image/jpg", "image/jpeg", "image/png", "image/webp"].includes(file.type),
+          {
+            message: "Only JPG, JPEG PNG, or WEBP files are allowed",
+          }
+        ),
+      z.string().min(1, "Document is required"),
+    ],
+    {
+      required_error: "Document is required",
+    }
+  ),
+});
+
+

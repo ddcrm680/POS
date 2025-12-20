@@ -194,3 +194,144 @@ export const numberOfVisit  = [
     id: "4"
   },
 ]
+export const organizationMockData = {
+  data: [
+    {
+      id: 1,
+      created_at: "2024-03-20T10:15:00",
+
+      /* ================= BASIC INFO ================= */
+      company_name: "Coating Daddy Pvt. Ltd",
+      company_name_in_bank: "Coating Daddy Private Limited",
+      email: "sales@coatingdaddy.com",
+      company_address:
+        "B 14-15, Block B, Sector 1, Noida, Uttar Pradesh 201301",
+
+      /* ================= BANK DETAILS ================= */
+      bank_name: "IDBI Bank",
+      account_no: "123456789012",
+      account_type: "Current",
+      ifsc_code: "IBKL0000123",
+      branch_name: "Noida Sector 1",
+      bank_address:
+        "IDBI Bank, Sector 1, Noida, Uttar Pradesh 201301",
+
+      /* ================= TAX DETAILS ================= */
+      gstin: "07AAGCC8962J1Z6",
+      pan_no: "AAGCC8962J",
+      aadhar_no: "",
+
+      /* ================= INVOICE ================= */
+      invoice_prefix: "CD/PP",
+      service_prefix: "CD/SS",
+
+      /* ================= LOCATION ================= */
+      country: "India",
+      state: "Uttar Pradesh",
+      city: "Noida",
+      district: "Gautam Buddha Nagar",
+      pincode: "201301",
+
+      /* ================= FILE ================= */
+      document: "",
+
+      /* ================= STATUS ================= */
+      status: 1,
+    },
+
+    {
+      id: 2,
+      created_at: "2024-03-06T14:40:00",
+
+      company_name: "DETAILING DEVILS INDIA PRIVATE LIMITED",
+      company_name_in_bank: "Detailing Devils India Pvt Ltd",
+      email: "sales@detailingdevils.com",
+      company_address:
+        "D-50, Sector 2, Noida, Gautam Buddha Nagar, Uttar Pradesh 201301",
+
+      bank_name: "Axis Bank Ltd.",
+      account_no: "987654321098",
+      account_type: "Current",
+      ifsc_code: "UTIB0000456",
+      branch_name: "Sector 18 Noida",
+      bank_address:
+        "Axis Bank, Sector 18, Noida, Uttar Pradesh 201301",
+
+      gstin: "09AAGCD3480N1Z6",
+      pan_no: "AAGCD3480N",
+      aadhar_no: "",
+
+      invoice_prefix: "DD/CCN",
+      service_prefix: "DD/SSN",
+
+      country: "India",
+      state: "Uttar Pradesh",
+      city: "Noida",
+      district: "Gautam Buddha Nagar",
+      pincode: "201301",
+
+      document: "",
+      status: 1,
+    },
+
+    {
+      id: 3,
+      created_at: "2024-03-06T09:25:00",
+
+      company_name: "Detailing Devils India Pvt. Ltd.",
+      company_name_in_bank: "Detailing Devils India Pvt Ltd",
+      email: "sales@detailingdevils.com",
+      company_address:
+        "A-110, Sector 83, Phase 2, Noida, Gautam Buddha Nagar, Uttar Pradesh 201305",
+
+      bank_name: "Axis Bank Ltd.",
+      account_no: "112233445566",
+      account_type: "Current",
+      ifsc_code: "UTIB0000789",
+      branch_name: "Sector 83 Noida",
+      bank_address:
+        "Axis Bank, Sector 83, Noida, Uttar Pradesh 201305",
+
+      gstin: "09AAGCD3480N1Z6",
+      pan_no: "AAGCD3480N",
+      aadhar_no: "123412341234",
+
+      invoice_prefix: "DD/CC",
+      service_prefix: "DD/SS",
+
+      country: "India",
+      state: "Uttar Pradesh",
+      city: "Noida",
+      district: "Gautam Buddha Nagar",
+      pincode: "201305",
+
+      document: "",
+      status: 1,
+    },
+  ],
+
+  meta: {
+    current_page: 1,
+    per_page: 10,
+    last_page: 1,
+    total: 3,
+    from: 1,
+    to: 3,
+    has_next: false,
+  },
+};
+export const countryOptions = [
+  { value: "IN", label: "India" },
+];
+
+export const stateOptions = [
+  { value: "UP", label: "Uttar Pradesh" },
+  { value: "DL", label: "Delhi" },
+  { value: "MH", label: "Maharashtra" },
+];
+
+export const cityOptions = [
+  { value: "NOIDA", label: "Noida" },
+  { value: "DELHI", label: "Delhi" },
+  { value: "MUMBAI", label: "Mumbai" },
+];
