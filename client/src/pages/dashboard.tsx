@@ -260,24 +260,7 @@ export default function Dashboard() {
             })} • Today's Revenue: ₹{metrics?.todayRevenue?.toLocaleString() || '0'}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <Badge variant="secondary" className={` ${userInfo?.is_active ?'bg-green-50 text-green-700 border-green-200':
-            'bg-red-50 text-red-700 border-red-200'}`}>
-            <div className={`w-2 h-2 ${userInfo?.is_active ? 'bg-green-500':'bg-red-500'} rounded-full mr-2`} />
-          {userInfo?.is_active ?'System Online' :'System Offline'}  
-          </Badge>
-          <Button variant="ghost" className="h-12 w-12" data-testid="button-refresh">
-            <RefreshCw size={20} />
-          </Button>
-          <Button variant="ghost" className="relative h-12 w-12" data-testid="button-notifications">
-            <Bell size={20} />
-            {totalInventoryAlerts > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white">
-                {totalInventoryAlerts > 99 ? '99+' : totalInventoryAlerts}
-              </span>
-            )}
-          </Button>
-        </div>
+     
       </div>
 
       {/* POS Tile Grid */}
