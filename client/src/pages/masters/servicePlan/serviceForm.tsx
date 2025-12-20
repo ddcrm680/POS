@@ -100,161 +100,6 @@ export default function ServiceForm({
       >  <div className="p-6 space-y-6 max-h-[50vh] overflow-y-auto">
           {/* Row 1 */}
           <Box className="flex gap-3 ">
-            <Box w={'50%'}>
-              <FormField
-                control={form.control}
-                name="invoice_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>
-                      Invoice Name<RequiredMark show={!isView} />
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="Enter invoice name"
-                        {...field}
-                        disabled={isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-            </Box>
-                  <Box w={'50%'}>
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>
-                      Price (₹)<RequiredMark show={!isView} />
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="Enter price"
-                        {...field}
-                        onChange={(e) => {
-                          let value = e.target.value;
-
-                          // 1️⃣ allow only digits
-                          value = value.replace(/\D/g, "");
-                          value = value.replace(/^0+/, "");
-
-                          // allow single zero
-                          if (value === "") {
-                            value = "0";
-                          }
-                          field.onChange(value);
-                        }}
-
-                        disabled={isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-            </Box>
-
-          </Box>
-              <Box className="flex gap-3">
-          
-            <Box w={'50%'}> <FormField
-              control={form.control}
-              name="sac"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: "#000" }}>
-
-                    Sac
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter sac"
-
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => {
-                        let value = e.target.value;
-
-                        // allow only letters and numbers (no special characters)
-                        value = value.replace(/[^a-zA-Z0-9]/g, "");
-
-                        field.onChange(value);
-                      }}
-
-                      disabled={isView}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            </Box>
-            <Box w={'50%'}> <FormField
-              control={form.control}
-              name="gst"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: "#000" }}>
-                    GST(%)<RequiredMark show={!isView} />
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter gst"
-                      {...field}
-                      onChange={(e) => {
-                        let value = e.target.value;
-
-                        // allow only digits and dot
-                        value = value.replace(/[^0-9.]/g, "");
-                        value = value.replace(/^0+/, "");
-
-                        // allow single zero
-                        if (value === "") {
-                          value = "0";
-                        }
-
-                        // allow only ONE decimal point
-                        if ((value.match(/\./g) || []).length > 1) {
-                          return;
-                        }
-
-                        // restrict to 2 decimal places
-                        if (value.includes(".")) {
-                          const [int, dec] = value.split(".");
-                          value = int + "." + dec.slice(0, 2);
-                        }
-
-                        // convert to number for validation
-                        const num = Number(value);
-
-                        // prevent negative
-                        if (num < 0) return;
-
-                        // max allowed is 100
-                        if (num > 100) return;
-
-                        field.onChange(value);
-                      }}
-
-                      disabled={isView}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            </Box>
-          </Box>
-          <Box className="flex gap-3 ">
             <Box w="33%">
               <FormField
                 control={form.control}
@@ -312,7 +157,7 @@ export default function ServiceForm({
                 )}
               />
             </Box>
-  <Box w="33%">
+            <Box w="33%">
 
               <FormField
                 control={form.control}
@@ -338,12 +183,166 @@ export default function ServiceForm({
               />
             </Box>
           </Box>
+          <Box className="flex gap-3 ">
+            <Box w={'40%'}>
+              <FormField
+                control={form.control}
+                name="invoice_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>
+                      Invoice Name<RequiredMark show={!isView} />
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Enter invoice name"
+                        {...field}
+                        disabled={isView}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+            </Box>
+            <Box w={'20%'}>
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>
+                      Price (₹)<RequiredMark show={!isView} />
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Enter price"
+                        {...field}
+                        onChange={(e) => {
+                          let value = e.target.value;
+
+                          // 1️⃣ allow only digits
+                          value = value.replace(/\D/g, "");
+                          value = value.replace(/^0+/, "");
+
+                          // allow single zero
+                          if (value === "") {
+                            value = "0";
+                          }
+                          field.onChange(value);
+                        }}
+
+                        disabled={isView}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+            </Box>
+            <Box w={'20%'}> <FormField
+              control={form.control}
+              name="sac"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "#000" }}>
+
+                    Sac
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter sac"
+
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => {
+                        let value = e.target.value;
+
+                        // allow only letters and numbers (no special characters)
+                        value = value.replace(/[^a-zA-Z0-9]/g, "");
+
+                        field.onChange(value);
+                      }}
+
+                      disabled={isView}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            </Box>
+            <Box w={'20%'}> <FormField
+              control={form.control}
+              name="gst"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "#000" }}>
+                    GST(%)<RequiredMark show={!isView} />
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter gst"
+                      {...field}
+                      onChange={(e) => {
+                        let value = e.target.value;
+
+                        // allow only digits and dot
+                        value = value.replace(/[^0-9.]/g, "");
+                        value = value.replace(/^0+/, "");
+
+                        // allow single zero
+                        if (value === "") {
+                          value = "0";
+                        }
+
+                        // allow only ONE decimal point
+                        if ((value.match(/\./g) || []).length > 1) {
+                          return;
+                        }
+
+                        // restrict to 2 decimal places
+                        if (value.includes(".")) {
+                          const [int, dec] = value.split(".");
+                          value = int + "." + dec.slice(0, 2);
+                        }
+
+                        // convert to number for validation
+                        const num = Number(value);
+
+                        // prevent negative
+                        if (num < 0) return;
+
+                        // max allowed is 100
+                        if (num > 100) return;
+
+                        field.onChange(value);
+                      }}
+
+                      disabled={isView}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            </Box>
+          </Box>
+
+
 
           {/* Row 2 */}
           <Box className="flex gap-3">
-          
 
-            <Box w={'33%'}> <FormField
+
+            <Box w={'33%'}> 
+              <FormField
               control={form.control}
               name="warranty_period"
               render={({ field }) => (
@@ -397,7 +396,7 @@ export default function ServiceForm({
               )}
             />
             </Box>
-              <Box w={'33%'}>
+            <Box w={'33%'}>
               <FormField
                 control={form.control}
                 name="number_of_visits"
@@ -425,8 +424,8 @@ export default function ServiceForm({
               />
             </Box>
           </Box>
-      
-           <Box className="flex gap-3">
+
+          <Box className="flex gap-3">
             <Box w={'100%'}> <FormField
               control={form.control}
               name="raw_materials"
@@ -477,7 +476,7 @@ export default function ServiceForm({
             />
             </Box>
           </Box>
-        
+
         </div>
         {/* Submit */}
         {mode !== 'view' && <div className="">

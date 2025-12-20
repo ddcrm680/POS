@@ -177,7 +177,7 @@
   .pos-header {
     height: var(--pos-header-height);
   }
-  
+  .form-label{ color: "#000!important" }
   .pos-bottom-nav {
     height: calc(var(--pos-bottom-nav-height) + var(--pos-safe-area-bottom));
     padding-bottom: var(--pos-safe-area-bottom);

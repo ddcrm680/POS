@@ -8,7 +8,7 @@ export interface ServiceItem {
   name: string;
   price: number;
   description?: string;
-  category?:string;
+  category?: string;
 }
 
 export interface KanbanCard {
@@ -70,27 +70,42 @@ export type editUserReq = {
   };
 }
 export type editServicePlanReq = {
-  
-  info: {id: string;
-      vehicle_type: string;
-  category_type: string;
-  plan_name: string;
-  invoice_name?: string;
 
-  number_of_visits: string;
-  price: number;
+  info: {
+    id: string;
+    vehicle_type: string;
+    category_type: string;
+    plan_name: string;
+    invoice_name?: string;
 
-  sac?: string;
-  gst?: number;
+    number_of_visits: string;
+    price: number;
 
-  warranty_period: string;
-  warranty_in: "months" | "years";
+    sac?: string;
+    gst?: number;
 
-  description?: string;
-  raw_materials?: string[];
+    warranty_period: string;
+    warranty_in: "months" | "years";
+
+    description?: string;
+    raw_materials?: string[];
   };
 }
 
+// export type organizationFormType = {
+//    company_name: string;
+//     email: string;
+
+//     invoice_prefix: string;
+//     service_prefix: string;
+
+//     gstin: string;
+//     bank_name: string;
+
+//     address: string;
+
+//     status: number; 
+// };
 
 export interface CommonDeleteModalProps {
   isOpen: boolean;
@@ -110,20 +125,20 @@ export interface UserApiType {
   , role_id: number, is_active: number, created_at: string
 
 }
-export interface vehicleType{
-    "id": number
+export interface vehicleType {
+  "id": number
+  "name": string
+  "vehicle_models": {
+    "id": number,
     "name": string
-    "vehicle_models":{
-            "id": number,
-            "name": string
-        }[]
+  }[]
 }
-export interface vehicleCardItem{
-    "company": string
-    "model":{
-            "id": number,
-            "name": string
-        }[]
+export interface vehicleCardItem {
+  "company": string
+  "model": {
+    "id": number,
+    "name": string
+  }[]
 }
 
 export type PasswordForm = z.infer<typeof passwordSchema>;
@@ -178,7 +193,7 @@ export type serviceFormType = {
   number_of_visits: string;
   price: number;
 
-  sac?: string | null ;
+  sac?: string | null;
   gst: number;
 
   warranty_period: string;
@@ -202,24 +217,46 @@ export interface userFormProp {
     setError: UseFormSetError<UserFormType>
   ) => void;
 }
-export interface serviceMetaInfoType{
-    categoryTypes: {label:string,value:string}[],
-    numberOfVisits:  {label:string,value:string}[],
-    servicePlans:  {label:string,value:string}[],
-    vehicleTypes:  {label:string,value:string}[],
-    warrantyPeriods:  {label:string,value:string}[]
+export interface serviceMetaInfoType {
+  categoryTypes: { label: string, value: string }[],
+  numberOfVisits: { label: string, value: string }[],
+  servicePlans: { label: string, value: string }[],
+  vehicleTypes: { label: string, value: string }[],
+  warrantyPeriods: { label: string, value: string }[]
 
-  }
+}
+export interface organizationMetaInfoType {
+  country: { label: string, value: string }[],
+  state: { label: string, value: string }[],
+  city: { label: string, value: string }[],
+
+}
+export interface organizationFormProp {
+  mode: "create" | "edit" | "view";
+  roles: any[];
+  organizationMetaInfo:organizationMetaInfoType
+  id?: string;
+
+  initialValues?: Partial<organizationFormType>;
+  isLoading?: boolean;
+  onClose: () => void;
+
+  // 👇 IMPORTANT
+  onSubmit: (
+    values: organizationFormType,
+    setError: UseFormSetError<organizationFormType>
+  ) => void;
+}
 export interface serviceFormProp {
   mode: "create" | "edit" | "view";
   roles: any[];
   id?: string;
-  serviceMetaInfo:{
-    categoryTypes: {label:string,value:string}[],
-    numberOfVisits:  {label:string,value:string}[],
-    servicePlans:  {label:string,value:string}[],
-    vehicleTypes:  {label:string,value:string}[],
-    warrantyPeriods:  {label:string,value:string}[]
+  serviceMetaInfo: {
+    categoryTypes: { label: string, value: string }[],
+    numberOfVisits: { label: string, value: string }[],
+    servicePlans: { label: string, value: string }[],
+    vehicleTypes: { label: string, value: string }[],
+    warrantyPeriods: { label: string, value: string }[]
 
   }
   initialValues?: Partial<serviceFormType>;
@@ -272,4 +309,63 @@ export type RHFSelectProps = {
   isDisabled?: boolean;
   placeholder?: string;
   creatable?: boolean;
+};
+export type organizationFormType = {
+  company_name: string;
+  company_name_in_bank: string;
+  email: string;
+
+  bank_name: string;
+  account_no: string;
+  account_type?: string;
+  ifsc_code: string;
+  branch_name?: string;
+  bank_address: string;
+
+  gstin: string;
+  pan_no: string;
+  aadhar_no?: string;
+
+  invoice_prefix: string;
+  service_prefix: string;
+
+  country: string;
+  state: string;
+  city: string;
+  district: string;
+  pincode: string;
+  company_address: string;
+  document: File | string;
+};
+export type editOrganizationReq = {
+  info: {
+    id: number | string;
+
+    company_name: string;
+    company_name_in_bank: string;
+    email: string;
+
+    bank_name: string;
+    account_no: string;
+    account_type?: string;
+    ifsc_code: string;
+    branch_name?: string;
+    bank_address: string;
+
+    gstin: string;
+    pan_no: string;
+    aadhar_no?: string;
+
+    invoice_prefix: string;
+    service_prefix: string;
+
+    country: string;
+    state: string;
+    city: string;
+    district: string;
+    pincode: string;
+
+    company_address: string;
+    document: File | string;
+  };
 };

@@ -500,132 +500,149 @@ export const servicePlanSchema = (serviceMetaInfo: serviceMetaInfoType) =>
   });
 
 export const organizationSchema = z.object({
-  /* ================= BASIC INFO ================= */
-
   company_name: z
     .string()
     .trim()
-    .min(3, "Company name must be at least 3 characters")
-    .max(150, "Company name must not exceed 150 characters"),
-
-  email: z
-    .string()
-    .trim()
-    .email("Please enter a valid email address"),
-
-  company_address: z
-    .string()
-    .trim()
-    .min(10, "Company address must be at least 10 characters")
-    .max(300, "Company address must not exceed 300 characters"),
-
-  /* ================= BANK DETAILS ================= */
-
-  bank_name: z
-    .string()
-    .trim()
-    .min(3, "Bank name must be at least 3 characters")
-    .max(150, "Bank name must not exceed 150 characters"),
+    .min(5, "Company name must be at least 5 characters")
+    .max(100, "Company name must not exceed 100 characters"),
 
   company_name_in_bank: z
     .string()
     .trim()
-    .min(3, "Company name in bank must be at least 3 characters")
-    .max(150, "Company name in bank must not exceed 150 characters"),
+    .min(5, "Company name in bank must be at least 5 characters")
+    .max(100, "Company name in bank must not exceed 100 characters"),
+
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .trim()
+    .email("Please enter a valid email address"),
+
+  bank_name: z
+    .string()
+    .min(1, "Bank name is required")
+    .trim()
+    .min(3, "Bank name must be at least 3 characters")
+    .max(100, "Bank name must not exceed 100 characters"),
 
   account_no: z
     .string()
-    .regex(/^\d{9,18}$/, "Account number must be 9–18 digits"),
+    .min(1, "Account number is required")
+    .regex(/^\d{9,18}$/, "Account number must be between 9 and 18 digits"),
 
   account_type: z
     .string()
     .trim()
-    .max(50, "Account type must not exceed 50 characters")
+    .max(100, "Account type must not exceed 100 characters")
     .optional()
-    .nullable()
-    .transform(v => v ?? undefined),
+    .transform(v => v || undefined),
 
   ifsc_code: z
     .string()
-    .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code"),
+    .min(1, "IFSC code is required")
+    .regex(
+      /^[A-Z]{4}0[A-Z0-9]{6}$/,
+      "Invalid IFSC code format (e.g. SBIN0001234)"
+    ),
 
   branch_name: z
     .string()
     .trim()
-    .max(150, "Branch name must not exceed 150 characters")
+    .max(100, "Branch name must not exceed 100 characters")
     .optional()
-    .nullable()
-    .transform(v => v ?? undefined),
+    .transform(v => v || undefined),
 
   bank_address: z
     .string()
     .trim()
     .min(10, "Bank address must be at least 10 characters")
-    .max(300, "Bank address must not exceed 300 characters"),
+    .max(200, "Bank address must not exceed 200 characters"),
 
-  /* ================= TAX DETAILS ================= */
-
-  company_gstin: z
+  gstin: z
     .string()
+    .min(1, "Company GSTIN is required")
     .regex(
       /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/,
       "Invalid GSTIN format"
     ),
 
-  company_pan: z
+  pan_no: z
     .string()
-    .regex(/^[A-Z]{5}\d{4}[A-Z]$/, "Invalid PAN number"),
+    .min(1, "PAN number is required")
+    .regex(
+      /^[A-Z]{5}\d{4}[A-Z]$/,
+      "Invalid PAN number format (e.g. ABCDE1234F)"
+    ),
 
-  aadhar_number: z
+  aadhar_no: z
     .string()
-    .regex(/^\d{12}$/, "Aadhaar number must be 12 digits")
+    .regex(
+      /^\d{12}$/,
+      "Aadhaar number must be exactly 12 digits"
+    )
     .optional()
-    .nullable()
-    .transform(v => v ?? undefined),
-
-  /* ================= INVOICE ================= */
+    .transform(v => v || undefined),
 
   invoice_prefix: z
     .string()
     .trim()
-    .min(2, "Invoice prefix must be at least 2 characters")
+    .min(1, "Invoice prefix must be at least 1 characters")
     .max(10, "Invoice prefix must not exceed 10 characters")
-    .regex(/^[A-Z0-9]+$/, "Only uppercase letters and numbers allowed"),
+    .regex(
+      /^[A-Z0-9]+$/,
+      "Invoice prefix must contain only uppercase letters and numbers"
+    ),
 
   service_prefix: z
     .string()
     .trim()
-    .min(2, "Service prefix must be at least 2 characters")
+    .min(1, "Service prefix must be at least 1 characters")
     .max(10, "Service prefix must not exceed 10 characters")
-    .regex(/^[A-Z0-9]+$/, "Only uppercase letters and numbers allowed"),
+    .regex(
+      /^[A-Z0-9]+$/,
+      "Service prefix must contain only uppercase letters and numbers"
+    ),
 
-  /* ================= LOCATION ================= */
-
-  country: z
-    .string()
-    .min(1, "Country is required"),
-
-  state: z
-    .string()
-    .min(1, "State is required"),
-
-  city: z
-    .string()
-    .min(1, "City is required"),
-
-  district: z
-    .string()
-    .min(1, "District is required"),
-
+  country: z.string().min(1, "Please select country"),
+  state: z.string().min(1, "Please select state"),
+  city: z.string().min(1, "Please select city"),
+  district: z.string().min(2, "District must be at least 2 characters")
+    .max(100, "District must not exceed 100 characters"),
   pincode: z
     .string()
-    .regex(/^\d{6}$/, "Pincode must be 6 digits"),
+    .min(1, "Pincode is required")
+    .regex(/^\d{6}$/, "Pincode must be exactly 6 digits"),
 
-  /* ================= FILE ================= */
+  company_address: z
+    .string()
+    .trim()
+    .min(10, "Company address must be at least 10 characters")
+    .max(200, "Company address must not exceed 200 characters"),
 
-  logo: z
-    .any()
-    .refine(file => file instanceof File, {
-      message: "Logo file is required",
-    }),
+  document: z.union(
+    [
+      z
+        .instanceof(File)
+        .refine(
+          file => file.size <= 2 * 1024 * 1024,
+          {
+            message: "File size must be 2MB or less",
+          }
+        )
+
+        .refine(
+          file =>
+            ["image/jpg", "image/jpeg", "image/png", "image/webp"].includes(file.type),
+          {
+            message: "Only JPG, JPEG PNG, or WEBP files are allowed",
+          }
+        ),
+      z.string().min(1, "Document is required"),
+    ],
+    {
+      required_error: "Document is required",
+    }
+  ),
 });
+
+

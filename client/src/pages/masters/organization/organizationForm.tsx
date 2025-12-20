@@ -17,76 +17,92 @@ import { Input } from "@/components/ui/input";
 import { Box } from "@chakra-ui/react";
 import { Constant } from "@/lib/constant";
 import { warrantyType } from "@/lib/mockData";
-import { serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
-import { servicePlanSchema, userSchema } from "@/lib/schema";
+import { organizationFormProp, organizationFormType, serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
+import { organizationSchema, servicePlanSchema, userSchema } from "@/lib/schema";
 import RHFSelect from "@/components/RHFSelect";
 import { Textarea } from "@/components/ui/textarea";
+import { unknown } from "zod";
 export const RequiredMark = ({ show }: { show: boolean }) =>
   show ? <span className="text-red-500 ml-1">*</span> : null;
 
 export default function OrganizationForm({
   mode,
   id,
-  serviceMetaInfo,
+  organizationMetaInfo,
   onClose,
   initialValues,
   isLoading = false,
   onSubmit,
-}: serviceFormProp) {
+}: organizationFormProp) {
   console.log(initialValues, 'initialValues');
-
-  const form = useForm<serviceFormType>({
-    resolver: zodResolver(servicePlanSchema(serviceMetaInfo)),
+  const form = useForm<organizationFormType>({
+    resolver: zodResolver(organizationSchema),
     defaultValues: {
-      vehicle_type: "",
-      category_type: "",
-      plan_name: "",
-      invoice_name: "",
+      company_name: "",
+      email: "",
+      company_address: "",
 
-      number_of_visits: "",
-      price: 0,
+      bank_name: "",
+      company_name_in_bank: "",
+      account_no: "",
+      account_type: "",
+      ifsc_code: "",
+      branch_name: "",
+      bank_address: "",
 
-      gst: 0,
+      gstin: "",
+      pan_no: "",
+      aadhar_no: "",
 
-      warranty_period: "",
-      warranty_in: "months",
+      invoice_prefix: "",
+      service_prefix: "",
 
-      raw_materials: [],
+      country: "India",
+      state: "",
+      city: "",
+      district: "",
+      pincode: "",
 
-      description: "",
-      sac: "",
-      ...initialValues,
+      document: "",
     },
     shouldUnregister: false,
   });
 
-
-  // Reset form when initialValues change (important for edit)
   useEffect(() => {
-    if (mode === 'edit' || mode === "view") {
+    if (mode === "edit" || mode === "view") {
+      console.log(initialValues, 'initialValues');
 
       form.reset({
-        vehicle_type: "",
-        category_type: "",
-        plan_name: "",
-        invoice_name: "",
+        company_name: initialValues?.company_name ?? "",
+        email: initialValues?.email ?? "",
+        company_address: initialValues?.company_address ?? "",
 
-        number_of_visits: "",
-        price: 0,
+        bank_name: initialValues?.bank_name ?? "",
+        company_name_in_bank: initialValues?.company_name_in_bank ?? "",
+        account_no: initialValues?.account_no ?? "",
+        account_type: initialValues?.account_type ?? "",
+        ifsc_code: initialValues?.ifsc_code ?? "",
+        branch_name: initialValues?.branch_name ?? "",
+        bank_address: initialValues?.bank_address ?? "",
 
-        gst: initialValues?.gst ?? 0,
+        gstin: initialValues?.gstin ?? "",
+        pan_no: initialValues?.pan_no ?? "",
+        aadhar_no: initialValues?.aadhar_no ?? "",
 
-        warranty_period: "",
-        warranty_in: "months",
-        description: initialValues?.description ?? "",
-        sac: initialValues?.sac ?? "",
-        raw_materials: [],
-        // ...(mode === "create" ? { password: "" } : {}),
-        ...initialValues,
-      } as serviceFormType);
+        invoice_prefix: initialValues?.invoice_prefix ?? "",
+        service_prefix: initialValues?.service_prefix ?? "",
 
+        country: initialValues?.country ?? "India",
+        state: initialValues?.state ?? "",
+        city: initialValues?.city ?? "",
+        district: initialValues?.district ?? "",
+        pincode: initialValues?.pincode ?? "",
+
+        document: initialValues?.document ?? "",
+      });
     }
-  }, [mode]);
+  }, [mode, initialValues, form]);
+
   const isView = mode === "view";
   const isCreate = mode === "create";
   return (
@@ -96,328 +112,355 @@ export default function OrganizationForm({
         onSubmit={form.handleSubmit((values) =>
           onSubmit(values, form.setError)
         )}
-        className="space-y-6 "
-      >  <div className="p-6 space-y-6 max-h-[50vh] overflow-y-auto">
-          {/* Row 1 */}
-          <Box className="flex gap-3 ">
-            <Box w={'50%'}>
-              <FormField
-                control={form.control}
-                name="invoice_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>
-                      Invoice Name<RequiredMark show={!isView} />
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="Enter invoice name"
-                        {...field}
-                        disabled={isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        className="space-y-6"
+      >
+        <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
 
-            </Box>
-                  <Box w={'50%'}>
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>
-                      Price (₹)<RequiredMark show={!isView} />
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="Enter price"
-                        {...field}
-                        onChange={(e) => {
-                          let value = e.target.value;
-
-                          // 1️⃣ allow only digits
-                          value = value.replace(/\D/g, "");
-                          value = value.replace(/^0+/, "");
-
-                          // allow single zero
-                          if (value === "") {
-                            value = "0";
-                          }
-                          field.onChange(value);
-                        }}
-
-                        disabled={isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-            </Box>
-
-          </Box>
-              <Box className="flex gap-3">
-          
-            <Box w={'50%'}> <FormField
-              control={form.control}
-              name="sac"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: "#000" }}>
-
-                    Sac
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter sac"
-
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => {
-                        let value = e.target.value;
-
-                        // allow only letters and numbers (no special characters)
-                        value = value.replace(/[^a-zA-Z0-9]/g, "");
-
-                        field.onChange(value);
-                      }}
-
-                      disabled={isView}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            </Box>
-            <Box w={'50%'}> <FormField
-              control={form.control}
-              name="gst"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: "#000" }}>
-                    GST(%)<RequiredMark show={!isView} />
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter gst"
-                      {...field}
-                      onChange={(e) => {
-                        let value = e.target.value;
-
-                        // allow only digits and dot
-                        value = value.replace(/[^0-9.]/g, "");
-                        value = value.replace(/^0+/, "");
-
-                        // allow single zero
-                        if (value === "") {
-                          value = "0";
-                        }
-
-                        // allow only ONE decimal point
-                        if ((value.match(/\./g) || []).length > 1) {
-                          return;
-                        }
-
-                        // restrict to 2 decimal places
-                        if (value.includes(".")) {
-                          const [int, dec] = value.split(".");
-                          value = int + "." + dec.slice(0, 2);
-                        }
-
-                        // convert to number for validation
-                        const num = Number(value);
-
-                        // prevent negative
-                        if (num < 0) return;
-
-                        // max allowed is 100
-                        if (num > 100) return;
-
-                        field.onChange(value);
-                      }}
-
-                      disabled={isView}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            </Box>
-          </Box>
-          <Box className="flex gap-3 ">
-            <Box w="33%">
-              <FormField
-                control={form.control}
-                name="plan_name"
-                disabled={mode === 'view'}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.planName}<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <RHFSelect
-                        field={field}
-                        options={serviceMetaInfo.servicePlans.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
-                        }))}
-                        placeholder={Constant.master.servicePlan.selectPlanName}
-                        isDisabled={isView}
-                      />
-
-
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-
-
-            <Box w="33%">
-
-              <FormField
-                control={form.control}
-                name="category_type"
-                disabled={mode === 'view'}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.vehicleType.replace('Vehicle',
-                      'Category'
-                    )}<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <RHFSelect
-                        field={field}
-                        options={serviceMetaInfo.categoryTypes.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
-                        }))}
-                        placeholder={Constant.master.servicePlan.selectVehicleType.replace('vehicle',
-                          'category'
-                        )}
-                        isDisabled={isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-  <Box w="33%">
-
-              <FormField
-                control={form.control}
-                name="vehicle_type"
-                disabled={mode === 'view'}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.vehicleType}<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <RHFSelect
-                        field={field}
-                        options={serviceMetaInfo.vehicleTypes.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
-                        }))}
-                        placeholder={Constant.master.servicePlan.selectVehicleType}
-                        isDisabled={isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-          </Box>
-
-          {/* Row 2 */}
+          {/* ================= ROW 1 ================= */}
           <Box className="flex gap-3">
-          
-
-            <Box w={'33%'}> <FormField
-              control={form.control}
-              name="warranty_period"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: "#000" }}>
-
-                    Warranty Period<RequiredMark show={!isView} />
-                  </FormLabel>
-                  <FormControl>
-                    <RHFSelect
-                      field={field}
-                      creatable={false}
-                      options={serviceMetaInfo.warrantyPeriods.map(p => ({
-                        value: String(p.value),
-                        label: p.label,
-                      }))}
-                      placeholder={Constant.master.servicePlan.selectWarrantyPeriod}
-                      isDisabled={isView}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            </Box>
-            <Box w={'33%'}> <FormField
-              control={form.control}
-              name="warranty_in"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: "#000" }}>
-                    Warranty Type<RequiredMark show={!isView} />
-                  </FormLabel>
-                  <FormControl>
-                    <RHFSelect
-                      field={field}
-                      creatable={false}
-                      options={warrantyType.map(p => ({
-                        value: String(p.id),
-                        label: p.name,
-                      }))}
-                      placeholder={Constant.master.servicePlan.selectVehicleType.replace('vehicle',
-                        'warranty'
-                      )}
-                      isDisabled={isView}
-                    />
-
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            </Box>
-              <Box w={'33%'}>
+            <Box w="33%">
               <FormField
                 control={form.control}
-                name="number_of_visits"
+                name="company_name"
                 render={({ field }) => (
-                  <FormItem >
-                    <FormLabel style={{ color: "#000" }}>
-                      Number of visit<RequiredMark show={!isView} />
-                    </FormLabel>
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Company Name<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter company name" disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="bank_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Bank Name<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.bankNamePlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Email<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input type="email" {...field} placeholder={Constant.master.orgnaization.emailPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+          </Box>
+
+          {/* ================= ROW 2 ================= */}
+          <Box className="flex gap-3">
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="company_name_in_bank"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Company Name in Bank<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.companyNameInBank} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="account_no"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Account No.<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.accountNoPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="account_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Account Type</FormLabel>
+                    <FormControl>
+
+                      <Input {...field} placeholder={Constant.master.orgnaization.accountTypePlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+          </Box>
+
+          {/* ================= ROW 3 ================= */}
+          <Box className="flex gap-3">
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="ifsc_code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>IFSC Code<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.ifscCodePlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="branch_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Branch Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.branchNamePlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="bank_address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Bank Address<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.bankAddressPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+          </Box>
+
+          {/* ================= ADDRESS ================= */}
+          <FormField
+            control={form.control}
+            name="company_address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel style={{ color: "#000" }}>Company Address<RequiredMark show={!isView} /></FormLabel>
+                <FormControl>
+                  <Textarea {...field} placeholder={Constant.master.orgnaization.companyAddressPlaceholder} disabled={isView} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* ================= TAX ================= */}
+          <Box className="flex gap-3">
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="gstin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Company GSTIN<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.companyGSTIN} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="pan_no"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Company PAN No.<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.companyPANPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="aadhar_no"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Aadhaar Number</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.aadharPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+          </Box>
+
+          {/* ================= INVOICE ================= */}
+          <Box className="flex gap-3">
+            <Box w="50%">
+              <FormField
+                control={form.control}
+                name="invoice_prefix"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Invoice Prefix<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.invoicePrefixPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="50%">
+              <FormField
+                control={form.control}
+                name="service_prefix"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Service Prefix<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.servicePrefixPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+          </Box>
+
+          {/* ================= LOCATION ================= */}
+          <Box className="flex gap-3">
+            <Box w="25%">
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Country<RequiredMark show={!isView} /></FormLabel>
+
                     <FormControl>
                       <RHFSelect
                         field={field}
                         creatable={false}
-                        options={serviceMetaInfo.numberOfVisits.map(p => ({
+                        options={organizationMetaInfo.country.map(p => ({
                           value: String(p.value),
                           label: p.label,
                         }))}
-                        placeholder={Constant.master.servicePlan.noOfVisit}
+                        placeholder={Constant.master.orgnaization.countryPlaceholder}
                         isDisabled={isView}
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
+            </Box>
+
+            <Box w="25%">
+              <FormField
+                control={form.control}
+                name="state"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>State<RequiredMark show={!isView} /></FormLabel>
+
+                    <FormControl>
+                      <RHFSelect
+                        field={field}
+                        creatable={false}
+                        options={organizationMetaInfo.state.map(p => ({
+                          value: String(p.value),
+                          label: p.label,
+                        }))}
+                        placeholder={Constant.master.orgnaization.statePlaceholder}
+                        isDisabled={isView}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="25%">
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>City<RequiredMark show={!isView} /></FormLabel>
+
+                    <FormControl>
+                      <RHFSelect
+                        field={field}
+                        creatable={false}
+                        options={organizationMetaInfo.city.map(p => ({
+                          value: String(p.value),
+                          label: p.label,
+                        }))}
+                        placeholder={Constant.master.orgnaization.cityPlaceholder}
+                        isDisabled={isView}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="25%">
+              <FormField
+                control={form.control}
+                name="district"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>District<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.districtPlaceholder} disabled={isView} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -425,61 +468,51 @@ export default function OrganizationForm({
               />
             </Box>
           </Box>
-      
-           <Box className="flex gap-3">
-            <Box w={'100%'}> <FormField
-              control={form.control}
-              name="raw_materials"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: "#000" }}>
 
-                    Raw Material Consumption (Type raw material name and Press Enter)
-                  </FormLabel>
-                  <FormControl>
-                    <RHFSelect
-                      field={field}
-                      isMulti
-                      options={[]}
-                      placeholder={Constant.master.servicePlan.mentionRawMaterial}
-                      isDisabled={isView}
-                    />
-
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            </Box>
-          </Box>
+          {/* ================= PIN + FILE ================= */}
           <Box className="flex gap-3">
-            <Box w={'100%'} mt={0}> <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: "#000" }}>
+            <Box w="50%">
+              <FormField
+                control={form.control}
+                name="pincode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Pincode<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.pincodePlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
 
-                    Description
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      value={field.value ?? ""}
-                      placeholder="Enter description (optional)"
-                      minLength={0}
-                      maxLength={200}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Box w="50%">
+              <FormField
+                control={form.control}
+                name="document"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Upload Document<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        disabled={isView}
+                        placeholder={Constant.master.orgnaization.documentPlaceholder}
+                        onChange={(e) =>
+                          field.onChange(e.target.files?.[0] ?? null)
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </Box>
           </Box>
-        
         </div>
-        {/* Submit */}
+
+        {/* ================= ACTIONS ================= */}
         {mode !== 'view' && <div className="">
           <div className="flex justify-end gap-3 pb-6 pr-6  border-t pt-[24px]">
             <Button

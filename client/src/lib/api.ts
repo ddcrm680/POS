@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
-import { editServicePlanReq, editUserReq, serviceFormType, UserFormType } from "./types";
+import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, UserFormType } from "./types";
 
 export const baseUrl =
   process.env.REACT_APP_BASE_URL || Constant.REACT_APP_BASE_URL;
@@ -198,6 +198,20 @@ export async function SaveServicePlan(values: serviceFormType) {
 
   }
 }
+export async function SaveOrganizations(values: organizationFormType) {
+  try {
+    const response: any = await api.post(
+      "/api/organizations/save", values
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
+
+  }
+}
 export async function DeleteUser(id: string) {
   try {
     const response = await api.delete(`/api/admin/delete-user/${id}`);
@@ -232,6 +246,22 @@ export async function EditServicePlan(editFormValue: editServicePlanReq) {
   try {
     const response: any = await api.post(
       `/api/service-plans/update/`, editFormValue.info
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+
+    throw response
+
+  }
+}
+export async function EditOrganization(editFormValue: editOrganizationReq) {
+
+  try {
+    const response: any = await api.post(
+      `/api/organizations/update/`, editFormValue.info
     );
     if (response?.data?.success === true) {
       return response.data?.data;
@@ -317,6 +347,31 @@ export async function fetchServicePlanList({
   }
   throw new Error("Failed to fetch service plan list");
 }
+export async function fetchOrganizationsList({
+  page,
+  search,
+  status,
+  per_page
+}: {
+  per_page: number;
+  page: number;
+  search: string;
+  status?: string | number;
+}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    search,
+    per_page: String(per_page)
+  });
+    if (status !== "") params.append("status", String(status));
+
+  const response = await api.get(`/api/organizations?${params.toString()}`);
+
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error("Failed to fetch organization list");
+}
 export async function fetchServicePlanMetaInfo() {
  
   const response = await api.get(`/api/service-plans/meta`);
@@ -368,6 +423,21 @@ export async function UpdateServicePlanStatus(statusInfo: { id: number, status: 
   try {
     const response: any = await api.post(
       `/api/service-plans/status/${statusInfo.id}`, { status: statusInfo.status }
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
+
+  }
+}
+export async function UpdateOrganizationStatus(statusInfo: { id: number, status: number }) {
+
+  try {
+    const response: any = await api.post(
+      `/api/organizations/status/${statusInfo.id}`, { status: statusInfo.status }
     );
     if (response?.data?.success === true) {
       return response.data?.data;

@@ -77,7 +77,7 @@ const isCreate = mode === "create";
       >  <div className="p-6 space-y-6">
           {/* Row 1 */}
           <Box className="flex gap-3 ">
-            <Box w={`${mode==='edit' ||  mode==="view"?'50%':'33%'}`}>
+            <Box w={`${mode==='edit' ||  mode==="view"?'50%':'50%'}`}>
               <FormField
                 control={form.control}
                 disabled={mode==='view'}
@@ -94,7 +94,7 @@ const isCreate = mode === "create";
               />
             </Box>
 
-            <Box w={`${mode==='edit' ||  mode==="view"?'50%':'33%'}`}>
+            <Box w={`${mode==='edit' ||  mode==="view"?'50%':'50%'}`}>
               <FormField
                 control={form.control}
                 name="email"
@@ -111,7 +111,12 @@ const isCreate = mode === "create";
               />
             </Box>
 
-           {mode!=='view' && <Box w="33%">
+           
+          </Box>
+
+          {/* Row 2 */}
+          <Box className="flex gap-3">
+            {mode!=='view' && <Box w="33%">
               <FormField
                 control={form.control}
                 name="phone"
@@ -136,10 +141,6 @@ const isCreate = mode === "create";
                 )}
               />
             </Box>}
-          </Box>
-
-          {/* Row 2 */}
-          <Box className="flex gap-3">
              {( mode==="view" )&& <Box w="50%">
               <FormField
                 control={form.control}
@@ -166,7 +167,7 @@ const isCreate = mode === "create";
                 )}
               />
             </Box>}
-            {mode!=='view'&&<Box w="50%">
+            {mode!=='view'&&<Box w="33%">
               <FormField
                 control={form.control}
                 name="password"
@@ -197,7 +198,7 @@ const isCreate = mode === "create";
               />
             </Box>}
 
-            <Box w="50%">
+            <Box w={mode==='view' ? "50%":"33%"}>
               <FormField
                 control={form.control}
                 name="role_id"
