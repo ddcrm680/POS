@@ -1,5 +1,3 @@
-import { Value } from "@radix-ui/react-select";
-
 export const vehicleListInfo = {
   data: [
     {
@@ -39,14 +37,14 @@ export const servicePlanMockResponse = {
       id: 1,
       date_created: "2024-04-10",
       vehicle_type: "Sedan",
-        invoice_name:"invoice",
+      invoice_name: "invoice",
 
       plan_name: "Bonnet Coating",
       category_type: "Bonnet Protection",
       number_of_visits: 1,
       sac: "9997",
-       warranty_period: "1",
-  warranty_in: "months" ,
+      warranty_period: "1",
+      warranty_in: "months",
 
       price: 2000,
       gst: 18,
@@ -59,14 +57,14 @@ export const servicePlanMockResponse = {
       id: 2,
       date_created: "2024-04-10",
       vehicle_type: "Sedan",
-        invoice_name:"invoice",
+      invoice_name: "invoice",
 
       plan_name: "Bonnet Coating",
       category_type: "Bonnet Protection",
       number_of_visits: 1,
       sac: "9997",
-       warranty_period: "1",
-  warranty_in: "months" ,
+      warranty_period: "1",
+      warranty_in: "months",
 
       price: 2000,
       gst: 18,
@@ -77,16 +75,16 @@ export const servicePlanMockResponse = {
     },
     {
       id: 3,
-       date_created: "2024-04-10",
+      date_created: "2024-04-10",
       vehicle_type: "Sedan",
-        invoice_name:"invoice",
+      invoice_name: "invoice",
 
       plan_name: "Bonnet Coating",
       category_type: "Bonnet Protection",
       number_of_visits: 1,
       sac: "9997",
-       warranty_period: "1",
-  warranty_in: "months" ,
+      warranty_period: "1",
+      warranty_in: "months",
 
       price: 2000,
       gst: 18,
@@ -176,7 +174,7 @@ export const warrantyType = [
     id: "years"
   },
 ]
-export const numberOfVisit  = [
+export const numberOfVisit = [
   {
     name: "1",
     id: "1"
@@ -227,6 +225,7 @@ export const organizationMockData = {
 
       /* ================= LOCATION ================= */
       country: "India",
+     
       state: "Uttar Pradesh",
       city: "Noida",
       district: "Gautam Buddha Nagar",
@@ -335,3 +334,112 @@ export const cityOptions = [
   { value: "DELHI", label: "Delhi" },
   { value: "MUMBAI", label: "Mumbai" },
 ];
+
+export const franchiseTableMockData = {
+  data: [
+    {
+      id: 101,
+      created_at: "2025-01-15T10:30:00Z",
+
+      store_name: "Detailing Devils – Noida Sector 62",
+      email: "rahul.verma@detailingdevils.com",
+      phone: "+91-9876543210",
+      location_name: "Noida Sector 62",
+
+      country: "India",
+      address:
+        "B 14-15, Block B, Sector 1, Noida, Uttar Pradesh 201301",
+
+      state: "Uttar Pradesh",
+      city: "Noida",
+      pincode: "201309",
+
+      gst_number: "09AAGCD3480N1Z6",
+      pan_number: "AAGCD3480N",
+
+      opening_date: "2024-06-15",
+
+      invoice_prefix: "DD-N62",
+      agreement_file: "documents/agreement/franchise_agreement.pdf",
+
+      status: 1,
+      registration_file: "documents/company/registration_cert.pdf",
+      cancelled_cheque: "documents/company/cancelled_cheque.webp",
+
+    },
+
+    {
+      id: 102,
+      created_at: "2025-02-03T12:10:00Z",
+
+      store_name: "Detailing Devils – Gurugram DLF Phase 3",
+      email: "amit.sharma@detailingdevils.com",
+      phone: "+91-9811122233",
+      location_name: "DLF Phase 3",
+
+      country: "India",
+      address:
+        "B 14-15, Block B, Sector 1, Noida, Uttar Pradesh 201301",
+
+      state: "Haryana",
+      city: "Gurugram",
+      pincode: "122002",
+
+      gst_number: "06AAGCD5678R1Z2",
+      pan_number: "AAGCS5678R",
+
+      opening_date: "2024-08-01",
+
+      invoice_prefix: "DD-GGM",
+
+      status: 1,
+      agreement_file: "documents/agreement/franchise_agreement.pdf",
+      registration_file: "documents/company/registration_gurgaon.pdf",
+      cancelled_cheque: "documents/company/cancelled_cheque.webp",
+
+
+    },
+
+    {
+      id: 103,
+      created_at: "2025-03-12T09:45:00Z",
+
+      store_name: "Detailing Devils – Pune Baner",
+      email: "sneha.k@detailingdevils.com",
+      phone: "+91-9898989898",
+      location_name: "Baner",
+
+      country: "India",
+      address:
+        "B 14-15, Block B, Sector 1, Noida, Uttar Pradesh 201301",
+
+      state: "Maharashtra",
+      city: "Pune",
+      pincode: "411045",
+
+      gst_number: "27AAGCD1122M1Z9",
+      pan_number: "AAGCK1122M",
+
+      opening_date: "2024-11-20",
+
+      invoice_prefix: "DD-PUNE",
+
+      status: 0, // Inactive
+      registration_file: "documents/company/registration_pune.pdf",
+      cancelled_cheque: "documents/company/cancelled_cheque.webp",
+      agreement_file: "documents/agreement/franchise_agreement.pdf",
+
+
+    },
+  ],
+
+  meta: {
+    current_page: 1,
+    per_page: 10,
+    last_page: 1,
+    total: 3,
+    from: 1,
+    to: 3,
+    has_next: false,
+  },
+};
