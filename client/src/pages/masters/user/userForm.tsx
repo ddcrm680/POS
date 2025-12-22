@@ -34,6 +34,7 @@ export default function UserFormInfo({
 }: userFormProp) {
 
   const [showPassword, setShowPassword] = useState(false);
+console.log(initialValues,'initialValues');
 
 const form = useForm<UserFormType>({
   resolver: zodResolver(userSchema(mode)),

@@ -198,7 +198,7 @@ export async function SaveServicePlan(values: serviceFormType) {
 
   }
 }
-export async function SaveOrganizations(values: organizationFormType) {
+export async function SaveOrganizations(values: FormData) {
   try {
     const response: any = await api.post(
       "/api/organizations/save", values
@@ -257,11 +257,11 @@ export async function EditServicePlan(editFormValue: editServicePlanReq) {
 
   }
 }
-export async function EditOrganization(editFormValue: editOrganizationReq) {
+export async function EditOrganization(editFormValue: FormData) {
 
   try {
     const response: any = await api.post(
-      `/api/organizations/update/`, editFormValue.info
+      `/api/organizations/update/`, editFormValue
     );
     if (response?.data?.success === true) {
       return response.data?.data;
@@ -347,6 +347,31 @@ export async function fetchServicePlanList({
   }
   throw new Error("Failed to fetch service plan list");
 }
+export async function fetchStoresList({
+  page,
+  search,
+  status,
+  per_page
+}: {
+  per_page: number;
+  page: number;
+  search: string;
+  status?: string | number;
+}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    search,
+    per_page: String(per_page)
+  });
+    if (status !== "") params.append("status", String(status));
+
+  const response = await api.get(`/api/store?${params.toString()}`);
+
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error("Failed to fetch organization list");
+}
 export async function fetchOrganizationsList({
   page,
   search,
@@ -403,6 +428,7 @@ export async function fetchVehicleList({
   }
   throw new Error("Failed to fetch vehicle list");
 }
+
 export async function UpdateUserStatus(statusInfo: { id: number, status: number }) {
 
   try {
@@ -438,6 +464,21 @@ export async function UpdateOrganizationStatus(statusInfo: { id: number, status:
   try {
     const response: any = await api.post(
       `/api/organizations/status/${statusInfo.id}`, { status: statusInfo.status }
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
+
+  }
+}
+export async function UpdateStoreStatus(statusInfo: { id: number, status: number }) {
+
+  try {
+    const response: any = await api.post(
+      `/api/store/status/${statusInfo.id}`, { status: statusInfo.status }
     );
     if (response?.data?.success === true) {
       return response.data?.data;

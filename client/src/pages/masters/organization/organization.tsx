@@ -79,11 +79,7 @@ export default function Organization() {
       key: "company_name",
       label: "Company Name",
       width: "250px",
-      render: (val: string) => (
-        <span className="text-primary font-medium cursor-pointer">
-          {val}
-        </span>
-      ),
+     
     },
     {
       key: "email", label: "Email", width: "150px",
@@ -178,103 +174,111 @@ export default function Organization() {
       });
     }
   }, []);
+const buildOrganizationFormData = (
+  value: organizationFormType,
+  id?: number
+) => {
+  const formData = new FormData();
 
-  const OrganizationCommonHandler = async (
-    value: organizationFormType,
-    setError: UseFormSetError<organizationFormType>
-  ) => {
-    console.log(value, 'value67890-[');
+  if (id) {
+    formData.append("id", String(id));
+  }
 
-    try {
-      setIsLoading(true);
+  // Company details
+  formData.append("company_name", value.company_name);
+  formData.append("company_name_in_bank", value.company_name_in_bank);
+  formData.append("email", value.email);
+  formData.append("gstin", value.gstin);
+  formData.append("pan_no", value.pan_no);
+  formData.append("aadhar_no", value.aadhar_no ?? "");
+  formData.append("company_address", value.company_address);
 
-      if (isOrganizationModalOpenInfo.type === "edit") {
-        await EditOrganization({
-          info: {
-            id: isOrganizationModalOpenInfo.info.id,
+  // Bank details
+  formData.append("bank_name", value.bank_name);
+  formData.append("account_no", value.account_no);
+  formData.append("account_type", value.account_type ?? "");
+  formData.append("ifsc_code", value.ifsc_code);
+  formData.append("branch_name", value.branch_name ?? "");
+  formData.append("bank_address", value.bank_address);
 
-            // Company details
-            company_name: value.company_name,
-            company_name_in_bank: value.company_name_in_bank,
-            email: value.email,
+  // Invoice / Service
+  formData.append("invoice_prefix", value.invoice_prefix);
+  formData.append("service_prefix", value.service_prefix);
 
-            gstin: value.gstin,
-            pan_no: value.pan_no,
-            aadhar_no: value.aadhar_no ?? "",
+  // Location
+  formData.append("country", value.country);
+  formData.append("state", value.state);
+  formData.append("city", value.city);
+  formData.append("district", value.district);
+  formData.append("pincode", value.pincode);
 
-            company_address: value.company_address,
+  // Document (important)
+  if (value.document instanceof File) {
+    formData.append("document", value.document);
+  }
 
-            // Bank details
-            bank_name: value.bank_name,
-            account_no: value.account_no,
-            account_type: value.account_type ?? "",
-            ifsc_code: value.ifsc_code,
-            branch_name: value.branch_name ?? "",
-            bank_address: value.bank_address,
+  return formData;
+};
+const OrganizationCommonHandler = async (
+  value: organizationFormType,
+  setError: UseFormSetError<organizationFormType>
+) => {
+  try {
+    setIsLoading(true);
 
-            // Invoice / Service
-            invoice_prefix: value.invoice_prefix,
-            service_prefix: value.service_prefix,
+    if (isOrganizationModalOpenInfo.type === "edit") {
+      const formData = buildOrganizationFormData(
+        value,
+        isOrganizationModalOpenInfo.info.id
+      );
 
-            // Location
-            country: value.country,
-            state: value.state,
-            city: value.city,
-            district: value.district,
-            pincode: value.pincode,
-            document:value.pincode
-          }
+      await EditOrganization(formData);
 
-        });
-
-        toast({
-          title: "Edit User",
-          description: "Organization updated successfully",
-          variant: "success",
-        });
-      } else {
-        await SaveOrganizations(value);
-
-        toast({
-          title: "Add Organization",
-          description: "Organization added successfully",
-          variant: "success",
-        });
-      }
-
-      setIsOrganizationModalOpenInfo({ open: false, type: "create", info: {} });
-      fetchOrganizations(false);
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.errors;
-
-
-      // 👇 THIS IS THE KEY PART
-      if (apiErrors && err?.response?.status === 422) {
-        Object.entries(apiErrors).forEach(([field, messages]) => {
-          setError(field as keyof organizationFormType, {
-            type: "server",
-            message: (messages as string[])[0],
-          });
-        });
-        return;
-      }
-      if (err?.response?.status === 403) {
-
-        setIsOrganizationModalOpenInfo({ open: false, type: "create", info: {} });
-      }
       toast({
-        title: "Error",
-        description:
-          err?.response?.data?.message ||
-          err.message ||
-          `Failed to ${isOrganizationModalOpenInfo.type === "create" ? "add" : "update"
-          } user`,
-        variant: "destructive",
+        title: "Edit Organization",
+        description: "Organization updated successfully",
+        variant: "success",
       });
-    } finally {
-      setIsLoading(false);
+    } else {
+      const formData = buildOrganizationFormData(value);
+
+      await SaveOrganizations(formData);
+
+      toast({
+        title: "Add Organization",
+        description: "Organization added successfully",
+        variant: "success",
+      });
     }
-  };
+
+    setIsOrganizationModalOpenInfo({ open: false, type: "create", info: {} });
+    fetchOrganizations(false);
+  } catch (err: any) {
+    const apiErrors = err?.response?.data?.errors;
+
+    if (apiErrors && err?.response?.status === 422) {
+      Object.entries(apiErrors).forEach(([field, messages]) => {
+        setError(field as keyof organizationFormType, {
+          type: "server",
+          message: (messages as string[])[0],
+        });
+      });
+      return;
+    }
+
+    toast({
+      title: "Error",
+      description:
+        err?.response?.data?.message ||
+        err.message ||
+        "Something went wrong",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const fetchOrganizations = async (isLoaderHide = false) => {
     try {

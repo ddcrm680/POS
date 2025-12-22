@@ -5,6 +5,7 @@ import Users from "./user/users";
 import VehicleMaster from "./vehicleMaster/vehicle";
 import Services from "./servicePlan/services";
 import Organization from "./organization/organization";
+import Store from "./store/store";
 
 export default function Master() {
   const [activeTab, setActiveTab] = useState("users");
@@ -22,7 +23,7 @@ export default function Master() {
               <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 ">
                 <div className=" mb-6 flex justify-between">
                   <h1 className="text-2xl font-bold text-gray-900 mb-2">Master Details</h1>
-                  <TabsList className="grid w-full grid-cols-4  lg:w-max  lg:inline-grid">
+                  <TabsList className="grid w-full grid-cols-5  lg:w-max  lg:inline-grid">
                     {masterTabList.map((tab) => {
                       const Icon = tab.emoji;
                       return (
@@ -39,26 +40,23 @@ export default function Master() {
                   </TabsList>
                   {/* <p className="text-gray-600">Centralize, organize, and control all master data settings</p> */}
                 </div>
-
-
-
                 {/* Overview Tab */}
                 <TabsContent value="users" className="space-y-6">
                   <Users />
                 </TabsContent>
-
                 {/* Vehicle Information Tab */}
                 <TabsContent value="vehicleMaster" className="space-y-6">
                   <VehicleMaster />
                 </TabsContent>
-
                 <TabsContent value="servicePlan" className="space-y-6">
                   <Services />
                 </TabsContent>
-<TabsContent value="organization" className="space-y-6">
+                <TabsContent value="organization" className="space-y-6">
                   <Organization />
                 </TabsContent>
-
+                <TabsContent value="store" className="space-y-6">
+                  <Store />
+                </TabsContent>
               </Tabs>
             </div>
           </div>
