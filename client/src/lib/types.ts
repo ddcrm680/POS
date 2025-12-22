@@ -122,7 +122,8 @@ export interface CommonDeleteModalProps {
 
 export interface UserApiType {
   id: number, full_name?: string, name?: string, email: string, phone: string
-  , role_id: number, is_active: number, created_at: string
+  , role_id: number, is_active: number, created_at: string,
+  address:string 
 
 }
 export interface vehicleType {
