@@ -17,7 +17,8 @@ import {
   UserCheck,
   Layers,
   Car,
-  Wrench
+  Wrench,
+  Store
 } from "lucide-react";
 
 export const Constant = {
@@ -67,6 +68,14 @@ export const Constant = {
 
       /* ================= FILE ================= */
       documentPlaceholder: "Upload document"
+    },
+    store: {
+      addressPlaceholder: "Enter address",
+      notesPlaceholder: "Enter notes",
+      GSTIN: "Enter GSTIN",
+      PANPlaceholder: "Enter PAN number",
+         phonePlaceholder: "Enter phone",
+         locationNamePlaceholder: "Enter location name",
     }
   },
 }
@@ -124,5 +133,5 @@ export const masterTabList = [
   { id: "vehicleMaster", label: "Vehicle Master", emoji: Car, color: "bg-blue-600 hover:bg-blue-700" },
   { id: "servicePlan", label: "Service Plan", emoji: Wrench, color: "bg-blue-600 hover:bg-blue-700" },
   { id: "organization", label: "Organization", emoji: Building, color: "bg-blue-600 hover:bg-blue-700" },
-
+  { id: "store", label: "Store", emoji: Store, color: "bg-blue-600 hover:bg-blue-700" },
 ];

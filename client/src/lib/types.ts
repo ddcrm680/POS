@@ -234,7 +234,7 @@ export interface organizationMetaInfoType {
 export interface organizationFormProp {
   mode: "create" | "edit" | "view";
   roles: any[];
-  organizationMetaInfo:organizationMetaInfoType
+  organizationMetaInfo: organizationMetaInfoType
   id?: string;
 
   initialValues?: Partial<organizationFormType>;
@@ -337,6 +337,61 @@ export type organizationFormType = {
   company_address: string;
   document: File | string;
 };
+export interface organizationFormProp {
+  mode: "create" | "edit" | "view";
+  roles: any[];
+  organizationMetaInfo: organizationMetaInfoType
+  id?: string;
+
+  initialValues?: Partial<organizationFormType>;
+  isLoading?: boolean;
+  onClose: () => void;
+
+  // 👇 IMPORTANT
+  onSubmit: (
+    values: organizationFormType,
+    setError: UseFormSetError<organizationFormType>
+  ) => void;
+}
+export interface storeFormProp {
+  mode: "create" | "edit" | "view";
+  roles: any[];
+  id?: string;
+
+  initialValues?: Partial<storeFormType>;
+  isLoading?: boolean;
+  onClose: () => void;
+
+  // 👇 IMPORTANT
+  onSubmit: (
+    values: storeFormType,
+    setError: UseFormSetError<storeFormType>
+  ) => void;
+}
+export type storeFormType = {
+  store_name: string;
+  email: string;
+
+  notes: string;
+  location_name: string
+  phone: string
+  gstin: string;
+  pan_no: string;
+
+  invoice_prefix: string;
+
+  country: string;
+  state: string;
+  city: string;
+  pincode: string;
+  address: string;
+  registration_file: File | string;
+  cancelled_cheque: File | string;
+  agreement_file: File | string;
+  opening_date:string
+};
+
+
 export type editOrganizationReq = {
   info: {
     id: number | string;

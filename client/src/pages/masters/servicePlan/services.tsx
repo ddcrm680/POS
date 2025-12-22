@@ -90,7 +90,7 @@ useEffect(()=>{
 
         return (
           <span className="text-sm font-medium text-gray-700">
-            {(serviceMetaInfo.vehicleTypes && serviceMetaInfo.vehicleTypes?.find((r) => (r.value === _value))?.label) ?? "-"}
+            {_value}
           </span>
         );
       }
@@ -114,8 +114,7 @@ useEffect(()=>{
 
         return (
           <span className="text-sm font-medium text-gray-700">
-            {(serviceMetaInfo.servicePlans && serviceMetaInfo.servicePlans?.find((r) => (r.value === _value))?.label) ?? "-"}
-          </span>
+          {_value}   </span>
         );
       }
     },
@@ -139,8 +138,7 @@ useEffect(()=>{
 
         return (
           <span className="text-sm font-medium text-gray-700">
-            {(serviceMetaInfo.categoryTypes && serviceMetaInfo.categoryTypes?.find((r) => (r.value === _value))?.label) ?? "-"}
-          </span>
+          {_value}   </span>
         );
       }
     },
