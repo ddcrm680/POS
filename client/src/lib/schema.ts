@@ -624,19 +624,14 @@ export const organizationSchema = z.object({
       z
         .instanceof(File)
         .refine(
-          file => file.size <= 1 * 1024 * 1024,
-          {
-            message: "File size must be 1MB or less",
-          }
-        )
-
-        .refine(
           file =>
+            file.size <= 1 * 1024 * 1024 &&
             ["image/jpg", "image/jpeg", "image/png", "image/webp"].includes(file.type),
           {
-            message: "Only JPG, JPEG PNG, or WEBP files are allowed",
+            message: "File must be JPG, JPEG, PNG or WEBP and size must be 1MB or less",
           }
-        ),
+        )
+      ,
       z.string().min(1, "Document is required"),
     ],
     {
