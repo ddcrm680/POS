@@ -274,6 +274,7 @@ export default function Users() {
       const mappedUsers = res.data.map((u: UserApiType) => ({
         id: u.id,
         name: u.full_name || u.name,
+        address:u.address,
         email: u.email,
         phone: u.phone,
         role_id: u.role_id,
