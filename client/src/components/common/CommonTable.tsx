@@ -139,7 +139,7 @@ const renderCardView = () => {
       {isCard ? (
         renderCardView()
       ) : (<div className="overflow-hidden rounded-lg border">
-        <Table.Root size="sm" striped>
+        <Table.Root size="sm" >
           <Table.Header>
             <Table.Row className="!bg-gray-100 border-b border-gray-200">
               {columns.map((col: any) => (

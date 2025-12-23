@@ -29,8 +29,7 @@ import { useAuth } from "@/lib/auth";
 import { fetchCityList, fetchStateList } from "@/lib/api";
 import { Pencil, Trash2, X } from "lucide-react";
 import { findIdByName } from "@/lib/utils";
-export const RequiredMark = ({ show }: { show: boolean }) =>
-  show ? <span className="text-red-500 ml-1">*</span> : null;
+import { RequiredMark } from "@/components/common/RequiredMark";
 
 export default function OrganizationForm({
   mode,
