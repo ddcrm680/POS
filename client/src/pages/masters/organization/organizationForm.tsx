@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import building from '@/lib/images/building.webp'
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Dialog from "@radix-ui/react-dialog";
 import { IconButton } from "@chakra-ui/react";
@@ -39,7 +40,7 @@ export default function OrganizationForm({
   isLoading = false,
   onSubmit,
 }: organizationFormProp) {
-  const { countries } = useAuth();
+  const { countries, user } = useAuth();
   const [existingOrgImage, setExistingOrgImage] = useState<string | null>(null);
 
   const form = useForm<organizationFormType>({
@@ -74,11 +75,15 @@ export default function OrganizationForm({
     },
     shouldUnregister: false,
   });
-useEffect(() => {
-  if ((mode === "edit" || mode === "view") && initialValues?.org_image) {
-    setExistingOrgImage(typeof initialValues.org_image==='string' ?initialValues.org_image :"");
-  }
-}, [mode, initialValues]);
+  useEffect(() => {
+    if ((mode === "edit" || mode === "view") && initialValues?.org_image) {
+      setExistingOrgImage(typeof initialValues.org_image === 'string' ? initialValues.org_image : "");
+    }
+
+  }, [mode, initialValues]);
+  useEffect(() => {
+
+  })
   const selectedCountry = form.watch("country");
   const selectedState = form.watch("state");
   const [states, setStates] = useState([])
@@ -91,6 +96,29 @@ useEffect(() => {
     setCountryList(countries)
   }, [countries])
   useEffect(() => {
+    if (mode == "create" &&
+      countryList.length) {
+      const hydrateLocation = async () => {
+        // 1️⃣ COUNTRY
+        isHydratingRef.current = true;
+        try {
+          const countryId = findIdByName(countryList, '101');
+          if (!countryId) return;
+          form.setValue("country", String(countryId));
+
+          // 2️⃣ STATES
+          setLoadingState(true);
+          const stateList = await fetchStateList(countryId);
+          setStates(stateList);
+          setLoadingState(false);
+
+        } finally {
+          // ✅ hydration completed
+          isHydratingRef.current = false;
+        }
+      };
+      hydrateLocation()
+    }
     if (
       (mode !== "edit" && mode !== "view") ||
       !initialValues ||
@@ -102,6 +130,7 @@ useEffect(() => {
       isHydratingRef.current = true;
       try {
         const countryId = findIdByName(countryList, initialValues.country);
+        console.log(countryId, 'countryId');
 
         if (!countryId) return;
 
@@ -114,6 +143,7 @@ useEffect(() => {
         setLoadingState(false);
 
         const stateId = findIdByName(stateList, initialValues.state);
+        console.log(stateId, 'stateId');
 
         if (!stateId) return;
 
@@ -145,6 +175,8 @@ useEffect(() => {
 
     form.setValue("country", String(india.id));
   }, [mode, countryList]);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const orgImageError = form.formState.errors.org_image;
 
   useEffect(() => {
     if (mode === "edit" || mode === "view") {
@@ -177,8 +209,17 @@ useEffect(() => {
 
         org_image: initialValues?.org_image ?? "",
       });
+      setPreviewUrl(typeof initialValues?.org_image == 'string' ? initialValues.org_image : "");
     }
   }, [mode, initialValues, form]);
+
+  const [previewUrl, setPreviewUrl] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      // if user exists and has avatar url (your API returns avatar path)
+      return (initialValues as any)?.org_image || null;
+    } catch { return null; }
+  });
 
   const isView = mode === "view";
   const isCreate = mode === "create";
@@ -195,7 +236,85 @@ useEffect(() => {
 
           {/* ================= ROW 1 ================= */}
           <Box className="flex gap-3">
-            <Box w="33%">
+
+            <Box w={'30%'}>
+
+              <FormField
+                control={form.control}
+                name="org_image"
+                render={({ field }) => (
+                  <FormItem>
+                    {/* <FormLabel style={{ color: "#000" }}>Organization logo<RequiredMark show={!isView} /></FormLabel> */}
+
+                    <div className="flex items-center gap-3 -ml-[40px] flex-col">
+                      {/* CLICKABLE AVATAR */}
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        aria-label="organization-logo"
+                        onClick={() => !isView && inputRef.current?.click()}
+                        onKeyDown={(e) => {
+                          if ((e.key === "Enter" || e.key === " ") && !isView) {
+                            e.preventDefault();
+                            inputRef.current?.click();
+                          }
+                        }}
+                        className={`w-14 h-14 rounded-full overflow-hidden bg-muted 
+              flex items-center justify-center
+              ${isView ? "cursor-not-allowed" : "cursor-pointer"}
+              border-2 hover:border-gray-300 focus-visible:ring-2 focus-visible:ring-primary`}
+                      >
+                        {previewUrl ? (
+                          <img
+                            src={
+                              previewUrl.startsWith("blob:")
+                                ? previewUrl
+                                : `${Constant.REACT_APP_BASE_URL}/${previewUrl}`
+                            }
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <img
+                            src={building}
+                            alt="logo preview"
+                            className="w-full h-full object-cover scale-125"
+                          />
+                        )}
+                      </div>
+
+                      {/* HIDDEN FILE INPUT */}
+                      {!isView && (
+                        <input
+                          ref={inputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+
+                            // ✅ Pass file to RHF → Zod validates
+                            field.onChange(file);
+
+                            // preview
+                            const objectUrl = URL.createObjectURL(file);
+                            setPreviewUrl(objectUrl);
+                          }}
+                        />
+                      )}
+
+                      {/* HELP TEXT */}
+                      {!orgImageError && <p className={`text-muted-foreground text-[12px] w-[150px] text-center ${orgImageError && 'text-destructive'}`} style={{ textAlign: 'center' }}>
+                        Allowed: JPG, JPEG, PNG, WEBP. Max 1 MB<RequiredMark show={!isView} />
+                      </p>}
+                    </div>
+                    {/* ✅ ZOD ERROR SHOWS HERE */}
+                    <FormMessage className="text-center !mt-6 !mr-4" />
+                  </FormItem>
+                )}
+              />
+            </Box>
+            <Box w="40%">
               <FormField
                 control={form.control}
                 name="company_name"
@@ -211,7 +330,7 @@ useEffect(() => {
               />
             </Box>
 
-            <Box w="33%">
+            <Box w="40%">
               <FormField
                 control={form.control}
                 name="bank_name"
@@ -227,7 +346,9 @@ useEffect(() => {
               />
             </Box>
 
-            <Box w="33%">
+          </Box>
+          <Box className="flex gap-3">
+            <Box w="50%">
               <FormField
                 control={form.control}
                 name="email"
@@ -242,6 +363,62 @@ useEffect(() => {
                 )}
               />
             </Box>
+            <Box w="50%">
+              <FormField
+                control={form.control}
+                name="pin_code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Pincode<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.pincodePlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+
+          </Box>
+
+          {/* ================= INVOICE ================= */}
+          <Box className="flex gap-3">
+            <Box w="50%">
+              <FormField
+                control={form.control}
+                name="invoice_prefix"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Invoice Prefix<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.invoicePrefixPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="50%">
+              <FormField
+                control={form.control}
+                name="service_prefix"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Service Prefix<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.servicePrefixPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+          </Box>
+          <Box className="flex gap-3">
+
+
           </Box>
 
           {/* ================= ROW 2 ================= */}
@@ -317,6 +494,59 @@ useEffect(() => {
             <Box w="33%">
               <FormField
                 control={form.control}
+                name="company_pan_no"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Company PAN No.<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.companyPANPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="aadhar_no"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Aadhaar Number</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.aadharPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+
+          </Box>
+
+
+
+          {/* ================= TAX ================= */}
+          <Box className="flex gap-3">
+            <Box w="33%">
+              <FormField
+                control={form.control}
+                name="company_gstin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Company company_gstin<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.companyGSTIN} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+            <Box w="33%">
+              <FormField
+                control={form.control}
                 name="branch_name"
                 render={({ field }) => (
                   <FormItem>
@@ -347,106 +577,6 @@ useEffect(() => {
             </Box>
           </Box>
 
-          {/* ================= ADDRESS ================= */}
-          <FormField
-            control={form.control}
-            name="org_address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel style={{ color: "#000" }}>Company Address<RequiredMark show={!isView} /></FormLabel>
-                <FormControl>
-                  <Textarea {...field} placeholder={Constant.master.orgnaization.companyAddressPlaceholder} disabled={isView} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* ================= TAX ================= */}
-          <Box className="flex gap-3">
-            <Box w="33%">
-              <FormField
-                control={form.control}
-                name="company_gstin"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Company company_gstin<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.companyGSTIN} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-
-            <Box w="33%">
-              <FormField
-                control={form.control}
-                name="company_pan_no"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Company PAN No.<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.companyPANPlaceholder} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-
-            <Box w="33%">
-              <FormField
-                control={form.control}
-                name="aadhar_no"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Aadhaar Number</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.aadharPlaceholder} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-          </Box>
-
-          {/* ================= INVOICE ================= */}
-          <Box className="flex gap-3">
-            <Box w="50%">
-              <FormField
-                control={form.control}
-                name="invoice_prefix"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Invoice Prefix<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.invoicePrefixPlaceholder} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-
-            <Box w="50%">
-              <FormField
-                control={form.control}
-                name="service_prefix"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Service Prefix<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.servicePrefixPlaceholder} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-          </Box>
 
           {/* ================= LOCATION ================= */}
           <Box className="flex gap-3">
@@ -596,97 +726,20 @@ useEffect(() => {
               />
             </Box>
           </Box>
-
-          {/* ================= PIN + FILE ================= */}
-          <Box className="flex gap-3">
-            <Box w="50%">
-              <FormField
-                control={form.control}
-                name="pin_code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Pincode<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.pincodePlaceholder} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-
-            <Box w="50%">
-              {/* <FormField
-                control={form.control}
-                name="org_image"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Organization Logo ( Allowed: JPG, JPEG, PNG, WEBP. Max {1} MB)<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        disabled={isView}
-                        placeholder={Constant.master.orgnaization.documentPlaceholder}
-                        onChange={(e) =>
-                          field.onChange(e.target.files?.[0] ?? null)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
-              <FormField
-                control={form.control}
-                name="org_image"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>
-                      Organization Logo ( Allowed: JPG, JPEG, PNG, WEBP. Max {1} MB)
-                      <RequiredMark show={!isView} />
-                    </FormLabel>
-
-                    {/* Existing file display */}
-                    {existingOrgImage && (
-                      <div className="mb-2 flex items-center justify-between gap-3 h-[40px] rounded border px-2 bg-gray-50">
-                        <span className="text-sm text-gray-700 truncate">
-                          {existingOrgImage.split("/").pop()}
-                        </span>
-
-                        {!isView && (
-                          <X size={18} onClick={() => {
-                            setExistingOrgImage(null);
-                            field.onChange(null);
-                          }} />
-
-
-                        )}
-                      </div>
-                    )}
-
-                    {/* File input */}
-                    {!isView && !existingOrgImage && (
-                      <FormControl>
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0] ?? null;
-                            field.onChange(file);
-                            if (file) setExistingOrgImage(null);
-                          }}
-                        />
-                      </FormControl>
-                    )}
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-            </Box>
-          </Box>
+          {/* ================= ADDRESS ================= */}
+          <FormField
+            control={form.control}
+            name="org_address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel style={{ color: "#000" }}>Company Address<RequiredMark show={!isView} /></FormLabel>
+                <FormControl>
+                  <Textarea {...field} placeholder={Constant.master.orgnaization.companyAddressPlaceholder} disabled={isView} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         {/* ================= ACTIONS ================= */}
