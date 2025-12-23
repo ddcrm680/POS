@@ -283,6 +283,7 @@ export type User = null | { id?: string; name?: string; email?: string;[k: strin
 export interface AuthContextValue {
   user: User | undefined; // undefined while loading
   isLoading: boolean;
+  countries:{ id: number, name: string, slug: string }[]
   roles: any[];
   isAuthenticated: boolean;
   login: (credentials: { email: string; password: string }) => Promise<any>;
@@ -323,8 +324,8 @@ export type organizationFormType = {
   branch_name?: string;
   bank_address: string;
 
-  gstin: string;
-  pan_no: string;
+  company_gstin: string;
+  company_pan_no: string;
   aadhar_no?: string;
 
   invoice_prefix: string;
@@ -334,9 +335,9 @@ export type organizationFormType = {
   state: string;
   city: string;
   district: string;
-  pincode: string;
-  company_address: string;
-  document: File | string;
+  pin_code: string;
+  org_address: string;
+  org_image: File | string;
 };
 export interface organizationFormProp {
   mode: "create" | "edit" | "view";
