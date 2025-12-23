@@ -66,7 +66,7 @@ export default function Organization() {
 
         return (
           <Box className="flex flex-col justify-center items-center">
-            <span className="text-sm font-medium text-sm  ">
+            <span className="font-bold  ">
               {formatDate(_value)}
             </span>
             <span className="text-sm font-medium  text-gray-700">

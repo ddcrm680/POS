@@ -21,8 +21,7 @@ import { serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/
 import { servicePlanSchema, userSchema } from "@/lib/schema";
 import RHFSelect from "@/components/RHFSelect";
 import { Textarea } from "@/components/ui/textarea";
-export const RequiredMark = ({ show }: { show: boolean }) =>
-  show ? <span className="text-red-500 ml-1">*</span> : null;
+import { RequiredMark } from "@/components/common/RequiredMark";
 
 export default function ServiceForm({
   mode,

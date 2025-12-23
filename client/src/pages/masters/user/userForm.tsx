@@ -20,8 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Box } from "@chakra-ui/react";
 import { Textarea } from "@/components/ui/textarea";
 import { userSchema } from "@/lib/schema";
-export const RequiredMark = ({ show }: { show: boolean }) =>
-  show ? <span className="text-red-500 ml-1">*</span> : null;
+import { RequiredMark } from "@/components/common/RequiredMark";
 
 export default function UserFormInfo({
   mode,
