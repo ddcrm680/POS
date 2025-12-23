@@ -27,7 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { unknown } from "zod";
 import { useAuth } from "@/lib/auth";
 import { fetchCityList, fetchStateList } from "@/lib/api";
-import { X } from "lucide-react";
+import { Pencil, Trash2, X } from "lucide-react";
 import { findIdByName } from "@/lib/utils";
 export const RequiredMark = ({ show }: { show: boolean }) =>
   show ? <span className="text-red-500 ml-1">*</span> : null;
@@ -244,41 +244,75 @@ export default function OrganizationForm({
                 name="org_image"
                 render={({ field }) => (
                   <FormItem>
-                    {/* <FormLabel style={{ color: "#000" }}>Organization logo<RequiredMark show={!isView} /></FormLabel> */}
-
                     <div className="flex items-center gap-3 -ml-[40px] flex-col">
-                      {/* CLICKABLE AVATAR */}
-                      <div
-                        role="button"
-                        tabIndex={0}
-                        aria-label="organization-logo"
-                        onClick={() => !isView && inputRef.current?.click()}
-                        onKeyDown={(e) => {
-                          if ((e.key === "Enter" || e.key === " ") && !isView) {
-                            e.preventDefault();
-                            inputRef.current?.click();
-                          }
-                        }}
-                        className={`w-14 h-14 rounded-full overflow-hidden bg-muted 
+
+                      {/* AVATAR WRAPPER */}
+                      <div className="relative">
+                        {/* CLICKABLE AVATAR */}
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          aria-label="organization-logo"
+                          onClick={() => !isView && inputRef.current?.click()}
+                          onKeyDown={(e) => {
+                            if ((e.key === "Enter" || e.key === " ") && !isView) {
+                              e.preventDefault();
+                              inputRef.current?.click();
+                            }
+                          }}
+                          className={`w-14 h-14 rounded-full overflow-hidden bg-muted 
               flex items-center justify-center
               ${isView ? "cursor-not-allowed" : "cursor-pointer"}
-              border-2 hover:border-gray-300 focus-visible:ring-2 focus-visible:ring-primary`}
-                      >
-                        {previewUrl ? (
-                          <img
-                            src={
-                              previewUrl.startsWith("blob:")
-                                ? previewUrl
-                                : `${Constant.REACT_APP_BASE_URL}/${previewUrl}`
-                            }
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <img
-                            src={building}
-                            alt="logo preview"
-                            className="w-full h-full object-cover scale-125"
-                          />
+              border-2
+              ${orgImageError ? "border-destructive" : "hover:border-gray-300"}
+              focus-visible:ring-2 focus-visible:ring-primary`}
+                        >
+                          {previewUrl ? (
+                            <img
+                              src={
+                                previewUrl.startsWith("blob:")
+                                  ? previewUrl
+                                  : `${Constant.REACT_APP_BASE_URL}/${previewUrl}`
+                              }
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <img
+                              src={building}
+                              alt="logo preview"
+                              className="w-full h-full object-cover scale-125"
+                            />
+                          )}
+                        </div>
+
+                        {/* ✏️ EDIT ICON */}
+                        {!isView && !previewUrl && (
+                          <button
+                            type="button"
+                            onClick={() => inputRef.current?.click()}
+                            className="absolute -bottom-1 -right-1 bg-white border rounded-full p-1 shadow hover:bg-gray-100"
+                            aria-label="Change image"
+                          >
+                            <Pencil size={12} />
+                          </button>
+                        )}
+
+                        {/* 🗑️ DELETE ICON (only when image exists) */}
+                        {!isView && previewUrl && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              field.onChange("");          // clear RHF value
+                              setPreviewUrl(null);         // clear preview
+                              if (inputRef.current) {
+                                inputRef.current.value = "";
+                              }
+                            }}
+                            className="absolute -bottom-1 -right-1 bg-white border rounded-full p-1 shadow hover:bg-red-100 text-red-600"
+                            aria-label="Remove image"
+                          >
+                            <Trash2 size={12} />
+                          </button>
                         )}
                       </div>
 
@@ -293,26 +327,29 @@ export default function OrganizationForm({
                             const file = e.target.files?.[0];
                             if (!file) return;
 
-                            // ✅ Pass file to RHF → Zod validates
-                            field.onChange(file);
-
-                            // preview
+                            field.onChange(file); // RHF + Zod
                             const objectUrl = URL.createObjectURL(file);
                             setPreviewUrl(objectUrl);
                           }}
                         />
                       )}
 
-                      {/* HELP TEXT */}
-                      {!orgImageError && <p className={`text-muted-foreground text-[12px] w-[150px] text-center ${orgImageError && 'text-destructive'}`} style={{ textAlign: 'center' }}>
-                        Allowed: JPG, JPEG, PNG, WEBP. Max 1 MB<RequiredMark show={!isView} />
-                      </p>}
+                      {/* HINT / ERROR TEXT */}
+                      {!orgImageError && (
+                        <p className={`text-muted-foreground text-[12px] w-[150px] text-center ${orgImageError && 'text-destructive'}`} style={{ textAlign: 'center' }}>
+                          Allowed: JPG, JPEG, PNG, WEBP. Max 1 MB
+                          <RequiredMark show={!isView} />
+                        </p>
+                      )}
+
                     </div>
-                    {/* ✅ ZOD ERROR SHOWS HERE */}
+
+                    {/* ZOD ERROR */}
                     <FormMessage className="text-center !mt-6 !mr-4" />
                   </FormItem>
                 )}
               />
+
             </Box>
             <Box w="40%">
               <FormField
