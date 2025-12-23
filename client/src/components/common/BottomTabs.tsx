@@ -25,18 +25,23 @@ export const BottomTabs = ({
         const isActive =
           location === tab.path ||
           (tab.path !== "/" && location.startsWith(tab.path));
-
+        const handleClick = () => {
+          if (tab.path === "/master") {
+            localStorage.removeItem('master_active_tab');
+          }
+        };
         return (
           <Link key={tab.path} href={tab.path}>
             <button
+              onClick={handleClick}
               className={`
                 relative transition-all duration-200
-                ${ `
+                ${`
                     pos-touch-target flex flex-col items-center justify-center gap-1
                     rounded-lg px-3 py-2 min-w-[60px]
                     ${isActive
-                      ? "pos-tab-active"
-                      : "pos-tab-inactive"}
+                  ? "pos-tab-active"
+                  : "pos-tab-inactive"}
                   `
                 }
               `}
@@ -55,9 +60,8 @@ export const BottomTabs = ({
               </div>
 
               <span
-                className={`leading-none ${
-                  isTop ? "text-xs" : "text-xs font-medium"
-                }`}
+                className={`leading-none ${isTop ? "text-xs" : "text-xs font-medium"
+                  }`}
               >
                 {tab.label}
               </span>
