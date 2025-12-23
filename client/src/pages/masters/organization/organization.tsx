@@ -112,14 +112,14 @@ export default function Organization() {
           }}
           options={[
             { label: 'All', value: '' },
-            { label: "Active", value: 1 },
-            { label: "Inactive", value: 0 },
+            { label: "Active", value: 'active' },
+            { label: "Inactive", value: 'inactive' },
           ]}
         />
       ),
       width: "120px",
       render: (value: string, _row: any,) => {
-        const isActive = value;
+        const isActive = value === 'active';
 
         return (
           <Switch.Root checked={isActive}
@@ -142,7 +142,7 @@ export default function Organization() {
 
   const OrganizationStatusUpdateHandler = useCallback(async (u: any) => {
     try {
-      const newStatus = u.status ? 0 : 1;
+      const newStatus = u.status ==='active' ? 'inactive' : "active" ;
 
       setUsers(prevUsers => {
 
@@ -156,7 +156,7 @@ export default function Organization() {
         );
       });
 
-      await UpdateOrganizationStatus({ id: u.id, status: newStatus });
+      await UpdateOrganizationStatus({ id: u.id,  });
 
       toast({
         title: "Status Update",
@@ -188,10 +188,10 @@ const buildOrganizationFormData = (
   formData.append("company_name", value.company_name);
   formData.append("company_name_in_bank", value.company_name_in_bank);
   formData.append("email", value.email);
-  formData.append("gstin", value.gstin);
-  formData.append("pan_no", value.pan_no);
+  formData.append("company_gstin", value.company_gstin);
+  formData.append("company_pan_no", value.company_pan_no);
   formData.append("aadhar_no", value.aadhar_no ?? "");
-  formData.append("company_address", value.company_address);
+  formData.append("org_address", value.org_address);
 
   // Bank details
   formData.append("bank_name", value.bank_name);
@@ -206,15 +206,15 @@ const buildOrganizationFormData = (
   formData.append("service_prefix", value.service_prefix);
 
   // Location
-  formData.append("country", value.country);
-  formData.append("state", value.state);
-  formData.append("city", value.city);
+  formData.append("country", value.country.toString());
+  formData.append("state", value.state.toString());
+  formData.append("city", value.city.toString());
   formData.append("district", value.district);
-  formData.append("pincode", value.pincode);
+  formData.append("pin_code", value.pin_code);
 
   // Document (important)
-  if (value.document instanceof File) {
-    formData.append("document", value.document);
+  if (value.org_image instanceof File) {
+    formData.append("org_image", value.org_image);
   }
 
   return formData;
@@ -284,13 +284,13 @@ const OrganizationCommonHandler = async (
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      const res = organizationMockData
-      // await fetchOrganizationsList({
-      //   per_page: perPage,
-      //   page,
-      //   search,
-      //   status: filters.status,
-      // });
+      const res = 
+      await fetchOrganizationsList({
+        per_page: perPage,
+        page,
+        search,
+        status: filters.status,
+      });
 
       const mappedUsers = res.data
       setHasNext(res.meta.has_next)
@@ -366,7 +366,7 @@ const OrganizationCommonHandler = async (
                     >
                       <EyeIcon />
                     </IconButton>
-                    {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
+                    {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin")?.id && <IconButton
                       size="xs"
                       mr={2}
                       aria-label="Edit"

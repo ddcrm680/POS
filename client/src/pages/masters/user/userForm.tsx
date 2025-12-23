@@ -60,8 +60,9 @@ const form = useForm<UserFormType>({
         phone: "",
         role_id: -1,
         // ...(mode === "create" ? { password: "" } : {}),
-        address: "",
+        
         ...initialValues,
+        address:initialValues?.address ?? "",
       });
     }
   }, [mode]);

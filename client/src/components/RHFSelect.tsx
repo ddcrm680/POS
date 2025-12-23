@@ -34,6 +34,7 @@ export default function RHFSelect({
     <Component
       isMulti={isMulti}
       isDisabled={isDisabled}
+      isSearchable
       formatCreateLabel={(inputValue: string) =>
         `Add "${inputValue}"`
       }

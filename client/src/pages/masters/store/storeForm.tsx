@@ -22,7 +22,7 @@ import { organizationSchema, servicePlanSchema, StoreSchema, userSchema } from "
 import RHFSelect from "@/components/RHFSelect";
 import { Textarea } from "@/components/ui/textarea";
 import { unknown } from "zod";
-import { useSearchParams } from "wouter";
+import { useLocation, useSearchParams } from "wouter";
 export const RequiredMark = ({ show }: { show: boolean }) =>
   show ? <span className="text-red-500 ml-1">*</span> : null;
 
@@ -34,6 +34,7 @@ export default function StoreForm({
 }: storeFormProp) {
   console.log(initialValues, 'initialValues');
   const [searchParams] = useSearchParams();
+const [, navigate] = useLocation();
 
   const id = searchParams.get("id");      // "101"
   const mode = searchParams.get("mode");  // "view"
@@ -493,16 +494,19 @@ export default function StoreForm({
               </Box>
             </Box>
           </div>
-
+          
           {/* ================= ACTIONS ================= */}
           <div className="sticky bottom-0 z-20 bg-white border-t">
             {mode !== 'view' && <div className="">
               <div className="flex justify-end gap-3 pb-6 pr-6  border-t pt-[24px]">
                 <Button
                   variant="outline"
+                  type="button"
                   disabled={isLoading}
                   className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
-                  onClick={onClose}
+                  onClick={()=>{
+                     navigate(`/master`)
+                  }}
                 >
                   {'Cancel'}
                 </Button>
@@ -532,10 +536,10 @@ export default function StoreForm({
                     />
                   </svg>}
                   {isLoading
-                    ? mode === "create" ? "Adding..." : "Updating..."
-                    : mode === "create"
-                      ? "Add "
-                      : "Update "}
+                    ? mode === "edit" ?  "Updating..." :"Adding..." 
+                    : mode === "edit"
+                      ?  "Update "
+                      :"Add "}
                 </Button>
               </div></div>}
           </div>

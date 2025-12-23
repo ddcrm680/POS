@@ -558,7 +558,7 @@ export const organizationSchema = z.object({
     .min(10, "Bank address must be at least 10 characters")
     .max(200, "Bank address must not exceed 200 characters"),
 
-  gstin: z
+  company_gstin: z
     .string()
     .min(1, "Company GSTIN is required")
     .regex(
@@ -566,7 +566,7 @@ export const organizationSchema = z.object({
       "Invalid GSTIN format"
     ),
 
-  pan_no: z
+  company_pan_no: z
     .string()
     .min(1, "PAN number is required")
     .regex(
@@ -588,38 +588,32 @@ export const organizationSchema = z.object({
     .trim()
     .min(1, "Invoice prefix must be at least 1 characters")
     .max(10, "Invoice prefix must not exceed 10 characters")
-    .regex(
-      /^[A-Z0-9]+$/,
-      "Invoice prefix must contain only uppercase letters and numbers"
-    ),
+    ,
 
   service_prefix: z
     .string()
     .trim()
     .min(1, "Service prefix must be at least 1 characters")
     .max(10, "Service prefix must not exceed 10 characters")
-    .regex(
-      /^[A-Z0-9]+$/,
-      "Service prefix must contain only uppercase letters and numbers"
-    ),
+    ,
 
   country: z.string().min(1, "Please select country"),
   state: z.string().min(1, "Please select state"),
   city: z.string().min(1, "Please select city"),
   district: z.string().min(2, "District must be at least 2 characters")
     .max(100, "District must not exceed 100 characters"),
-  pincode: z
+  pin_code: z
     .string()
     .min(1, "Pincode is required")
     .regex(/^\d{6}$/, "Pincode must be exactly 6 digits"),
 
-  company_address: z
+  org_address: z
     .string()
     .trim()
     .min(10, "Company address must be at least 10 characters")
     .max(200, "Company address must not exceed 200 characters"),
 
-  document: z.union(
+  org_image: z.union(
     [
       z
         .instanceof(File)
@@ -632,10 +626,10 @@ export const organizationSchema = z.object({
           }
         )
       ,
-      z.string().min(1, "Document is required"),
+      z.string().min(1, "Organization logo is required"),
     ],
     {
-      required_error: "Document is required",
+      required_error: "Organization logo is required",
     }
   ),
 });

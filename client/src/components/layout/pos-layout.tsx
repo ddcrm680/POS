@@ -45,16 +45,12 @@ export default function POSLayout({ children }: POSLayoutProps) {
     setIsDefaultView(isDefault)
   }, [user, roles])
   useEffect(() => {
+    console.log(roles,'rolesertyew');
+    
     setRoleList(roles || [])
   }, [roles])
   // Update clock every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
+  
 
   const handleQuickAction = (actionId: string) => {
     // Handle quick actions
@@ -81,23 +77,10 @@ export default function POSLayout({ children }: POSLayoutProps) {
     } catch { return null; }
   });
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    });
-  };
+
   const { Logout } = useAuth();
   const navigation = useLocation();
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+
   async function handleLogout() {
     await Logout();
     navigation[1]('/login');
@@ -128,17 +111,6 @@ export default function POSLayout({ children }: POSLayoutProps) {
             </div>
           </div>
 
-          <div className="hidden md:block w-px h-10 bg-border" />
-
-          {/* Digital Clock */}
-          <div className="hidden md:flex flex-col">
-            <div className="pos-digital-clock text-1xl font-bold text-foreground" data-testid="pos-time">
-              {formatTime(currentTime)}
-            </div>
-            <div className="text-sm text-muted-foreground" data-testid="pos-date">
-              {formatDate(currentTime)}
-            </div>
-          </div>
         </div>
 
         {/* Center: Quick Actions (Desktop) */}
@@ -195,7 +167,7 @@ export default function POSLayout({ children }: POSLayoutProps) {
 
                 <div className="hidden lg:block text-left">
                   <p className="font-medium  text-foreground text-sm leading-tight" data-testid="cashier-name">{userInfo?.name ?? "-"}</p>
-                  <p className="text-muted-foreground text-xs leading-tight">{roleList && roleList.length > 0 ? roleList.find((role: { name: string, id: number, slug: string }) => role.slug === userInfo?.role).name : "-"}</p>
+                  <p className="text-muted-foreground text-xs leading-tight">{roleList && roleList.length > 0 ? roleList.find((role: { name: string, id: number, slug: string }) => role.slug === userInfo?.role)?.name : "-"}</p>
                 </div>
 
               </Button>
