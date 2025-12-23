@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { fetchRoleList, fetchUserApi, login as loginApi, logout as logoutApi } from "./api";
+import { fetchCountryList, fetchRoleList, fetchUserApi, login as loginApi, logout as logoutApi } from "./api";
 import { AuthContextValue, User } from "@/lib/types";
 import { cookieStore } from "./cookie"; // your cookie helper
 
@@ -16,6 +16,8 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
   const [roles, setRoles] = useState<{ id: number, name: string, slug: string }[]>([]);
+  
+  const [countries, setCountries] = useState<{ id: number, name: string, slug: string }[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -35,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("userInfo");
     localStorage.removeItem("token");
     localStorage.removeItem("roleList");
+    localStorage.removeItem("countryList");
     setUser(null);
   };
 
@@ -62,6 +65,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           if (raw)
             fetchRoles()
+        }
+        const cachedCountryList = localStorage.getItem("countryList");
+        if (cachedCountryList) {
+
+          try {
+            const parsed = JSON.parse(cachedCountryList);
+            if (mounted) setRoles(parsed);
+          } catch {
+            localStorage.removeItem("countryList");
+          }
+        } else {
+          if (raw)
+            fetchCountry()
         }
 
         if (raw) {
@@ -131,6 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("userInfo", JSON.stringify(userData));
         setUser(userData);
         fetchRoles()
+        fetchCountry()
       }
       return userData;
     } catch (e) {
@@ -155,6 +172,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setRoles([]);
     }
   };
+   const fetchCountry = async () => {
+    try {
+      const res = await fetchCountryList();
+      if (res && Array.isArray(res)) {
+        setCountries(res || []);
+        localStorage.setItem("countryList", JSON.stringify(res));
+      } else {
+        localStorage.setItem("countryList", JSON.stringify([]));
+        setCountries([]);
+      }
+    } catch {
+      localStorage.setItem("countryList", JSON.stringify([]));
+      setCountries([]);
+    }
+  };
   // logout wrapper — call server, then clear client
   const Logout = async () => {
     setIsLoading(true);
@@ -176,6 +208,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextValue = {
     user,
     isLoading,
+    countries,
     roles,
     isAuthenticated: !!user,
     login,

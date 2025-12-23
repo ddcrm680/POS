@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import * as Dialog from "@radix-ui/react-dialog";
+import { IconButton } from "@chakra-ui/react";
 
 import { Form } from "@/components/ui/form";
 import {
@@ -22,25 +24,30 @@ import { organizationSchema, servicePlanSchema, userSchema } from "@/lib/schema"
 import RHFSelect from "@/components/RHFSelect";
 import { Textarea } from "@/components/ui/textarea";
 import { unknown } from "zod";
+import { useAuth } from "@/lib/auth";
+import { fetchCityList, fetchStateList } from "@/lib/api";
+import { X } from "lucide-react";
 export const RequiredMark = ({ show }: { show: boolean }) =>
   show ? <span className="text-red-500 ml-1">*</span> : null;
 
 export default function OrganizationForm({
   mode,
   id,
-  organizationMetaInfo,
   onClose,
   initialValues,
   isLoading = false,
   onSubmit,
 }: organizationFormProp) {
   console.log(initialValues, 'initialValues');
+  const { countries } = useAuth();
+  const [existingOrgImage, setExistingOrgImage] = useState<string | null>(null);
+
   const form = useForm<organizationFormType>({
     resolver: zodResolver(organizationSchema),
     defaultValues: {
       company_name: "",
       email: "",
-      company_address: "",
+      org_address: "",
 
       bank_name: "",
       company_name_in_bank: "",
@@ -50,8 +57,8 @@ export default function OrganizationForm({
       branch_name: "",
       bank_address: "",
 
-      gstin: "",
-      pan_no: "",
+      company_gstin: "",
+      company_pan_no: "",
       aadhar_no: "",
 
       invoice_prefix: "",
@@ -61,12 +68,127 @@ export default function OrganizationForm({
       state: "",
       city: "",
       district: "",
-      pincode: "",
+      pin_code: "",
 
-      document: "",
+      org_image: "",
     },
     shouldUnregister: false,
   });
+
+  const selectedCountry = form.watch("country");
+  const selectedState = form.watch("state");
+  const [states, setStates] = useState([])
+  const [cities, setCities] = useState([])
+    const [countryList, setCountryList] = useState<{ id: number; name: string; slug: string; }[]>([])
+  const [loadingState, setLoadingState] = useState(false)
+  const [loadingCity, setLoadingCity] = useState(false)
+  useEffect(()=>{
+    setCountryList(countries)
+  },[countries])
+  useEffect(() => {
+  if (!countryList?.length) return;
+
+      const india = countryList.find(c => c.name === "India");
+      console.log(india,'indiaindia');
+      
+      if (india) {
+        form.setValue("country", String(india.id), {
+          shouldValidate: false,
+          shouldDirty: false,
+        });
+      }
+    if (mode === 'create') {
+      if (!countryList?.length) return;
+
+      const india = countryList.find(c => c.name === "India");
+      if (india) {
+        form.setValue("country", String(india.id), {
+          shouldValidate: false,
+          shouldDirty: false,
+        });
+      }
+    } else {
+      const selectedCountry = countryList.find(c => c.name === initialValues?.country);
+      if (selectedCountry) {
+        form.setValue("country", String(selectedCountry.id), {
+          shouldValidate: false,
+          shouldDirty: false,
+        });
+      }
+      const selectedState = countryList.find(c => c.name === initialValues?.state);
+      if (selectedState) {
+        form.setValue("state", String(selectedState.id), {
+          shouldValidate: false,
+          shouldDirty: false,
+        });
+      }
+      const selectedCity = countryList.find(c => c.name === initialValues?.city);
+      if (selectedCity) {
+        form.setValue("city", String(selectedCity.id), {
+          shouldValidate: false,
+          shouldDirty: false,
+        });
+      }
+    }
+  }, [initialValues?.city, initialValues?.state, initialValues?.country,countryList]);
+  useEffect(() => {
+    if ((mode === "edit" || mode === "view") && initialValues?.org_image) {
+      setExistingOrgImage(typeof initialValues.org_image == 'string' ? initialValues.org_image : "");
+    }
+  }, [mode, initialValues]);
+
+  useEffect(() => {
+    if (!selectedCountry) {
+      setStates([]);
+      setCities([]);
+      form.setValue("state", "");
+      form.setValue("city", "");
+      return;
+    }
+    console.log(selectedCountry, 'selectedCountry');
+
+    const loadStates = async () => {
+      try {
+        setLoadingState(true);
+        const data = await fetchStateList(Number(selectedCountry));
+        setStates(data);
+        if (mode === 'create') {
+          form.setValue("state", "");
+          form.setValue("city", "");
+        }
+        setCities([]);
+      } catch (err) {
+        console.error("Failed to load states", err);
+      } finally {
+        setLoadingState(false);
+      }
+    };
+
+    loadStates();
+  }, [selectedCountry]);
+  useEffect(() => {
+    if (!selectedState) {
+      setCities([]);
+      form.setValue("city", "");
+      return;
+    }
+
+    const loadCities = async () => {
+      try {
+        setLoadingCity(true);
+        const data = await fetchCityList(Number(selectedState));
+        setCities(data);
+        if (mode === 'create')
+          form.setValue("city", "");
+      } catch (err) {
+        console.error("Failed to load cities", err);
+      } finally {
+        setLoadingCity(false);
+      }
+    };
+
+    loadCities();
+  }, [selectedState]);
 
   useEffect(() => {
     if (mode === "edit" || mode === "view") {
@@ -75,7 +197,7 @@ export default function OrganizationForm({
       form.reset({
         company_name: initialValues?.company_name ?? "",
         email: initialValues?.email ?? "",
-        company_address: initialValues?.company_address ?? "",
+        org_address: initialValues?.org_address ?? "",
 
         bank_name: initialValues?.bank_name ?? "",
         company_name_in_bank: initialValues?.company_name_in_bank ?? "",
@@ -85,20 +207,20 @@ export default function OrganizationForm({
         branch_name: initialValues?.branch_name ?? "",
         bank_address: initialValues?.bank_address ?? "",
 
-        gstin: initialValues?.gstin ?? "",
-        pan_no: initialValues?.pan_no ?? "",
+        company_gstin: initialValues?.company_gstin ?? "",
+        company_pan_no: initialValues?.company_pan_no ?? "",
         aadhar_no: initialValues?.aadhar_no ?? "",
 
         invoice_prefix: initialValues?.invoice_prefix ?? "",
         service_prefix: initialValues?.service_prefix ?? "",
 
-        country: initialValues?.country ?? "India",
+        country: initialValues?.country ?? "",
         state: initialValues?.state ?? "",
         city: initialValues?.city ?? "",
         district: initialValues?.district ?? "",
-        pincode: initialValues?.pincode ?? "",
+        pin_code: initialValues?.pin_code ?? "",
 
-        document: initialValues?.document ?? "",
+        org_image: initialValues?.org_image ?? "",
       });
     }
   }, [mode, initialValues, form]);
@@ -273,7 +395,7 @@ export default function OrganizationForm({
           {/* ================= ADDRESS ================= */}
           <FormField
             control={form.control}
-            name="company_address"
+            name="org_address"
             render={({ field }) => (
               <FormItem>
                 <FormLabel style={{ color: "#000" }}>Company Address<RequiredMark show={!isView} /></FormLabel>
@@ -290,10 +412,10 @@ export default function OrganizationForm({
             <Box w="33%">
               <FormField
                 control={form.control}
-                name="gstin"
+                name="company_gstin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Company GSTIN<RequiredMark show={!isView} /></FormLabel>
+                    <FormLabel style={{ color: "#000" }}>Company company_gstin<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
                       <Input {...field} placeholder={Constant.master.orgnaization.companyGSTIN} disabled={isView} />
                     </FormControl>
@@ -306,7 +428,7 @@ export default function OrganizationForm({
             <Box w="33%">
               <FormField
                 control={form.control}
-                name="pan_no"
+                name="company_pan_no"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>Company PAN No.<RequiredMark show={!isView} /></FormLabel>
@@ -385,9 +507,9 @@ export default function OrganizationForm({
                       <RHFSelect
                         field={field}
                         creatable={false}
-                        options={organizationMetaInfo.country.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
+                        options={countryList.map(p => ({
+                          value: String(p.id),
+                          label: p.name,
                         }))}
                         placeholder={Constant.master.orgnaization.countryPlaceholder}
                         isDisabled={isView}
@@ -406,24 +528,34 @@ export default function OrganizationForm({
                 name="state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>State<RequiredMark show={!isView} /></FormLabel>
+                    <FormLabel>
+                      State<RequiredMark show={!isView} />
+                    </FormLabel>
 
                     <FormControl>
                       <RHFSelect
                         field={field}
                         creatable={false}
-                        options={organizationMetaInfo.state.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
+                        options={states.map((s: any) => ({
+                          value: String(s.id),
+                          label: s.name,
                         }))}
-                        placeholder={Constant.master.orgnaization.statePlaceholder}
-                        isDisabled={isView}
+                        placeholder={
+                          loadingState
+                            ? "Loading states..."
+                            : "Select state"
+                        }
+                        isDisabled={
+                          isView || !selectedCountry
+                        }
                       />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
             </Box>
 
             <Box w="25%">
@@ -432,24 +564,34 @@ export default function OrganizationForm({
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>City<RequiredMark show={!isView} /></FormLabel>
+                    <FormLabel>
+                      City<RequiredMark show={!isView} />
+                    </FormLabel>
 
                     <FormControl>
                       <RHFSelect
                         field={field}
                         creatable={false}
-                        options={organizationMetaInfo.city.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
+                        options={cities.map((c: any) => ({
+                          value: String(c.id),
+                          label: c.name,
                         }))}
-                        placeholder={Constant.master.orgnaization.cityPlaceholder}
-                        isDisabled={isView}
+                        placeholder={
+                          loadingCity
+                            ? "Loading cities..."
+                            : "Select city"
+                        }
+                        isDisabled={
+                          isView || !selectedState
+                        }
                       />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
             </Box>
 
             <Box w="25%">
@@ -474,7 +616,7 @@ export default function OrganizationForm({
             <Box w="50%">
               <FormField
                 control={form.control}
-                name="pincode"
+                name="pin_code"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>Pincode<RequiredMark show={!isView} /></FormLabel>
@@ -488,16 +630,16 @@ export default function OrganizationForm({
             </Box>
 
             <Box w="50%">
-              <FormField
+              {/* <FormField
                 control={form.control}
-                name="document"
+                name="org_image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Upload Document ( Allowed: JPG, JPEG, PNG, WEBP. Max {1} MB)<RequiredMark show={!isView} /></FormLabel>
+                    <FormLabel style={{ color: "#000" }}>Organization Logo ( Allowed: JPG, JPEG, PNG, WEBP. Max {1} MB)<RequiredMark show={!isView} /></FormLabel>
                     <FormControl>
                       <Input
                         type="file"
-                         accept="image/*"
+                        accept="image/*"
                         disabled={isView}
                         placeholder={Constant.master.orgnaization.documentPlaceholder}
                         onChange={(e) =>
@@ -508,7 +650,55 @@ export default function OrganizationForm({
                     <FormMessage />
                   </FormItem>
                 )}
+              /> */}
+              <FormField
+                control={form.control}
+                name="org_image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>
+                      Organization Image ( Allowed: JPG, JPEG, PNG, WEBP. Max {1} MB)
+                      <RequiredMark show={!isView} />
+                    </FormLabel>
+
+                    {/* Existing file display */}
+                    {existingOrgImage && (
+                      <div className="mb-2 flex items-center justify-between gap-3 h-[40px] rounded border px-2 bg-gray-50">
+                        <span className="text-sm text-gray-700 truncate">
+                          {existingOrgImage.split("/").pop()}
+                        </span>
+
+                        {!isView && (
+                             <X size={18}  onClick={() => {
+                            setExistingOrgImage(null);
+                            field.onChange(null);
+                          }}/>
+                        
+
+                        )}
+                      </div>
+                    )}
+
+                    {/* File input */}
+                    {!isView && !existingOrgImage && (
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] ?? null;
+                            field.onChange(file);
+                            if (file) setExistingOrgImage(null);
+                          }}
+                        />
+                      </FormControl>
+                    )}
+
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
+
             </Box>
           </Box>
         </div>

@@ -406,6 +406,33 @@ export async function fetchServicePlanMetaInfo() {
   }
   throw new Error("Failed to fetch service plan meta info");
 }
+export async function fetchCountryList() {
+ 
+  const response = await api.get(`/api/utility/countries`);
+
+  if (response?.data?.success === true) {
+    return response.data.data;
+  }
+  throw new Error("Failed to fetch country info");
+}
+export async function fetchCityList(state_id:number) {
+ 
+  const response = await api.get(`/api/utility/cities?state_id=${state_id}`);
+
+  if (response?.data?.success === true) {
+    return response.data.data;
+  }
+  throw new Error("Failed to fetch country info");
+}
+export async function fetchStateList(country_id:number) {
+ 
+  const response = await api.get(`/api/utility/states?country_id=${country_id}`);
+
+  if (response?.data?.success === true) {
+    return response.data.data;
+  }
+  throw new Error("Failed to fetch country info");
+}
 export async function fetchVehicleList({
   page,
   search,
@@ -463,7 +490,7 @@ export async function UpdateOrganizationStatus(statusInfo: { id: number, status:
 
   try {
     const response: any = await api.post(
-      `/api/organizations/status/${statusInfo.id}`, { status: statusInfo.status }
+      `/api/organizations/status/${statusInfo.id}`,
     );
     if (response?.data?.success === true) {
       return response.data?.data;

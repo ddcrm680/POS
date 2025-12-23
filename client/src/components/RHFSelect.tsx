@@ -15,6 +15,7 @@ export default function RHFSelect({
   creatable = true,
 }: RHFSelectProps) {
   const Component = creatable ? CreatableSelect : Select;
+console.log(options,'optionsoptions');
 
   const value = isMulti
     ? Array.isArray(field.value)
@@ -34,6 +35,7 @@ export default function RHFSelect({
     <Component
       isMulti={isMulti}
       isDisabled={isDisabled}
+      isSearchable
       formatCreateLabel={(inputValue: string) =>
         `Add "${inputValue}"`
       }

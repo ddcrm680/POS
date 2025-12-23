@@ -30,3 +30,5 @@ export function formatTime(dateString: string) {
 
   return `${timePart}`;
 }
+export const findIdByName = (list: any[], name?: string) =>
+  list.find(item => item.name === name)?.id ?? "";
