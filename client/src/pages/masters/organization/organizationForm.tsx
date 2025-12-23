@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -27,6 +27,7 @@ import { unknown } from "zod";
 import { useAuth } from "@/lib/auth";
 import { fetchCityList, fetchStateList } from "@/lib/api";
 import { X } from "lucide-react";
+import { findIdByName } from "@/lib/utils";
 export const RequiredMark = ({ show }: { show: boolean }) =>
   show ? <span className="text-red-500 ml-1">*</span> : null;
 
@@ -38,7 +39,6 @@ export default function OrganizationForm({
   isLoading = false,
   onSubmit,
 }: organizationFormProp) {
-  console.log(initialValues, 'initialValues');
   const { countries } = useAuth();
   const [existingOrgImage, setExistingOrgImage] = useState<string | null>(null);
 
@@ -74,125 +74,80 @@ export default function OrganizationForm({
     },
     shouldUnregister: false,
   });
-
+useEffect(() => {
+  if ((mode === "edit" || mode === "view") && initialValues?.org_image) {
+    setExistingOrgImage(typeof initialValues.org_image==='string' ?initialValues.org_image :"");
+  }
+}, [mode, initialValues]);
   const selectedCountry = form.watch("country");
   const selectedState = form.watch("state");
   const [states, setStates] = useState([])
   const [cities, setCities] = useState([])
-    const [countryList, setCountryList] = useState<{ id: number; name: string; slug: string; }[]>([])
+  const [countryList, setCountryList] = useState<{ id: number; name: string; slug: string; }[]>([])
   const [loadingState, setLoadingState] = useState(false)
   const [loadingCity, setLoadingCity] = useState(false)
-  useEffect(()=>{
+  const isHydratingRef = useRef(false);
+  useEffect(() => {
     setCountryList(countries)
-  },[countries])
+  }, [countries])
   useEffect(() => {
-  if (!countryList?.length) return;
+    if (
+      (mode !== "edit" && mode !== "view") ||
+      !initialValues ||
+      !countryList.length
+    ) return;
 
-      const india = countryList.find(c => c.name === "India");
-      console.log(india,'indiaindia');
-      
-      if (india) {
-        form.setValue("country", String(india.id), {
-          shouldValidate: false,
-          shouldDirty: false,
-        });
-      }
-    if (mode === 'create') {
-      if (!countryList?.length) return;
-
-      const india = countryList.find(c => c.name === "India");
-      if (india) {
-        form.setValue("country", String(india.id), {
-          shouldValidate: false,
-          shouldDirty: false,
-        });
-      }
-    } else {
-      const selectedCountry = countryList.find(c => c.name === initialValues?.country);
-      if (selectedCountry) {
-        form.setValue("country", String(selectedCountry.id), {
-          shouldValidate: false,
-          shouldDirty: false,
-        });
-      }
-      const selectedState = countryList.find(c => c.name === initialValues?.state);
-      if (selectedState) {
-        form.setValue("state", String(selectedState.id), {
-          shouldValidate: false,
-          shouldDirty: false,
-        });
-      }
-      const selectedCity = countryList.find(c => c.name === initialValues?.city);
-      if (selectedCity) {
-        form.setValue("city", String(selectedCity.id), {
-          shouldValidate: false,
-          shouldDirty: false,
-        });
-      }
-    }
-  }, [initialValues?.city, initialValues?.state, initialValues?.country,countryList]);
-  useEffect(() => {
-    if ((mode === "edit" || mode === "view") && initialValues?.org_image) {
-      setExistingOrgImage(typeof initialValues.org_image == 'string' ? initialValues.org_image : "");
-    }
-  }, [mode, initialValues]);
-
-  useEffect(() => {
-    if (!selectedCountry) {
-      setStates([]);
-      setCities([]);
-      form.setValue("state", "");
-      form.setValue("city", "");
-      return;
-    }
-    console.log(selectedCountry, 'selectedCountry');
-
-    const loadStates = async () => {
+    const hydrateLocation = async () => {
+      // 1️⃣ COUNTRY
+      isHydratingRef.current = true;
       try {
+        const countryId = findIdByName(countryList, initialValues.country);
+
+        if (!countryId) return;
+
+        form.setValue("country", String(countryId));
+
+        // 2️⃣ STATES
         setLoadingState(true);
-        const data = await fetchStateList(Number(selectedCountry));
-        setStates(data);
-        if (mode === 'create') {
-          form.setValue("state", "");
-          form.setValue("city", "");
-        }
-        setCities([]);
-      } catch (err) {
-        console.error("Failed to load states", err);
-      } finally {
+        const stateList = await fetchStateList(countryId);
+        setStates(stateList);
         setLoadingState(false);
-      }
-    };
 
-    loadStates();
-  }, [selectedCountry]);
-  useEffect(() => {
-    if (!selectedState) {
-      setCities([]);
-      form.setValue("city", "");
-      return;
-    }
+        const stateId = findIdByName(stateList, initialValues.state);
 
-    const loadCities = async () => {
-      try {
+        if (!stateId) return;
+
+        form.setValue("state", String(stateId));
+
+        // 3️⃣ CITIES
         setLoadingCity(true);
-        const data = await fetchCityList(Number(selectedState));
-        setCities(data);
-        if (mode === 'create')
-          form.setValue("city", "");
-      } catch (err) {
-        console.error("Failed to load cities", err);
-      } finally {
+        const cityList = await fetchCityList(stateId);
+        setCities(cityList);
         setLoadingCity(false);
+
+        const cityId = findIdByName(cityList, initialValues.city);
+        if (!cityId) return;
+
+        form.setValue("city", String(cityId));
+      } finally {
+        // ✅ hydration completed
+        isHydratingRef.current = false;
       }
     };
 
-    loadCities();
-  }, [selectedState]);
+    hydrateLocation();
+  }, [mode, initialValues, countryList]);
+  useEffect(() => {
+    if (mode !== "create" || !countryList.length) return;
+
+    const india = countryList.find(c => c.name === "India");
+    if (!india) return;
+
+    form.setValue("country", String(india.id));
+  }, [mode, countryList]);
 
   useEffect(() => {
     if (mode === "edit" || mode === "view") {
-      console.log(initialValues, 'initialValues');
 
       form.reset({
         company_name: initialValues?.company_name ?? "",
@@ -505,8 +460,25 @@ export default function OrganizationForm({
 
                     <FormControl>
                       <RHFSelect
-                        field={field}
+                        field={{
+                          ...field,
+                          onChange: async (value: string) => {
+                            field.onChange(value); // RHF update
+
+                            // USER action only → safe to reset
+                            setStates([]);
+                            setCities([]);
+                            form.setValue("state", "");
+                            form.setValue("city", "");
+
+                            setLoadingState(true);
+                            const stateList = await fetchStateList(Number(value));
+                            setStates(stateList);
+                            setLoadingState(false);
+                          },
+                        }}
                         creatable={false}
+
                         options={countryList.map(p => ({
                           value: String(p.id),
                           label: p.name,
@@ -528,13 +500,27 @@ export default function OrganizationForm({
                 name="state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
+                    <FormLabel style={{ color: "#000" }}>
                       State<RequiredMark show={!isView} />
                     </FormLabel>
 
                     <FormControl>
                       <RHFSelect
-                        field={field}
+                        field={{
+                          ...field,
+                          onChange: async (value: string) => {
+                            field.onChange(value);
+
+                            // reset city on USER state change
+                            setCities([]);
+                            form.setValue("city", "");
+
+                            setLoadingCity(true);
+                            const cityList = await fetchCityList(Number(value));
+                            setCities(cityList);
+                            setLoadingCity(false);
+                          },
+                        }}
                         creatable={false}
                         options={states.map((s: any) => ({
                           value: String(s.id),
@@ -564,7 +550,7 @@ export default function OrganizationForm({
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
+                    <FormLabel style={{ color: "#000" }}>
                       City<RequiredMark show={!isView} />
                     </FormLabel>
 
@@ -657,7 +643,7 @@ export default function OrganizationForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>
-                      Organization Image ( Allowed: JPG, JPEG, PNG, WEBP. Max {1} MB)
+                      Organization Logo ( Allowed: JPG, JPEG, PNG, WEBP. Max {1} MB)
                       <RequiredMark show={!isView} />
                     </FormLabel>
 
@@ -669,11 +655,11 @@ export default function OrganizationForm({
                         </span>
 
                         {!isView && (
-                             <X size={18}  onClick={() => {
+                          <X size={18} onClick={() => {
                             setExistingOrgImage(null);
                             field.onChange(null);
-                          }}/>
-                        
+                          }} />
+
 
                         )}
                       </div>

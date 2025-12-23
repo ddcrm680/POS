@@ -486,7 +486,7 @@ export async function UpdateServicePlanStatus(statusInfo: { id: number, status: 
 
   }
 }
-export async function UpdateOrganizationStatus(statusInfo: { id: number, status: number }) {
+export async function UpdateOrganizationStatus(statusInfo: { id: number, }) {
 
   try {
     const response: any = await api.post(

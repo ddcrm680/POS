@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           try {
             const parsed = JSON.parse(cachedCountryList);
-            if (mounted) setRoles(parsed);
+            if (mounted) setCountries(parsed);
           } catch {
             localStorage.removeItem("countryList");
           }

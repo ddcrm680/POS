@@ -112,14 +112,14 @@ export default function Organization() {
           }}
           options={[
             { label: 'All', value: '' },
-            { label: "Active", value: 1 },
-            { label: "Inactive", value: 0 },
+            { label: "Active", value: 'active' },
+            { label: "Inactive", value: 'inactive' },
           ]}
         />
       ),
       width: "120px",
       render: (value: string, _row: any,) => {
-        const isActive = value;
+        const isActive = value === 'active';
 
         return (
           <Switch.Root checked={isActive}
@@ -142,7 +142,7 @@ export default function Organization() {
 
   const OrganizationStatusUpdateHandler = useCallback(async (u: any) => {
     try {
-      const newStatus = u.status ? 0 : 1;
+      const newStatus = u.status ==='active' ? 'inactive' : "active" ;
 
       setUsers(prevUsers => {
 
@@ -156,7 +156,7 @@ export default function Organization() {
         );
       });
 
-      await UpdateOrganizationStatus({ id: u.id, status: newStatus });
+      await UpdateOrganizationStatus({ id: u.id,  });
 
       toast({
         title: "Status Update",
