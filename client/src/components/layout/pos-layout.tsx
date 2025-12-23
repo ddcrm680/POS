@@ -128,17 +128,17 @@ export default function POSLayout({ children }: POSLayoutProps) {
             </div>
           </div>
 
-          <div className="hidden md:block w-px h-10 bg-border" />
+          {/* <div className="hidden md:block w-px h-10 bg-border" /> */}
 
           {/* Digital Clock */}
-          <div className="hidden md:flex flex-col">
+          {/* <div className="hidden md:flex flex-col">
             <div className="pos-digital-clock text-1xl font-bold text-foreground" data-testid="pos-time">
               {formatTime(currentTime)}
             </div>
             <div className="text-sm text-muted-foreground" data-testid="pos-date">
               {formatDate(currentTime)}
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Center: Quick Actions (Desktop) */}
