@@ -27,6 +27,7 @@ export default function CommonTable({
   setPage,
   isAdd = false,
   isClear = false,
+  onRowClick,
   page,
   resetFilter,
   searchValue = "",
@@ -189,7 +190,8 @@ const renderCardView = () => {
               data.map((row: any, rowIndex: number) => (
                 <Table.Row
                   key={row.id ?? rowIndex}
-                  className="transition-all hover:bg-gray-50 border-b border-gray-100"
+                   onClick={() => onRowClick?.(row, rowIndex)}
+                  className={`transition-all hover:bg-gray-50 border-b border-gray-100 ${onRowClick ? 'cursor-pointer' :" "}`}
                 >
                   {columns.map((col: any) => (
                     <Table.Cell

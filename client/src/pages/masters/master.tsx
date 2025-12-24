@@ -8,6 +8,7 @@ import VehicleMaster from "./vehicleMaster/vehicle";
 import Services from "./servicePlan/services";
 import Organization from "./organization/organization";
 import Store from "./store/store";
+import SystemLog from "./systemLog/systemLog";
 
 const MASTER_TAB_KEY = "master_active_tab";
 
@@ -40,7 +41,7 @@ export default function Master() {
                   Master Details
                 </h1>
 
-                <TabsList className="grid w-full grid-cols-5 lg:w-max lg:inline-grid">
+                <TabsList className="grid w-full grid-cols-6 lg:w-max lg:inline-grid">
                   {masterTabList.map((tab) => {
                     const Icon = tab.emoji;
                     return (
@@ -79,6 +80,9 @@ export default function Master() {
                 <Store />
               </TabsContent>
 
+              <TabsContent value="systemLog">
+                <SystemLog />
+              </TabsContent>
             </Tabs>
           </div>
         </div>

@@ -185,6 +185,21 @@ export type UserFormType = {
   role_id: number;
   address?: string | undefined;
 }
+export type systemLogType = {
+  action: string
+  description: string
+  ip_address: string
+  browser: string
+  platform: string
+  device_type: string
+  url: string
+  client_url: string
+  subjectType: string
+
+  actor?:string
+  subjectId: string
+};
+
 export type serviceFormType = {
   vehicle_type: string;
   category_type: string;
@@ -246,6 +261,28 @@ export interface organizationFormProp {
   onSubmit: (
     values: organizationFormType,
     setError: UseFormSetError<organizationFormType>
+  ) => void;
+}
+export interface systemLogProp {
+  mode: "create" | "edit" | "view";
+  roles: any[];
+  id?: string;
+  serviceMetaInfo: {
+    categoryTypes: { label: string, value: string }[],
+    numberOfVisits: { label: string, value: string }[],
+    servicePlans: { label: string, value: string }[],
+    vehicleTypes: { label: string, value: string }[],
+    warrantyPeriods: { label: string, value: string }[]
+
+  }
+  initialValues?: Partial<systemLogType>;
+  isLoading?: boolean;
+  onClose: () => void;
+
+  // 👇 IMPORTANT
+  onSubmit: (
+    values: systemLogType,
+    setError: UseFormSetError<systemLogType>
   ) => void;
 }
 export interface serviceFormProp {
