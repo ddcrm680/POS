@@ -417,7 +417,7 @@ export default function OrganizationForm({
 
           </section>
           <section>
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">
+             <h3 className="text-sm font-semibold mb-4 text-gray-700">
               Banking Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -517,7 +517,7 @@ export default function OrganizationForm({
             </div>
           </section>
           <section>
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">
+             <h3 className="text-sm font-semibold mb-4 text-gray-700">
               Tax Information
             </h3>
 
@@ -564,7 +564,7 @@ export default function OrganizationForm({
             </div>
           </section>
           <section>
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">
+             <h3 className="text-sm font-semibold mb-4 text-gray-700">
               Address
             </h3>
 
