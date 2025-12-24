@@ -69,7 +69,7 @@ export default function SystemLog() {
     },
     { key: "action", label: "Action", width: "150px" },
     // { key: "description", label: "Description", width: "150px" },
-    { key: "ip_address", label: "IP", width: "150px" },
+    { key: "ip_address", label: "IP Address", width: "150px" },
     {
       key: "platform", label: (
         <ColumnFilter
