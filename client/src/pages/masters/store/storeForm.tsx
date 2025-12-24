@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, useSearchParams } from "wouter";
@@ -27,6 +27,9 @@ import { FloatingTextarea } from "@/components/common/FloatingTextarea";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { SectionCard } from "@/components/common/card";
 import { Loader } from "@/components/common/loader";
+import { useAuth } from "@/lib/auth";
+import { fetchCityList, fetchStateList } from "@/lib/api";
+import { findIdByName } from "@/lib/utils";
 
 /* -------------------- CARD -------------------- */
 
@@ -42,10 +45,6 @@ export default function StoreForm({
   const id = searchParams.get("id");
   const mode = searchParams.get("mode");
   const isView = mode === "view";
-
-  const [filePreview, setFilePreview] = useState<Record<string, string | null>>(
-    {}
-  );
 
   const form = useForm<storeFormType>({
     resolver: zodResolver(StoreSchema),
@@ -63,16 +62,119 @@ export default function StoreForm({
       state: "",
       city: "",
       pincode: "",
-      opening_date:"",
+      opening_date: "",
       registration_file: "",
       cancelled_cheque: "",
       agreement_file: "",
     },
   });
 
+  const [filePreview, setFilePreview] = useState<Record<string, string | null>>(
+    {}
+  );
+  const { countries } = useAuth();
+
+  const [countryList, setCountryList] = useState<
+    { id: number; name: string; slug?: string }[]
+  >([]);
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+
+  const [loadingState, setLoadingState] = useState(false);
+  const [loadingCity, setLoadingCity] = useState(false);
+
+  const isHydratingRef = useRef(false);
+  useEffect(() => {
+    setCountryList(countries)
+  }, [countries])
+  useEffect(() => {
+    console.log(mode,countryList,'modemode');
+    
+    if ((mode == "create" || !mode) &&
+      countryList.length) {
+      const hydrateLocation = async () => {
+        // 1️⃣ COUNTRY
+        isHydratingRef.current = true;
+        try {
+          const countryId = findIdByName(countryList, '101');
+          if (!countryId) return;
+          form.setValue("country", String(countryId));
+
+          // 2️⃣ STATES
+          setLoadingState(true);
+          const stateList = await fetchStateList(countryId);
+          setStates(stateList);
+          setLoadingState(false);
+
+        } finally {
+          // ✅ hydration completed
+          isHydratingRef.current = false;
+        }
+      };
+      hydrateLocation()
+    }
+    if (
+      (mode !== "edit" && mode !== "view") ||
+      !initialValues ||
+      !countryList.length
+    ) return;
+
+    const hydrateLocation = async () => {
+      // 1️⃣ COUNTRY
+      isHydratingRef.current = true;
+      try {
+        const countryId = findIdByName(countryList, initialValues.country);
+        console.log(countryId, 'countryId');
+
+        if (!countryId) return;
+
+        form.setValue("country", String(countryId));
+
+        // 2️⃣ STATES
+        setLoadingState(true);
+        const stateList = await fetchStateList(countryId);
+        setStates(stateList);
+        setLoadingState(false);
+
+        const stateId = findIdByName(stateList, initialValues.state);
+        console.log(stateId, 'stateId');
+
+        if (!stateId) return;
+
+        form.setValue("state", String(stateId));
+
+        // 3️⃣ CITIES
+        setLoadingCity(true);
+        const cityList = await fetchCityList(stateId);
+        setCities(cityList);
+        setLoadingCity(false);
+
+        const cityId = findIdByName(cityList, initialValues.city);
+        if (!cityId) return;
+
+        form.setValue("city", String(cityId));
+      } finally {
+        // ✅ hydration completed
+        isHydratingRef.current = false;
+      }
+    };
+
+    hydrateLocation();
+  }, [mode, initialValues, countryList]);
+  useEffect(() => {
+    if (mode !== "create" || !countryList.length) return;
+
+    const india = countryList.find(c => c.name === "India");
+    if (!india) return;
+
+    form.setValue("country", String(india.id));
+  }, [mode, countryList]);
+
   /* -------------------- HYDRATE -------------------- */
   useEffect(() => {
     if (mode === "edit" || mode === "view") {
+      console.log(initialValues,'initialValues');
+      
       form.reset({
         store_name: initialValues?.store_name ?? "",
         email: initialValues?.email ?? "",
@@ -86,7 +188,7 @@ export default function StoreForm({
         country: initialValues?.country ?? "India",
         state: initialValues?.state ?? "",
         city: initialValues?.city ?? "",
-        opening_date:initialValues?.opening_date ?? "",
+        opening_date: initialValues?.opening_date ?? "",
         pincode: initialValues?.pincode ?? "",
         registration_file: initialValues?.registration_file ?? "",
         cancelled_cheque: initialValues?.cancelled_cheque ?? "",
@@ -177,10 +279,28 @@ export default function StoreForm({
                     name="country"
                     label="Country"
                     control={form.control}
-                    options={countryOptions}
                     isRequired
                     isDisabled={isView}
+                    options={countryList.map(c => ({
+                      value: String(c.id),
+                      label: c.name,
+                    }))}
+                    onValueChange={async (value) => {
+                      if (isHydratingRef.current) return
+
+                      setStates([])
+                      setCities([])
+                      form.setValue("state", "")
+                      form.setValue("city", "")
+
+                      setLoadingState(true)
+                      const stateList = await fetchStateList(Number(value))
+                      setStates(stateList)
+                      setLoadingState(false)
+                    }}
                   />
+
+
 
 
 
@@ -191,19 +311,40 @@ export default function StoreForm({
                     name="state"
                     label="State"
                     control={form.control}
-                    options={countryOptions}
                     isRequired
-                    isDisabled={isView}
+                    isDisabled={isView || !form.getValues("country")}
+                    options={states.map(s => ({
+                      value: String(s.id),
+                      label: s.name,
+                    }))}
+                    onValueChange={async (value) => {
+                      if (isHydratingRef.current) return
+
+                      setCities([])
+                      form.setValue("city", "")
+
+                      setLoadingCity(true)
+                      const cityList = await fetchCityList(Number(value))
+                      setCities(cityList)
+                      setLoadingCity(false)
+                    }}
                   />
+
+
 
                   <FloatingRHFSelect
                     name="city"
                     label="City"
                     control={form.control}
-                    options={countryOptions}
                     isRequired
-                    isDisabled={isView}
+                    isDisabled={isView || !form.getValues("state")}
+                    options={cities.map(c => ({
+                      value: String(c.id),
+                      label: c.name,
+                    }))}
                   />
+
+
 
                 </div>
                 <div className="md:col-span-2">
@@ -223,7 +364,7 @@ export default function StoreForm({
             <SectionCard title="Billing & Tax">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[{ label: "Invoice prefix", fieldName: "invoice_prefix" },
-                { label: "Company GSTIN", fieldName: "gstin" },
+                { label: "GSTIN", fieldName: "gstin" },
                 { label: "PAN number", fieldName: "pan_no" }
                 ].map((item) => (
                   <FloatingField

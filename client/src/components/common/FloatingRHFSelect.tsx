@@ -17,6 +17,7 @@ type FloatingRHFSelectProps = {
   isDisabled?: boolean
   isRequired?: boolean
   creatable?: boolean
+  onValueChange?: (value: string | string[]) => void
 }
 
 export function FloatingRHFSelect({
@@ -28,6 +29,7 @@ export function FloatingRHFSelect({
   isDisabled = false,
   isRequired = false,
   creatable = false,
+  onValueChange
 }: FloatingRHFSelectProps) {
   const Component = creatable ? CreatableSelect : Select
   const [focused, setFocused] = useState(false)
@@ -38,6 +40,7 @@ export function FloatingRHFSelect({
       control={control}
       render={({ field, fieldState }) => {
         const error = fieldState.error
+
         const hasValue = isMulti
           ? Array.isArray(field.value) && field.value.length > 0
           : !!field.value
@@ -45,9 +48,18 @@ export function FloatingRHFSelect({
         const shouldFloat = focused || hasValue
 
         const value = isMulti
-          ? options.filter(o => field.value?.includes(o.value))
-          : options.find(o => o.value === field.value) ?? null
-
+          ? Array.isArray(field.value)
+            ? field.value.map((v: string) => ({
+              value: v,
+              label: options.find(o => o.value === v)?.label || v,
+            }))
+            : []
+          : field.value
+            ? {
+              value: field.value,
+              label: options.find(o => o.value === field.value)?.label || field.value,
+            }
+            : null;
         return (
           <Box position="relative" h={'44px'} w="full">
             {/* FLOATING LABEL */}
@@ -57,7 +69,7 @@ export function FloatingRHFSelect({
               top={shouldFloat ? "-6px" : "12px"}
               fontSize={shouldFloat ? "xs" : "sm"}
               color={error ? "red.500" : "gray.500"}
-              bg="white"
+              bg={isDisabled ? "transparent" : "white"}
               px="4px"
               zIndex={2}
               pointerEvents="none"
@@ -73,14 +85,19 @@ export function FloatingRHFSelect({
               isSearchable
               options={options}
               value={value}
+              
               placeholder="" // 👈 IMPORTANT: no placeholder
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               onChange={(selected: any) => {
                 if (isMulti) {
-                  field.onChange(selected ? selected.map((o: Option) => o.value) : [])
+                  const values = selected ? selected.map((o: Option) => o.value) : []
+                  field.onChange(values)
+                  onValueChange?.(values)
                 } else {
-                  field.onChange(selected ? selected.value : "")
+                  const value = selected ? selected.value : ""
+                  field.onChange(value)
+                  onValueChange?.(value)
                 }
               }}
               styles={{
@@ -91,13 +108,13 @@ export function FloatingRHFSelect({
                   borderColor: error
                     ? "#e53e3e"
                     : state.isFocused
-                    ? "#3182ce"
-                    : "#e1e7ef",
+                      ? "#3182ce"
+                      : "#e1e7ef",
                   boxShadow: "none",
                 }),
                 valueContainer: (base) => ({
                   ...base,
-                //   paddingTop: "6px",
+                  //   paddingTop: "6px",
                 }),
                 placeholder: () => ({
                   display: "none", // 👈 hide placeholder completely

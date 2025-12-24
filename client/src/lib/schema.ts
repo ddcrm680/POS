@@ -646,7 +646,7 @@ const fileOrPath = z.union([
         ),
       { message: "Only JPG, PNG, WEBP or PDF allowed" }
     ),
-  z.string().min(1),
+  z.string(),
 ]);
 export const StoreSchema = z.object({
   store_name: z
@@ -664,12 +664,12 @@ export const StoreSchema = z.object({
   notes: z
     .string()
     .trim()
-    .min(10, "Bank address must be at least 10 characters")
-    .max(200, "Bank address must not exceed 200 characters"),
+    .min(10, "Notes must be at least 10 characters")
+    .max(200, "Notes must not exceed 200 characters"),
 
   gstin: z
     .string()
-    .min(1, "Company GSTIN is required")
+    .min(1, "GSTIN is required")
     .regex(
       /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/,
       "Invalid GSTIN format"
@@ -712,9 +712,20 @@ export const StoreSchema = z.object({
     .min(10, "Location name must be at least 10 characters")
     .max(200, "Location name must not exceed 200 characters"),
   phone: z.string().max(15),
-  agreement_file: fileOrPath,
-  registration_file: fileOrPath,
-  cancelled_cheque: fileOrPath,
+  agreement_file: fileOrPath
+  .refine(val => val !== undefined && val !== "", {
+    message: "Agreement file is required",
+  }),
+
+  registration_file: fileOrPath
+  .refine(val => val !== undefined && val !== "", {
+    message: "Registration file is required",
+  }),
+
+cancelled_cheque: fileOrPath
+  .refine(val => val !== undefined && val !== "", {
+    message: "Cancelled cheque is required",
+  }),
   opening_date: z
   .string()
   .min(1, "Opening date is required"),
