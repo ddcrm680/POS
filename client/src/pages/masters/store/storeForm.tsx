@@ -1,25 +1,40 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, useSearchParams } from "wouter";
 
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import RHFSelect from "@/components/RHFSelect";
 
 import { StoreSchema } from "@/lib/schema";
 import { storeFormProp, storeFormType } from "@/lib/types";
-import { Constant } from "@/lib/constant";
 import { countryOptions, stateOptions, cityOptions } from "@/lib/mockData";
-import { Card } from "@/components/common/card";
 import { RequiredMark } from "@/components/common/RequiredMark";
+import { Field } from "@chakra-ui/react";
+import { FloatingField } from "@/components/common/FloatingField";
+import { FloatingTextarea } from "@/components/common/FloatingTextarea";
+import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
+import { SectionCard } from "@/components/common/card";
+import { Loader } from "@/components/common/loader";
+import { useAuth } from "@/lib/auth";
+import { fetchCityList, fetchStateList } from "@/lib/api";
+import { findIdByName } from "@/lib/utils";
+
+/* -------------------- CARD -------------------- */
+
 
 export default function StoreForm({
-  onClose,
   initialValues,
   isLoading = false,
   onSubmit,
@@ -47,15 +62,119 @@ export default function StoreForm({
       state: "",
       city: "",
       pincode: "",
+      opening_date: "",
       registration_file: "",
       cancelled_cheque: "",
       agreement_file: "",
     },
   });
 
-  /* ---------------- HYDRATE EDIT / VIEW ---------------- */
+  const [filePreview, setFilePreview] = useState<Record<string, string | null>>(
+    {}
+  );
+  const { countries } = useAuth();
+
+  const [countryList, setCountryList] = useState<
+    { id: number; name: string; slug?: string }[]
+  >([]);
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+
+  const [loadingState, setLoadingState] = useState(false);
+  const [loadingCity, setLoadingCity] = useState(false);
+
+  const isHydratingRef = useRef(false);
+  useEffect(() => {
+    setCountryList(countries)
+  }, [countries])
+  useEffect(() => {
+    console.log(mode,countryList,'modemode');
+    
+    if ((mode == "create" || !mode) &&
+      countryList.length) {
+      const hydrateLocation = async () => {
+        // 1️⃣ COUNTRY
+        isHydratingRef.current = true;
+        try {
+          const countryId = findIdByName(countryList, '101');
+          if (!countryId) return;
+          form.setValue("country", String(countryId));
+
+          // 2️⃣ STATES
+          setLoadingState(true);
+          const stateList = await fetchStateList(countryId);
+          setStates(stateList);
+          setLoadingState(false);
+
+        } finally {
+          // ✅ hydration completed
+          isHydratingRef.current = false;
+        }
+      };
+      hydrateLocation()
+    }
+    if (
+      (mode !== "edit" && mode !== "view") ||
+      !initialValues ||
+      !countryList.length
+    ) return;
+
+    const hydrateLocation = async () => {
+      // 1️⃣ COUNTRY
+      isHydratingRef.current = true;
+      try {
+        const countryId = findIdByName(countryList, initialValues.country);
+        console.log(countryId, 'countryId');
+
+        if (!countryId) return;
+
+        form.setValue("country", String(countryId));
+
+        // 2️⃣ STATES
+        setLoadingState(true);
+        const stateList = await fetchStateList(countryId);
+        setStates(stateList);
+        setLoadingState(false);
+
+        const stateId = findIdByName(stateList, initialValues.state);
+        console.log(stateId, 'stateId');
+
+        if (!stateId) return;
+
+        form.setValue("state", String(stateId));
+
+        // 3️⃣ CITIES
+        setLoadingCity(true);
+        const cityList = await fetchCityList(stateId);
+        setCities(cityList);
+        setLoadingCity(false);
+
+        const cityId = findIdByName(cityList, initialValues.city);
+        if (!cityId) return;
+
+        form.setValue("city", String(cityId));
+      } finally {
+        // ✅ hydration completed
+        isHydratingRef.current = false;
+      }
+    };
+
+    hydrateLocation();
+  }, [mode, initialValues, countryList]);
+  useEffect(() => {
+    if (mode !== "create" || !countryList.length) return;
+
+    const india = countryList.find(c => c.name === "India");
+    if (!india) return;
+
+    form.setValue("country", String(india.id));
+  }, [mode, countryList]);
+
+  /* -------------------- HYDRATE -------------------- */
   useEffect(() => {
     if (mode === "edit" || mode === "view") {
+      console.log(initialValues,'initialValues');
+      
       form.reset({
         store_name: initialValues?.store_name ?? "",
         email: initialValues?.email ?? "",
@@ -69,6 +188,7 @@ export default function StoreForm({
         country: initialValues?.country ?? "India",
         state: initialValues?.state ?? "",
         city: initialValues?.city ?? "",
+        opening_date: initialValues?.opening_date ?? "",
         pincode: initialValues?.pincode ?? "",
         registration_file: initialValues?.registration_file ?? "",
         cancelled_cheque: initialValues?.cancelled_cheque ?? "",
@@ -76,211 +196,274 @@ export default function StoreForm({
       });
     }
   }, [mode, initialValues, form]);
+  /* -------------------- FILE HANDLER -------------------- */
+  const handleFile = (key: keyof storeFormType, file: File | null) => {
+    if (!file) return;
+    form.setValue(key, file);
+    if (file.type.startsWith("image/")) {
+      setFilePreview((p) => ({
+        ...p,
+        [key]: URL.createObjectURL(file),
+      }));
+    }
+  };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((values) => onSubmit(values, form.setError))}
-        className="min-h-screen bg-gray-50"
+        onSubmit={form.handleSubmit((v) => onSubmit(v, form.setError))}
+        className="min-h-screen bg-gray-100 p-4 md:p-10"
       >
-        {/* ---------------- HEADER ---------------- */}
-        <div className="bg-white border-b sticky top-0 z-20">
-          <div className="max-w-7xl mx-auto px-6 py-3 flex justify-center items-center">
-            <h2 className="text-lg font-semibold">
-              {isView ? "View Store" : id ? "Edit Store" : "Add Store"}
-            </h2>
+        <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg">
+
+          {/* HEADER */}
+          <div className="border-b px-6 py-4 ">
+            <h1 className="text-xl font-semibold">
+              {isView ? "View Store" : id ? "Edit Store" : "Create New Store"}
+            </h1>
+
           </div>
-        </div>
 
-        {/* ---------------- CONTENT ---------------- */}
-        <div className="max-w-7xl pb-4 bg-white mx-auto rounded-xl ">
+          <div className=" pb-4">
 
-          {/* STORE INFO */}
-          <Card title="Store Information">
-            <div className="grid grid-cols-3 gap-4">
-              <FormField name="store_name" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Store Name<RequiredMark show={!isView} /></FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled={isView} placeholder="Enter store name" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField name="email" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email<RequiredMark show={!isView} /></FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled={isView} placeholder="Enter email" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField name="phone" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone<RequiredMark show={!isView} /></FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled={isView} placeholder="Enter phone" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            </div>
-          </Card>
-
-          {/* BILLING + TAX */}
-          <div className="grid grid-cols-2 gap-6">
-            <Card title="Billing & Invoicing">
-              <FormField name="invoice_prefix" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Invoice Prefix<RequiredMark show={!isView} /></FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled={isView} placeholder="Eg: DD/INV" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            </Card>
-
-            <Card title="Tax Information">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField name="gstin" control={form.control} render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>GSTIN<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                <FormField name="pan_no" control={form.control} render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>PAN No.<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+            {/* STORE INFO */}
+            <SectionCard title="Store Information">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* "store_name", "email", "phone" */}
+                {[{ label: "Store Name", fieldName: "store_name", isRequired: true },
+                { label: "Email", fieldName: "email", isRequired: true },
+                { label: "Phone", fieldName: "phone", isRequired: false }
+                ].map((item) => (
+                  <FloatingField
+                    isView={isView}
+                    isRequired={item.isRequired}
+                    name={item.fieldName}
+                    label={item.label}
+                    control={form.control}
+                  />
+                ))}
               </div>
-            </Card>
+            </SectionCard>
+
+            {/* LOCATION */}
+            <SectionCard title="Location & Operations">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FloatingField
+                  isView={isView}
+                  isRequired={true}
+                  name={'location_name'}
+                  label={'Location Name'}
+                  control={form.control}
+                />
+                <FloatingField
+                  isView={isView}
+                  isRequired={true}
+                  name={'pincode'}
+                  label={'Pincode'}
+                  control={form.control}
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* OPENING DATE */}
+
+                  <FloatingField
+                    name="opening_date"
+                    label="Opening Date"
+                    type="date"
+                    isRequired
+                    isView={isView}
+                    control={form.control}
+                  />
+
+                  {/* COUNTRY */}
+                  <FloatingRHFSelect
+                    name="country"
+                    label="Country"
+                    control={form.control}
+                    isRequired
+                    isDisabled={isView}
+                    options={countryList.map(c => ({
+                      value: String(c.id),
+                      label: c.name,
+                    }))}
+                    onValueChange={async (value) => {
+                      if (isHydratingRef.current) return
+
+                      setStates([])
+                      setCities([])
+                      form.setValue("state", "")
+                      form.setValue("city", "")
+
+                      setLoadingState(true)
+                      const stateList = await fetchStateList(Number(value))
+                      setStates(stateList)
+                      setLoadingState(false)
+                    }}
+                  />
+
+
+
+
+
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* STATE */}
+                  <FloatingRHFSelect
+                    name="state"
+                    label="State"
+                    control={form.control}
+                    isRequired
+                    isDisabled={isView || !form.getValues("country")}
+                    options={states.map(s => ({
+                      value: String(s.id),
+                      label: s.name,
+                    }))}
+                    onValueChange={async (value) => {
+                      if (isHydratingRef.current) return
+
+                      setCities([])
+                      form.setValue("city", "")
+
+                      setLoadingCity(true)
+                      const cityList = await fetchCityList(Number(value))
+                      setCities(cityList)
+                      setLoadingCity(false)
+                    }}
+                  />
+
+
+
+                  <FloatingRHFSelect
+                    name="city"
+                    label="City"
+                    control={form.control}
+                    isRequired
+                    isDisabled={isView || !form.getValues("state")}
+                    options={cities.map(c => ({
+                      value: String(c.id),
+                      label: c.name,
+                    }))}
+                  />
+
+
+
+                </div>
+                <div className="md:col-span-2">
+                  <FloatingTextarea
+                    name="address"
+                    label="Address"
+                    isView={isView}
+                    isRequired
+                    control={form.control}
+                  />
+
+                </div>
+              </div>
+            </SectionCard>
+
+            {/* BILLING */}
+            <SectionCard title="Billing & Tax">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[{ label: "Invoice prefix", fieldName: "invoice_prefix" },
+                { label: "GSTIN", fieldName: "gstin" },
+                { label: "PAN number", fieldName: "pan_no" }
+                ].map((item) => (
+                  <FloatingField
+                    isView={isView}
+                    isRequired={true}
+                    name={item.fieldName}
+                    label={item.label}
+                    control={form.control}
+                  />
+
+                ))}
+              </div>
+            </SectionCard>
+
+            {/* DOCUMENTS */}
+            <SectionCard title="Documents">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  "registration_file",
+                  "cancelled_cheque",
+                  "agreement_file",
+                ].map((key) => (
+                  <FormField
+                    key={key}
+                    name={key as any}
+                    control={form.control}
+                    render={() => (
+                      <FormItem>
+                        <p className="text-sm font-medium capitalize">
+                          {key.replace("_", " ")}
+                        </p>
+
+                        <div className="h-32 rounded-lg border bg-gray-50 flex items-center justify-center overflow-hidden">
+                          {filePreview[key] ? (
+                            <img
+                              src={filePreview[key]!}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-xs text-gray-400">
+                              No preview
+                            </span>
+                          )}
+                        </div>
+
+                        {!isView && (
+                          <Input
+                            type="file"
+                            onChange={(e) =>
+                              handleFile(
+                                key as any,
+                                e.target.files?.[0] ?? null
+                              )
+                            }
+                          />
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+            </SectionCard>
+
+            {/* NOTES */}
+            <SectionCard title="Additional Notes">
+              <FloatingTextarea
+                name="notes"
+                label="Notes"
+                isView={isView}
+                isRequired
+                control={form.control}
+              />
+
+            </SectionCard>
           </div>
+          {mode !== 'view' && <div className="">
+            <div className="border-t px-6 py-4 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                disabled={isLoading}
+                className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                onClick={() => navigate("/master")}
+              >
+                {'Cancel'}
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
+              >
+                {isLoading && <Loader />}
+                {isLoading
+                  ? mode === "create" ? "Adding..." : "Updating..."
+                  : id ? "Update " : "Create "}
+              </Button>
+            </div></div>}
 
-          {/* DOCUMENTS */}
-          <Card title="Store Documents">
-            <div className="grid grid-cols-3 gap-4">
-              {["registration_file", "cancelled_cheque", "agreement_file"].map((name) => (
-                <FormField key={name} name={name as any} control={form.control} render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{name.replace("_", " ")}<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input type="file" disabled={isView} onChange={(e) => field.onChange(e.target.files?.[0] ?? null)} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              ))}
-            </div>
-          </Card>
-
-          {/* LOCATION */}
-          <Card title="Location & Operational Details">
-            <div className="grid grid-cols-3 gap-4">
-              <FormField name="location_name" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location Name<RequiredMark show={!isView} /></FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled={isView} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField name="pincode" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Pincode<RequiredMark show={!isView} /></FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled={isView} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField name="country" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country<RequiredMark show={!isView} /></FormLabel>
-                  <FormControl>
-                    <RHFSelect field={field} options={countryOptions} isDisabled={isView} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 mt-4">
-              <FormField name="state" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>State<RequiredMark show={!isView} /></FormLabel>
-                  <FormControl>
-                    <RHFSelect field={field} options={stateOptions} isDisabled={isView} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField name="city" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City<RequiredMark show={!isView} /></FormLabel>
-                  <FormControl>
-                    <RHFSelect field={field} options={cityOptions} isDisabled={isView} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            </div>
-
-            <div className="mt-4">
-              <FormField name="address" control={form.control} render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address<RequiredMark show={!isView} /></FormLabel>
-                  <FormControl>
-                    <Textarea {...field} disabled={isView} rows={3} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            </div>
-          </Card>
-
-          {/* NOTES */}
-          <Card title="Additional Notes">
-            <FormField name="notes" control={form.control} render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Textarea {...field} disabled={isView} rows={3} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-          </Card>
         </div>
-
-        {/* ---------------- FOOTER ---------------- */}
-        {mode !== "view" && (
-          <div className="sticky bottom-0  bg-white border-t">
-            <div className="max-w-7xl mx-auto px-6 py-3 flex justify-end gap-3">
-              <Button variant="outline" onClick={() => navigate("/master")}>
-                Cancel
-              </Button>
-              <Button className="bg-red-500 hover:bg-red-600">
-                {id ? "Update" : "Add"}
-              </Button>
-            </div>
-          </div>
-        )}
       </form>
     </Form>
   );

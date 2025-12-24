@@ -646,14 +646,14 @@ const fileOrPath = z.union([
         ),
       { message: "Only JPG, PNG, WEBP or PDF allowed" }
     ),
-  z.string().min(1),
+  z.string(),
 ]);
 export const StoreSchema = z.object({
   store_name: z
     .string()
     .trim()
-    .min(5, "Company name must be at least 5 characters")
-    .max(100, "Company name must not exceed 100 characters"),
+    .min(5, "Store name must be at least 5 characters")
+    .max(100, "Store name must not exceed 100 characters"),
 
   email: z
     .string()
@@ -664,12 +664,12 @@ export const StoreSchema = z.object({
   notes: z
     .string()
     .trim()
-    .min(10, "Bank address must be at least 10 characters")
-    .max(200, "Bank address must not exceed 200 characters"),
+    .min(10, "Notes must be at least 10 characters")
+    .max(200, "Notes must not exceed 200 characters"),
 
   gstin: z
     .string()
-    .min(1, "Company GSTIN is required")
+    .min(1, "GSTIN is required")
     .regex(
       /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/,
       "Invalid GSTIN format"
@@ -693,8 +693,6 @@ export const StoreSchema = z.object({
       /^[A-Z0-9]+$/,
       "Invoice prefix must contain only uppercase letters and numbers"
     ),
-
-
   country: z.string().min(1, "Please select country"),
   state: z.string().min(1, "Please select state"),
   city: z.string().min(1, "Please select city"),
@@ -714,58 +712,22 @@ export const StoreSchema = z.object({
     .min(10, "Location name must be at least 10 characters")
     .max(200, "Location name must not exceed 200 characters"),
   phone: z.string().max(15),
-  agreement_file: fileOrPath,
-  registration_file: fileOrPath,
-  cancelled_cheque: fileOrPath,
+  agreement_file: fileOrPath
+  .refine(val => val !== undefined && val !== "", {
+    message: "Agreement file is required",
+  }),
+
+  registration_file: fileOrPath
+  .refine(val => val !== undefined && val !== "", {
+    message: "Registration file is required",
+  }),
+
+cancelled_cheque: fileOrPath
+  .refine(val => val !== undefined && val !== "", {
+    message: "Cancelled cheque is required",
+  }),
   opening_date: z
   .string()
   .min(1, "Opening date is required"),
 
 });
-
-
-// export const storeSchema = z.object({
-//   store_name: z
-//     .string()
-//     .trim()
-//     .min(3, "Franchise name must be at least 3 characters")
-//     .max(150),
-
-//   email: z.string().email("Invalid email address"),
-
-//   phone: z
-//     .string()
-//     .regex(/^\+?\d{10,13}$/, "Invalid phone number"),
-
-//   location_name: z.string().min(2, "Location name is required"),
-
-//   country: z.string().min(1, "Country is required"),
-//   state: z.string().min(1, "State is required"),
-//   city: z.string().min(1, "City is required"),
-//   pincode: z.string().regex(/^\d{6}$/, "Pincode must be 6 digits"),
-
-//   gst_number: z
-//     .string()
-//     .regex(
-//       /^\d{2}[A-Z]{5}\d{4}[A-Z][A-Z\d]Z[A-Z\d]$/,
-//       "Invalid GST number"
-//     ),
-
-//   pan_number: z
-//     .string()
-//     .regex(/^[A-Z]{5}\d{4}[A-Z]$/, "Invalid PAN number"),
-
-//   opening_date: z.string().min(1, "Opening date is required"),
-
-//   invoice_prefix: z
-//     .string()
-//     .trim()
-//     .min(2)
-//     .max(10)
-//     .regex(/^[A-Z0-9-]+$/, "Only uppercase letters, numbers & hyphen"),
-
-//   agreement_file: fileOrPath,
-//   registration_file: fileOrPath,
-//   cancelled_cheque: fileOrPath,
-// });
-

@@ -234,16 +234,17 @@ export default function OrganizationForm({
         <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
 
           {/* ================= ROW 1 ================= */}
-          <Box className="flex gap-3">
+          <section className="flex flex-col sm:flex-row gap-6 items-start">
+            <div className="flex md:w-[25%] flex-col items-center gap-3 self-center">
 
-            <Box w={'30%'}>
+              {/* <Box w={'30%'}> */}
 
               <FormField
                 control={form.control}
                 name="org_image"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="flex items-center gap-3 -ml-[40px] flex-col">
+                    <div className="flex items-center gap-3 justify-center  flex-col">
 
                       {/* AVATAR WRAPPER */}
                       <div className="relative">
@@ -259,7 +260,7 @@ export default function OrganizationForm({
                               inputRef.current?.click();
                             }
                           }}
-                          className={`w-14 h-14 rounded-full overflow-hidden bg-muted 
+                          className={`w-20 h-20 rounded-full overflow-hidden bg-muted 
               flex items-center justify-center
               ${isView ? "cursor-not-allowed" : "cursor-pointer"}
               border-2
@@ -349,8 +350,10 @@ export default function OrganizationForm({
                 )}
               />
 
-            </Box>
-            <Box w="40%">
+              {/* </Box> */}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+              {/* <Box w="40%"> */}
               <FormField
                 control={form.control}
                 name="company_name"
@@ -364,27 +367,9 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
+              {/* </Box> */}
 
-            <Box w="40%">
-              <FormField
-                control={form.control}
-                name="bank_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Bank Name<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.bankNamePlaceholder} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-
-          </Box>
-          <Box className="flex gap-3">
-            <Box w="50%">
+              {/* <Box w="40%"> */}
               <FormField
                 control={form.control}
                 name="email"
@@ -398,29 +383,7 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
-            <Box w="50%">
-              <FormField
-                control={form.control}
-                name="pin_code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Pincode<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.pincodePlaceholder} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
 
-
-          </Box>
-
-          {/* ================= INVOICE ================= */}
-          <Box className="flex gap-3">
-            <Box w="50%">
               <FormField
                 control={form.control}
                 name="invoice_prefix"
@@ -434,9 +397,7 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
 
-            <Box w="50%">
               <FormField
                 control={form.control}
                 name="service_prefix"
@@ -450,16 +411,16 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
-          </Box>
-          <Box className="flex gap-3">
+              {/* </Box> */}
+            </div>
 
 
-          </Box>
-
-          {/* ================= ROW 2 ================= */}
-          <Box className="flex gap-3">
-            <Box w="33%">
+          </section>
+          <section>
+             <h3 className="text-sm font-semibold mb-4 text-gray-700">
+              Banking Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="company_name_in_bank"
@@ -473,9 +434,20 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
+              <FormField
+                control={form.control}
+                name="bank_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Bank Name<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.bankNamePlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Box w="33%">
               <FormField
                 control={form.control}
                 name="account_no"
@@ -489,9 +461,6 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
-
-            <Box w="33%">
               <FormField
                 control={form.control}
                 name="account_type"
@@ -506,12 +475,6 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
-          </Box>
-
-          {/* ================= ROW 3 ================= */}
-          <Box className="flex gap-3">
-            <Box w="33%">
               <FormField
                 control={form.control}
                 name="ifsc_code"
@@ -525,62 +488,6 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
-
-            <Box w="33%">
-              <FormField
-                control={form.control}
-                name="company_pan_no"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Company PAN No.<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.companyPANPlaceholder} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-
-            <Box w="33%">
-              <FormField
-                control={form.control}
-                name="aadhar_no"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Aadhaar Number</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.aadharPlaceholder} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-
-          </Box>
-
-
-
-          {/* ================= TAX ================= */}
-          <Box className="flex gap-3">
-            <Box w="33%">
-              <FormField
-                control={form.control}
-                name="company_gstin"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Company company_gstin<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={Constant.master.orgnaization.companyGSTIN} disabled={isView} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-            <Box w="33%">
               <FormField
                 control={form.control}
                 name="branch_name"
@@ -594,9 +501,6 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
-
-            <Box w="33%">
               <FormField
                 control={form.control}
                 name="bank_address"
@@ -610,13 +514,61 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
-          </Box>
+            </div>
+          </section>
+          <section>
+             <h3 className="text-sm font-semibold mb-4 text-gray-700">
+              Tax Information
+            </h3>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="company_gstin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Company GSTIN<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.companyGSTIN} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="company_pan_no"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Company PAN No.<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.companyPANPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="aadhar_no"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Aadhaar Number</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.aadharPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </section>
+          <section>
+             <h3 className="text-sm font-semibold mb-4 text-gray-700">
+              Address
+            </h3>
 
-          {/* ================= LOCATION ================= */}
-          <Box className="flex gap-3">
-            <Box w="25%">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <FormField
                 control={form.control}
                 name="country"
@@ -657,10 +609,6 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-
-            </Box>
-
-            <Box w="25%">
               <FormField
                 control={form.control}
                 name="state"
@@ -707,10 +655,6 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-
-            </Box>
-
-            <Box w="25%">
               <FormField
                 control={form.control}
                 name="city"
@@ -743,10 +687,6 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-
-            </Box>
-
-            <Box w="25%">
               <FormField
                 control={form.control}
                 name="district"
@@ -760,22 +700,41 @@ export default function OrganizationForm({
                   </FormItem>
                 )}
               />
-            </Box>
-          </Box>
+              <FormField
+                control={form.control}
+                name="pin_code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Pincode<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={Constant.master.orgnaization.pincodePlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+            </div>
+            <div className="grid grid-cols-1 mt-[1rem] md:grid-cols-1 gap-4">
+
+              <FormField
+                control={form.control}
+                name="org_address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Company Address<RequiredMark show={!isView} /></FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder={Constant.master.orgnaization.companyAddressPlaceholder} disabled={isView} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </section>
+
           {/* ================= ADDRESS ================= */}
-          <FormField
-            control={form.control}
-            name="org_address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel style={{ color: "#000" }}>Company Address<RequiredMark show={!isView} /></FormLabel>
-                <FormControl>
-                  <Textarea {...field} placeholder={Constant.master.orgnaization.companyAddressPlaceholder} disabled={isView} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
         </div>
 
         {/* ================= ACTIONS ================= */}
