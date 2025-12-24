@@ -75,11 +75,10 @@ const isCreate = mode === "create";
     onSubmit(values, form.setError)
   )}
         className="space-y-6 "
-      >  <div className="p-6 space-y-6">
+      >  <div className="p-6 space-y-6 max-h-[500px] overflow-auto">
           {/* Row 1 */}
-          <Box className="flex gap-3 ">
-            <Box w={`${mode==='edit' ||  mode==="view"?'50%':'50%'}`}>
-              <FormField
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
                 control={form.control}
                 disabled={mode==='view'}
                 name="name"
@@ -93,10 +92,8 @@ const isCreate = mode === "create";
                   </FormItem>
                 )}
               />
-            </Box>
 
-            <Box w={`${mode==='edit' ||  mode==="view"?'50%':'50%'}`}>
-              <FormField
+           <FormField
                 control={form.control}
                 name="email"
                  disabled={mode==='view'}
@@ -110,14 +107,12 @@ const isCreate = mode === "create";
                   </FormItem>
                 )}
               />
-            </Box>
-
            
-          </Box>
+          </div>
 
           {/* Row 2 */}
-          <Box className="flex gap-3">
-            {mode!=='view' && <Box w="33%">
+          <div className={`grid grid-cols-1 ${mode!=='view' ? "md:grid-cols-3":"md:grid-cols-2"} gap-4`}>
+            {mode!=='view' && 
               <FormField
                 control={form.control}
                 name="phone"
@@ -141,8 +136,8 @@ const isCreate = mode === "create";
                   </FormItem>
                 )}
               />
-            </Box>}
-             {( mode==="view" )&& <Box w="50%">
+         }
+             {( mode==="view" )&& 
               <FormField
                 control={form.control}
                 name="phone"
@@ -167,8 +162,8 @@ const isCreate = mode === "create";
                   </FormItem>
                 )}
               />
-            </Box>}
-            {mode!=='view'&&<Box w="33%">
+           }
+            {mode!=='view'&&
               <FormField
                 control={form.control}
                 name="password"
@@ -197,9 +192,9 @@ const isCreate = mode === "create";
                   </FormItem>
                 )}
               />
-            </Box>}
+           }
 
-            <Box w={mode==='view' ? "50%":"33%"}>
+            {/* <Box w={mode==='view' ? "50%":"33%"}> */}
               <FormField
                 control={form.control}
                 name="role_id"
@@ -224,11 +219,11 @@ const isCreate = mode === "create";
                   </FormItem>
                 )}
               />
-            </Box>
-          </Box>
+            {/* </Box> */}
+          </div>
 
           {/* Address */}
-          <Box>
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
             <FormField
               control={form.control}
                disabled={mode==='view'}
@@ -248,7 +243,7 @@ const isCreate = mode === "create";
                 </FormItem>
               )}
             />
-          </Box>
+                  </div>
         </div>
         {/* Submit */}
        {mode!=='view' &&  <div className="">
