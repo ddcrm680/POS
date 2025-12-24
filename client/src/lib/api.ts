@@ -261,7 +261,7 @@ export async function EditOrganization(editFormValue: FormData) {
 
   try {
     const response: any = await api.post(
-      `/api/organizations/update/`, editFormValue
+      `/api/organizations/update`, editFormValue
     );
     if (response?.data?.success === true) {
       return response.data?.data;
