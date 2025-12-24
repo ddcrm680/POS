@@ -276,14 +276,9 @@ export interface systemLogProp {
 
   }
   initialValues?: Partial<systemLogType>;
-  isLoading?: boolean;
   onClose: () => void;
 
-  // 👇 IMPORTANT
-  onSubmit: (
-    values: systemLogType,
-    setError: UseFormSetError<systemLogType>
-  ) => void;
+
 }
 export interface serviceFormProp {
   mode: "create" | "edit" | "view";

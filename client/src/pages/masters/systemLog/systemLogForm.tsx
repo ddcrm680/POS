@@ -1,239 +1,193 @@
-"use client";
-
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { Box } from "@chakra-ui/react";
-
-import { Form } from "@/components/ui/form";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Loader } from "@/components/common/loader";
 import { Button } from "@/components/ui/button";
-
-import { systemLogProp, systemLogType } from "@/lib/types";
-
-/* -------------------- COMPONENT -------------------- */
+import { Card, CardContent } from "@/components/ui/card";
+import { fetchServiceLogItem } from "@/lib/api";
+import { formatDate, formatTime } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export default function SystemLogForm({
-  mode,
-  id,
   initialValues,
   onClose,
-}: systemLogProp) {
-  const isView = mode === "view";
+}: any) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [log, setLog] = useState<any>(null);
 
-  const form = useForm<systemLogType>({
-    defaultValues: {
-      action: "",
-      actor: "",
-      ip_address: "",
-      browser: "",
-      platform: "",
-      description:"",
-      device_type: "",
-      url: "",
-      client_url: "",
-      subjectType: "",
-      subjectId: "",
-    },
-    shouldUnregister: false,
-  });
-
-  /* -------------------- HYDRATE VALUES -------------------- */
   useEffect(() => {
-    if (!initialValues) return;
+    async function load() {
+      try {
+        setIsLoading(true);
+        const res: any = await fetchServiceLogItem(initialValues.id);
+        setLog(res.data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    }
 
-    form.reset({
-      action: initialValues.action ?? "",
-      actor:initialValues.actor ??"",
-      ip_address: initialValues.ip_address ?? "",
-      browser: `${initialValues.browser ?? ""}`,
-      url: initialValues.url ?? "",
-      client_url: initialValues.client_url ?? "",
-      description:initialValues.description??"",
-      subjectType: initialValues.subjectType ?? "",
-      platform:initialValues.platform,
-      device_type:initialValues.device_type,
-      subjectId: `${initialValues.subjectType} #${String(initialValues.subjectId ?? "")}`,
-     
-    });
-  }, [initialValues, form]);
+    if (initialValues?.id) load();
+  }, [initialValues?.id]);
 
-  /* -------------------- UI -------------------- */
+  if (isLoading) {
+    return <div className="min-h-[150px] flex justify-center items-center">
+      <div className="p-6 text-sm "><Loader/></div>
+    </div>;
+  }
+
+  if (!log) return null;
 
   return (
-    <Form {...form}>
-     <Form {...form}>
- <form className="space-y-6">
-  <div className="p-6 space-y-8 max-h-[50vh] overflow-y-auto">
+    <Card>
+      <CardContent className="p-6 space-y-8 ">
 
-    {/* ================= ACTION ================= */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-       <FormField
-        control={form.control}
-        name="actor"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel style={{ color: "#000" }}>Actor</FormLabel>
-            <FormControl>
-              <Input {...field} disabled />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="action"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel style={{ color: "#000" }}>Action</FormLabel>
-            <FormControl>
-              <Input {...field} disabled />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      
-    </div>
+        {/* ================= META ================= */}
+        <div className="grid  grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+          <Info label="Action" value={log.action.replaceAll("_", " ")} />
+          <Info label="Date" value={`${formatDate(log.created_at)} ${formatTime(log.created_at)}`} />
+          <Info
+            label="Done By"
+            value={`${log.actor.name} (${log.actor.email})`}
+          />
+          <Info
+            label="Affected Entity"
+            value={`${log.subject.type} #${log.subject.id}`}
+          />
+          <Info label="IP Address" value={log.ip_address} mono />
+          <Info
+            label="Browser / Platform"
+            value={`${log.browser} · ${log.platform} · ${log.device_type}`}
+          />
+        </div>
 
-    {/* ================= ACTOR / DESCRIPTION / SUBJECT ================= */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-     
+        {/* ================= URLS ================= */}
+        <div className="space-y-2 grid grid-cols-1 md:grid-cols-3 gap-6  text-xs">
+          <Info label="API URL" value={log.url} link />
+          <Info label="Client URL" value={log.client_url} link />
+        </div>
 
-      <FormField
-        control={form.control}
-        name="description"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel style={{ color: "#000" }}>Description</FormLabel>
-            <FormControl>
-              <Input {...field} disabled />
-            </FormControl>
-          </FormItem>
-        )}
-      />
+        {/* ================= DIFF ================= */}
+        <div>
+          <h4 className="text-sm font-semibold mb-3">
+            Changes
+          </h4>
+          <BeforeAfterDiff
+            before={log.meta?.before}
+            after={log.meta?.after}
+          />
+        </div>
 
-      <FormField
-        control={form.control}
-        name="subjectId"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel style={{ color: "#000" }}>Subject</FormLabel>
-            <FormControl>
-              <Input {...field} disabled />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-    </div>
- {/* ================= URLS ================= */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <FormField
-        control={form.control}
-        name="url"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel style={{ color: "#000" }}>API URL</FormLabel>
-            <FormControl>
-              <Input {...field} disabled />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="client_url"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel style={{ color: "#000" }}>Client URL</FormLabel>
-            <FormControl>
-              <Input {...field} disabled />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-    </div>
-    {/* ================= TECH INFO ================= */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-      <FormField
-        control={form.control}
-        name="ip_address"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel style={{ color: "#000" }}>IP Address</FormLabel>
-            <FormControl>
-              <Input {...field} disabled />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="browser"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel style={{ color: "#000" }}>Browser</FormLabel>
-            <FormControl>
-              <Input {...field} disabled />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="platform"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel style={{ color: "#000" }}>Platform</FormLabel>
-            <FormControl>
-              <Input {...field} disabled />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="device_type"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel style={{ color: "#000" }}>Device Type</FormLabel>
-            <FormControl>
-              <Input {...field} disabled />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-    </div>
-
-   
-
-  </div>
-
-  {/* FOOTER */}
-  <div className="flex justify-end gap-3 px-6 pb-6 border-t pt-4">
-    <Button
-      variant="outline"
-      onClick={onClose}
-      className="hover:bg-[#E3EDF6] hover:text-[#000]"
-    >
-      Close
-    </Button>
-  </div>
-</form>
-
-</Form>
-
-    </Form>
+      </CardContent>
+    </Card>
   );
 }
+function Info({
+  label,
+  value,
+  mono = false,
+  link = false,
+}: {
+  label: string;
+  value?: string;
+  mono?: boolean;
+  link?: boolean;
+}) {
+  return (
+    <div>
+      <p className="text-gray-500">{label}</p>
+      {link ? (
+        <a
+          href={value}
+          target="_blank"
+          className="text-blue-600 break-all hover:underline"
+        >
+          {value}
+        </a>
+      ) : (
+        <p className={`break-all ${mono ? "font-mono" : ""}`}>
+          {value || "-"}
+        </p>
+      )}
+    </div>
+  );
+}
+function getDiff(before: any = {}, after: any = {}) {
+  const keys = new Set([
+    ...Object.keys(before || {}),
+    ...Object.keys(after || {}),
+  ]);
 
+  return Array.from(keys).map((key) => ({
+    key,
+    before: before?.[key],
+    after: after?.[key],
+    changed: before?.[key] !== after?.[key],
+  }));
+}
+
+function BeforeAfterDiff({
+  before,
+  after,
+}: {
+  before: any;
+  after: any;
+}) {
+  const diffs = getDiff(before, after);
+
+  if (!diffs.length) {
+    return (
+      <p className="text-sm text-gray-500">
+        No changes recorded
+      </p>
+    );
+  }
+
+  return (
+    <div className="border rounded-md overflow-hidden">
+      
+      {/* HEADER */}
+      <div className="grid grid-cols-3 bg-gray-100 text-xs font-semibold text-gray-600 px-3 py-2 sticky top-0 z-10">
+        <div>Field</div>
+        <div>Before</div>
+        <div>After</div>
+      </div>
+
+      {/* BODY */}
+      <div className="max-h-[180px] overflow-y-auto divide-y">
+        {diffs.map(({ key, before, after, changed }: any) => (
+          <div
+            key={key}
+            className={`grid grid-cols-3 gap-3 px-3 py-2 text-sm
+              ${changed ? "bg-yellow-50" : "bg-white"}
+            `}
+          >
+            {/* FIELD NAME */}
+            <div className="font-medium text-gray-700 capitalize">
+              {key.replaceAll("_", " ")}
+            </div>
+
+            {/* BEFORE */}
+            <div className="text-gray-600 break-all">
+              {before ?? (
+                <span className="italic text-gray-400">—</span>
+              )}
+            </div>
+
+            {/* AFTER */}
+            <div
+              className={`break-all ${
+                changed
+                  ? "font-semibold text-green-700"
+                  : "text-gray-600"
+              }`}
+            >
+              {after ?? (
+                <span className="italic text-gray-400">—</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 

@@ -380,6 +380,14 @@ export async function fetchServiceLogList({
   }
   throw new Error("Failed to fetch system logs list");
 }
+export async function fetchServiceLogItem(id:string) {
+  const response = await api.get(`/api/admin/system-logs/${id.toString()}`);
+
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error("Failed to fetch system logs info");
+}
 export async function fetchStoresList({
   page,
   search,
