@@ -347,6 +347,39 @@ export async function fetchServicePlanList({
   }
   throw new Error("Failed to fetch service plan list");
 }
+
+export async function fetchServiceLogList({
+  page,
+  search,
+  browser,
+  platform,
+  device_type,
+  per_page
+}: {
+  per_page: number;
+  page: number;
+  search: string;
+  browser?: string | number;
+  platform?: string | number;
+  device_type?: string | number;
+}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    search,
+    per_page: String(per_page)
+  });
+  if (platform) params.append("platform", String(platform));
+  if (browser) params.append("browser", String(browser));
+
+  if (device_type) params.append("device_type", String(device_type));
+
+  const response = await api.get(`/api/admin/system-logs?${params.toString()}`);
+
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error("Failed to fetch system logs list");
+}
 export async function fetchStoresList({
   page,
   search,
