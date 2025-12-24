@@ -238,19 +238,7 @@ export default function SystemLog() {
             setIsServicePlanModalOpenInfo({
               open: true,
               type: "view",
-              info: {
-                action: row.action,
-                actor: row.actor.name,
-                ip_address: row.ip_address,
-                browser: row.browser,
-                platform: row.platform,
-                device_type: row.device_type,
-                description:row.description,
-                url: row.url,
-                client_url: row.client_url,
-                subjectType: row.subject.type,
-                subjectId: row.subject.id,
-              },
+              info:row
             })
           }}
 
@@ -265,22 +253,24 @@ export default function SystemLog() {
           primaryColor="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
         >
           <SystemLogForm
-            id="service-form"
-            serviceMetaInfo={serviceMetaInfo}
             initialValues={
-              isServicePlanModalOpenInfo.type === "edit" || isServicePlanModalOpenInfo.type === "view"
+              isServicePlanModalOpenInfo.type === "edit" ||
+                isServicePlanModalOpenInfo.type === "view"
                 ? isServicePlanModalOpenInfo.info
                 : {}
             }
-            isLoading={isLoading}
-            mode={isServicePlanModalOpenInfo.type === 'view' ? "view" : isServicePlanModalOpenInfo.type === "create" ? "create" : "edit"}
+            mode={
+              isServicePlanModalOpenInfo.type === "view"
+                ? "view"
+                : isServicePlanModalOpenInfo.type === "create"
+                  ? "create"
+                  : "edit"
+            }
             onClose={() =>
               setIsServicePlanModalOpenInfo({ open: false, type: "create", info: {} })
             }
-            roles={roles}
-            onSubmit={(values, setError) => {
-            }}
           />
+
 
         </CommonModal>
       </CardContent>
