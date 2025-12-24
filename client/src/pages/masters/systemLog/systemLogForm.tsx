@@ -38,7 +38,7 @@ export default function SystemLogForm({
 
   return (
     <Card>
-      <CardContent className="p-6 space-y-8 ">
+      <CardContent className="p-6 space-y-8 overflow-auto max-h-[500px]">
 
         {/* ================= META ================= */}
         <div className="grid  grid-cols-1 md:grid-cols-3 gap-6 text-sm">
