@@ -99,7 +99,7 @@ const renderCardView = () => {
     <div className={`w-full space-y-4 pt-6 ${className}`}>
       {/* Search Bar */}
       {searchable && (
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           <div className="relative flex-1 max-w-md">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2
@@ -123,7 +123,7 @@ const renderCardView = () => {
               className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
               onClick={() => { resetFilter() }}
             >
-              {'Clear'}
+              {'Clear Filter'}
             </Button>}
             {isAdd && <Button
               onClick={() => setIsModalOpen(true)}
@@ -139,9 +139,9 @@ const renderCardView = () => {
       {/* Table */}
       {isCard ? (
         renderCardView()
-      ) : (<div className="overflow-hidden rounded-lg border">
-        <Table.Root size="sm" >
-          <Table.Header>
+      ) : (<div className="relative overflow-x-auto rounded-lg border">
+        <Table.Root size="sm"className="min-w-[900px]" >
+          <Table.Header className="sticky top-0 z-10 bg-gray-100">
             <Table.Row className="!bg-gray-100 border-b border-gray-200">
               {columns.map((col: any) => (
                 <Table.ColumnHeader
@@ -191,7 +191,12 @@ const renderCardView = () => {
                 <Table.Row
                   key={row.id ?? rowIndex}
                    onClick={() => onRowClick?.(row, rowIndex)}
-                  className={`transition-all hover:bg-gray-50 border-b border-gray-100 ${onRowClick ? 'cursor-pointer' :" "}`}
+                   className={`
+  transition-all
+  border-b border-gray-100
+  hover:bg-gray-50
+  ${onRowClick ? "cursor-pointer active:bg-gray-100" : ""}
+`}
                 >
                   {columns.map((col: any) => (
                     <Table.Cell
@@ -220,7 +225,7 @@ const renderCardView = () => {
 
       {/* Pagination */}
       {(total > perPageOptions[0] || lastPage > 1) && (
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
 
           {/* Per Page selector */}
           {setPerPage && total > perPageOptions[0] && (
@@ -255,7 +260,7 @@ const renderCardView = () => {
             </Button>
 
             <span className="text-sm">
-              Page <strong>{page}</strong> of <strong>{lastPage}</strong>
+               <strong>{page}</strong> of <strong>{lastPage}</strong>
             </span>
 
             <Button

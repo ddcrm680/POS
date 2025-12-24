@@ -37,24 +37,42 @@ export default function Master() {
 
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <div className="mb-6 flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Master Details
-                </h1>
+              <h1 className="
+  text-lg
+  sm:text-xl
+  md:text-2xl
+  font-bold
+  text-gray-900
+">
+  Master Details
+</h1>
 
-                <TabsList className="grid w-full grid-cols-6 lg:w-max lg:inline-grid">
+                <TabsList className="
+    flex 
+    overflow-x-auto
+    scrollbar-hide
+    lg:grid lg:grid-cols-6
+    justify-start
+     lg:overf5low-visible
+     lg:w-[40]
+  ">
                   {masterTabList.map((tab) => {
                     const Icon = tab.emoji;
                     return (
-                      <TabsTrigger
-                        key={tab.id}
-                        value={tab.id}
-                        className="flex items-center gap-2"
-                      >
-                        <Icon size={16} />
-                        <span className="hidden sm:inline">
-                          {tab.label}
-                        </span>
-                      </TabsTrigger>
+                     <TabsTrigger
+  key={tab.id}
+  value={tab.id}
+  className="
+    flex items-center gap-2
+    whitespace-nowrap
+    px-3
+  "
+>
+  <Icon size={16} />
+  <span className="hidden sm:inline">
+    {tab.label}
+  </span>
+</TabsTrigger>
                     );
                   })}
                 </TabsList>

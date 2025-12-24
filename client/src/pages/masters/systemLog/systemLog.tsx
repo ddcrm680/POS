@@ -67,7 +67,13 @@ export default function SystemLog() {
         );
       },
     },
-    { key: "action", label: "Action", width: "150px" },
+    { key: "action", label: "Affected Module", width: "150px" , render: (_value: any,) => {
+
+        return (
+          <span className="text-sm font-medium text-gray-700">
+            {_value.split('_').map((item:string)=>item.substring(0,1).toUpperCase()+item.substring(1)).join(' ')}   </span>
+        );
+      }},
     // { key: "description", label: "Description", width: "150px" },
     { key: "ip_address", label: "IP Address", width: "150px" },
     {
@@ -234,14 +240,35 @@ export default function SystemLog() {
           setIsModalOpen={(value: boolean) =>
             setIsServicePlanModalOpenInfo({ open: value, type: "create", info: {} })
           }
-          onRowClick={(row: any) => {
-            setIsServicePlanModalOpenInfo({
-              open: true,
-              type: "view",
-              info:row
-            })
-          }}
 
+          actions={(row: any) => {
+            return (
+              <>
+
+                {(
+                  <Box className="gap-3">
+                    <IconButton
+                      size="xs"
+                      mr={2}
+                      aria-label="View"
+                      onClick={() =>
+                        setIsServicePlanModalOpenInfo({
+                          open: true,
+                          type: "view",
+                          info: row
+                        })
+                      }
+                    >
+                      <EyeIcon />
+                    </IconButton>
+
+
+
+                  </Box>
+                )}
+              </>
+            );
+          }}
         />
         <CommonModal
           isOpen={isServicePlanModalOpenInfo.open}
