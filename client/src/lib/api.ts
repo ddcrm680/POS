@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
 import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, UserFormType } from "./types";
+import { DateRangeType, DateValueType } from "react-tailwindcss-datepicker";
 
 export const baseUrl =
   process.env.REACT_APP_BASE_URL || Constant.REACT_APP_BASE_URL;
@@ -366,8 +367,8 @@ export async function fetchServiceLogList({
   platform?: string | number;
   device_type?: string | number;
   action?: string | number;
-  from_date?: string;
-  to_date?: string
+  from_date?: string; 
+  to_date?: string;   
 }) {
   const params = new URLSearchParams({
     page: String(page),

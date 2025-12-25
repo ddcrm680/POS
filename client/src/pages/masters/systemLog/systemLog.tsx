@@ -8,6 +8,8 @@ import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton } from "@chakra-ui/react";
 import { EyeIcon } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
+import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
+
 import { formatDate, formatTime } from "@/lib/utils";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import SystemLogForm from "./systemLogForm";
@@ -22,9 +24,9 @@ export default function SystemLog() {
     device_type: [],
     platform: [],
   })
-  const [dateRange, setDateRange] = useState({
-    from: "",
-    to: "",
+  const [dateRange, setDateRange] = useState<DateValueType>({
+    startDate: null,
+    endDate: null,
   });
 
   const { roles } = useAuth();
@@ -189,8 +191,12 @@ export default function SystemLog() {
           platform: filters.platform,
           device_type: filters.device_type,
           action: filters.action,
-          from_date: dateRange.from,
-          to_date: dateRange.to,
+          from_date: dateRange?.startDate
+            ? dateRange?.startDate.toISOString().slice(0, 10)
+            : undefined,
+          to_date: dateRange?.endDate
+            ? dateRange?.endDate.toISOString().slice(0, 10)
+            : undefined,
         });
 
       const mappedLogs = res.data
@@ -216,6 +222,10 @@ export default function SystemLog() {
   function resetFilter() {
     setSearch('')
     setPage(1)
+    setDateRange({
+   startDate: null,
+   endDate: null,
+ })
     setFilters({
       browser: "",
       platform: "",
@@ -223,6 +233,7 @@ export default function SystemLog() {
       action: ""
     })
   }
+
   return (
     <Card className="w-full">
       <CardContent>
@@ -238,38 +249,40 @@ export default function SystemLog() {
           total={total}
           hasNext={has_next}
           filtersSlot={
-            <div className="flex justify-end gap-2">
-              <Input
-                type="date"
-                value={dateRange.from}
-                onChange={(e) =>
-                  setDateRange((p) => ({ ...p, from: e.target.value }))
-                }
-                className="w-[140px]"
-              />
+            <div className="flex items-end gap-3 relative z-50">
 
-              <Input
-                type="date"
-                value={dateRange.to}
-                onChange={(e) =>
-                  setDateRange((p) => ({ ...p, to: e.target.value }))
-                }
-                className="w-[140px]"
-              />
+              <div className="flex flex-col gap-1 relative z-[9999]">
+              
+
+                <Datepicker
+                  value={dateRange}
+                  onChange={(val) => {
+                    setDateRange(val);
+                    setPage(1);
+                  }}
+                  showShortcuts
+                  popoverDirection="down"
+                  containerClassName="relative z-[9999]"
+                  inputClassName="
+          w-[260px]
+          border rounded-md
+          py-2 px-3
+          text-sm
+          focus:ring-1 focus:ring-red-500
+        "
+                />
+              </div>
 
               <Button
-                variant="outline"
-                  className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] text-white"
-                disabled={!dateRange.from || !dateRange.to}
-                onClick={() => {
-                  setPage(1);
-                  fetchSystemLog();
-                }}
+                onClick={() => fetchSystemLog()}
+                className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] text-white"
               >
                 Apply
               </Button>
             </div>
           }
+
+
           tabType=""
           tabDisplayName="Service Plan"
           page={page}
