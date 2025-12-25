@@ -96,94 +96,95 @@ export default function ServiceForm({
           onSubmit(values, form.setError)
         )}
         className="space-y-6 "
-      >  <div className="p-6 space-y-6 max-h-[50vh] overflow-y-auto">
+      >  <div className="p-6 space-y-6 max-h-[500px] overflow-auto">
           {/* Row 1 */}
-          <Box className="flex gap-3 ">
-            <Box w="33%">
-              <FormField
-                control={form.control}
-                name="plan_name"
-                disabled={mode === 'view'}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.planName}<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <RHFSelect
-                        field={field}
-                        options={serviceMetaInfo.servicePlans.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
-                        }))}
-                        placeholder={Constant.master.servicePlan.selectPlanName}
-                        isDisabled={isView}
-                      />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            {/* <Box w="33%"> */}
+            <FormField
+              control={form.control}
+              name="plan_name"
+              disabled={mode === 'view'}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.planName}<RequiredMark show={!isView} /></FormLabel>
+                  <FormControl>
+                    <RHFSelect
+                      field={field}
+                      options={serviceMetaInfo.servicePlans.map(p => ({
+                        value: String(p.value),
+                        label: p.label,
+                      }))}
+                      placeholder={Constant.master.servicePlan.selectPlanName}
+                      isDisabled={isView}
+                    />
 
 
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* </Box> */}
 
 
-            <Box w="33%">
+            {/* <Box w="33%"> */}
 
-              <FormField
-                control={form.control}
-                name="category_type"
-                disabled={mode === 'view'}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.vehicleType.replace('Vehicle',
-                      'Category'
-                    )}<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <RHFSelect
-                        field={field}
-                        options={serviceMetaInfo.categoryTypes.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
-                        }))}
-                        placeholder={Constant.master.servicePlan.selectVehicleType.replace('vehicle',
-                          'category'
-                        )}
-                        isDisabled={isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-            <Box w="33%">
+            <FormField
+              control={form.control}
+              name="category_type"
+              disabled={mode === 'view'}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.vehicleType.replace('Vehicle',
+                    'Category'
+                  )}<RequiredMark show={!isView} /></FormLabel>
+                  <FormControl>
+                    <RHFSelect
+                      field={field}
+                      options={serviceMetaInfo.categoryTypes.map(p => ({
+                        value: String(p.value),
+                        label: p.label,
+                      }))}
+                      placeholder={Constant.master.servicePlan.selectVehicleType.replace('vehicle',
+                        'category'
+                      )}
+                      isDisabled={isView}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* </Box> */}
+            {/* <Box w="33%"> */}
 
-              <FormField
-                control={form.control}
-                name="vehicle_type"
-                disabled={mode === 'view'}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.vehicleType}<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <RHFSelect
-                        field={field}
-                        options={serviceMetaInfo.vehicleTypes.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
-                        }))}
-                        placeholder={Constant.master.servicePlan.selectVehicleType}
-                        isDisabled={isView}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-          </Box>
-          <Box className="flex gap-3 ">
-            <Box w={'40%'}>
+            <FormField
+              control={form.control}
+              name="vehicle_type"
+              disabled={mode === 'view'}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "#000" }}>{Constant.master.servicePlan.vehicleType}<RequiredMark show={!isView} /></FormLabel>
+                  <FormControl>
+                    <RHFSelect
+                      field={field}
+                      options={serviceMetaInfo.vehicleTypes.map(p => ({
+                        value: String(p.value),
+                        label: p.label,
+                      }))}
+                      placeholder={Constant.master.servicePlan.selectVehicleType}
+                      isDisabled={isView}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* </Box> */}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="invoice_name"
@@ -204,9 +205,6 @@ export default function ServiceForm({
                   </FormItem>
                 )}
               />
-
-            </Box>
-            <Box w={'20%'}>
               <FormField
                 control={form.control}
                 name="price"
@@ -241,107 +239,103 @@ export default function ServiceForm({
                   </FormItem>
                 )}
               />
-
-            </Box>
-            <Box w={'20%'}> <FormField
-              control={form.control}
-              name="sac"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: "#000" }}>
-
-                    Sac
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter sac"
-
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => {
-                        let value = e.target.value;
-
-                        // allow only letters and numbers (no special characters)
-                        value = value.replace(/[^a-zA-Z0-9]/g, "");
-
-                        field.onChange(value);
-                      }}
-
-                      disabled={isView}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            </Box>
-            <Box w={'20%'}> <FormField
-              control={form.control}
-              name="gst"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ color: "#000" }}>
-                    GST(%)<RequiredMark show={!isView} />
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter gst"
-                      {...field}
-                      onChange={(e) => {
-                        let value = e.target.value;
-
-                        // allow only digits and dot
-                        value = value.replace(/[^0-9.]/g, "");
-                        value = value.replace(/^0+/, "");
-
-                        // allow single zero
-                        if (value === "") {
-                          value = "0";
-                        }
-
-                        // allow only ONE decimal point
-                        if ((value.match(/\./g) || []).length > 1) {
-                          return;
-                        }
-
-                        // restrict to 2 decimal places
-                        if (value.includes(".")) {
-                          const [int, dec] = value.split(".");
-                          value = int + "." + dec.slice(0, 2);
-                        }
-
-                        // convert to number for validation
-                        const num = Number(value);
-
-                        // prevent negative
-                        if (num < 0) return;
-
-                        // max allowed is 100
-                        if (num > 100) return;
-
-                        field.onChange(value);
-                      }}
-
-                      disabled={isView}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            </Box>
-          </Box>
-
-
-
-          {/* Row 2 */}
-          <Box className="flex gap-3">
-
-
-            <Box w={'33%'}> 
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
               <FormField
+                control={form.control}
+                name="sac"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>
+
+                      Sac
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Enter sac"
+
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => {
+                          let value = e.target.value;
+
+                          // allow only letters and numbers (no special characters)
+                          value = value.replace(/[^a-zA-Z0-9]/g, "");
+
+                          field.onChange(value);
+                        }}
+
+                        disabled={isView}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="gst"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>
+                      GST(%)<RequiredMark show={!isView} />
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Enter gst"
+                        {...field}
+                        onChange={(e) => {
+                          let value = e.target.value;
+
+                          // allow only digits and dot
+                          value = value.replace(/[^0-9.]/g, "");
+                          value = value.replace(/^0+/, "");
+
+                          // allow single zero
+                          if (value === "") {
+                            value = "0";
+                          }
+
+                          // allow only ONE decimal point
+                          if ((value.match(/\./g) || []).length > 1) {
+                            return;
+                          }
+
+                          // restrict to 2 decimal places
+                          if (value.includes(".")) {
+                            const [int, dec] = value.split(".");
+                            value = int + "." + dec.slice(0, 2);
+                          }
+
+                          // convert to number for validation
+                          const num = Number(value);
+
+                          // prevent negative
+                          if (num < 0) return;
+
+                          // max allowed is 100
+                          if (num > 100) return;
+
+                          field.onChange(value);
+                        }}
+
+                        disabled={isView}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+          {/* Row 2 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+
+            {/* <Box w={'33%'}>  */}
+            <FormField
               control={form.control}
               name="warranty_period"
               render={({ field }) => (
@@ -366,8 +360,9 @@ export default function ServiceForm({
                 </FormItem>
               )}
             />
-            </Box>
-            <Box w={'33%'}> <FormField
+            {/* </Box> */}
+            {/* <Box w={'33%'}>  */}
+            <FormField
               control={form.control}
               name="warranty_in"
               render={({ field }) => (
@@ -394,38 +389,40 @@ export default function ServiceForm({
                 </FormItem>
               )}
             />
-            </Box>
-            <Box w={'33%'}>
-              <FormField
-                control={form.control}
-                name="number_of_visits"
-                render={({ field }) => (
-                  <FormItem >
-                    <FormLabel style={{ color: "#000" }}>
-                      Number of visit<RequiredMark show={!isView} />
-                    </FormLabel>
-                    <FormControl>
-                      <RHFSelect
-                        field={field}
-                        creatable={false}
-                        options={serviceMetaInfo.numberOfVisits.map(p => ({
-                          value: String(p.value),
-                          label: p.label,
-                        }))}
-                        placeholder={Constant.master.servicePlan.noOfVisit}
-                        isDisabled={isView}
-                      />
+            {/* </Box> */}
+            {/* <Box w={'33%'}> */}
+            <FormField
+              control={form.control}
+              name="number_of_visits"
+              render={({ field }) => (
+                <FormItem >
+                  <FormLabel style={{ color: "#000" }}>
+                    Number of visit<RequiredMark show={!isView} />
+                  </FormLabel>
+                  <FormControl>
+                    <RHFSelect
+                      field={field}
+                      creatable={false}
+                      options={serviceMetaInfo.numberOfVisits.map(p => ({
+                        value: String(p.value),
+                        label: p.label,
+                      }))}
+                      placeholder={Constant.master.servicePlan.noOfVisit}
+                      isDisabled={isView}
+                    />
 
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </Box>
-          </Box>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* </Box> */}
+          </div>
 
-          <Box className="flex gap-3">
-            <Box w={'100%'}> <FormField
+          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1  gap-4">
+
+            {/* <Box w={'100%'}>  */}
+            <FormField
               control={form.control}
               name="raw_materials"
               render={({ field }) => (
@@ -448,10 +445,12 @@ export default function ServiceForm({
                 </FormItem>
               )}
             />
-            </Box>
-          </Box>
-          <Box className="flex gap-3">
-            <Box w={'100%'} mt={0}> <FormField
+            {/* </Box> */}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1   gap-4">
+
+            {/* <Box w={'100%'} mt={0}>  */}
+            <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
@@ -473,8 +472,8 @@ export default function ServiceForm({
                 </FormItem>
               )}
             />
-            </Box>
-          </Box>
+            {/* </Box> */}
+          </div>
 
         </div>
         {/* Submit */}
