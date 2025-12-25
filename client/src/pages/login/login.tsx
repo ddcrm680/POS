@@ -26,19 +26,19 @@ import {
 } from "@/components/ui/form";
 import { Eye, EyeOff } from "lucide-react";
 import { Box, HStack } from "@chakra-ui/react";
-import { LoginFormValues,  } from "@/lib/types";
+import { LoginFormValues, } from "@/lib/types";
 import { Constant } from "@/lib/constant";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { loginSchema } from "@/lib/schema";
 
 export default function LoginPage() {
-    const [location, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { user, isLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    
+
     if (!isLoading && user) {
       setLocation("/home");
     }
@@ -52,7 +52,7 @@ export default function LoginPage() {
     defaultValues: { email: "", password: "" },
   });
   const { login } = useAuth();
-    useEffect(() => {
+  useEffect(() => {
     const expired = sessionStorage.getItem("sessionExpired");
 
     if (expired) {
@@ -65,13 +65,13 @@ export default function LoginPage() {
       sessionStorage.removeItem("sessionExpired");
     }
   }, []);
- const onSubmit = async (vals: { email: string; password: string }) => {
+  const onSubmit = async (vals: { email: string; password: string }) => {
     setIsSubmitting(true);
     try {
       await login(vals);
-       toast?.({
-        title:"Login Success",
-        description:Constant.login.loginSuccessMessage,
+      toast?.({
+        title: "Login Success",
+        description: Constant.login.loginSuccessMessage,
         variant: "success",
       });
       setLocation("/home");
@@ -88,159 +88,161 @@ export default function LoginPage() {
   };
   return (
     <div className="min-h-screen bg-white">
-      
-    <HStack
-      gap={0}
-      align="stretch"
-      className="w-full h-screen" 
-    >       
-          <Box
-            w={{ base: "100%", md: "65%" }}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            className="relative hidden md:flex" // hide on small screens (form will be full width then)
-            style={{ borderRight: "1px solid rgba(226,232,240,0.8)" }}
-          >
-            {/* background / bottom image (full area) */}
-            <div className="w-full h-full relative overflow-hidden bg-[#fff2f2]">
-                 <div
-                style={{
-                  position: "absolute",
-                      left:' -0%',
-    bottom: '0%',
-                  // transform: "translate(-50%, -20%)",
-                  width: "80%",
-                  boxShadow: "0 20px 40px rgba(0,0,0,0.18)",
-                  borderRadius: 12,
-                  overflow: "hidden",
-                  background: "white",
-                }}
-              >
-             
+
+      <HStack
+        gap={0}
+        align="stretch"
+        className="w-full h-screen"
+      >
+         {/* LEFT*/}
+    
+        <Box
+          w={{ base: "0%", lg: "65%" }}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          className="relative hidden md:flex" // hide on small screens (form will be full width then)
+          style={{ borderRight: "1px solid rgba(226,232,240,0.8)" }}
+        >
+          {/* background / bottom image (full area) */}
+          <div className="w-full h-full relative hidden lg:flex overflow-hidden bg-[#fff2f2]">
+            <div
+              style={{
+                position: "absolute",
+                left: ' -0%',
+                bottom: '0%',
+                // transform: "translate(-50%, -20%)",
+                width: "80%",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.18)",
+                borderRadius: 12,
+                overflow: "hidden",
+                background: "white",
+              }}
+            >
+
               <img
-              
+
                 src={Employee}
                 alt="Job card background"
                 className="w-[70%] h-[70%] object-cover opacity-95"
-                style={{ filter: "saturate(1.05) contrast(0.95)",width:"100%",height:"100%", objectFit:"cover" }}
+                style={{ filter: "saturate(1.05) contrast(0.95)", width: "100%", height: "100%", objectFit: "cover" }}
               />
-</div>
-              {/* overlay (top) image centered, slightly smaller and elevated */}
-             <div
-  style={{
-    position: "absolute",
-    top: "15%",
-    height: "70%",
-    boxShadow: "rgba(0, 0, 0, 0.18) 0px 20px 40px",
-
-                  
-    borderRadius: "12px",
-    overflow: "hidden",
-    background: "white",
-    right: "-40%",
-  }}
->
-
-                <img
-                  src={JobCard}
-                  alt="Employee"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-           
             </div>
-          </Box>
+            {/* overlay (top) image centered, slightly smaller and elevated */}
+            <div
+              style={{
+                position: "absolute",
+                top: "15%",
+                height: "70%",
+                boxShadow: "rgba(0, 0, 0, 0.18) 0px 20px 40px",
 
-          {/* RIGHT: login form (on small screens this is full width) */}
-          <Box
-            w={{ base: "100%", md: "35%" }}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            p={{ base: 6, md: 12 }}
-          >
-            <div className="w-full max-w-md mx-4 z-10">
-              <Card className="drop-shadow-[0_3px_8px_rgba(254,0,0,0.4)]">
-                <CardHeader className="pt-6">
-                    <img src={Logo} alt="Detailing Devils" className="h-10 pl-4 object-contain my-4" />
-      
-                  <CardTitle className="text-xl text-center">Login</CardTitle>
-                </CardHeader>
 
-                <CardContent className="px-8 pb-8">
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-  control={form.control}
-  name="email"
-  render={({ field }) => {
-    const hasError = !!form.formState.errors.email;
-    return (
-      <FormItem>
-        {/* force black label even when error present */}
-        <FormLabel style={{ color: "#000" }} className="text-sm font-medium">
-          Email
-        </FormLabel>
+                borderRadius: "12px",
+                overflow: "hidden",
+                background: "white",
+                right: "-40%",
+              }}
+            >
 
-        <FormControl>
-          <div className="relative group">
-          
+              <img
+                src={JobCard}
+                alt="Employee"
+                className="w-full h-full object-cover"
+              />
+            </div>
 
-            <Input
-              {...field}
-              placeholder="official@example.com"
-              className="pl-4"
-              data-testid="input-email"
-              autoComplete="email"
-            />
+
           </div>
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    );
-  }}
-/>
+        </Box>
 
+        {/* RIGHT: login form (on small screens this is full width) */}
+        <Box
+          w={{ base: "100%", lg: "35%" }}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          p={{ base: 6, md: 12 }}
+        >
+          <div className="w-full max-w-md mx-4 z-10">
+            <Card className="drop-shadow-[0_3px_8px_rgba(254,0,0,0.4)]">
+              <CardHeader className="pt-6">
+                <img src={Logo} alt="Detailing Devils" className="h-10 pl-4 object-contain my-4" />
 
-                      <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
+                <CardTitle className="text-xl text-center">Login</CardTitle>
+              </CardHeader>
+
+              <CardContent className="px-8 pb-8">
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => {
+                        const hasError = !!form.formState.errors.email;
+                        return (
                           <FormItem>
-                         <FormLabel style={{ color: "#000" }} className="text-sm font-medium">
-      Password</FormLabel>
+                            {/* force black label even when error present */}
+                            <FormLabel style={{ color: "#000" }} className="text-sm font-medium">
+                              Email
+                            </FormLabel>
+
                             <FormControl>
-                              <div className="relative">
-                          
+                              <div className="relative group">
+
+
                                 <Input
                                   {...field}
-                                  type={showPwd ? "text" : "password"}
-                                  placeholder="Enter your password"
-                                  className="pl-4 pr-4"
-                                  autoComplete="current-password"
-                                  data-testid="input-password"
+                                  placeholder="official@example.com"
+                                  className="pl-4"
+                                  data-testid="input-email"
+                                  autoComplete="email"
                                 />
-
-                                <button
-                                  type="button"
-                                  onClick={() => setShowPwd((s) => !s)}
-                                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded focus:outline-none"
-                                  aria-label={showPwd ? "Hide password" : "Show password"}
-                                >
-                                  {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
                               </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
-                        )}
-                      />
+                        );
+                      }}
+                    />
 
-                     
 
-                     <div>
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel style={{ color: "#000" }} className="text-sm font-medium">
+                            Password</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+
+                              <Input
+                                {...field}
+                                type={showPwd ? "text" : "password"}
+                                placeholder="Enter your password"
+                                className="pl-4 pr-4"
+                                autoComplete="current-password"
+                                data-testid="input-password"
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() => setShowPwd((s) => !s)}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded focus:outline-none"
+                                aria-label={showPwd ? "Hide password" : "Show password"}
+                              >
+                                {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                              </button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+
+
+                    <div>
                       <Button
                         type="submit"
                         className="
@@ -285,14 +287,14 @@ export default function LoginPage() {
                         )}
                       </Button>
                     </div>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
 
-            </div>
-          </Box>
-        </HStack>
+          </div>
+        </Box>
+      </HStack>
     </div>
   );
 }
