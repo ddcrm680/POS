@@ -354,7 +354,8 @@ export async function fetchServiceLogList({
   browser,
   platform,
   device_type,
-  per_page
+  per_page,
+  action
 }: {
   per_page: number;
   page: number;
@@ -362,6 +363,7 @@ export async function fetchServiceLogList({
   browser?: string | number;
   platform?: string | number;
   device_type?: string | number;
+  action ?: string | number;
 }) {
   const params = new URLSearchParams({
     page: String(page),
@@ -370,6 +372,7 @@ export async function fetchServiceLogList({
   });
   if (platform) params.append("platform", String(platform));
   if (browser) params.append("browser", String(browser));
+ if (action) params.append("action", String(action));
 
   if (device_type) params.append("device_type", String(device_type));
 

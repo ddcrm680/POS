@@ -123,7 +123,7 @@ export interface CommonDeleteModalProps {
 export interface UserApiType {
   id: number, full_name?: string, name?: string, email: string, phone: string
   , role_id: number, is_active: number, created_at: string,
-  address:string 
+  address: string
 
 }
 export interface vehicleType {
@@ -196,7 +196,7 @@ export type systemLogType = {
   client_url: string
   subjectType: string
 
-  actor?:string
+  actor?: string
   subjectId: string
 };
 
@@ -239,6 +239,16 @@ export interface serviceMetaInfoType {
   servicePlans: { label: string, value: string }[],
   vehicleTypes: { label: string, value: string }[],
   warrantyPeriods: { label: string, value: string }[]
+
+}
+export interface systemLogMetaInfoType {
+
+  action: { label: string, value: string }[],
+  browser
+  : { label: string, value: string }[],
+  device_type: { label: string, value: string }[],
+  platform
+  : { label: string, value: string }[],
 
 }
 export interface organizationMetaInfoType {
@@ -315,7 +325,7 @@ export type User = null | { id?: string; name?: string; email?: string;[k: strin
 export interface AuthContextValue {
   user: User | undefined; // undefined while loading
   isLoading: boolean;
-  countries:{ id: number, name: string, slug: string }[]
+  countries: { id: number, name: string, slug: string }[]
   roles: any[];
   isAuthenticated: boolean;
   login: (credentials: { email: string; password: string }) => Promise<any>;
@@ -422,7 +432,7 @@ export type storeFormType = {
   registration_file: File | string;
   cancelled_cheque: File | string;
   agreement_file: File | string;
-  opening_date:string
+  opening_date: string
 };
 
 

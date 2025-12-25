@@ -1,32 +1,24 @@
 // src/components/profile/profile.tsx
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { UseFormSetError } from "react-hook-form";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
-import { useLocation } from "wouter";
-import { EditServicePlan, fetchServiceLogList, fetchServicePlanMetaInfo, SaveServicePlan, UpdateServicePlanStatus } from "@/lib/api";
+import { fetchServiceLogList } from "@/lib/api";
 import CommonTable from "@/components/common/CommonTable";
-import { Box, IconButton, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon } from "lucide-react";
+import { Box, IconButton } from "@chakra-ui/react";
+import { EyeIcon } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { formatDate, formatTime } from "@/lib/utils";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
-import { categoryType, planName, servicePlanMockResponse, vehicleType } from "@/lib/mockData";
 import SystemLogForm from "./systemLogForm";
-import { serviceFormType, serviceMetaInfoType, UserFormType } from "@/lib/types";
+import { systemLogMetaInfoType } from "@/lib/types";
 
 export default function SystemLog() {
-  const { toast } = useToast();
-  const [serviceMetaInfo, setServiceMetaInfo] = useState<serviceMetaInfoType>({
-    categoryTypes: [],
-    numberOfVisits: [],
-    servicePlans: [],
-    vehicleTypes: [],
-    warrantyPeriods: []
-
+  const [systemLogMetaInfo, setSystemLogMetaInfo] = useState<systemLogMetaInfoType>({
+    action: [],
+    browser: [],
+    device_type: [],
+    platform: [],
   })
   const { roles } = useAuth();
   const [users, setUsers] = useState<Array<any>>([]);
@@ -50,6 +42,7 @@ export default function SystemLog() {
     browser: "",
     platform: "",
     device_type: "",
+    action: ""
   });
 
   const columns = useMemo(() => [
@@ -67,13 +60,28 @@ export default function SystemLog() {
         );
       },
     },
-    { key: "action", label: "Affected Module", width: "150px" , render: (_value: any,) => {
+    {
+      key: "action", label: (
+        <ColumnFilter
+          label="Affected Module"
+          value={filters.action}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, action: val }));
+            setPage(1);
+          }}
+          options={[{ label: 'All', value: '' }, ...systemLogMetaInfo.action].map(r => ({
+            label: r.label,
+            value: r.value,
+          }))}
+        />
+      ),width: "150px", render: (_value: any,) => {
 
         return (
           <span className="text-sm font-medium text-gray-700">
-            {_value.split('_').map((item:string)=>item.substring(0,1).toUpperCase()+item.substring(1)).join(' ')}   </span>
+            {_value.split('_').map((item: string) => item.substring(0, 1).toUpperCase() + item.substring(1)).join(' ')}   </span>
         );
-      }},
+      }
+    },
     // { key: "description", label: "Description", width: "150px" },
     { key: "ip_address", label: "IP Address", width: "150px" },
     {
@@ -82,10 +90,10 @@ export default function SystemLog() {
           label="Platform"
           value={filters.platform}
           onChange={(val) => {
-            setFilters(f => ({ ...f, category_type: val }));
+            setFilters(f => ({ ...f, platform: val }));
             setPage(1);
           }}
-          options={[{ label: 'All', value: '' }, ...serviceMetaInfo.categoryTypes].map(r => ({
+          options={[{ label: 'All', value: '' }, ...systemLogMetaInfo.platform].map(r => ({
             label: r.label,
             value: r.value,
           }))}
@@ -105,10 +113,10 @@ export default function SystemLog() {
           label="Browser"
           value={filters.browser}
           onChange={(val) => {
-            setFilters(f => ({ ...f, vehicle_type: val }));
+            setFilters(f => ({ ...f, browser: val }));
             setPage(1);
           }}
-          options={[{ label: 'All', value: '' }, ...serviceMetaInfo.vehicleTypes].map(r => ({
+          options={[{ label: 'All', value: '' }, ...systemLogMetaInfo.browser].map(r => ({
             label: r.label,
             value: r.value,
           }))}
@@ -129,10 +137,10 @@ export default function SystemLog() {
           label="Device Type"
           value={filters.device_type}
           onChange={(val) => {
-            setFilters(f => ({ ...f, plan_name: val }));
+            setFilters(f => ({ ...f, device_type: val }));
             setPage(1);
           }}
-          options={[{ label: 'All', value: '' }, ...serviceMetaInfo.servicePlans].map(r => ({
+          options={[{ label: 'All', value: '' }, ...systemLogMetaInfo.device_type].map(r => ({
             label: r.label,
             value: r.value,
           }))}
@@ -159,7 +167,7 @@ export default function SystemLog() {
     },
 
 
-  ], [roles, page, PER_PAGE, filters, serviceMetaInfo]);
+  ], [roles, page, PER_PAGE, filters, systemLogMetaInfo]);
 
   const fetchSystemLog = async (isLoaderHide = false) => {
     try {
@@ -173,15 +181,16 @@ export default function SystemLog() {
           browser: filters.browser,
           platform: filters.platform,
           device_type: filters.device_type,
+          action:filters.action
         });
 
-      const mappedUsers = res.data
-      console.log(mappedUsers, 'mappedUsers');
+      const mappedLogs = res.data
 
       setHasNext(res.meta.has_next)
       setTotal(res.meta.total)
-      setUsers(mappedUsers);
+      setUsers(mappedLogs);
       setLastPage(res.meta.last_page);
+      setSystemLogMetaInfo(res.meta.filters)
     } catch (e) {
       console.error(e);
 
@@ -194,22 +203,16 @@ export default function SystemLog() {
   useEffect(() => {
     fetchSystemLog(false);
   }, [search, page, filters, perPage]);
-  //    async function getServiceMetaInfo() {
-  //     const res = await fetchServicePlanMetaInfo()
-  //     setServiceMetaInfo(res)
-  //   }
-  // useEffect(() => {
-
-  //   getServiceMetaInfo()
-  // }, [])
+ 
   function resetFilter() {
     setSearch('')
     setPage(1)
     setFilters({
-      browser: "",
-      platform: "",
-      device_type: "",
-    })
+   browser: "",
+   platform: "",
+   device_type: "",
+   action: ""
+ })
   }
   return (
     <Card className="w-full">
