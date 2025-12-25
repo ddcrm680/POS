@@ -118,7 +118,7 @@ const renderCardView = () => {
               className="pl-10"
             />
           </div>
-         <Box className="flex gap-2">
+         <Box className="flex flex-col md:flex-row gap-2 ">
              {filtersSlot}
           <Box className="flex gap-3">
             {isClear && <Button

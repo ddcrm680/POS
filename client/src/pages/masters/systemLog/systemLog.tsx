@@ -255,6 +255,7 @@ export default function SystemLog() {
               
 
                 <Datepicker
+                placeholder="From date       -      To date"
                   value={dateRange}
                   onChange={(val) => {
                     setDateRange(val);
@@ -264,7 +265,7 @@ export default function SystemLog() {
                   popoverDirection="down"
                   containerClassName="relative z-[9999]"
                   inputClassName="
-          w-[260px]
+          w-[220px]
           border rounded-md
           py-2 px-3
           text-sm
