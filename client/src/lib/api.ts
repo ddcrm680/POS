@@ -355,7 +355,9 @@ export async function fetchServiceLogList({
   platform,
   device_type,
   per_page,
-  action
+  action,
+  from_date,
+  to_date
 }: {
   per_page: number;
   page: number;
@@ -363,7 +365,9 @@ export async function fetchServiceLogList({
   browser?: string | number;
   platform?: string | number;
   device_type?: string | number;
-  action ?: string | number;
+  action?: string | number;
+  from_date?: string;
+  to_date?: string
 }) {
   const params = new URLSearchParams({
     page: String(page),
@@ -372,9 +376,10 @@ export async function fetchServiceLogList({
   });
   if (platform) params.append("platform", String(platform));
   if (browser) params.append("browser", String(browser));
- if (action) params.append("action", String(action));
-
-  if (device_type) params.append("device_type", String(device_type));
+  if (action) params.append("action", String(action));
+  if (browser) params.append("browser", String(browser));
+  if (from_date) params.append("from_date", String(from_date));
+  if (to_date) params.append("to_date", String(to_date));
 
   const response = await api.get(`/api/admin/system-logs?${params.toString()}`);
 
@@ -383,7 +388,7 @@ export async function fetchServiceLogList({
   }
   throw new Error("Failed to fetch system logs list");
 }
-export async function fetchServiceLogItem(id:string) {
+export async function fetchServiceLogItem(id: string) {
   const response = await api.get(`/api/admin/system-logs/${id.toString()}`);
 
   if (response?.data?.success === true) {
@@ -407,7 +412,7 @@ export async function fetchStoresList({
     search,
     per_page: String(per_page)
   });
-    if (status !== "") params.append("status", String(status));
+  if (status !== "") params.append("status", String(status));
 
   const response = await api.get(`/api/store?${params.toString()}`);
 
@@ -432,7 +437,7 @@ export async function fetchOrganizationsList({
     search,
     per_page: String(per_page)
   });
-    if (status !== "") params.append("status", String(status));
+  if (status !== "") params.append("status", String(status));
 
   const response = await api.get(`/api/organizations?${params.toString()}`);
 
@@ -442,7 +447,7 @@ export async function fetchOrganizationsList({
   throw new Error("Failed to fetch organization list");
 }
 export async function fetchServicePlanMetaInfo() {
- 
+
   const response = await api.get(`/api/service-plans/meta`);
 
   if (response?.data?.success === true) {
@@ -451,7 +456,7 @@ export async function fetchServicePlanMetaInfo() {
   throw new Error("Failed to fetch service plan meta info");
 }
 export async function fetchCountryList() {
- 
+
   const response = await api.get(`/api/utility/countries`);
 
   if (response?.data?.success === true) {
@@ -459,8 +464,8 @@ export async function fetchCountryList() {
   }
   throw new Error("Failed to fetch country info");
 }
-export async function fetchCityList(state_id:number) {
- 
+export async function fetchCityList(state_id: number) {
+
   const response = await api.get(`/api/utility/cities?state_id=${state_id}`);
 
   if (response?.data?.success === true) {
@@ -468,8 +473,8 @@ export async function fetchCityList(state_id:number) {
   }
   throw new Error("Failed to fetch country info");
 }
-export async function fetchStateList(country_id:number) {
- 
+export async function fetchStateList(country_id: number) {
+
   const response = await api.get(`/api/utility/states?country_id=${country_id}`);
 
   if (response?.data?.success === true) {

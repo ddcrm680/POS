@@ -30,7 +30,7 @@ export default function SystemLogForm({
 
   if (isLoading) {
     return <div className="min-h-[150px] flex justify-center items-center">
-      <div className="p-6 text-sm "><Loader/></div>
+      <div className="p-6 text-sm "><Loader /></div>
     </div>;
   }
 
@@ -42,7 +42,7 @@ export default function SystemLogForm({
 
         {/* ================= META ================= */}
         <div className="grid  grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-          <Info label="Affected Module" value={log.action.split('_').map((item:string)=>item.substring(0,1).toUpperCase()+item.substring(1)).join(' ')} />
+          <Info label="Affected Module" value={log.action.split('_').map((item: string) => item.substring(0, 1).toUpperCase() + item.substring(1)).join(' ')} />
           <Info label="Date" value={`${formatDate(log.created_at)} ${formatTime(log.created_at)}`} />
           <Info
             label="Done By"
@@ -61,8 +61,8 @@ export default function SystemLogForm({
 
         {/* ================= URLS ================= */}
         <div className="space-y-2 grid grid-cols-1 md:grid-cols-3 gap-6  text-xs">
-          <Info label="API URL" value={log.url}  />
-          <Info label="Client URL" value={log.client_url}  />
+          <Info label="API URL" value={log.url} />
+          <Info label="Client URL" value={log.client_url} />
         </div>
 
         {/* ================= DIFF ================= */}
@@ -70,10 +70,14 @@ export default function SystemLogForm({
           <h4 className="text-sm font-semibold mb-3">
             Changes
           </h4>
-          <BeforeAfterDiff
-            before={log.meta?.before}
-            after={log.meta?.after}
-          />
+          {log.meta && (log.meta.before || log.meta.after) ? (
+            <BeforeAfterDiff
+              before={log.meta.before}
+              after={log.meta.after}
+            />
+          ) : (
+            <MetaJsonViewer meta={log.meta} />
+          )}
         </div>
 
       </CardContent>
@@ -143,7 +147,7 @@ function BeforeAfterDiff({
 
   return (
     <div className="border rounded-md overflow-hidden">
-      
+
       {/* HEADER */}
       <div className="grid grid-cols-3 bg-gray-100 text-xs font-semibold text-gray-600 px-3 py-2 sticky top-0 z-10">
         <div>Field</div>
@@ -174,11 +178,10 @@ function BeforeAfterDiff({
 
             {/* AFTER */}
             <div
-              className={`break-all ${
-                changed
+              className={`break-all ${changed
                   ? "font-semibold text-green-700"
                   : "text-gray-600"
-              }`}
+                }`}
             >
               {after ?? (
                 <span className="italic text-gray-400">—</span>
@@ -191,3 +194,18 @@ function BeforeAfterDiff({
   );
 }
 
+function MetaJsonViewer({ meta }: { meta?: any }) {
+  if (!meta || Object.keys(meta).length === 0) {
+    return (
+      <p className="text-sm text-gray-500">
+        No changes recorded
+      </p>
+    );
+  }
+
+  return (
+    <pre className="bg-gray-50 p-3 rounded text-xs max-h-60 overflow-auto">
+      {JSON.stringify(meta, null, 2)}
+    </pre>
+  );
+}

@@ -38,6 +38,7 @@ export default function CommonTable({
   onSearch,
   className = "",
   debounceDelay = 300,
+  filtersSlot=null
 }: any) {
   const [localSearch, setLocalSearch] = useState(searchValue);
 
@@ -117,6 +118,8 @@ const renderCardView = () => {
               className="pl-10"
             />
           </div>
+         <Box className="flex gap-2">
+             {filtersSlot}
           <Box className="flex gap-3">
             {isClear && <Button
               variant="outline"
@@ -133,6 +136,7 @@ const renderCardView = () => {
               Add {tabDisplayName || "Item"}
             </Button>}
           </Box>
+         </Box>
         </div>
       )}
 

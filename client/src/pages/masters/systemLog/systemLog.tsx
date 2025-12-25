@@ -12,6 +12,8 @@ import { formatDate, formatTime } from "@/lib/utils";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import SystemLogForm from "./systemLogForm";
 import { systemLogMetaInfoType } from "@/lib/types";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function SystemLog() {
   const [systemLogMetaInfo, setSystemLogMetaInfo] = useState<systemLogMetaInfoType>({
@@ -20,6 +22,11 @@ export default function SystemLog() {
     device_type: [],
     platform: [],
   })
+  const [dateRange, setDateRange] = useState({
+    from: "",
+    to: "",
+  });
+
   const { roles } = useAuth();
   const [users, setUsers] = useState<Array<any>>([]);
   const [perPage, setPerPage] = useState(10);
@@ -74,7 +81,7 @@ export default function SystemLog() {
             value: r.value,
           }))}
         />
-      ),width: "150px", render: (_value: any,) => {
+      ), width: "150px", render: (_value: any,) => {
 
         return (
           <span className="text-sm font-medium text-gray-700">
@@ -181,7 +188,9 @@ export default function SystemLog() {
           browser: filters.browser,
           platform: filters.platform,
           device_type: filters.device_type,
-          action:filters.action
+          action: filters.action,
+          from_date: dateRange.from,
+          to_date: dateRange.to,
         });
 
       const mappedLogs = res.data
@@ -202,17 +211,17 @@ export default function SystemLog() {
 
   useEffect(() => {
     fetchSystemLog(false);
-  }, [search, page, filters, perPage]);
- 
+  }, [search, page, filters, perPage,]);
+
   function resetFilter() {
     setSearch('')
     setPage(1)
     setFilters({
-   browser: "",
-   platform: "",
-   device_type: "",
-   action: ""
- })
+      browser: "",
+      platform: "",
+      device_type: "",
+      action: ""
+    })
   }
   return (
     <Card className="w-full">
@@ -228,6 +237,39 @@ export default function SystemLog() {
           isLoading={isListLoading}
           total={total}
           hasNext={has_next}
+          filtersSlot={
+            <div className="flex justify-end gap-2">
+              <Input
+                type="date"
+                value={dateRange.from}
+                onChange={(e) =>
+                  setDateRange((p) => ({ ...p, from: e.target.value }))
+                }
+                className="w-[140px]"
+              />
+
+              <Input
+                type="date"
+                value={dateRange.to}
+                onChange={(e) =>
+                  setDateRange((p) => ({ ...p, to: e.target.value }))
+                }
+                className="w-[140px]"
+              />
+
+              <Button
+                variant="outline"
+                  className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] text-white"
+                disabled={!dateRange.from || !dateRange.to}
+                onClick={() => {
+                  setPage(1);
+                  fetchSystemLog();
+                }}
+              >
+                Apply
+              </Button>
+            </div>
+          }
           tabType=""
           tabDisplayName="Service Plan"
           page={page}
