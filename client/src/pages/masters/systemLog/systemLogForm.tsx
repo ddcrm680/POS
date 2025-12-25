@@ -42,7 +42,7 @@ export default function SystemLogForm({
 
         {/* ================= META ================= */}
         <div className="grid  grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-          <Info label="Affected Module" value={log.action.split('_').map((item: string) => item.substring(0, 1).toUpperCase() + item.substring(1)).join(' ')} />
+          <Info label="Operation" value={log.action.split('_').map((item: string) => item.substring(0, 1).toUpperCase() + item.substring(1)).join(' ')} />
           <Info label="Date" value={`${formatDate(log.created_at)} ${formatTime(log.created_at)}`} />
           <Info
             label="Done By"

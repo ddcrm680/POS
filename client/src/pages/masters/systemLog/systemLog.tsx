@@ -72,7 +72,7 @@ export default function SystemLog() {
     {
       key: "action", label: (
         <ColumnFilter
-          label="Affected Module"
+          label="Operation"
           value={filters.action}
           onChange={(val) => {
             setFilters(f => ({ ...f, action: val }));
