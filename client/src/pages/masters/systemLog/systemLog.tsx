@@ -91,8 +91,17 @@ export default function SystemLog() {
         );
       }
     },
-    // { key: "description", label: "Description", width: "150px" },
-    { key: "ip_address", label: "IP Address", width: "150px" },
+    {
+      key: "description", label: "Description", width: "150px",
+      render: (_value: any,) => {
+      
+        return (
+          <span
+          >
+            {_value}
+          </span>);
+      }
+    },
     {
       key: "platform", label: (
         <ColumnFilter
@@ -143,7 +152,7 @@ export default function SystemLog() {
     {
       key: "device_type", label: (
         <ColumnFilter
-          label="Device Type"
+          label="Device"
           value={filters.device_type}
           onChange={(val) => {
             setFilters(f => ({ ...f, device_type: val }));
@@ -223,9 +232,9 @@ export default function SystemLog() {
     setSearch('')
     setPage(1)
     setDateRange({
-   startDate: null,
-   endDate: null,
- })
+      startDate: null,
+      endDate: null,
+    })
     setFilters({
       browser: "",
       platform: "",
@@ -252,10 +261,10 @@ export default function SystemLog() {
             <div className="flex items-end gap-3 relative z-50">
 
               <div className="flex flex-col gap-1 relative z-[9999]">
-              
+
 
                 <Datepicker
-                placeholder="From date       -      To date"
+                  placeholder="From date       -      To date"
                   value={dateRange}
                   onChange={(val) => {
                     setDateRange(val);

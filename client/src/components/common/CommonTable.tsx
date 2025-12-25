@@ -17,7 +17,7 @@ export default function CommonTable({
   actions,
   total,
   isLoading,
-  setIsModalOpen,CardComponent,
+  setIsModalOpen, CardComponent,
   hasNext,
   tabDisplayName,
   tabType,
@@ -34,11 +34,11 @@ export default function CommonTable({
   perPage = 2,
   setPerPage,
   isCard = false,
-  perPageOptions = [10,25,50,100],
+  perPageOptions = [10, 25, 50, 100],
   onSearch,
   className = "",
   debounceDelay = 300,
-  filtersSlot=null
+  filtersSlot = null
 }: any) {
   const [localSearch, setLocalSearch] = useState(searchValue);
 
@@ -62,38 +62,38 @@ export default function CommonTable({
   }, [localSearch, debounceDelay, onSearch]);
 
   const hasUserTyped = useRef(false);
-const renderCardView = () => {
-  if (isLoading) {
+  const renderCardView = () => {
+    if (isLoading) {
+      return (
+        <div className="py-10 text-center text-gray-500">
+          <Loader />
+        </div>
+      );
+    }
+
+    if (!isLoading && data.length === 0) {
+      return (
+        <div className="py-10 text-center text-gray-500">
+          No data found
+        </div>
+      );
+    }
+
+    if (!CardComponent) return null;
+
     return (
-      <div className="py-10 text-center text-gray-500">
-        <Loader />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {data.map((item: any, idx: number) => (
+          <CardComponent
+            key={item.id ?? idx}
+            item={item}
+            isInModal={false}
+            setIsUserModalOpenInfo={(value: boolean) => setIsUserModalOpenInfo({ open: value, info: item })}
+          />
+        ))}
       </div>
     );
-  }
-
-  if (!isLoading && data.length === 0) {
-    return (
-      <div className="py-10 text-center text-gray-500">
-        No data found
-      </div>
-    );
-  }
-
-  if (!CardComponent) return null;
-
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {data.map((item: any, idx: number) => (
-        <CardComponent
-          key={item.id ?? idx}
-          item={item}
-          isInModal={false}
-          setIsUserModalOpenInfo={(value:boolean) => setIsUserModalOpenInfo({ open: value, info: item })} 
-        />
-      ))}
-    </div>
-  );
-};
+  };
 
 
   return (
@@ -118,25 +118,25 @@ const renderCardView = () => {
               className="pl-10"
             />
           </div>
-         <Box className="flex flex-col md:flex-row gap-2 ">
-             {filtersSlot}
-          <Box className="flex gap-3">
-            {isClear && <Button
-              variant="outline"
-              className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
-              onClick={() => { resetFilter() }}
-            >
-              {'Clear Filter'}
-            </Button>}
-            {isAdd && <Button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add {tabDisplayName || "Item"}
-            </Button>}
+          <Box className="flex flex-col md:flex-row gap-2 ">
+            {filtersSlot}
+            <Box className="flex gap-3">
+              {isClear && <Button
+                variant="outline"
+                className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                onClick={() => { resetFilter() }}
+              >
+                {'Clear Filter'}
+              </Button>}
+              {isAdd && <Button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add {tabDisplayName || "Item"}
+              </Button>}
+            </Box>
           </Box>
-         </Box>
         </div>
       )}
 
@@ -144,7 +144,7 @@ const renderCardView = () => {
       {isCard ? (
         renderCardView()
       ) : (<div className="relative overflow-x-auto rounded-lg border">
-        <Table.Root size="sm"className="min-w-[900px]" >
+        <Table.Root size="sm" className="min-w-[900px]" >
           <Table.Header className="sticky top-0 z-10 bg-gray-100">
             <Table.Row className="!bg-gray-100 border-b border-gray-200">
               {columns.map((col: any) => (
@@ -194,8 +194,8 @@ const renderCardView = () => {
               data.map((row: any, rowIndex: number) => (
                 <Table.Row
                   key={row.id ?? rowIndex}
-                   onClick={() => onRowClick?.(row, rowIndex)}
-                   className={`
+                  onClick={() => onRowClick?.(row, rowIndex)}
+                  className={`
   transition-all
   border-b border-gray-100
   hover:bg-gray-50
@@ -228,11 +228,10 @@ const renderCardView = () => {
       </div>)}
 
       {/* Pagination */}
-      {(total > perPageOptions[0] || lastPage > 1) && (
+      { (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
-
-          {/* Per Page selector */}
-          {setPerPage && total > perPageOptions[0] && (
+{
+  (total > perPageOptions[0] || lastPage > 1) && <>  {setPerPage && total > perPageOptions[0] && (
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">Rows per page</span>
               <select
@@ -264,7 +263,7 @@ const renderCardView = () => {
             </Button>
 
             <span className="text-sm">
-               <strong>{page}</strong> of <strong>{lastPage}</strong>
+              <strong>{page}</strong> of <strong>{lastPage}</strong>
             </span>
 
             <Button
@@ -274,12 +273,19 @@ const renderCardView = () => {
             >
               Next
             </Button>
-          </div>
-
+             
+          </div></>
+}
+          {/* Per Page selector */}
+        
+         <span className="text-sm text-gray-600">
+            Total : <strong>{total}</strong>
+          </span>
           {/* )} */}
-      
+
         </div>
       )}
+      
     </div>
   );
 }
