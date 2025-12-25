@@ -61,8 +61,8 @@ export default function SystemLogForm({
 
         {/* ================= URLS ================= */}
         <div className="space-y-2 grid grid-cols-1 md:grid-cols-3 gap-6  text-xs">
-          <Info label="API URL" value={log.url} link />
-          <Info label="Client URL" value={log.client_url} link />
+          <Info label="API URL" value={log.url}  />
+          <Info label="Client URL" value={log.client_url}  />
         </div>
 
         {/* ================= DIFF ================= */}
