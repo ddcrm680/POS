@@ -165,8 +165,9 @@ export default function Profile() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-6">
-            <Box className="flex justify-between">
-              <Box w={'20%'}>
+           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
+
+             <div className="flex flex-col items-center md:items-start">
                 <div className="flex items-center gap-3 flex-col">
                   <div
                     role="button"
@@ -222,10 +223,9 @@ export default function Profile() {
                     </div>
                   </div>
                 </div>
-              </Box>
-              <Box w={'70%'} className="gap-3 flex flex-col">
-                <Box w={'100%'} className="gap-3 flex">
-                  <Box w={'50%'}>
+              </div>
+            <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="fullName"
@@ -244,8 +244,6 @@ export default function Profile() {
                         </FormItem>
                       )}
                     />
-                  </Box>
-                  <Box w={'50%'}>
                     <FormField
                       control={form.control}
                       name="email"
@@ -261,10 +259,9 @@ export default function Profile() {
                       )}
                     />
 
-                  </Box>
-                </Box>
+                </div>
 
-                <Box w={'50%'}>
+                <div className="md:w-1/2">
                   <FormField
                     control={form.control}
                     name="phoneNumber"
@@ -296,9 +293,9 @@ export default function Profile() {
                     )}
                   />
 
-                </Box>
-              </Box>
-            </Box>
+                </div>
+              </div>
+            </div>
             <div className="flex justify-end gap-3">
               {mode === 'view' && <Button
                 type="button"

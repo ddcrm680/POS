@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { PasswordForm,  } from "@/lib/types";
+import { PasswordForm, } from "@/lib/types";
 import { UpdatePassword } from "@/lib/api";
 import { Box } from "@chakra-ui/react";
 import { Eye, EyeOff } from "lucide-react";
@@ -18,7 +18,7 @@ import { passwordSchema } from "@/lib/schema";
 
 export default function Password() {
   const { toast } = useToast();
-   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showNew, setShowNew] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -34,7 +34,7 @@ export default function Password() {
 
   const changePasswordMutation = useMutation({
     mutationFn: async (vals: PasswordForm) => {
-        setIsLoading(true)
+      setIsLoading(true)
       const value = {
         current_password: vals.currentPassword,
         password: vals.newPassword,
@@ -45,7 +45,7 @@ export default function Password() {
     onSuccess: () => {
       toast({ title: "Password updated", description: "Your password was changed successfully.", variant: "success" });
       form.reset();
-       setIsLoading(false)
+      setIsLoading(false)
     },
     onError: (err: any) => {
       toast({
@@ -53,7 +53,7 @@ export default function Password() {
         description: err?.message || "Failed to update password",
         variant: "destructive",
       });
-       setIsLoading(false)
+      setIsLoading(false)
     },
   });
 
@@ -66,63 +66,57 @@ export default function Password() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-6">
-            <Box w={'100%'} className="gap-3 flex">
-              <Box w={'50%'} >
-                <FormField
-                  control={form.control}
-                  name="currentPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel style={{ color: "#000" }}>Current Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input {...field} type={showCurrent ? "text" : "password"} placeholder="Current password" />
-                          <button
-                            type="button"
-                            onClick={() => setShowCurrent((s) => !s)}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded focus:outline-none"
-                            aria-label={showCurrent ? "Hide password" : "Show password"}
-                          >
-                            {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
-                          </button>
+            <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
 
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </Box>
-              <Box w={'50%'} >
+              <FormField
+                control={form.control}
+                name="currentPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>Current Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input {...field} type={showCurrent ? "text" : "password"} placeholder="Current password" />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrent((s) => !s)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded focus:outline-none"
+                          aria-label={showCurrent ? "Hide password" : "Show password"}
+                        >
+                          {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
 
-                <FormField
-                  control={form.control}
-                  name="newPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel style={{ color: "#000" }}>New Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input {...field} type={showNew ? "text" : "password"} placeholder="New password" />
-                          <button
-                            type="button"
-                            onClick={() => setShowNew((s) => !s)}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded focus:outline-none"
-                            aria-label={showCurrent ? "Hide password" : "Show password"}
-                          >
-                            {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
-                          </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </Box>
-            </Box>
-            <Box w={'50%'} >
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "#000" }}>New Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input {...field} type={showNew ? "text" : "password"} placeholder="New password" />
+                        <button
+                          type="button"
+                          onClick={() => setShowNew((s) => !s)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded focus:outline-none"
+                          aria-label={showCurrent ? "Hide password" : "Show password"}
+                        >
+                          {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
 
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="confirmPassword"
@@ -147,48 +141,48 @@ export default function Password() {
                   </FormItem>
                 )}
               />
-            </Box>
+            </div>
             <div className="flex justify-end gap-3  ">
               <Button
                 type="button"
                 variant="outline"
                 className='hover:bg-[#E3EDF6] hover:text-[#000]'
-   disabled={isLoading}
+                disabled={isLoading}
                 onClick={() => window.history.back()}
                 data-testid="button-back"
               >
                 ← Back
               </Button>
               <Button type="submit"
-               className="
+                className="
                           bg-[#FE0000] 
                           hover:bg-[rgb(238,6,6)]
                           hover:border-black
                           transition-all duration-200
                           flex items-center justify-center gap-2
                         "
-                 disabled={isLoading}
+                disabled={isLoading}
               >
-               {isLoading &&  <svg
-            className="h-6 w-6 animate-spin text-[#fff]"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            />
-          </svg>}  {isLoading ? "Updating...":"Update"}
+                {isLoading && <svg
+                  className="h-6 w-6 animate-spin text-[#fff]"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  />
+                </svg>}  {isLoading ? "Updating..." : "Update"}
               </Button>
             </div>
           </form>

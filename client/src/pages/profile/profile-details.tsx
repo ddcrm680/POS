@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { type Customer, POSJobData,  } from "@/lib/types";
+import { type Customer, POSJobData, } from "@/lib/types";
 import {
   BarChart3,
   Key
@@ -123,7 +123,7 @@ export default function ProfileDetails() {
         parkingLocation: "Auto-assigned",
       };
 
-       await apiRequest("POST", "/api/job-cards", jobCardData);
+      await apiRequest("POST", "/api/job-cards", jobCardData);
     },
     onSuccess: () => {
       toast({
@@ -144,54 +144,66 @@ export default function ProfileDetails() {
   return (
     <>
       <div className="  p-6">
-        <div className=" mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile Details</h1>
-          <p className="text-gray-600">Access and edit complete profile details</p>
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
 
-        <div className={`grid gap-6 transition-all duration-300 ${showServiceHistory ? 'grid-cols-12' : 'grid-cols-1'
-          }`}>
-          <div className="p-6">
-            <div className=" mx-auto space-y-6 ">
+          <div className=" mb-6 flex justify-between">
+            <div className="flex flex-col">
+              <h1 className="
+  text-lg
+  sm:text-xl
+  md:text-2xl
+  font-bold
+  text-gray-900
+">Profile Details</h1>
 
+            </div>
+            <TabsList className="
+    flex 
+    overflow-x-auto
+    scrollbar-hide
+    lg:grid lg:grid-cols-2
+    justify-start
+     lg:overf5low-visible
+     
+  ">
+
+              <TabsTrigger
+                value="overview"
+                className="flex items-center gap-3"
+                data-testid="tab-overview"
+              >
+                <BarChart3 size={16} />
+                <span className="hidden sm:inline">Overview</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="password"
+                className="flex items-center gap-3"
+                data-testid="tab-vehicles"
+              >
+                <Key size={16} />
+                <span className="hidden sm:inline">Password</span>
+              </TabsTrigger>
+
+            </TabsList>
+
+          </div>
+
+          <div className={`grid gap-6 transition-all duration-300 ${showServiceHistory ? 'grid-cols-12' : 'grid-cols-1'
+            }`}>
+            <div className=" mx-auto space-y-6 w-full">
               {/* Main Content Tabs */}
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2  lg:w-max  lg:inline-grid">
+              {/* Overview Tab */}
+              <TabsContent value="overview" className="space-y-6 mt-0">
+                <Profile />
+              </TabsContent>
 
-                  <TabsTrigger
-                    value="overview"
-                    className="flex items-center gap-3"
-                    data-testid="tab-overview"
-                  >
-                    <BarChart3 size={16} />
-                    <span className="hidden sm:inline">Overview</span>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="password"
-                    className="flex items-center gap-3"
-                    data-testid="tab-vehicles"
-                  >
-                    <Key size={16}/>
-                    <span className="hidden sm:inline">Password</span>
-                  </TabsTrigger>
-
-                </TabsList>
-
-                {/* Overview Tab */}
-                <TabsContent value="overview" className="space-y-6">
-                  <Profile />
-                </TabsContent>
-
-                {/* Vehicle Information Tab */}
-                <TabsContent value="password" className="space-y-6">
-                  <Password />
-                </TabsContent>
-
-
-              </Tabs>
+              {/* Vehicle Information Tab */}
+              <TabsContent value="password" className="space-y-6">
+                <Password />
+              </TabsContent>
             </div>
           </div>
-        </div>
+        </Tabs>
       </div>
     </>
   );

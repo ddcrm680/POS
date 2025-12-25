@@ -37,15 +37,15 @@ export default function Master() {
 
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <div className="mb-6 flex justify-between items-center">
-              <h1 className="
+                <h1 className="
   text-lg
   sm:text-xl
   md:text-2xl
   font-bold
   text-gray-900
 ">
-  Master Details
-</h1>
+                  Master Details
+                </h1>
 
                 <TabsList className="
     flex 
@@ -59,20 +59,20 @@ export default function Master() {
                   {masterTabList.map((tab) => {
                     const Icon = tab.emoji;
                     return (
-                     <TabsTrigger
-  key={tab.id}
-  value={tab.id}
-  className="
+                      <TabsTrigger
+                        key={tab.id}
+                        value={tab.id}
+                        className="
     flex items-center gap-2
     whitespace-nowrap
     px-3
   "
->
-  <Icon size={16} />
-  <span className="hidden sm:inline">
-    {tab.label}
-  </span>
-</TabsTrigger>
+                      >
+                        <Icon size={16} />
+                        <span className="hidden sm:inline">
+                          {tab.label}
+                        </span>
+                      </TabsTrigger>
                     );
                   })}
                 </TabsList>
