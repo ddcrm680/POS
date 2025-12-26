@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteUser, EditUser, fetchTerritoryMasterList, fetchUserList, SaveUser, UpdateTerritoryStatus, UpdateUserStatus } from "@/lib/api";
+import { DeleteTerritory, DeleteUser, EditUser, fetchTerritoryMasterList, fetchUserList, SaveUser, UpdateTerritoryStatus, UpdateUserStatus } from "@/lib/api";
 import { TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton, Switch } from "@chakra-ui/react";
@@ -30,15 +30,41 @@ export default function TerritoryMaster() {
   const [filters, setFilters] = useState({
     status: "",
   });
+const [isLoading, setIsLoading] = useState(false);
 
   const [lastPage, setLastPage] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
   const [isListLoading, setIsListLoading] = useState(true);
-
+ const [isTerritoryDeleteModalInfo, setIsTerritoryDeleteModalOpenInfo] = useState<{ open: boolean, info: any }>({
+    open: false,
+    info: {}
+  });
   const PER_PAGE = 10;
+  const TerritoryDeleteHandler = async () => {
+    try {
+      setIsLoading(true);
 
+      await DeleteTerritory(isTerritoryDeleteModalInfo?.info?.id);
+      toast({ title: `Delete Territory`, description: "Territory deleted successfully", variant: "success", });
+
+      fetchTerritoryMaster(false)
+
+    } catch (err: any) {
+
+      toast({
+        title: "Error",
+        description:
+          err?.response?.data?.message ||
+          err.message || `Failed to delete territory`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsTerritoryDeleteModalOpenInfo({ open: false, info: {} });
+      setIsLoading(false);
+    }
+  };
   const columns = useMemo(() => [
     {
       key: "created_at", label: "Created On", align: "center", width: "100px", render: (_value: any,) => {
@@ -262,6 +288,20 @@ export default function TerritoryMaster() {
                       <EditIcon />
                     </IconButton>}
 
+                    {
+                      Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && !row.store &&
+                      <IconButton
+                        size="xs"
+                        mr={2}
+                        colorScheme="red"
+                        aria-label="Delete"
+                        onClick={() => {
+                          setIsTerritoryDeleteModalOpenInfo({ open: true, info: row });
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </IconButton>}
+
                   </Box>
                 )}
               </>
@@ -269,6 +309,20 @@ export default function TerritoryMaster() {
           }}
 
         />
+         <CommonDeleteModal
+                width="420px"
+                maxWidth="420px"
+                isOpen={isTerritoryDeleteModalInfo.open}
+                title="Delete Territory"
+                description={`Are you sure you want to delete this territory? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                isLoading={isLoading}
+                onCancel={() =>
+                  setIsTerritoryDeleteModalOpenInfo({ open: false, info: {} })
+                }
+                onConfirm={TerritoryDeleteHandler}
+              />
       
       </CardContent>
     </Card>

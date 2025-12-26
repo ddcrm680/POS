@@ -243,7 +243,18 @@ export async function DeleteUser(id: string) {
     throw error;
   }
 }
+export async function DeleteTerritory(id: string) {
+  try {
+    const response = await api.delete(`/api/admin/territories/delete/${id}`);
 
+    if (response.data?.success === true) {
+      return response.data.data;
+    }
+  } catch (error) {
+    console.error("Delete territory failed", error);
+    throw error;
+  }
+}
 export async function EditUser(editFormValue: editUserReq) {
 
   try {
