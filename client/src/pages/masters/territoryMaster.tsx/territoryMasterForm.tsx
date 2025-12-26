@@ -20,9 +20,9 @@ import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { useAuth } from "@/lib/auth";
 import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
-import { EditTerritory, fetchCitiesByStates, fetchCityList, fetchStateList, fetchTerritoryById, SaveTerritory } from "@/lib/api";
+import { EditTerritory, fetchCitiesByStates, fetchCityList, fetchStateList, fetchStoreCrispList, fetchTerritoryById, SaveTerritory } from "@/lib/api";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
-import { storeFormProp, TerritoryFormApiValues, TerritoryFormValues, TerritoryMasterApiType } from "@/lib/types";
+import { storeFormProp, storeListType, TerritoryFormApiValues, TerritoryFormValues, TerritoryMasterApiType } from "@/lib/types";
 import { FRANCHISES } from "@/lib/mockData";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TerritoryMasterSchema } from "@/lib/schema";
@@ -53,18 +53,20 @@ export default function TerritoryMasterForm() {
     },
   });
   const { countries } = useAuth();
+  
   const [initialValues, setInitialValues] = useState<TerritoryFormApiValues | null>(null)
+  const [storeList, setStoreList] = useState<storeListType[] >([])
   useEffect(() => {
 
     if (!countryList.length) return;
 
-    if ((mode == "create" || !mode) &&
+    if (( !mode) &&
       countryList.length) {
       const hydrateLocation = async () => {
         // 1️⃣ COUNTRY
         isHydratingRef.current = true;
         try {
-          const countryId = findIdByName(countryList, "India");
+          const countryId = findIdByName(countryList, "101");
 
           if (!countryId) return;
           form.setValue("country_id", String(countryId));
@@ -138,7 +140,7 @@ const hydrate = async () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingState, setLoadingState] = useState(false);
   const [loadingCity, setLoadingCity] = useState(false);
-  const fetchTerritoryMaster = async (isLoaderHide = false) => {
+  const fetchTerritoryMaster = async () => {
     try {
       setIsInfoLoading(true);
       const res =
@@ -152,10 +154,23 @@ const hydrate = async () => {
       setIsInfoLoading(false);
     }
   };
+  const fetchStoreList = async () => {
+    try {
+      const res =
+        await fetchStoreCrispList();
+      setStoreList(res?.data)
+    } catch (e) {
+      console.error(e);
 
+    } 
+  };
   useEffect(() => {
+     fetchStoreList()
     if (id)
-      fetchTerritoryMaster(false);
+    {
+      fetchTerritoryMaster();
+     
+    }
   }, [id]);
   const isHydratingRef = useRef(false);
   useEffect(() => {
@@ -172,11 +187,18 @@ const hydrate = async () => {
   ) => {
     try {
       setIsLoading(true);
-
+      const updatedValues={
+    "name": value.name,
+    "store_id": Number(value.store_id),
+    "notes": value.notes,
+    "country_id":  Number(value.country_id),
+    "state_ids": value.state_ids.map(item=>Number(item)),
+    "city_ids": value.city_ids.map(item=>Number(item))
+}
       if (mode === "edit") {
         await EditTerritory({
           id: id ?? '',
-          info: value
+          info: updatedValues
         });
 
         toast({
@@ -185,7 +207,7 @@ const hydrate = async () => {
           variant: "success",
         });
       } else {
-        await SaveTerritory(value);
+        await SaveTerritory(updatedValues);
 
         toast({
           title: "Add Territory",
@@ -225,12 +247,14 @@ const hydrate = async () => {
     }
   };
 useEffect(() => {
-  if (!initialValues) return;
+  if (!initialValues || !storeList.length) return;
 
   if (mode === "edit" || mode === "view") {
     form.reset({
       name: initialValues.name ?? "",
-      store_id: initialValues.store_id ?? "",
+      store_id: initialValues.store_id
+        ? String(initialValues.store_id)
+        : "",
       notes: initialValues.notes ?? "",
       country_id: initialValues.country?.id
         ? String(initialValues.country.id)
@@ -239,11 +263,9 @@ useEffect(() => {
       city_ids: initialValues.city_ids?.map(String) ?? [],
     });
   }
-}, [mode, initialValues]);
-useEffect(()=>{
-  console.log(cities,'citiescities');
-  
-},[cities ])
+}, [mode, initialValues, storeList]);
+
+
   return (
     <Form {...form}>
       <form
@@ -281,13 +303,11 @@ useEffect(()=>{
                       label="Franchise"
                       control={form.control}
                       isDisabled={false}
-                      options={FRANCHISES.map(c => ({
-                        value: String(c.value),
-                        label: c.label,
+                      options={storeList.map(c => ({
+                        value: String(c.id),
+                        label: c.name,
                       }))}
-                      onValueChange={async (value) => {
-
-                      }}
+                      
                     />
 
                     <FloatingRHFSelect

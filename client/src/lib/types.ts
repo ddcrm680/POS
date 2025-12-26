@@ -512,7 +512,14 @@ export type TerritoryFormValues = {
   city_ids: string[]
   state_ids: string[];
 };
-
+export type TerritoryFormRequestValues = {
+  name: string;
+  store_id?: number;
+  notes?:string
+  country_id: number;
+  city_ids: number[]
+  state_ids: number[];
+};
 export type TerritoryFormApiValues = {
   name: string;
   store_id?: string;
@@ -523,3 +530,6 @@ export type TerritoryFormApiValues = {
   city_ids: string[]
   state_ids: string[];
 };
+export type storeListType = {id:number;
+    name:string
+  }

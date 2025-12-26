@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
-import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
+import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, TerritoryFormRequestValues, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
 import { DateRangeType, DateValueType } from "react-tailwindcss-datepicker";
 
 export const baseUrl =
@@ -189,7 +189,7 @@ export async function SaveUser(values: UserFormType) {
 
   }
 }
-export async function SaveTerritory(values: TerritoryFormValues) {
+export async function SaveTerritory(values: TerritoryFormRequestValues) {
   try {
     const response: any = await api.post(
       "/api/admin/territories/save", values
@@ -260,7 +260,7 @@ export async function EditUser(editFormValue: editUserReq) {
 
   }
 }
-export async function EditTerritory(editFormValue: {id:string,info:TerritoryFormValues}) {
+export async function EditTerritory(editFormValue: {id:string,info:TerritoryFormRequestValues}) {
 
   try {
     const response: any = await api.post(
@@ -327,6 +327,16 @@ export async function fetchTerritoryById(id:string) {
     return response.data;
   }
   throw new Error(response.data?.message || "Failed to fetch territory info");
+}
+export async function fetchStoreCrispList() {
+
+  const response: any = await api.get(
+    `/api/utility/stores`,
+  );
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error(response.data?.message || "Failed to fetch store list");
 }
 export async function fetchUserList({
   page,
