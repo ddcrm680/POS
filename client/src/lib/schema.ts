@@ -588,14 +588,14 @@ export const organizationSchema = z.object({
     .trim()
     .min(1, "Invoice prefix must be at least 1 characters")
     .max(10, "Invoice prefix must not exceed 10 characters")
-    ,
+  ,
 
   service_prefix: z
     .string()
     .trim()
     .min(1, "Service prefix must be at least 1 characters")
     .max(10, "Service prefix must not exceed 10 characters")
-    ,
+  ,
 
   country: z.string().min(1, "Please select country"),
   state: z.string().min(1, "Please select state"),
@@ -664,8 +664,14 @@ export const StoreSchema = z.object({
   notes: z
     .string()
     .trim()
-    .min(10, "Notes must be at least 10 characters")
-    .max(200, "Notes must not exceed 200 characters"),
+    .optional()
+    .refine(
+      val => !val || (val.length >= 10 && val.length <= 200),
+      {
+        message: "Notes must be between 10 and 200 characters",
+      }
+    ),
+
 
   gstin: z
     .string()
@@ -696,7 +702,7 @@ export const StoreSchema = z.object({
   country: z.string().min(1, "Please select country"),
   state: z.string().min(1, "Please select state"),
   city: z.string().min(1, "Please select city"),
-   pincode: z
+  pincode: z
     .string()
     .min(1, "Pincode is required")
     .regex(/^\d{6}$/, "Pincode must be exactly 6 digits"),
@@ -713,21 +719,51 @@ export const StoreSchema = z.object({
     .max(200, "Location name must not exceed 200 characters"),
   phone: z.string().max(15),
   agreement_file: fileOrPath
-  .refine(val => val !== undefined && val !== "", {
-    message: "Agreement file is required",
-  }),
+    .refine(val => val !== undefined && val !== "", {
+      message: "Agreement file is required",
+    }),
 
   registration_file: fileOrPath
-  .refine(val => val !== undefined && val !== "", {
-    message: "Registration file is required",
-  }),
+    .refine(val => val !== undefined && val !== "", {
+      message: "Registration file is required",
+    }),
 
-cancelled_cheque: fileOrPath
-  .refine(val => val !== undefined && val !== "", {
-    message: "Cancelled cheque is required",
-  }),
+  cancelled_cheque: fileOrPath
+    .refine(val => val !== undefined && val !== "", {
+      message: "Cancelled cheque is required",
+    }),
   opening_date: z
-  .string()
-  .min(1, "Opening date is required"),
+    .string()
+    .min(1, "Opening date is required"),
 
 });
+export const TerritoryMasterSchema = z.object({
+  territory_name: z
+    .string()
+    .trim()
+    .min(5, "Territory name must be at least 5 characters")
+    .max(100, "Territory name must not exceed 100 characters"),
+  franchise: z.string().optional(),
+  notes: z
+    .string()
+    .trim()
+    .optional()
+    .refine(
+      val => !val || (val.length >= 10 && val.length <= 200),
+      {
+        message: "Notes must be between 10 and 200 characters",
+      }
+    ),
+  country: z.string().min(1, "Please select country"),
+  states:
+    z
+      .array(
+        z.string().min(1, "Please select state"),
+      ),
+  city: z
+    .array(
+      z.string().min(1, "Please select city"),
+    ),
+
+});
+

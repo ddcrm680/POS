@@ -9,6 +9,7 @@ import Services from "./servicePlan/services";
 import Organization from "./organization/organization";
 import Store from "./store/store";
 import SystemLog from "./systemLog/systemLog";
+import TerritoryMaster from "./territoryMaster.tsx/territoryMaster";
 
 const MASTER_TAB_KEY = "master_active_tab";
 
@@ -47,13 +48,12 @@ export default function Master() {
                   Master Details
                 </h1>
 
-                <TabsList className="
+                <TabsList className="h-auto
     flex 
     overflow-x-auto
     scrollbar-hide
-    lg:grid lg:grid-cols-6
+    lg:grid lg:grid-cols-7
     justify-start
-     lg:overf5low-visible
      lg:w-[40]
   ">
                   {masterTabList.map((tab) => {
@@ -100,6 +100,9 @@ export default function Master() {
 
               <TabsContent value="systemLog">
                 <SystemLog />
+              </TabsContent>
+               <TabsContent value="territoryMaster">
+                <TerritoryMaster />
               </TabsContent>
             </Tabs>
           </div>

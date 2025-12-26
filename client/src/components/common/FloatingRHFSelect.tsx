@@ -85,8 +85,9 @@ export function FloatingRHFSelect({
               isSearchable
               options={options}
               value={value}
-              
-              placeholder="" // 👈 IMPORTANT: no placeholder
+              placeholder=""
+              menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+              menuPosition="fixed"
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               onChange={(selected: any) => {
@@ -112,15 +113,23 @@ export function FloatingRHFSelect({
                       : "#e1e7ef",
                   boxShadow: "none",
                 }),
-                valueContainer: (base) => ({
+
+                menuPortal: (base) => ({
                   ...base,
-                  //   paddingTop: "6px",
+                  zIndex: 9999, // 🔥 ABOVE ALL FLOATING LABELS
                 }),
+
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 9999,
+                }),
+
                 placeholder: () => ({
-                  display: "none", // 👈 hide placeholder completely
+                  display: "none",
                 }),
               }}
             />
+
 
             {/* ERROR */}
             {error && (

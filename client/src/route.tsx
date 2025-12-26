@@ -22,6 +22,7 @@ import { login } from "./lib/api";
 import ProfileDetails from "./pages/profile/profile-details";
 import Master from "./pages/masters/master";
 import StoreForm from "./pages/masters/store/storeForm";
+import TerritoryMasterForm from "./pages/masters/territoryMaster.tsx/territoryMasterForm";
 export function Router() {
   return (
     <Switch>
@@ -31,7 +32,10 @@ export function Router() {
       </Route>
       <Route path="/home" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/profile" component={() => <ProtectedRoute component={ProfileDetails} />} />
-      <Route path="/master" component={() => <ProtectedRoute component={Master} />} />
+      <Route path="/master" component={() => <ProtectedRoute component={Master} 
+      />} />
+       <Route path="/master/territory/manage" component={() => <ProtectedRoute component={TerritoryMasterForm} />} />
+  
       <Route path="/master/stores/manage" component={() => <ProtectedRoute component={StoreForm} />} />
       <Route path="/manager" component={() => <ProtectedRoute component={ManagerDashboard} />} />
       <Route path="/customers" component={() => <ProtectedRoute component={Customers} />} />

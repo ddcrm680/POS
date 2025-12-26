@@ -41,7 +41,8 @@ function createInstance(): AxiosInstance {
   inst.interceptors.response.use(
     (res) => res,
     async (error) => {
-      const status = error?.status;
+      try{
+        const status = error?.status;
       console.log(error, 'status');
 
       if (status === 401) {
@@ -75,6 +76,10 @@ function createInstance(): AxiosInstance {
       }
 
       return Promise.reject(error);
+      }catch(e){
+      console.log(e);
+      
+    }
     }
   );
 
@@ -313,6 +318,42 @@ export async function fetchUserList({
   }
   throw new Error("Failed to fetch user list");
 }
+export async function fetchTerritoryMasterList({
+  page,
+  search,
+  per_page
+}: {
+  per_page: number;
+  page: number;
+  search: string;
+}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    search,
+    per_page: String(per_page)
+  });
+
+  const response = await api.get(`/api/admin/territory-master?${params.toString()}`);
+
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error("Failed to fetch territory list");
+}
+// lib/api.ts
+export async function fetchCitiesByStates(stateIds: number[]) {
+  const res = await api.post(
+    "/api/utility/cities/by-states",
+    {
+      state_ids: stateIds,
+    }
+  );
+ if (res?.data?.success === true) {
+    return res.data.data;
+  }
+  throw new Error("Failed to fetch territory list");
+}
+
 export async function fetchServicePlanList({
   page,
   search,

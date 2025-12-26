@@ -124,8 +124,41 @@ export interface UserApiType {
   id: number, full_name?: string, name?: string, email: string, phone: string
   , role_id: number, is_active: number, created_at: string,
   address: string
-
 }
+export interface TerritoryMasterApiType {
+  id: number;
+
+  location_name: string;
+
+  assigned_franchise_id: number;
+
+  country_id: string;
+
+  state: string;
+
+  city: string;
+
+  district: string;
+
+  pin_code: string;
+
+  created_by: number | string;
+
+  status: "active" | "inactive";
+
+  del: number | boolean;
+
+  created_at: string; // ISO date string
+
+  updated_at: string; // ISO date string
+
+  assigned_franchise: string;
+
+  action: string; // HTML string
+
+  DT_RowIndex: number;
+}
+
 export interface vehicleType {
   "id": number
   "name": string
@@ -416,7 +449,7 @@ export type storeFormType = {
   store_name: string;
   email: string;
 
-  notes: string;
+  notes?: string;
   location_name: string
   phone: string
   gstin: string;
@@ -467,4 +500,15 @@ export type editOrganizationReq = {
     company_address: string;
     document: File | string;
   };
+};
+
+/* -------------------- TYPES -------------------- */
+
+export type TerritoryFormValues = {
+  territory_name: string;
+  franchise?: string;
+  notes?:string
+  country: string;
+  city: string[]
+  states: string[];
 };

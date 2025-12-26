@@ -435,7 +435,6 @@ export default function StoreForm({
                 name="notes"
                 label="Notes"
                 isView={isView}
-                isRequired
                 control={form.control}
               />
 

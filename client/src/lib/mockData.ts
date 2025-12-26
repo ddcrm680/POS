@@ -225,7 +225,7 @@ export const organizationMockData = {
 
       /* ================= LOCATION ================= */
       country: "India",
-     
+
       state: "Uttar Pradesh",
       city: "Noida",
       district: "Gautam Buddha Nagar",
@@ -319,6 +319,42 @@ export const organizationMockData = {
     has_next: false,
   },
 };
+
+export const FRANCHISES = [
+  { value: "north", label: "North Franchise" },
+  { value: "south", label: "South Franchise" },
+];
+
+export const territoryMasterMockData = {
+  data: [{
+    "id": 86,
+    "location_name": "DD NOIDA SECTOR 70",
+    "assigned_franchise_id": 78,
+    "country_id": "India",
+    "state": ["Uttar Pradesh"],
+    "city":[' Sec 16 Noida',' Sec37 Noida',] ,
+    "created_at": "2024-05-14T12:17:51.000000Z",
+  },
+  {
+       "id": 84,
+    "location_name": "DD NOIDA SECTOR 70",
+    "assigned_franchise_id": 78,
+    "country_id": "India",
+    "state": ["Uttar Pradesh"],
+    "city":[' Sec 16 Noida',' Sec37 Noida',] ,
+    "created_at": "2024-05-14T12:17:51.000000Z",
+  },],
+
+  meta: {
+    current_page: 1,
+    per_page: 10,
+    last_page: 1,
+    total: 3,
+    from: 1,
+    to: 3,
+    has_next: false,
+  },
+}
 export const countryOptions = [
   { value: "IN", label: "India" },
 ];
