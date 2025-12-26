@@ -34,3 +34,43 @@ export const findIdByName = (list: any[], name?: string) =>{
 
    return list.find(item => item.id === Number(name))?.id ?? "";
 }
+export const findIdsByNames = (list: any[], names: string[]) => {
+  return list
+    .filter(item => names.includes(item.name))
+    .map(item => String(item.id));
+};
+
+export function formatAndTruncate(
+  value: string[],
+  maxLen: number = 15
+): {
+  displayText: string;
+  fullText: string;
+  isTruncated: boolean;
+} {
+  if (!value) {
+    return {
+      displayText: "",
+      fullText: "",
+      isTruncated: false,
+    };
+  }
+  console.log(value,'valuevaluevalue');
+  
+
+  const fullText = value
+    .map((item) =>
+      item.trim().charAt(0).toUpperCase() + item.trim().slice(1)
+    )
+    .join(", ");
+
+  const isTruncated = fullText.length > maxLen;
+
+  return {
+    fullText,
+    isTruncated,
+    displayText: isTruncated
+      ? fullText.slice(0, maxLen) + "…"
+      : fullText,
+  };
+}

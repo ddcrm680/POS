@@ -20,7 +20,8 @@ import {
   Wrench,
   Store,
   Activity,
-  FileText
+  FileText,
+  MapPinned
 } from "lucide-react";
 
 export const Constant = {
@@ -137,4 +138,5 @@ export const masterTabList = [
   { id: "organization", label: "Organization", emoji: Building, color: "bg-blue-600 hover:bg-blue-700" },
   { id: "store", label: "Store", emoji: Store, color: "bg-blue-600 hover:bg-blue-700" },
   { id: "systemLog", label: "System Log",  emoji: FileText , color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "territoryMaster", label: "Territory Master",  emoji: MapPinned  , color: "bg-blue-600 hover:bg-blue-700" },
 ];
