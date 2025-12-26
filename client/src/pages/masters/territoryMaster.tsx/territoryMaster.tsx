@@ -229,8 +229,8 @@ export default function TerritoryMaster() {
           width="420px"
           maxWidth="420px"
           isOpen={isTerritoryDeleteModalInfo.open}
-          title="Delete User"
-          description={`Are you sure you want to delete this user? This action cannot be undone.`}
+          title="Delete Territory"
+          description={`Are you sure you want to delete this territory? This action cannot be undone.`}
           confirmText="Delete"
           cancelText="Cancel"
           isLoading={isLoading}
