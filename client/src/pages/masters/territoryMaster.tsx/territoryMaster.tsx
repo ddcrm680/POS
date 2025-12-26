@@ -26,10 +26,6 @@ export default function TerritoryMaster() {
   const [perPage, setPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [has_next, setHasNext] = useState(false)
-  const [isTerritoryDeleteModalInfo, setIsTerritoryDeleteModalOpenInfo] = useState<{ open: boolean, info: any }>({
-    open: false,
-    info: {}
-  });
   const [, navigate] = useLocation();
   const [filters, setFilters] = useState({
     status: "",
@@ -40,7 +36,6 @@ export default function TerritoryMaster() {
   const [page, setPage] = useState(1);
 
   const [isListLoading, setIsListLoading] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
 
   const PER_PAGE = 10;
 
@@ -185,29 +180,7 @@ export default function TerritoryMaster() {
       });
     }
   }, []);
-  const TerritoryDeleteHandler = async () => {
-    try {
-      setIsLoading(true);
 
-      await DeleteUser(isTerritoryDeleteModalInfo?.info?.id);
-      toast({ title: `Delete User`, description: "User deleted successfully", variant: "success", });
-
-      fetchTerritoryMaster(false)
-
-    } catch (err: any) {
-
-      toast({
-        title: "Error",
-        description:
-          err?.response?.data?.message ||
-          err.message || `Failed to delete user`,
-        variant: "destructive",
-      });
-    } finally {
-      setIsTerritoryDeleteModalOpenInfo({ open: false, info: {} });
-      setIsLoading(false);
-    }
-  };
   const fetchTerritoryMaster = async (isLoaderHide = false) => {
     try {
       if (!isLoaderHide)
@@ -296,21 +269,7 @@ export default function TerritoryMaster() {
           }}
 
         />
-        <CommonDeleteModal
-          width="420px"
-          maxWidth="420px"
-          isOpen={isTerritoryDeleteModalInfo.open}
-          title="Delete Territory"
-          description={`Are you sure you want to delete this territory? This action cannot be undone.`}
-          confirmText="Delete"
-          cancelText="Cancel"
-          isLoading={isLoading}
-          onCancel={() =>
-            setIsTerritoryDeleteModalOpenInfo({ open: false, info: {} })
-          }
-          onConfirm={TerritoryDeleteHandler}
-        />
-
+      
       </CardContent>
     </Card>
   );

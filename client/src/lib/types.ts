@@ -512,3 +512,14 @@ export type TerritoryFormValues = {
   city_ids: string[]
   state_ids: string[];
 };
+
+export type TerritoryFormApiValues = {
+  name: string;
+  store_id?: string;
+  notes?:string
+  country: {id:number;
+    name:string
+  }
+  city_ids: string[]
+  state_ids: string[];
+};

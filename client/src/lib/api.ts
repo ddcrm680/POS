@@ -264,7 +264,7 @@ export async function EditTerritory(editFormValue: {id:string,info:TerritoryForm
 
   try {
     const response: any = await api.post(
-      `api/admin/territories/update`, {...editFormValue,id:editFormValue.id}
+      `api/admin/territories/update`, {...editFormValue.info,id:editFormValue.id}
     );
     if (response?.data?.success === true) {
       return response.data?.data;
@@ -317,6 +317,16 @@ export async function fetchRoleList() {
     return response.data?.data;
   }
   throw new Error(response.data?.message || "Failed to fetch role list");
+}
+export async function fetchTerritoryById(id:string) {
+
+  const response: any = await api.get(
+    `/api/admin/territories/view/${id}`,
+  );
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error(response.data?.message || "Failed to fetch territory info");
 }
 export async function fetchUserList({
   page,
