@@ -129,7 +129,6 @@ export default function OrganizationForm({
       isHydratingRef.current = true;
       try {
         const countryId = findIdByName(countryList, initialValues.country);
-        console.log(countryId, 'countryId');
 
         if (!countryId) return;
 
@@ -142,7 +141,6 @@ export default function OrganizationForm({
         setLoadingState(false);
 
         const stateId = findIdByName(stateList, initialValues.state);
-        console.log(stateId, 'stateId');
 
         if (!stateId) return;
 

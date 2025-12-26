@@ -11,7 +11,6 @@ type SidebarProps = {
 };
 
 export const Sidebar = ({ roleName, location, user, onClose, previewUrl }: SidebarProps) => {
-    console.log(previewUrl, 'previewUrl');
 
     return (
         <aside className="flex flex-col w-64 bg-card border-l lg:border-r border-border h-full  lg:hidden">

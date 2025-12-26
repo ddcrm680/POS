@@ -738,29 +738,29 @@ export const StoreSchema = z.object({
 
 });
 export const TerritoryMasterSchema = z.object({
-  territory_name: z
+  name: z
     .string()
     .trim()
     .min(5, "Territory name must be at least 5 characters")
     .max(100, "Territory name must not exceed 100 characters"),
-  franchise: z.string().optional(),
+  store_id: z.string().optional(),
   notes: z
     .string()
     .trim()
     .optional()
     .refine(
-      val => !val || (val.length >= 10 && val.length <= 200),
+      val => !val || (val.length >= 10 && val.length <= 255),
       {
-        message: "Notes must be between 10 and 200 characters",
+        message: "Notes must be between 10 and 255 characters",
       }
     ),
-  country: z.string().min(1, "Please select country"),
-  states:
+  country_id: z.string().min(1, "Please select country"),
+  state_ids:
     z
       .array(
         z.string().min(1, "Please select state"),
       ),
-  city: z
+  city_ids: z
     .array(
       z.string().min(1, "Please select city"),
     ),

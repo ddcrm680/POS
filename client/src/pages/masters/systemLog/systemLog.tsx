@@ -174,7 +174,6 @@ export default function SystemLog() {
     },
     {
       key: "done_by", label: "Done By", width: "150px", render: (_value: any, row: any) => {
-        console.log(_value, 'valuesss');
 
         return (
           <span className="text-sm font-medium text-gray-700">

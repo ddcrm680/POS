@@ -194,7 +194,7 @@ export default function CustomerProfile() {
           <CustomerProfileHeader 
             customer={customer}
             onEditCustomer={() => {
-              console.log('Edit customer functionality');
+              // console.log('Edit customer functionality');
             }}
             onSendMessage={() => {
               setActiveTab('communication');
@@ -340,7 +340,7 @@ export default function CustomerProfile() {
               <VehicleInformationPanel 
                 customerId={customer.id}
                 onVehicleSelect={(vehicle) => {
-                  console.log('Vehicle selected:', vehicle);
+                  // console.log('Vehicle selected:', vehicle);
                 }}
               />
             </TabsContent>

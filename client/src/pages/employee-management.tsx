@@ -345,7 +345,6 @@ export default function EmployeeManagement() {
   ];
 
   const handleClockAction = (action: string, employee: any) => {
-    console.log('Clock action:', action, employee);
     
     const messages = {
       clock_in: `⏰ Clock In Successful!\n\n${employee.firstName} ${employee.lastName} has clocked in at ${format(new Date(), "h:mm a")}.\n\nLocation: Main Facility\nExpected shift: 8 hours`,

@@ -88,7 +88,6 @@ export default function StoreForm({
     setCountryList(countries)
   }, [countries])
   useEffect(() => {
-    console.log(mode,countryList,'modemode');
     
     if ((mode == "create" || !mode) &&
       countryList.length) {
@@ -124,7 +123,6 @@ export default function StoreForm({
       isHydratingRef.current = true;
       try {
         const countryId = findIdByName(countryList, initialValues.country);
-        console.log(countryId, 'countryId');
 
         if (!countryId) return;
 
@@ -137,7 +135,6 @@ export default function StoreForm({
         setLoadingState(false);
 
         const stateId = findIdByName(stateList, initialValues.state);
-        console.log(stateId, 'stateId');
 
         if (!stateId) return;
 
@@ -173,7 +170,6 @@ export default function StoreForm({
   /* -------------------- HYDRATE -------------------- */
   useEffect(() => {
     if (mode === "edit" || mode === "view") {
-      console.log(initialValues,'initialValues');
       
       form.reset({
         store_name: initialValues?.store_name ?? "",
@@ -458,7 +454,7 @@ export default function StoreForm({
                 {isLoading && <Loader />}
                 {isLoading
                   ? mode === "create" ? "Adding..." : "Updating..."
-                  : id ? "Update " : "Create "}
+                  : id ? "Update " : "Add "}
               </Button>
             </div></div>}
 

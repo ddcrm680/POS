@@ -134,9 +134,9 @@ export interface TerritoryMasterApiType {
 
   country_id: string;
 
-  state: string;
+  state_ids: string;
 
-  city: string;
+  city_ids: string;
 
   district: string;
 
@@ -152,7 +152,7 @@ export interface TerritoryMasterApiType {
 
   updated_at: string; // ISO date string
 
-  assigned_franchise: string;
+  store_id: string;
 
   action: string; // HTML string
 
@@ -505,10 +505,31 @@ export type editOrganizationReq = {
 /* -------------------- TYPES -------------------- */
 
 export type TerritoryFormValues = {
-  territory_name: string;
-  franchise?: string;
+  name: string;
+  store_id?: string;
   notes?:string
-  country: string;
-  city: string[]
-  states: string[];
+  country_id: string;
+  city_ids: string[]
+  state_ids: string[];
 };
+export type TerritoryFormRequestValues = {
+  name: string;
+  store_id?: number;
+  notes?:string
+  country_id: number;
+  city_ids: number[]
+  state_ids: number[];
+};
+export type TerritoryFormApiValues = {
+  name: string;
+  store_id?: string;
+  notes?:string
+  country: {id:number;
+    name:string
+  }
+  city_ids: string[]
+  state_ids: string[];
+};
+export type storeListType = {id:number;
+    name:string
+  }

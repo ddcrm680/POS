@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
-import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, UserFormType } from "./types";
+import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, TerritoryFormRequestValues, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
 import { DateRangeType, DateValueType } from "react-tailwindcss-datepicker";
 
 export const baseUrl =
@@ -43,7 +43,6 @@ function createInstance(): AxiosInstance {
     async (error) => {
       try{
         const status = error?.status;
-      console.log(error, 'status');
 
       if (status === 401) {
         sessionStorage.setItem("sessionExpired", "1");
@@ -77,7 +76,7 @@ function createInstance(): AxiosInstance {
 
       return Promise.reject(error);
       }catch(e){
-      console.log(e);
+      // console.log(e);
       
     }
     }
@@ -190,6 +189,20 @@ export async function SaveUser(values: UserFormType) {
 
   }
 }
+export async function SaveTerritory(values: TerritoryFormRequestValues) {
+  try {
+    const response: any = await api.post(
+      "/api/admin/territories/save", values
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
+
+  }
+}
 export async function SaveServicePlan(values: serviceFormType) {
   try {
     const response: any = await api.post(
@@ -247,6 +260,22 @@ export async function EditUser(editFormValue: editUserReq) {
 
   }
 }
+export async function EditTerritory(editFormValue: {id:string,info:TerritoryFormRequestValues}) {
+
+  try {
+    const response: any = await api.post(
+      `api/admin/territories/update`, {...editFormValue.info,id:editFormValue.id}
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+
+    throw response
+
+  }
+}
 export async function EditServicePlan(editFormValue: editServicePlanReq) {
 
   try {
@@ -289,6 +318,26 @@ export async function fetchRoleList() {
   }
   throw new Error(response.data?.message || "Failed to fetch role list");
 }
+export async function fetchTerritoryById(id:string) {
+
+  const response: any = await api.get(
+    `/api/admin/territories/view/${id}`,
+  );
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error(response.data?.message || "Failed to fetch territory info");
+}
+export async function fetchStoreCrispList() {
+
+  const response: any = await api.get(
+    `/api/utility/stores`,
+  );
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error(response.data?.message || "Failed to fetch store list");
+}
 export async function fetchUserList({
   page,
   search,
@@ -320,20 +369,22 @@ export async function fetchUserList({
 }
 export async function fetchTerritoryMasterList({
   page,
-  search,
+  search,  status,
   per_page
 }: {
   per_page: number;
   page: number;
   search: string;
+    status?: string | number;
 }) {
   const params = new URLSearchParams({
     page: String(page),
     search,
     per_page: String(per_page)
   });
+ if (status !== "") params.append("status", String(status));
 
-  const response = await api.get(`/api/admin/territory-master?${params.toString()}`);
+  const response = await api.get(`/api/admin/territories/list?${params.toString()}`);
 
   if (response?.data?.success === true) {
     return response.data;
@@ -597,6 +648,21 @@ export async function UpdateStoreStatus(statusInfo: { id: number, status: number
   try {
     const response: any = await api.post(
       `/api/store/status/${statusInfo.id}`, { status: statusInfo.status }
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
+
+  }
+}
+export async function UpdateTerritoryStatus(statusInfo: { id: number,}) {
+
+  try {
+    const response: any = await api.post(
+      `api/admin/territories/status/${statusInfo.id}`
     );
     if (response?.data?.success === true) {
       return response.data?.data;

@@ -80,7 +80,7 @@ export default function SOPDrawer({ jobCard, isOpen = false, onOpenChange, child
       await completeStepMutation.mutateAsync(stepId);
     } else {
       // Handle uncomplete logic if needed
-      console.log('Uncomplete step:', stepId);
+      // console.log('Uncomplete step:', stepId);
     }
   };
 
