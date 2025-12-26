@@ -55,7 +55,6 @@ export function formatAndTruncate(
       isTruncated: false,
     };
   }
-  console.log(value,'valuevaluevalue');
   
 
   const fullText = value

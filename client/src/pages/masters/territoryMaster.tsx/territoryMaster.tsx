@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteUser, EditUser, fetchTerritoryMasterList, fetchUserList, SaveUser, UpdateUserStatus } from "@/lib/api";
+import { DeleteUser, EditUser, fetchTerritoryMasterList, fetchUserList, SaveUser, UpdateTerritoryStatus, UpdateUserStatus } from "@/lib/api";
 import { TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton, Switch } from "@chakra-ui/react";
@@ -31,6 +31,9 @@ export default function TerritoryMaster() {
     info: {}
   });
   const [, navigate] = useLocation();
+  const [filters, setFilters] = useState({
+    status: "",
+  });
 
   const [lastPage, setLastPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -57,14 +60,34 @@ export default function TerritoryMaster() {
       },
     },
     {
-      key: "location_name", label: "Territory", width: "150px",
+      key: "name", label: "Territory", width: "150px",
+      render: (_value: any,) => {
+
+        return (
+          <span
+            className="text-sm font-medium text-gray-700 cursor-help"
+          >
+            {_value ?? "-"}
+          </span>
+        );
+      }
     },
     {
-      key: "assigned_franchise", label: "	Franchise", width: "150px",
+      key: "store", label: "	Franchise", width: "150px",
+      render: (_value: any,) => {
+
+        return (
+          <span
+            className="text-sm font-medium text-gray-700 cursor-help"
+          >
+            {_value ?? "-"}
+          </span>
+        );
+      }
     },
-    { key: "country_id", label: "Country", width: "150px" },
+    { key: "country", label: "Country", width: "150px" },
     {
-      key: "state", label: "State", width: "150px", render: (_value: any,) => {
+      key: "states", label: "State", width: "150px", render: (_value: any,) => {
 
         return (
           <span
@@ -77,7 +100,7 @@ export default function TerritoryMaster() {
       }
     },
     {
-      key: "city", label: "City", width: "150px", render: (_value: any,) => {
+      key: "cities", label: "City", width: "150px", render: (_value: any,) => {
 
         return (
           <span
@@ -88,9 +111,80 @@ export default function TerritoryMaster() {
           </span>);
       }
     },
+    {
+      key: "is_active",
+      label: (
+        <ColumnFilter
+          label="Status"
+          value={filters.status}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, status: val }));
+            setPage(1);
+          }}
+          options={[
+            { label: 'All', value: '' },
+            { label: "Active", value: true },
+            { label: "Inactive", value: false },
+          ]}
+        />
+      ),
+      width: "120px",
+      render: (value: string, _row: any,) => {
+        const isActive = value;
 
-  ], [roles, page, PER_PAGE,]);
+        return (
+          <Switch.Root checked={isActive}
+            onCheckedChange={(e: any) => TerritoryStatusUpdateHandler(_row)}
+            size="sm">
+            <Switch.HiddenInput />
+            <Switch.Control
+              bg="#ffa9a9"          // unchecked color
+              _checked={{
+                bg: "#22c55e",     // checked color
+              }}
+            />
+          </Switch.Root>
 
+        );
+      },
+    },
+
+  ], [roles, page, PER_PAGE, filters]);
+  const TerritoryStatusUpdateHandler = useCallback(async (u: any) => {
+    try {
+      const newStatus = u.is_active ? false : true;
+      console.log(newStatus,u.is_active , 'newStatus');
+
+      setUsers(prevUsers => {
+
+        return prevUsers.map(item =>
+          item.id === u.id
+            ? {
+              ...item,
+              is_active: newStatus,
+            }
+            : item
+        );
+      });
+
+      await UpdateTerritoryStatus({ id: u.id, });
+
+      toast({
+        title: "Status Update",
+        description: "Territory status updated successfully",
+        variant: "success",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description:
+          err?.response?.data?.message ||
+          err.message ||
+          "Failed to update territory status",
+        variant: "destructive",
+      });
+    }
+  }, []);
   const TerritoryDeleteHandler = async () => {
     try {
       setIsLoading(true);
@@ -118,12 +212,12 @@ export default function TerritoryMaster() {
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      const res = territoryMasterMockData
-      //  await fetchTerritoryMasterList({
-      //   per_page: perPage,
-      //   page,
-      //   search,
-      // });
+      const res =
+        await fetchTerritoryMasterList({
+          per_page: perPage,
+          page,
+          search,
+        });
 
       const mappedTerritory = res.data
       setHasNext(res.meta.has_next)
@@ -141,11 +235,13 @@ export default function TerritoryMaster() {
 
   useEffect(() => {
     fetchTerritoryMaster(false);
-  }, [search, page, perPage]);
+  }, [search, page, perPage, filters]);
   function resetFilter() {
     setSearch('')
     setPage(1)
-
+    setFilters({
+      status: ""
+    })
   }
   return (
     <Card className="w-full">
@@ -180,17 +276,6 @@ export default function TerritoryMaster() {
 
                 {(
                   <Box className="gap-3">
-                    <IconButton
-                      size="xs"
-                      mr={2}
-                      aria-label="View"
-                      onClick={() => {
-                        navigate(`/master/territory/manage?id=${row.id}&mode=view`)
-                      }
-                      }
-                    >
-                      <EyeIcon />
-                    </IconButton>
                     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
                       size="xs"
                       mr={2}
@@ -203,20 +288,6 @@ export default function TerritoryMaster() {
                     >
                       <EditIcon />
                     </IconButton>}
-
-                    {
-                      Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id &&
-                      <IconButton
-                        size="xs"
-                        mr={2}
-                        colorScheme="red"
-                        aria-label="Delete"
-                        onClick={() => {
-                          setIsTerritoryDeleteModalOpenInfo({ open: true, info: row });
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </IconButton>}
 
                   </Box>
                 )}

@@ -374,7 +374,6 @@ export default function FacilityManagement() {
   ];
 
   const handleTaskAction = (action: string, task: any) => {
-    console.log('Task action:', action, task);
     
     if (action === 'complete') {
       alert(`✅ Task Completed!\n\n"${task.taskName}" has been marked as complete.\n\nGreat work maintaining facility standards!`);

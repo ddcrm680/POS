@@ -39,7 +39,7 @@ export function FloatingField({
       render={({ field, fieldState }) => {
         const { error } = fieldState
         if(name==='opening_date')
-console.log(error,'errorerrorerror');
+{}
 
         const shouldFloat =
           focused || (field.value && String(field.value).length > 0)

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormSetError } from "react-hook-form";
 import { ChevronDown, ChevronUp, Search } from "lucide-react";
 
 import {
@@ -20,13 +20,14 @@ import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { useAuth } from "@/lib/auth";
 import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
-import { fetchCitiesByStates, fetchCityList, fetchStateList } from "@/lib/api";
+import { EditTerritory, fetchCitiesByStates, fetchCityList, fetchStateList, SaveTerritory } from "@/lib/api";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
-import { storeFormProp, TerritoryFormValues } from "@/lib/types";
+import { storeFormProp, TerritoryFormValues, TerritoryMasterApiType } from "@/lib/types";
 import { FRANCHISES } from "@/lib/mockData";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TerritoryMasterSchema } from "@/lib/schema";
 import { findIdByName, findIdsByNames } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TerritoryMasterForm({
   initialValues,
@@ -46,12 +47,12 @@ export default function TerritoryMasterForm({
   const form = useForm<TerritoryFormValues>({
     resolver: zodResolver(TerritoryMasterSchema),
     defaultValues: {
-      territory_name: "",
-      franchise: "",
+      name: "",
+      store_id: "",
       notes: "",
-      country: "India",
-      states: [],
-      city: [],
+      country_id: "India",
+      state_ids: [],
+      city_ids: [],
     },
   });
   const { countries } = useAuth();
@@ -67,7 +68,7 @@ export default function TerritoryMasterForm({
         try {
           const countryId = findIdByName(countryList, '101');
           if (!countryId) return;
-          form.setValue("country", String(countryId));
+          form.setValue("country_id", String(countryId));
 
           // 2️⃣ STATES
           setLoadingState(true);
@@ -89,16 +90,16 @@ export default function TerritoryMasterForm({
         /* 1️⃣ COUNTRY */
         const countryId = findIdByName(
           countryList,
-          initialValues?.country || "India"
+          initialValues?.country_id || "India"
         );
         if (!countryId) return;
 
-        form.setValue("country", String(countryId));
+        form.setValue("country_id", String(countryId));
 
         /* 2️⃣ STATES (already IDs from backend) */
-        if (initialValues?.states?.length) {
-          const stateIds = initialValues.states.map((id: any) => String(id));
-          form.setValue("states", stateIds);
+        if (initialValues?.state_ids?.length) {
+          const stateIds = initialValues.state_ids.map((id: any) => String(id));
+          form.setValue("state_ids", stateIds);
 
           /* 3️⃣ FETCH CITIES (SINGLE API CALL ✅) */
           setLoadingCity(true);
@@ -109,10 +110,10 @@ export default function TerritoryMasterForm({
           setLoadingCity(false);
 
           /* 4️⃣ SET CITIES */
-          if (initialValues?.city?.length) {
+          if (initialValues?.city_ids?.length) {
             form.setValue(
-              "city",
-              initialValues.city.map((id: any) => String(id))
+              "city_ids",
+              initialValues.city_ids.map((id: any) => String(id))
             );
           }
         }
@@ -125,7 +126,7 @@ export default function TerritoryMasterForm({
       hydrate();
     }
   }, [mode, initialValues, countryList]);
-
+  const { toast } = useToast();
 
   const [states, setStates] = useState<any[]>([]);
   const [cities, setCities] = useState<any[]>([]);
@@ -141,20 +142,77 @@ export default function TerritoryMasterForm({
   const { control, handleSubmit, watch, setValue } = form;
 
   const onSubmit = (values: TerritoryFormValues) => {
-    console.log("Territory payload →", values);
+    TerritoryCommonHandler(values, form.setError)
+  };
+  const TerritoryCommonHandler = async (
+    value: TerritoryFormValues,
+    setError: UseFormSetError<TerritoryFormValues>
+  ) => {
+    try {
+      setIsLoading(true);
+
+      if (mode === "edit") {
+        await EditTerritory({
+          id: id ?? '',
+          info: value
+        });
+
+        toast({
+          title: "Edit Territory",
+          description: "Territory updated successfully",
+          variant: "success",
+        });
+      } else {
+        await SaveTerritory(value);
+
+        toast({
+          title: "Add Territory",
+          description: "Territory added successfully",
+          variant: "success",
+        });
+      }
+      navigate("/master")
+    } catch (err: any) {
+      const apiErrors = err?.response?.data?.errors;
+
+
+      // 👇 THIS IS THE KEY PART
+      if (apiErrors && err?.response?.status === 422) {
+        Object.entries(apiErrors).forEach(([field, messages]) => {
+          setError(field as keyof TerritoryFormValues, {
+            type: "server",
+            message: (messages as string[])[0],
+          });
+        });
+        return;
+      }
+      if (err?.response?.status === 403) {
+        navigate("/master")
+      }
+      toast({
+        title: "Error",
+        description:
+          err?.response?.data?.message ||
+          err.message ||
+          `Failed to ${mode === "create" ? "add" : "update"
+          } territory`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   useEffect(() => {
     if (mode === "edit" || mode === "view") {
-      console.log(initialValues, 'initialValues');
 
 
       form.reset({
-        territory_name: initialValues?.territory_name ?? "",
-        franchise: initialValues?.franchise ?? "",
+        name: initialValues?.name ?? "",
+        store_id: initialValues?.store_id ?? "",
         notes: initialValues?.notes ?? "",
-        country: initialValues?.country ?? "India",
-        states: initialValues?.states ?? [],
-        city: initialValues?.city ?? "",
+        country_id: initialValues?.country_id ?? "India",
+        state_ids: initialValues?.state_ids ?? [],
+        city_ids: initialValues?.city_ids ?? "",
       });
     }
   }, [mode, initialValues, form]);
@@ -183,13 +241,13 @@ export default function TerritoryMasterForm({
                 <FloatingField
                   isView={false}
                   isRequired={true}
-                  name={'territory_name'}
+                  name={'name'}
                   label={'Territory Name'}
                   control={form.control}
                 />
 
                 <FloatingRHFSelect
-                  name="franchise"
+                  name="store_id"
                   label="Franchise"
                   control={form.control}
                   isDisabled={false}
@@ -198,12 +256,12 @@ export default function TerritoryMasterForm({
                     label: c.label,
                   }))}
                   onValueChange={async (value) => {
-       
+
                   }}
                 />
 
                 <FloatingRHFSelect
-                  name="country"
+                  name="country_id"
                   label="Country"
                   control={form.control}
                   isRequired
@@ -217,8 +275,8 @@ export default function TerritoryMasterForm({
 
                     setStates([]);
                     setCities([]);
-                    form.setValue("states", []);
-                    form.setValue("city", []);
+                    form.setValue("state_ids", []);
+                    form.setValue("city_ids", []);
 
                     setLoadingState(true);
                     const stateList = await fetchStateList(Number(value));
@@ -230,12 +288,12 @@ export default function TerritoryMasterForm({
               </div>
               <div className="grid pt-5 gap-4  grid-cols-1 md:grid-cols-2 ">
                 <FloatingRHFSelect
-                  name="states"
+                  name="state_ids"
                   label="State"
                   isMulti
                   control={form.control}
                   isRequired
-                  isDisabled={isView || !form.getValues("country")}
+                  isDisabled={isView || !form.getValues("country_id")}
                   options={states.map(s => ({
                     value: String(s.id),
                     label: s.name,
@@ -243,7 +301,7 @@ export default function TerritoryMasterForm({
                   onValueChange={async (values) => {
                     if (isHydratingRef.current) return;
 
-                    form.setValue("city", []);
+                    form.setValue("city_ids", []);
                     setCities([]);
 
                     // ✅ normalize to array
@@ -266,12 +324,12 @@ export default function TerritoryMasterForm({
                 />
 
                 <FloatingRHFSelect
-                  name="city"
+                  name="city_ids"
                   label="City"
                   isMulti
                   control={form.control}
                   isRequired
-                  isDisabled={isView || !form.getValues("states")}
+                  isDisabled={isView || !form.getValues("state_ids")}
                   options={cities.map(c => ({
                     value: String(c.id),
                     label: c.name,
@@ -307,10 +365,10 @@ export default function TerritoryMasterForm({
                   disabled={isLoading}
                   className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
                 >
-                  {isLoading && <Loader />}
+                  {isLoading && <Loader isShowLoadingText={false} />}
                   {isLoading
-                    ? mode === "create" ? "Adding..." : "Updating..."
-                    : id ? "Update " : "Create "}
+                    ? id ?  "Updating...":"Adding..." 
+                    : id ? "Update " : "Add "}
                 </Button>
               </div></div>}
           </div>

@@ -333,7 +333,6 @@ export default function ManagerDashboard() {
   ];
 
   const handleAlertAction = (action: string, alert: any) => {
-    console.log('Alert action:', action, alert);
     
     if (action === 'whatsapp' && alert.customer) {
       const message = `Hi ${alert.customer}, this is regarding your service appointment.`;

@@ -52,10 +52,7 @@ export default function Services() {
     category_type: "",
     status: ""
   });
-useEffect(()=>{
-  console.log(serviceMetaInfo,'serviceMetaInfo');
-  
-})
+
   const columns = useMemo(() => [
     {
       key: "created_at", label: "Created On", align: "center", width: "100px", render: (_value: any,) => {
@@ -134,7 +131,6 @@ useEffect(()=>{
         />
       ), width: "150px",
       render: (_value: any,) => {
-        console.log(_value, serviceMetaInfo.categoryTypes, '_value_value');
 
         return (
           <span className="text-sm font-medium text-gray-700">
@@ -262,7 +258,6 @@ useEffect(()=>{
     value: serviceFormType,
     setError: UseFormSetError<serviceFormType>
   ) => {
-    console.log(value, 'value67890-[');
 
     try {
       setIsLoading(true);

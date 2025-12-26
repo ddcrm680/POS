@@ -32,7 +32,6 @@ export default function ServiceForm({
   isLoading = false,
   onSubmit,
 }: serviceFormProp) {
-  console.log(initialValues, 'initialValues');
 
   const form = useForm<serviceFormType>({
     resolver: zodResolver(servicePlanSchema(serviceMetaInfo)),

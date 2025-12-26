@@ -45,8 +45,6 @@ export default function POSLayout({ children }: POSLayoutProps) {
     setIsDefaultView(isDefault)
   }, [user, roles])
   useEffect(() => {
-    console.log(roles,'rolesertyew');
-    
     setRoleList(roles || [])
   }, [roles])
   // Update clock every second
