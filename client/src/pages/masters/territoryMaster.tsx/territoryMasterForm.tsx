@@ -53,14 +53,15 @@ export default function TerritoryMasterForm() {
     },
   });
   const { countries } = useAuth();
-  
+
+  const prevStateIdsRef = useRef<string[]>([]);
   const [initialValues, setInitialValues] = useState<TerritoryFormApiValues | null>(null)
-  const [storeList, setStoreList] = useState<storeListType[] >([])
+  const [storeList, setStoreList] = useState<storeListType[]>([])
   useEffect(() => {
 
     if (!countryList.length) return;
 
-    if (( !mode) &&
+    if ((!mode) &&
       countryList.length) {
       const hydrateLocation = async () => {
         // 1️⃣ COUNTRY
@@ -84,47 +85,48 @@ export default function TerritoryMasterForm() {
       };
       hydrateLocation()
     }
-const hydrate = async () => {
-  isHydratingRef.current = true;
 
-  try {
-    if (!initialValues?.country) return;
+    const hydrate = async () => {
+      isHydratingRef.current = true;
 
-    /* 1️⃣ COUNTRY */
-    const countryId = initialValues.country.id;
-    form.setValue("country_id", String(countryId));
+      try {
+        if (!initialValues?.country) return;
 
-    /* 2️⃣ FETCH STATES (✅ REQUIRED) */
-    setLoadingState(true);
-    const stateList = await fetchStateList(countryId);
-    setStates(stateList);
-    setLoadingState(false);
+        /* 1️⃣ COUNTRY */
+        const countryId = initialValues.country.id;
+        form.setValue("country_id", String(countryId));
 
-    /* 3️⃣ SET STATES */
-    if (initialValues.state_ids?.length) {
-      const stateIds = initialValues.state_ids.map(String);
-      form.setValue("state_ids", stateIds);
+        /* 2️⃣ FETCH STATES (✅ REQUIRED) */
+        setLoadingState(true);
+        const stateList = await fetchStateList(countryId);
+        setStates(stateList);
+        setLoadingState(false);
 
-      /* 4️⃣ FETCH CITIES */
-      setLoadingCity(true);
-      const cityList = await fetchCitiesByStates(
-        initialValues.state_ids.map(Number)
-      );
-      setCities(cityList);
-      setLoadingCity(false);
+        /* 3️⃣ SET STATES */
+        if (initialValues.state_ids?.length) {
+          const stateIds = initialValues.state_ids.map(String);
+          form.setValue("state_ids", stateIds);
 
-      /* 5️⃣ SET CITIES */
-      if (initialValues.city_ids?.length) {
-        form.setValue(
-          "city_ids",
-          initialValues.city_ids.map(String)
-        );
+          /* 4️⃣ FETCH CITIES */
+          setLoadingCity(true);
+          const cityList = await fetchCitiesByStates(
+            initialValues.state_ids.map(Number)
+          );
+          setCities(cityList);
+          setLoadingCity(false);
+
+          /* 5️⃣ SET CITIES */
+          if (initialValues.city_ids?.length) {
+            form.setValue(
+              "city_ids",
+              initialValues.city_ids.map(String)
+            );
+          }
+        }
+      } finally {
+        isHydratingRef.current = false;
       }
-    }
-  } finally {
-    isHydratingRef.current = false;
-  }
-};
+    };
 
 
     if (mode === "edit" || mode === "view") {
@@ -162,14 +164,13 @@ const hydrate = async () => {
     } catch (e) {
       console.error(e);
 
-    } 
+    }
   };
   useEffect(() => {
-     fetchStoreList()
-    if (id)
-    {
+    fetchStoreList()
+    if (id) {
       fetchTerritoryMaster();
-     
+
     }
   }, [id]);
   const isHydratingRef = useRef(false);
@@ -187,14 +188,14 @@ const hydrate = async () => {
   ) => {
     try {
       setIsLoading(true);
-      const updatedValues={
-    "name": value.name,
-    "store_id": Number(value.store_id),
-    "notes": value.notes,
-    "country_id":  Number(value.country_id),
-    "state_ids": value.state_ids.map(item=>Number(item)),
-    "city_ids": value.city_ids.map(item=>Number(item))
-}
+      const updatedValues = {
+        "name": value.name,
+        "store_id": Number(value.store_id),
+        "notes": value.notes,
+        "country_id": Number(value.country_id),
+        "state_ids": value.state_ids.map(item => Number(item)),
+        "city_ids": value.city_ids.map(item => Number(item))
+      }
       if (mode === "edit") {
         await EditTerritory({
           id: id ?? '',
@@ -246,25 +247,30 @@ const hydrate = async () => {
       setIsLoading(false);
     }
   };
-useEffect(() => {
-  if (!initialValues || !storeList.length) return;
+  useEffect(() => {
+    if (!initialValues || !storeList.length) return;
 
-  if (mode === "edit" || mode === "view") {
-    form.reset({
-      name: initialValues.name ?? "",
-      store_id: initialValues.store_id
-        ? String(initialValues.store_id)
-        : "",
-      notes: initialValues.notes ?? "",
-      country_id: initialValues.country?.id
-        ? String(initialValues.country.id)
-        : "",
-      state_ids: initialValues.state_ids?.map(String) ?? [],
-      city_ids: initialValues.city_ids?.map(String) ?? [],
-    });
-  }
-}, [mode, initialValues, storeList]);
+    if (mode === "edit" || mode === "view") {
+      form.reset({
+        name: initialValues.name ?? "",
+        store_id: initialValues.store_id
+          ? String(initialValues.store_id)
+          : "",
+        notes: initialValues.notes ?? "",
+        country_id: initialValues.country?.id
+          ? String(initialValues.country.id)
+          : "",
+        state_ids: initialValues.state_ids?.map(String) ?? [],
+        city_ids: initialValues.city_ids?.map(String) ?? [],
+      });
+    }
+  }, [mode, initialValues, storeList]);
 
+  useEffect(() => {
+    if (initialValues?.state_ids?.length) {
+      prevStateIdsRef.current = initialValues.state_ids.map(String);
+    }
+  }, [initialValues]);
 
   return (
     <Form {...form}>
@@ -307,7 +313,7 @@ useEffect(() => {
                         value: String(c.id),
                         label: c.name,
                       }))}
-                      
+
                     />
 
                     <FloatingRHFSelect
@@ -351,27 +357,57 @@ useEffect(() => {
                       onValueChange={async (values) => {
                         if (isHydratingRef.current) return;
 
-                        form.setValue("city_ids", []);
-                        setCities([]);
+                        const newStateIds = Array.isArray(values) ? values : [];
+                        const prevStateIds = prevStateIdsRef.current;
 
-                        // ✅ normalize to array
-                        const stateIds = Array.isArray(values) ? values : [values];
+                        // 🆕 added states
+                        const added = newStateIds.filter(id => !prevStateIds.includes(id));
 
-                        if (!stateIds.length) return;
+                        //  removed states
+                        const removed = prevStateIds.filter(id => !newStateIds.includes(id));
 
-                        setLoadingCity(true);
+                        // update ref
+                        prevStateIdsRef.current = newStateIds;
 
-                        try {
-                          const cityList = await fetchCitiesByStates(
-                            stateIds.map(id => Number(id))
+                        /* ================= ADD STATES ================= */
+                        if (added.length > 0) {
+                          setLoadingCity(true);
+                          try {
+                            const newCities = await fetchCitiesByStates(
+                              added.map(Number)
+                            );
+
+                            // merge (no duplicates)
+                            setCities(prev => {
+                              const map = new Map(prev.map(c => [String(c.id), c]));
+                              newCities.forEach((c: any) => map.set(String(c.id), c));
+                              return Array.from(map.values());
+                            });
+                          } finally {
+                            setLoadingCity(false);
+                          }
+                        }
+
+                        /* ================= REMOVE STATES ================= */
+                        if (removed.length > 0) {
+                          // remove city OPTIONS of removed states
+                          setCities(prev =>
+                            prev.filter(c => !removed.includes(String(c.state_id)))
                           );
-                          setCities(cityList);
-                        } finally {
-                          setLoadingCity(false);
+
+                          // remove SELECTED city_ids of removed states
+                          const selectedCityIds = form.getValues("city_ids");
+
+                          const filteredCityIds = selectedCityIds.filter(cityId => {
+                            const city = cities.find(c => String(c.id) === cityId);
+                            return city && !removed.includes(String(city.state_id));
+                          });
+
+                          form.setValue("city_ids", filteredCityIds);
                         }
                       }}
-
                     />
+
 
                     <FloatingRHFSelect
                       name="city_ids"
