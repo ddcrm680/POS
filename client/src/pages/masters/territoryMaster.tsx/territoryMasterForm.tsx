@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useForm, UseFormSetError } from "react-hook-form";
-import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronUp, Search } from "lucide-react";
 
 import {
   Form,
@@ -159,7 +159,7 @@ export default function TerritoryMasterForm() {
   const fetchStoreList = async () => {
     try {
       const res =
-        !id ? await fetchUnassignedStoreList() :await fetchStoreCrispList();
+        !id ? await fetchUnassignedStoreList() : await fetchStoreCrispList();
       setStoreList(res?.data)
     } catch (e) {
       console.error(e);
@@ -281,13 +281,27 @@ export default function TerritoryMasterForm() {
         <div className="max-w-7xl mx-auto bg-white rounded-xl shadow">
 
           {/* HEADER */}
-          <div className="border-b px-5 py-4">
-
+          <div className="border-b px-6 py-4 flex items-center gap-3">
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={() => window.history.back()}
+              className="
+                flex items-center gap-1 justify-start -ml-2
+                text-sm font-medium
+                text-muted-black
+                hover:text-foreground
+                transition
+              "
+            >
+              <ChevronLeft size={20} />
+            </button>
             <h1 className="text-xl font-semibold">
               {isView ? "View Territory" : id ? "Edit Territory" : "Create New Territory"}
             </h1>
 
           </div>
+
 
           <div>
             {

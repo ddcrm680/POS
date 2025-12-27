@@ -30,6 +30,7 @@ import { Loader } from "@/components/common/loader";
 import { useAuth } from "@/lib/auth";
 import { fetchCityList, fetchStateList } from "@/lib/api";
 import { findIdByName } from "@/lib/utils";
+import { ArrowLeft, ArrowLeftIcon, ChevronLeft } from "lucide-react";
 
 /* -------------------- CARD -------------------- */
 
@@ -88,7 +89,7 @@ export default function StoreForm({
     setCountryList(countries)
   }, [countries])
   useEffect(() => {
-    
+
     if ((mode == "create" || !mode) &&
       countryList.length) {
       const hydrateLocation = async () => {
@@ -170,7 +171,7 @@ export default function StoreForm({
   /* -------------------- HYDRATE -------------------- */
   useEffect(() => {
     if (mode === "edit" || mode === "view") {
-      
+
       form.reset({
         store_name: initialValues?.store_name ?? "",
         email: initialValues?.email ?? "",
@@ -213,11 +214,27 @@ export default function StoreForm({
         <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg">
 
           {/* HEADER */}
-          <div className="border-b px-6 py-4 ">
+          <div className="border-b px-6 py-4 flex items-center gap-3">
+            {/* Back Button */}
+            <button
+            type="button"
+            disabled={isLoading}
+              onClick={() => window.history.back()}
+              className="
+      flex items-center gap-1 justify-start -ml-2
+      text-sm font-medium
+      text-muted-black
+      hover:text-foreground
+      transition
+    "
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {/* Title */}
             <h1 className="text-xl font-semibold">
               {isView ? "View Store" : id ? "Edit Store" : "Create New Store"}
             </h1>
-
           </div>
 
           <div className=" pb-4">
