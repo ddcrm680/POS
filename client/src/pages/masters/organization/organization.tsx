@@ -18,6 +18,7 @@ import { categoryType, cityOptions, countryOptions, organizationMockData, planNa
 import ServiceForm from "./organizationForm";
 import { organizationFormType, organizationMetaInfoType, serviceFormType, serviceMetaInfoType, UserFormType } from "@/lib/types";
 import OrganizationForm from "./organizationForm";
+import OrganizationView from "./organizationView";
 
 export default function Organization() {
   const { toast } = useToast();
@@ -398,6 +399,12 @@ const OrganizationCommonHandler = async (
           cancelTextClass='hover:bg-[#E3EDF6] hover:text-[#000]'
           primaryColor="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
         >
+          {
+                      isOrganizationModalOpenInfo.type === 'view' ?
+                        <OrganizationView
+                          info={isOrganizationModalOpenInfo.info}
+                        />
+                        : 
           <OrganizationForm
             id="organization-form"
             organizationMetaInfo={organizationMetaInfo}
@@ -415,7 +422,7 @@ const OrganizationCommonHandler = async (
             onSubmit={(values, setError) => {
               OrganizationCommonHandler(values, setError);
             }}
-          />
+          />}
 
         </CommonModal>
       </CardContent>

@@ -17,6 +17,7 @@ import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { categoryType, planName, servicePlanMockResponse, vehicleType } from "@/lib/mockData";
 import ServiceForm from "./serviceForm";
 import { serviceFormType, serviceMetaInfoType, UserFormType } from "@/lib/types";
+import ServicePlanView from "./servicePlanView";
 
 export default function Services() {
   const { toast } = useToast();
@@ -465,6 +466,12 @@ export default function Services() {
           cancelTextClass='hover:bg-[#E3EDF6] hover:text-[#000]'
           primaryColor="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
         >
+           {
+            isServicePlanModalOpenInfo.type === 'view' ?
+              <ServicePlanView
+                info={isServicePlanModalOpenInfo.info}
+              />
+              : 
           <ServiceForm
             id="service-form"
             serviceMetaInfo={serviceMetaInfo}
@@ -482,7 +489,7 @@ export default function Services() {
             onSubmit={(values, setError) => {
               ServiceCommonHandler(values, setError);
             }}
-          />
+          />}
 
         </CommonModal>
       </CardContent>

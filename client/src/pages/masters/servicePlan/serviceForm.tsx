@@ -278,7 +278,7 @@ export default function ServiceForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>
-                      GST(%)<RequiredMark show={!isView} />
+                      GST (%)<RequiredMark show={!isView} />
                     </FormLabel>
                     <FormControl>
                       <Input
