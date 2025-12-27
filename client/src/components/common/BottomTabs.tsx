@@ -34,21 +34,26 @@ export const BottomTabs = ({
           <Link key={tab.path} href={tab.path}>
             <button
               onClick={handleClick}
-             className={`
-  relative transition-all duration-200
-  pos-touch-target flex flex-col items-center justify-center gap-1
-  rounded-lg px-3 py-2 min-w-[60px]
+              data-state={isActive ? "active" : "inactive"}
+              className="
+    relative
+    transition-all duration-200
+    pos-touch-target
+    flex flex-col items-center justify-center gap-1
+    rounded-lg px-3 py-2 min-w-[60px]
 
-  hover:bg-muted
-  hover:shadow-sm
-  hover:-translate-y-[1px]
+    text-muted-foreground
 
-  ${isActive
-    ? "pos-tab-active"
-    : "pos-tab-inactive"}
-`}
+    hover:bg-muted
+    hover:shadow-sm
+    hover:-translate-y-[1px]
 
+    data-[state=active]:bg-primary
+    data-[state=active]:text-primary-foreground
+    data-[state=active]:shadow
+  "
             >
+
               <div className="relative">
                 <Icon
                   size={isTop ? 18 : 20}
