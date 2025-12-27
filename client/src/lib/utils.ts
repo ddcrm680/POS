@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { FloatingRHFSelectProps, GroupedOption, Option } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -120,4 +121,46 @@ export function getDiff(before: any = {}, after: any = {}) {
       changed,
     };
   });
+}
+export function buildGroupedCityOptions(
+  cities: any[],
+  states: any[]
+) {
+  const stateMap = new Map(
+    states.map(s => [String(s.id), s.name])
+  );
+
+  const grouped: Record<string, any[]> = {};
+
+  cities.forEach(city => {
+    const stateId = String(city.state_id);
+    const stateName = stateMap.get(stateId) || "Other";
+
+    if (!grouped[stateName]) {
+      grouped[stateName] = [];
+    }
+
+    grouped[stateName].push({
+      value: String(city.id),
+      label: city.name,
+    });
+  });
+
+  return Object.entries(grouped).map(([label, options]) => ({
+    label,
+    options,
+  }));
+}
+export function flattenOptions(
+  options: Option[] | GroupedOption[]
+): Option[] {
+  if (!options || options.length === 0) return []
+
+  // grouped options
+  if ("options" in options[0]) {
+    return (options as GroupedOption[]).flatMap(g => g.options)
+  }
+
+  // flat options
+  return options as Option[]
 }

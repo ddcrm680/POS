@@ -1,4 +1,4 @@
-import { ControllerRenderProps, UseFormSetError } from "react-hook-form";
+import { Control, ControllerRenderProps, UseFormSetError } from "react-hook-form";
 import { CustomerSchema, InsertCustomerSchema, JobCardSchema, loginSchema, passwordSchema, posJobSchema, profileSchema, userSchema, VehicleSchema } from "./schema";
 import z from "zod";
 import { ReactNode } from "react";
@@ -118,6 +118,23 @@ export interface CommonDeleteModalProps {
   isLoading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+}
+export type GroupedOption = {
+  label: string
+  options: Option[]
+}
+export type FloatingRHFSelectProps = {
+  name: string
+  label: string
+  control: Control<any>
+ options: Option[] | GroupedOption[]
+
+
+  isMulti?: boolean
+  isDisabled?: boolean
+  isRequired?: boolean
+  creatable?: boolean
+  onValueChange?: (value: string | string[]) => void
 }
 
 export interface UserApiType {

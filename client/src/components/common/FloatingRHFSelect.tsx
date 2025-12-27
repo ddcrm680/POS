@@ -5,20 +5,9 @@ import CreatableSelect from "react-select/creatable"
 import { Controller, Control } from "react-hook-form"
 import { Box, Text } from "@chakra-ui/react"
 import { useState } from "react"
-import { Option } from "@/lib/types"
+import { FloatingRHFSelectProps, Option } from "@/lib/types"
 import { RequiredMark } from "./RequiredMark"
-
-type FloatingRHFSelectProps = {
-  name: string
-  label: string
-  control: Control<any>
-  options: Option[]
-  isMulti?: boolean
-  isDisabled?: boolean
-  isRequired?: boolean
-  creatable?: boolean
-  onValueChange?: (value: string | string[]) => void
-}
+import { flattenOptions } from "@/lib/utils"
 
 export function FloatingRHFSelect({
   name,
@@ -47,19 +36,24 @@ export function FloatingRHFSelect({
 
         const shouldFloat = focused || hasValue
 
+        const flatOptions = flattenOptions(options)
+
         const value = isMulti
           ? Array.isArray(field.value)
             ? field.value.map((v: string) => ({
               value: v,
-              label: options.find(o => o.value === v)?.label || v,
+              label: flatOptions.find(o => o.value === v)?.label || v,
             }))
             : []
           : field.value
             ? {
               value: field.value,
-              label: options.find(o => o.value === field.value)?.label || field.value,
+              label:
+                flatOptions.find(o => o.value === field.value)?.label ||
+                field.value,
             }
-            : null;
+            : null
+
         return (
           <Box position="relative" h={'44px'} w="full">
             {/* FLOATING LABEL */}
@@ -84,6 +78,16 @@ export function FloatingRHFSelect({
               isDisabled={isDisabled}
               isSearchable
               options={options}
+              getOptionValue={(o: any) => o.value}
+              getOptionLabel={(o: any) => o.label}
+              formatGroupLabel={(group) => (
+                <div className="flex justify-between">
+                  <span>{group.label}</span>
+                  <span className="text-xs text-gray-400">
+                    {group.options.length}
+                  </span>
+                </div>
+              )}
               value={value}
               placeholder=""
               menuPortalTarget={typeof document !== "undefined" ? document.body : null}
@@ -102,6 +106,12 @@ export function FloatingRHFSelect({
                 }
               }}
               styles={{
+                groupHeading: base => ({
+                  ...base,
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  color: "#2d3748",
+                }),
                 control: (base, state) => ({
                   ...base,
                   minHeight: "44px",

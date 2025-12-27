@@ -26,7 +26,7 @@ import { storeFormProp, storeListType, TerritoryFormApiValues, TerritoryFormValu
 import { FRANCHISES } from "@/lib/mockData";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TerritoryMasterSchema } from "@/lib/schema";
-import { findIdByName, findIdsByNames } from "@/lib/utils";
+import { buildGroupedCityOptions, findIdByName, findIdsByNames } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 export default function TerritoryMasterForm() {
@@ -416,10 +416,8 @@ export default function TerritoryMasterForm() {
                       control={form.control}
                       isRequired
                       isDisabled={isView || !form.getValues("state_ids")}
-                      options={cities.map(c => ({
-                        value: String(c.id),
-                        label: c.name,
-                      }))}
+                      options={buildGroupedCityOptions(cities, states)}
+
                     />
                   </div>
                 </SectionCard>
