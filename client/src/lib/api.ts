@@ -3,6 +3,7 @@ import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
 import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, TerritoryFormRequestValues, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
 import { DateRangeType, DateValueType } from "react-tailwindcss-datepicker";
+import { setServiceDown } from "./systemStatus";
 
 export const baseUrl =
   process.env.REACT_APP_BASE_URL || Constant.REACT_APP_BASE_URL;
@@ -41,44 +42,46 @@ function createInstance(): AxiosInstance {
   inst.interceptors.response.use(
     (res) => res,
     async (error) => {
-      try{
+      try {
         const status = error?.status;
 
-      if (status === 401) {
-        sessionStorage.setItem("sessionExpired", "1");
+        if (status === 401) {
+          sessionStorage.setItem("sessionExpired", "1");
 
-        // clear auth
-        localStorage.clear();
-        cookieStore.removeItem("token");
+          // clear auth
+          localStorage.clear();
+          cookieStore.removeItem("token");
 
-        window.location.href = "/login";
+          window.location.href = "/login";
+
+          return Promise.reject(error);
+        }
+        if (status === 403) {
+          window.dispatchEvent(new Event("auth:unauthorized"));
+        }
+        if (status === 503) {
+          setServiceDown(true);
+        }
+        const cfg = error.config;
+        // ❌ No config = can't retry
+        if (!cfg) return Promise.reject(error);
+
+        const isTimeout = error.code === "ECONNABORTED";
+        const isNetwork = !error.response;
+
+        const shouldRetry = isTimeout || isNetwork;
+
+        if (shouldRetry && cfg.__retryCount < API_RETRY_COUNT) {
+          cfg.__retryCount += 1;
+
+          return inst(cfg); // 🔁 retry request
+        }
 
         return Promise.reject(error);
+      } catch (e) {
+        // console.log(e);
+
       }
-      if (status === 403) {
-        window.dispatchEvent(new Event("auth:unauthorized"));
-      }
-
-      const cfg = error.config;
-      // ❌ No config = can't retry
-      if (!cfg) return Promise.reject(error);
-
-      const isTimeout = error.code === "ECONNABORTED";
-      const isNetwork = !error.response;
-
-      const shouldRetry = isTimeout || isNetwork;
-
-      if (shouldRetry && cfg.__retryCount < API_RETRY_COUNT) {
-        cfg.__retryCount += 1;
-
-        return inst(cfg); // 🔁 retry request
-      }
-
-      return Promise.reject(error);
-      }catch(e){
-      // console.log(e);
-      
-    }
     }
   );
 
@@ -271,11 +274,11 @@ export async function EditUser(editFormValue: editUserReq) {
 
   }
 }
-export async function EditTerritory(editFormValue: {id:string,info:TerritoryFormRequestValues}) {
+export async function EditTerritory(editFormValue: { id: string, info: TerritoryFormRequestValues }) {
 
   try {
     const response: any = await api.post(
-      `api/admin/territories/update`, {...editFormValue.info,id:editFormValue.id}
+      `api/admin/territories/update`, { ...editFormValue.info, id: editFormValue.id }
     );
     if (response?.data?.success === true) {
       return response.data?.data;
@@ -329,7 +332,7 @@ export async function fetchRoleList() {
   }
   throw new Error(response.data?.message || "Failed to fetch role list");
 }
-export async function fetchTerritoryById(id:string) {
+export async function fetchTerritoryById(id: string) {
 
   const response: any = await api.get(
     `/api/admin/territories/view/${id}`,
@@ -380,20 +383,20 @@ export async function fetchUserList({
 }
 export async function fetchTerritoryMasterList({
   page,
-  search,  status,
+  search, status,
   per_page
 }: {
   per_page: number;
   page: number;
   search: string;
-    status?: string | number;
+  status?: string | number;
 }) {
   const params = new URLSearchParams({
     page: String(page),
     search,
     per_page: String(per_page)
   });
- if (status !== "") params.append("status", String(status));
+  if (status !== "") params.append("status", String(status));
 
   const response = await api.get(`/api/admin/territories/list?${params.toString()}`);
 
@@ -410,7 +413,7 @@ export async function fetchCitiesByStates(stateIds: number[]) {
       state_ids: stateIds,
     }
   );
- if (res?.data?.success === true) {
+  if (res?.data?.success === true) {
     return res.data.data;
   }
   throw new Error("Failed to fetch territory list");
@@ -470,8 +473,8 @@ export async function fetchServiceLogList({
   platform?: string | number;
   device_type?: string | number;
   action?: string | number;
-  from_date?: string; 
-  to_date?: string;   
+  from_date?: string;
+  to_date?: string;
 }) {
   const params = new URLSearchParams({
     page: String(page),
@@ -669,7 +672,7 @@ export async function UpdateStoreStatus(statusInfo: { id: number, status: number
 
   }
 }
-export async function UpdateTerritoryStatus(statusInfo: { id: number,}) {
+export async function UpdateTerritoryStatus(statusInfo: { id: number, }) {
 
   try {
     const response: any = await api.post(

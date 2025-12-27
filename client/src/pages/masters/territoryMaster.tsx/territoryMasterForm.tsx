@@ -300,7 +300,7 @@ useEffect(() => {
 
                     <FloatingRHFSelect
                       name="store_id"
-                      label="Franchise"
+                      label="Store"
                       control={form.control}
                       isDisabled={false}
                       options={storeList.map(c => ({

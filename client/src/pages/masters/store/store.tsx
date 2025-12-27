@@ -55,7 +55,7 @@ const [, navigate] = useLocation();
     },
     {
       key: "store_name",
-      label: "Franchise Name",
+      label: "Store",
       width: "250px",
      
     },

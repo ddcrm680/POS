@@ -94,7 +94,7 @@ const [isLoading, setIsLoading] = useState(false);
       }
     },
     {
-      key: "store", label: "	Franchise", width: "150px",
+      key: "store", label: "	Store", width: "150px",
       render: (_value: any,) => {
 
         return (
