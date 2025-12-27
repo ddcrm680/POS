@@ -74,3 +74,50 @@ export function formatAndTruncate(
       : fullText,
   };
 }
+export function isObject(val: any) {
+  return val !== null && typeof val === "object" && !Array.isArray(val);
+}
+
+export function isEqualDeep(a: any, b: any): boolean {
+  // same reference or same primitive
+  if (a === b) return true;
+
+  // array comparison
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    return a.every((item, i) => isEqualDeep(item, b[i]));
+  }
+
+  // object comparison
+  if (isObject(a) && isObject(b)) {
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+    if (aKeys.length !== bKeys.length) return false;
+    return aKeys.every(
+      key => isEqualDeep(a[key], b[key])
+    );
+  }
+
+  return false;
+}
+
+export function getDiff(before: any = {}, after: any = {}) {
+  const keys = new Set([
+    ...Object.keys(before || {}),
+    ...Object.keys(after || {}),
+  ]);
+
+  return Array.from(keys).map((key) => {
+    const beforeVal = before?.[key];
+    const afterVal = after?.[key];
+
+    const changed = !isEqualDeep(beforeVal, afterVal);
+
+    return {
+      key,
+      before: beforeVal,
+      after: afterVal,
+      changed,
+    };
+  });
+}
