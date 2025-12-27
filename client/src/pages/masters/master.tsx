@@ -72,8 +72,8 @@ export default function Master() {
     hover:shadow-sm
     hover:-translate-y-[1px]
 
-    data-[state=active]:bg-primary
-    data-[state=active]:text-primary-foreground
+    data-[state=active]:bg-white
+    data-[state=active]:text-[#65758b]
     data-[state=active]:shadow
   "
                       >
