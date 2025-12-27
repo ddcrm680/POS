@@ -1,4 +1,5 @@
 import { Loader } from "@/components/common/loader";
+import { Info } from "@/components/common/viewInfo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { fetchServiceLogItem } from "@/lib/api";
@@ -38,10 +39,10 @@ export default function SystemLogForm({
 
   return (
     <Card>
-      <CardContent className="p-6 space-y-8 overflow-auto max-h-[500px]">
+      <CardContent className="p-6 space-y-4 overflow-auto max-h-[500px]">
 
         {/* ================= META ================= */}
-        <div className="grid  grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+        <div className="grid  grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <Info label="Operation" value={log.action.split('_').map((item: string) => item.substring(0, 1).toUpperCase() + item.substring(1)).join(' ')} />
           <Info label="Date" value={`${formatDate(log.created_at)} ${formatTime(log.created_at)}`} />
           <Info
@@ -57,11 +58,7 @@ export default function SystemLogForm({
             label="Browser / Platform"
             value={`${log.browser} · ${log.platform} · ${log.device_type}`}
           />
-        </div>
-
-        {/* ================= URLS ================= */}
-        <div className="space-y-2 grid grid-cols-1 md:grid-cols-3 gap-6  text-sm">
-          <Info
+           <Info
             label="Description"
             value={`${log.description}`}
           />
@@ -69,7 +66,6 @@ export default function SystemLogForm({
           <Info label="Client URL" value={log.client_url} />
 
         </div>
-
         {/* ================= DIFF ================= */}
         <div>
           <h4 className="text-sm font-semibold mb-3">
@@ -89,36 +85,7 @@ export default function SystemLogForm({
     </Card>
   );
 }
-function Info({
-  label,
-  value,
-  mono = false,
-  link = false,
-}: {
-  label: string;
-  value?: string;
-  mono?: boolean;
-  link?: boolean;
-}) {
-  return (
-    <div>
-      <p className="text-gray-500">{label}</p>
-      {link ? (
-        <a
-          href={value}
-          target="_blank"
-          className="text-blue-600 break-all hover:underline"
-        >
-          {value}
-        </a>
-      ) : (
-        <p className={`break-all ${mono ? "font-mono" : ""}`}>
-          {value || "-"}
-        </p>
-      )}
-    </div>
-  );
-}
+
 function renderValue(value: any) {
   if (value === null || value === undefined) {
     return <span className="italic text-gray-400">—</span>;

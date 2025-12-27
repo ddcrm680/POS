@@ -391,6 +391,27 @@ export async function fetchUserList({
   }
   throw new Error("Failed to fetch user list");
 }
+export async function fetchUserLogInfo({
+  page,
+  per_page,
+  id
+}: {
+  per_page: number;
+  page: number;
+  id:string
+}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    per_page: String(per_page)
+  });
+
+  const response = await api.get(`/api/admin/view-user/${id}?${params.toString()}`);
+
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error("Failed to fetch user info");
+}
 export async function fetchTerritoryMasterList({
   page,
   search, status,

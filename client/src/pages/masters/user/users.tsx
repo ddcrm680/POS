@@ -17,6 +17,7 @@ import UserFormInfo from "./userForm";
 import { formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
+import UserView from "./userView";
 
 export default function Users() {
   const { toast } = useToast();
@@ -274,7 +275,7 @@ export default function Users() {
       const mappedUsers = res.data.map((u: UserApiType) => ({
         id: u.id,
         name: u.full_name || u.name,
-        address:u.address,
+        address: u.address,
         email: u.email,
         phone: u.phone,
         role_id: u.role_id,
@@ -392,6 +393,8 @@ export default function Users() {
 
         />
         <CommonModal
+          width={isUserModalOpenInfo.type === 'view' && isUserModalOpenInfo.open && '80%'}
+          maxWidth={isUserModalOpenInfo.type === 'view' && isUserModalOpenInfo.open && '80%'}
           isOpen={isUserModalOpenInfo.open}
           onClose={() => setIsUserModalOpenInfo({ open: false, type: 'create', info: {} })}
           title={isUserModalOpenInfo.type === 'view' ? "View User" : isUserModalOpenInfo.type === 'create' ? "Add User" : "Edit User"}
@@ -400,24 +403,30 @@ export default function Users() {
           cancelTextClass='hover:bg-[#E3EDF6] hover:text-[#000]'
           primaryColor="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
         >
-          <UserFormInfo
-            id="user-form"
-            initialValues={
-              isUserModalOpenInfo.type === "edit" || isUserModalOpenInfo.type === "view"
-                ? isUserModalOpenInfo.info
-                : {}
-            }
-            isLoading={isLoading}
-            mode={isUserModalOpenInfo.type === 'view' ? "view" : isUserModalOpenInfo.type === "create" ? "create" : "edit"}
-            onClose={() =>
-              setIsUserModalOpenInfo({ open: false, type: "create", info: {} })
-            }
-            roles={roles}
-            onSubmit={(values, setError) => {
-              UserCommonHandler(values, setError);
-            }}
-          />
+          {
+            isUserModalOpenInfo.type === 'view' ?
+              <UserView
+                info={isUserModalOpenInfo.info}
+              />
+              : <UserFormInfo
+                id="user-form"
+                initialValues={
+                  isUserModalOpenInfo.type === "edit" || isUserModalOpenInfo.type === "view"
+                    ? isUserModalOpenInfo.info
+                    : {}
+                }
+                isLoading={isLoading}
+                mode={isUserModalOpenInfo.type === 'view' ? "view" : isUserModalOpenInfo.type === "create" ? "create" : "edit"}
+                onClose={() =>
+                  setIsUserModalOpenInfo({ open: false, type: "create", info: {} })
+                }
+                roles={roles}
+                onSubmit={(values, setError) => {
+                  UserCommonHandler(values, setError);
+                }}
+              />
 
+          }
         </CommonModal>
         <CommonDeleteModal
           width="420px"
