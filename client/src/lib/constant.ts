@@ -21,7 +21,9 @@ import {
   Store,
   Activity,
   FileText,
-  MapPinned
+  MapPinned,
+  Key,
+  BarChart3
 } from "lucide-react";
 
 export const Constant = {
@@ -139,4 +141,18 @@ export const masterTabList = [
   { id: "store", label: "Store", emoji: Store, color: "bg-blue-600 hover:bg-blue-700" },
   { id: "systemLog", label: "System Log",  emoji: FileText , color: "bg-blue-600 hover:bg-blue-700" },
   { id: "territoryMaster", label: "Territory Master",  emoji: MapPinned  , color: "bg-blue-600 hover:bg-blue-700" },
+];
+export const profileMenu=[
+{
+  value:"overview",
+  dataTestId:"tab-overview",
+  label:"Overview",
+  emoji: BarChart3
+},
+{
+  value:"password",
+  dataTestId:"tab-vehicles",
+  label:"Password",
+  emoji: Key
+}
 ];

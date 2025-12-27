@@ -9,7 +9,7 @@ import {
   BarChart3,
   Key
 } from "lucide-react";
-import { availableServices } from "@/lib/constant";
+import { availableServices, profileMenu } from "@/lib/constant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Password from "./password";
 import Profile from "./profile";
@@ -157,32 +157,39 @@ export default function ProfileDetails() {
 ">Profile Details</h1>
 
             </div>
-            <TabsList className="
+            <TabsList className="h-auto
     flex 
     overflow-x-auto
     scrollbar-hide
     lg:grid lg:grid-cols-2
     justify-start
-     lg:overf5low-visible
+     lg:w-[40]
      
   ">
+              {profileMenu.map((item) => {
+                 const Icon = item.emoji;
+                return <TabsTrigger
+                  value={item.value}
+                 className="
+    flex items-center gap-2
+    whitespace-nowrap px-3 py-2
+    transition-all duration-200
 
-              <TabsTrigger
-                value="overview"
-                className="flex items-center gap-3"
-                data-testid="tab-overview"
-              >
-                <BarChart3 size={16} />
-                <span className="hidden sm:inline">Overview</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="password"
-                className="flex items-center gap-3"
-                data-testid="tab-vehicles"
-              >
-                <Key size={16} />
-                <span className="hidden sm:inline">Password</span>
-              </TabsTrigger>
+    hover:bg-muted
+    hover:text-foreground
+    hover:shadow-sm
+    hover:-translate-y-[1px]
+
+    data-[state=active]:bg-primary
+    data-[state=active]:text-primary-foreground
+    data-[state=active]:shadow
+  "
+                  data-testid={item.dataTestId}
+                >
+                 <Icon size={16} />
+                  <span className="hidden sm:inline">{item.label}</span>
+                </TabsTrigger>
+              })}
 
             </TabsList>
 

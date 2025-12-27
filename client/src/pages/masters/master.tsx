@@ -64,8 +64,17 @@ export default function Master() {
                         value={tab.id}
                         className="
     flex items-center gap-2
-    whitespace-nowrap
-    px-3
+    whitespace-nowrap px-3 py-2
+    transition-all duration-200
+
+    hover:bg-muted
+    hover:text-foreground
+    hover:shadow-sm
+    hover:-translate-y-[1px]
+
+    data-[state=active]:bg-primary
+    data-[state=active]:text-primary-foreground
+    data-[state=active]:shadow
   "
                       >
                         <Icon size={16} />
@@ -73,6 +82,7 @@ export default function Master() {
                           {tab.label}
                         </span>
                       </TabsTrigger>
+
                     );
                   })}
                 </TabsList>
@@ -101,7 +111,7 @@ export default function Master() {
               <TabsContent value="systemLog">
                 <SystemLog />
               </TabsContent>
-               <TabsContent value="territoryMaster">
+              <TabsContent value="territoryMaster">
                 <TerritoryMaster />
               </TabsContent>
             </Tabs>
