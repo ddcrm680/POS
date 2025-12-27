@@ -20,7 +20,7 @@ import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { useAuth } from "@/lib/auth";
 import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
-import { EditTerritory, fetchCitiesByStates, fetchCityList, fetchStateList, fetchStoreCrispList, fetchTerritoryById, SaveTerritory } from "@/lib/api";
+import { EditTerritory, fetchCitiesByStates, fetchCityList, fetchStateList, fetchStoreCrispList, fetchTerritoryById, fetchUnassignedStoreList, SaveTerritory } from "@/lib/api";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
 import { storeFormProp, storeListType, TerritoryFormApiValues, TerritoryFormValues, TerritoryMasterApiType } from "@/lib/types";
 import { FRANCHISES } from "@/lib/mockData";
@@ -159,7 +159,7 @@ export default function TerritoryMasterForm() {
   const fetchStoreList = async () => {
     try {
       const res =
-        await fetchStoreCrispList();
+        !id ? await fetchUnassignedStoreList() :await fetchStoreCrispList();
       setStoreList(res?.data)
     } catch (e) {
       console.error(e);

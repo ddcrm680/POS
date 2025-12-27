@@ -352,6 +352,16 @@ export async function fetchStoreCrispList() {
   }
   throw new Error(response.data?.message || "Failed to fetch store list");
 }
+export async function fetchUnassignedStoreList() {
+
+  const response: any = await api.get(
+    `/api/utility/unassigned-stores`,
+  );
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error(response.data?.message || "Failed to fetch unassigned store list");
+}
 export async function fetchUserList({
   page,
   search,
