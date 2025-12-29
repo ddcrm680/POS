@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormSetError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, useSearchParams } from "wouter";
 
@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
 import { StoreSchema } from "@/lib/schema";
-import { storeFormProp, storeFormType } from "@/lib/types";
+import { storeFormApi, storeFormProp, storeFormType, TerritoryFormApiValues } from "@/lib/types";
 import { countryOptions, stateOptions, cityOptions } from "@/lib/mockData";
 import { RequiredMark } from "@/components/common/RequiredMark";
 import { Field } from "@chakra-ui/react";
@@ -28,18 +28,16 @@ import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { SectionCard } from "@/components/common/card";
 import { Loader } from "@/components/common/loader";
 import { useAuth } from "@/lib/auth";
-import { fetchCityList, fetchStateList } from "@/lib/api";
+import { baseUrl, EditStore, fetchCityList, fetchOrganizationsList, fetchStateList, fetchStoreById, fetchTerritoryById, fetchTerritoryOrganizationList, SaveStore } from "@/lib/api";
 import { findIdByName } from "@/lib/utils";
 import { ArrowLeft, ArrowLeftIcon, ChevronLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { storeFormKeys } from "@/lib/constant";
 
 /* -------------------- CARD -------------------- */
 
 
-export default function StoreForm({
-  initialValues,
-  isLoading = false,
-  onSubmit,
-}: storeFormProp) {
+export default function StoreForm() {
   const [searchParams] = useSearchParams();
   const [, navigate] = useLocation();
 
@@ -47,16 +45,19 @@ export default function StoreForm({
   const mode = searchParams.get("mode");
   const isView = mode === "view";
 
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<storeFormType>({
     resolver: zodResolver(StoreSchema),
     defaultValues: {
-      store_name: "",
+      name: "",
       email: "",
       phone: "",
-      location_name: "",
-      address: "",
+      organization_id: "",
+      territory_id: "",
+      registered_address: "",
+      shipping_address: "",
       notes: "",
-      gstin: "",
+      gst_no: "",
       pan_no: "",
       invoice_prefix: "",
       country: "India",
@@ -64,17 +65,40 @@ export default function StoreForm({
       city: "",
       pincode: "",
       opening_date: "",
+      pan_card_file: "",
       registration_file: "",
-      cancelled_cheque: "",
-      agreement_file: "",
+      gstin_file: "",
     },
   });
-
+  const [isInfoLoading, setIsInfoLoading] = useState(false);
+  const { toast } = useToast();
+  const { control, handleSubmit, watch, setValue } = form;
+  const [initialValues, setInitialValues] = useState<storeFormApi | null>(null)
   const [filePreview, setFilePreview] = useState<Record<string, string | null>>(
     {}
   );
   const { countries } = useAuth();
+  const fetchStoreInfo = async () => {
+    try {
+      setIsInfoLoading(true);
+      const res =
+        await fetchStoreById(id ?? "");
 
+      const updatedInfo = { ...res?.data, territory_id: res?.data?.territory?.id ?? "" }
+      setInitialValues(updatedInfo)
+    } catch (e) {
+      console.error(e);
+
+    } finally {
+      setIsInfoLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (id) {
+      fetchStoreInfo();
+
+    }
+  }, [id]);
   const [countryList, setCountryList] = useState<
     { id: number; name: string; slug?: string }[]
   >([]);
@@ -86,6 +110,7 @@ export default function StoreForm({
 
   const isHydratingRef = useRef(false);
   useEffect(() => {
+
     setCountryList(countries)
   }, [countries])
   useEffect(() => {
@@ -97,7 +122,9 @@ export default function StoreForm({
         isHydratingRef.current = true;
         try {
           const countryId = findIdByName(countryList, '101');
+
           if (!countryId) return;
+
           form.setValue("country", String(countryId));
 
           // 2️⃣ STATES
@@ -106,7 +133,7 @@ export default function StoreForm({
           setStates(stateList);
           setLoadingState(false);
 
-        }catch(e){
+        } catch (e) {
           console.error(e)
         } finally {
           // ✅ hydration completed
@@ -153,6 +180,16 @@ export default function StoreForm({
         if (!cityId) return;
 
         form.setValue("city", String(cityId));
+
+        // ORGANIZATION
+        if (initialValues.organization_id) {
+          form.setValue("organization_id", String(initialValues.organization_id));
+        }
+
+        // TERRITORY
+        if (initialValues.territory_id) {
+          form.setValue("territory_id", String(initialValues.territory_id));
+        }
       } finally {
         // ✅ hydration completed
         isHydratingRef.current = false;
@@ -170,47 +207,206 @@ export default function StoreForm({
     form.setValue("country", String(india.id));
   }, [mode, countryList]);
 
+  const [organizationTerritoryList, setOrganizationTerritoryList] = useState<any>({
+    territories: [],
+    organizations: []
+  });
+  const fetchOrganizationsTerritory = async () => {
+    try {
+      const res = await fetchTerritoryOrganizationList();
+
+      setOrganizationTerritoryList({
+        territories: res.territories.map((t: any) => {
+          const isAssigned = t.store_id !== null;
+          const isSelected = String(t.id) === String(selectedTerritoryId);
+
+          return {
+            value: String(t.id),
+            label: isAssigned && !isSelected
+              ? `${t.name} (Assigned)`
+              : t.name,
+            isDisabled: isAssigned && !isSelected,
+          };
+        }),
+        organizations: res.organizations,
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  const selectedTerritoryId = form.watch("territory_id");
+
+  useEffect(() => {
+    fetchOrganizationsTerritory();
+  }, [selectedTerritoryId]);
+
+
   /* -------------------- HYDRATE -------------------- */
   useEffect(() => {
+    if (!initialValues) return;
+
+    const previews: Record<string, string> = {};
+
+    (["pan_card_file", "registration_file", "gstin_file"] as const).forEach(key => {
+      const val = initialValues[key];
+      if (typeof val === "string" && val) {
+        previews[key] = `${baseUrl}/${val}`;
+      }
+    });
+
+    setFilePreview(previews);
     if (mode === "edit" || mode === "view") {
 
       form.reset({
-        store_name: initialValues?.store_name ?? "",
+        name: initialValues?.name ?? "",
         email: initialValues?.email ?? "",
+        organization_id: initialValues?.organization_id ?? "",
         phone: initialValues?.phone ?? "",
-        location_name: initialValues?.location_name ?? "",
-        address: initialValues?.address ?? "",
+        territory_id: initialValues?.territory_id.toString() ?? "",
+        registered_address: initialValues?.registered_address ?? "",
+
+        shipping_address: initialValues?.shipping_address ?? "",
         notes: initialValues?.notes ?? "",
-        gstin: initialValues?.gstin ?? "",
+        gst_no: initialValues?.gst_no ?? "",
         pan_no: initialValues?.pan_no ?? "",
         invoice_prefix: initialValues?.invoice_prefix ?? "",
-        country: initialValues?.country ?? "India",
+
+        country: initialValues?.country.toString() ?? "",
         state: initialValues?.state ?? "",
         city: initialValues?.city ?? "",
-        opening_date: initialValues?.opening_date ?? "",
+        opening_date: initialValues?.opening_date
+          ? new Date(initialValues.opening_date)
+            .toISOString()
+            .slice(0, 10)
+          : "",
+        // city: initialValues?.city ?? "",
         pincode: initialValues?.pincode ?? "",
+        pan_card_file: initialValues?.pan_card_file ?? "",
         registration_file: initialValues?.registration_file ?? "",
-        cancelled_cheque: initialValues?.cancelled_cheque ?? "",
-        agreement_file: initialValues?.agreement_file ?? "",
+        gstin_file: initialValues?.gstin_file ?? "",
       });
     }
   }, [mode, initialValues, form]);
   /* -------------------- FILE HANDLER -------------------- */
   const handleFile = (key: keyof storeFormType, file: File | null) => {
     if (!file) return;
-    form.setValue(key, file);
-    if (file.type.startsWith("image/")) {
-      setFilePreview((p) => ({
-        ...p,
-        [key]: URL.createObjectURL(file),
-      }));
+
+    form.setValue(key, file, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+
+    const url = URL.createObjectURL(file);
+    setFilePreview(prev => ({ ...prev, [key]: url }));
+  };
+  const onSubmit = (values: storeFormType) => {
+    StoreCommonHandler(values, form.setError)
+  };
+  const buildOrganizationFormData = (
+    value: storeFormType, id?: string | null,) => {
+    const formData = new FormData();
+
+    if (id) {
+      formData.append("id", String(id));
+    }
+
+    formData.append("name", value.name);
+    formData.append("organization_id", value.organization_id);
+    formData.append("email", value.email);
+    formData.append("gst_no", value.gst_no);
+    formData.append("pan_no", value.pan_no);
+    formData.append("invoice_prefix", value.invoice_prefix);
+    formData.append("country", (value.country) ?? "");
+    formData.append("state", value.state);
+    formData.append("pincode", value.pincode);
+    formData.append("registered_address", value.registered_address);
+    formData.append("shipping_address", value.shipping_address ?? "");
+    formData.append("territory_id", value.territory_id);
+    formData.append("phone", value.phone ?? "");
+    formData.append("opening_date", value.opening_date);
+    formData.append("city", value.city.toString());
+    formData.append("notes", value.notes ?? "");
+    if (value.gstin_file instanceof File) {
+      formData.append("gstin_file", value.gstin_file);
+    }
+
+    if (value.pan_card_file instanceof File) {
+      formData.append("pan_card_file", value.pan_card_file);
+    }
+
+    if (value.registration_file instanceof File) {
+      formData.append("registration_file", value.registration_file);
+    }
+
+
+    return formData;
+  };
+  const StoreCommonHandler = async (
+    value: storeFormType,
+    setError: UseFormSetError<storeFormType>
+  ) => {
+    try {
+
+      setIsLoading(true);
+
+      if (mode === "edit") {
+        const formData = buildOrganizationFormData(
+          value,
+          id
+        );
+        await EditStore(formData);
+
+        toast({
+          title: "Edit Store",
+          description: "Store updated successfully",
+          variant: "success",
+        });
+      } else {
+        const formData = buildOrganizationFormData(value);
+
+        await SaveStore(formData);
+
+        toast({
+          title: "Add Store",
+          description: "Store added successfully",
+          variant: "success",
+        });
+      }
+      navigate("/master")
+    } catch (err: any) {
+      const apiErrors = err?.response?.data?.errors;
+
+
+      // 👇 THIS IS THE KEY PART
+      if (apiErrors && err?.response?.status === 422) {
+        Object.entries(apiErrors).forEach(([field, messages]) => {
+          setError(field as keyof storeFormType, {
+            type: "server",
+            message: (messages as string[])[0],
+          });
+        });
+        return;
+      }
+      if (err?.response?.status === 403) {
+        navigate("/master")
+      }
+      toast({
+        title: "Error",
+        description:
+          err?.response?.data?.message ||
+          err.message ||
+          `Failed to ${mode === "create" ? "add" : "update"
+          } store`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
-
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((v) => onSubmit(v, form.setError))}
+        onSubmit={handleSubmit(onSubmit)}
         className="min-h-screen bg-gray-100 p-4 md:p-10"
       >
         <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg">
@@ -219,8 +415,8 @@ export default function StoreForm({
           <div className="border-b px-6 py-4 flex items-center gap-3">
             {/* Back Button */}
             <button
-            type="button"
-            disabled={isLoading}
+              type="button"
+              disabled={isLoading}
               onClick={() => window.history.back()}
               className="
       flex items-center gap-1 justify-start -ml-2
@@ -244,8 +440,8 @@ export default function StoreForm({
             {/* STORE INFO */}
             <SectionCard title="Store Information">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* "store_name", "email", "phone" */}
-                {[{ label: "Store Name", fieldName: "store_name", isRequired: true },
+                {/* "name", "email", "phone" */}
+                {[{ label: "Store Name", fieldName: "name", isRequired: true },
                 { label: "Email", fieldName: "email", isRequired: true },
                 { label: "Phone", fieldName: "phone", isRequired: false }
                 ].map((item) => (
@@ -261,127 +457,138 @@ export default function StoreForm({
             </SectionCard>
 
             {/* LOCATION */}
+            {/* ================= LOCATION & OPERATIONS ================= */}
             <SectionCard title="Location & Operations">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FloatingField
-                  isView={isView}
-                  isRequired={true}
-                  name={'location_name'}
-                  label={'Location Name'}
+
+              {/* 🔹 Business Assignment */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <FloatingRHFSelect
+                  name="organization_id"
+                  label="Organization"
                   control={form.control}
+                  isRequired
+                  isDisabled={isView}
+                  options={organizationTerritoryList.organizations.map((o: any) => ({
+                    value: String(o.id),
+                    label: o.org_name,
+                  }))}
+                />
+                <FloatingRHFSelect
+                  name="territory_id"
+                  label="Territory"
+                  control={form.control}
+                  isRequired
+                  isDisabled={isView}
+                  options={organizationTerritoryList.territories}
                 />
                 <FloatingField
-                  isView={isView}
-                  isRequired={true}
-                  name={'pincode'}
-                  label={'Pincode'}
+                  name="opening_date"
+                  label="Opening Date"
+                  type="date"
                   control={form.control}
+                  isRequired
+                  isView={isView}
                 />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* OPENING DATE */}
-
-                  <FloatingField
-                    name="opening_date"
-                    label="Opening Date"
-                    type="date"
-                    isRequired
-                    isView={isView}
-                    control={form.control}
-                  />
-
-                  {/* COUNTRY */}
-                  <FloatingRHFSelect
-                    name="country"
-                    label="Country"
-                    control={form.control}
-                    isRequired
-                    isDisabled={isView}
-                    options={countryList.map(c => ({
-                      value: String(c.id),
-                      label: c.name,
-                    }))}
-                    onValueChange={async (value) => {
-                      if (isHydratingRef.current) return
-
-                      setStates([])
-                      setCities([])
-                      form.setValue("state", "")
-                      form.setValue("city", "")
-
-                      setLoadingState(true)
-                      const stateList = await fetchStateList(Number(value))
-                      setStates(stateList)
-                      setLoadingState(false)
-                    }}
-                  />
-
-
-
-
-
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* STATE */}
-                  <FloatingRHFSelect
-                    name="state"
-                    label="State"
-                    control={form.control}
-                    isRequired
-                    isDisabled={isView || !form.getValues("country")}
-                    options={states.map(s => ({
-                      value: String(s.id),
-                      label: s.name,
-                    }))}
-                    onValueChange={async (value) => {
-                      if (isHydratingRef.current) return
-
-                      setCities([])
-                      form.setValue("city", "")
-
-                      setLoadingCity(true)
-                      const cityList = await fetchCityList(Number(value))
-                      setCities(cityList)
-                      setLoadingCity(false)
-                    }}
-                  />
-
-
-
-                  <FloatingRHFSelect
-                    name="city"
-                    label="City"
-                    control={form.control}
-                    isRequired
-                    isDisabled={isView || !form.getValues("state")}
-                    options={cities.map(c => ({
-                      value: String(c.id),
-                      label: c.name,
-                    }))}
-                  />
-
-
-
-                </div>
-                <div className="md:col-span-2">
-                  <FloatingTextarea
-                    name="address"
-                    label="Address"
-                    isView={isView}
-                    isRequired
-                    control={form.control}
-                  />
-
-                </div>
               </div>
+
+
+              {/* 🔹 Geographical Location */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <FloatingField
+                  name="pincode"
+                  label="Pincode"
+                  control={form.control}
+                  isRequired
+                  isView={isView}
+                />
+                <FloatingRHFSelect
+                  name="country"
+                  label="Country"
+                  control={form.control}
+                  isRequired
+                  isDisabled={isView}
+                  options={countryList.map(c => ({
+                    value: String(c.id),
+                    label: c.name,
+                  }))}
+                  onValueChange={async (value) => {
+                    if (isHydratingRef.current) return;
+
+                    setStates([]);
+                    setCities([]);
+                    form.setValue("state", "");
+                    form.setValue("city", "");
+
+                    setLoadingState(true);
+                    const stateList = await fetchStateList(Number(value));
+                    setStates(stateList);
+                    setLoadingState(false);
+                  }}
+                />
+
+                <FloatingRHFSelect
+                  name="state"
+                  label="State"
+                  control={form.control}
+                  isRequired
+                  isDisabled={isView || !form.getValues("country")}
+                  options={states.map(s => ({
+                    value: String(s.id),
+                    label: s.name,
+                  }))}
+                  onValueChange={async (value) => {
+                    if (isHydratingRef.current) return;
+
+                    setCities([]);
+                    form.setValue("city", "");
+
+                    setLoadingCity(true);
+                    const cityList = await fetchCityList(Number(value));
+                    setCities(cityList);
+                    setLoadingCity(false);
+                  }}
+                />
+
+                <FloatingRHFSelect
+                  name="city"
+                  label="City"
+                  control={form.control}
+                  isRequired
+                  isDisabled={isView || !form.getValues("state")}
+                  options={cities.map(c => ({
+                    value: String(c.id),
+                    label: c.name,
+                  }))}
+                />
+
+
+              </div>
+
+              {/* 🔹 Address Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FloatingTextarea
+                  name="registered_address"
+                  label="Permanent Address"
+                  control={form.control}
+                  isRequired
+                  isView={isView}
+                />
+
+                <FloatingTextarea
+                  name="shipping_address"
+                  label="Shipping Address"
+                  control={form.control}
+                  isRequired
+                  isView={isView}
+                />
+              </div>
+
             </SectionCard>
 
             {/* BILLING */}
             <SectionCard title="Billing & Tax">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[{ label: "Invoice prefix", fieldName: "invoice_prefix" },
-                { label: "GSTIN", fieldName: "gstin" },
-                { label: "PAN number", fieldName: "pan_no" }
-                ].map((item) => (
+                {storeFormKeys.billingTaxFieldList.map((item) => (
                   <FloatingField
                     isView={isView}
                     isRequired={true}
@@ -397,26 +604,25 @@ export default function StoreForm({
             {/* DOCUMENTS */}
             <SectionCard title="Documents">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  "registration_file",
-                  "cancelled_cheque",
-                  "agreement_file",
-                ].map((key) => (
+                {storeFormKeys.file.map((item) => (
                   <FormField
-                    key={key}
-                    name={key as any}
+                    key={item.key}
+                    name={item.key as any}
                     control={form.control}
-                    render={() => (
+                    render={({ fieldState }) => {
+                      
+    const hasError = !!fieldState.error;
+                      return (
                       <FormItem>
                         <p className="text-sm font-medium capitalize">
-                          {key.replace("_", " ")}
+                          {item.label}
                         </p>
 
                         <div className="h-32 rounded-lg border bg-gray-50 flex items-center justify-center overflow-hidden">
-                          {filePreview[key] ? (
+                          {filePreview[item.key] ? (
                             <img
-                              src={filePreview[key]!}
-                              className="w-full h-full object-cover"
+                              src={filePreview[item.key]!}
+                               className="w-full h-full object-contain"
                             />
                           ) : (
                             <span className="text-xs text-gray-400">
@@ -427,10 +633,12 @@ export default function StoreForm({
 
                         {!isView && (
                           <Input
+                            className={hasError ? "border-red-500 focus-visible:ring-red-500" : ""}
+          
                             type="file"
                             onChange={(e) =>
                               handleFile(
-                                key as any,
+                                item.key as any,
                                 e.target.files?.[0] ?? null
                               )
                             }
@@ -438,7 +646,7 @@ export default function StoreForm({
                         )}
                         <FormMessage />
                       </FormItem>
-                    )}
+                    )}}
                   />
                 ))}
               </div>
@@ -470,9 +678,9 @@ export default function StoreForm({
                 disabled={isLoading}
                 className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
               >
-                {isLoading && <Loader />}
+                {isLoading && <Loader isShowLoadingText={false} color="#fff" />}
                 {isLoading
-                  ? mode === "create" ? "Adding..." : "Updating..."
+                  ? id ? "Updating..." : "Adding..."
                   : id ? "Update " : "Add "}
               </Button>
             </div></div>}

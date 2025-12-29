@@ -636,20 +636,21 @@ export const organizationSchema = z.object({
 const fileOrPath = z.union([
   z
     .instanceof(File)
-    .refine(f => f.size <= 1 * 1024 * 1024, {
-      message: "File must be 1MB or less",
-    })
     .refine(
       f =>
-        ["image/jpeg", "image/png", "image/webp", "application/pdf"].includes(
+        ["image/jpeg", "image/jpg", "image/png", "image/webp", "application/pdf"].includes(
           f.type
         ),
-      { message: "Only JPG, PNG, WEBP or PDF allowed" }
-    ),
+      { message: "Only JPG, JPEG, PNG, WEBP or PDF allowed" }
+    )
+    .refine(f => f.size <= 2 * 1024 * 1024, {
+      message: "File must be 2MB or less",
+    })
+    ,
   z.string(),
 ]);
 export const StoreSchema = z.object({
-  store_name: z
+  name: z
     .string()
     .trim()
     .min(5, "Store name must be at least 5 characters")
@@ -660,20 +661,20 @@ export const StoreSchema = z.object({
     .min(1, "Email is required")
     .trim()
     .email("Please enter a valid email address"),
-
+  organization_id: z.string().min(1, "Please select organization"),
   notes: z
     .string()
     .trim()
     .optional()
     .refine(
-      val => !val || (val.length >= 10 && val.length <= 200),
+      val => !val || (val.length >= 10 && val.length <= 255),
       {
-        message: "Notes must be between 10 and 200 characters",
+        message: "Notes must be between 10 and 255 characters",
       }
     ),
 
 
-  gstin: z
+  gst_no: z
     .string()
     .min(1, "GSTIN is required")
     .regex(
@@ -705,32 +706,34 @@ export const StoreSchema = z.object({
   pincode: z
     .string()
     .min(1, "Pincode is required")
+    .max(10,"Pincode must not exceed 10 digits")
     .regex(/^\d{6}$/, "Pincode must be exactly 6 digits"),
 
-  address: z
+  registered_address: z
     .string()
     .trim()
     .min(10, "Address must be at least 10 characters")
-    .max(200, "Address must not exceed 200 characters"),
-  location_name: z
+    .max(255, "Address must not exceed 255 characters"),
+  shipping_address: z
     .string()
     .trim()
-    .min(10, "Location name must be at least 10 characters")
-    .max(200, "Location name must not exceed 200 characters"),
+    .min(10, "Address must be at least 10 characters")
+    .max(255, "Address must not exceed 255 characters"),
+  territory_id: z.string().min(1, "Please select territory"),
   phone: z.string().max(15),
-  agreement_file: fileOrPath
+  gstin_file: fileOrPath
     .refine(val => val !== undefined && val !== "", {
-      message: "Agreement file is required",
+      message: "GST file is required",
+    }),
+
+  pan_card_file: fileOrPath
+    .refine(val => val !== undefined && val !== "", {
+      message: "PAN card file is required",
     }),
 
   registration_file: fileOrPath
     .refine(val => val !== undefined && val !== "", {
       message: "Registration file is required",
-    }),
-
-  cancelled_cheque: fileOrPath
-    .refine(val => val !== undefined && val !== "", {
-      message: "Cancelled cheque is required",
     }),
   opening_date: z
     .string()

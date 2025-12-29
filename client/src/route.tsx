@@ -23,6 +23,7 @@ import ProfileDetails from "./pages/profile/profile-details";
 import Master from "./pages/masters/master";
 import StoreForm from "./pages/masters/store/storeForm";
 import TerritoryMasterForm from "./pages/masters/territoryMaster.tsx/territoryMasterForm";
+import StoreFormHandler from "./pages/masters/store/storeViewHandler";
 export function Router() {
   return (
     <Switch>
@@ -36,7 +37,7 @@ export function Router() {
       />} />
        <Route path="/master/territory/manage" component={() => <ProtectedRoute component={TerritoryMasterForm} />} />
   
-      <Route path="/master/stores/manage" component={() => <ProtectedRoute component={StoreForm} />} />
+      <Route path="/master/stores/manage" component={() => <ProtectedRoute component={StoreFormHandler} />} />
       <Route path="/manager" component={() => <ProtectedRoute component={ManagerDashboard} />} />
       <Route path="/customers" component={() => <ProtectedRoute component={Customers} />} />
       <Route path="/job-cards" component={() => <ProtectedRoute component={JobCards} />} />

@@ -12,15 +12,15 @@ import { EditIcon, EyeIcon } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { franchiseTableMockData, organizationMockData } from "@/lib/mockData";
-import { organizationFormType } from "@/lib/types";
+import { organizationFormType, storeFormApi } from "@/lib/types";
 import { useLocation } from "wouter";
 
 export default function Store() {
   const { toast } = useToast();
-const [, navigate] = useLocation();
+  const [, navigate] = useLocation();
 
   const { roles } = useAuth();
-  const [stores, setStores] = useState<Array<any>>([]);
+  const [stores, setStores] = useState<Array<storeFormApi>>([]);
   const [perPage, setPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [has_next, setHasNext] = useState(false)
@@ -28,7 +28,7 @@ const [, navigate] = useLocation();
   const [lastPage, setLastPage] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
- 
+
   const [isListLoading, setIsListLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,10 +54,10 @@ const [, navigate] = useLocation();
       },
     },
     {
-      key: "store_name",
-      label: "Store",
+      key: "name",
+      label: "Store name",
       width: "250px",
-     
+
     },
     {
       key: "email", label: "Email", width: "150px",
@@ -68,11 +68,24 @@ const [, navigate] = useLocation();
 
     },
     {
-      key: "location_name", label: "Location name", width: "150px",
+      key: "territory_id", label: "Territory", width: "150px",
     },
- 
     {
-      key: "opening_date", label: "Opening date", width: "150px",
+      key: "organization", label: "Organization", width: "150px",
+    },
+
+    {
+      key: "opening_date", label: "Opening date",  align: "center", width: "150px",
+       render: (_value: any,) => {
+
+        return (
+          <Box className="flex flex-col justify-center items-center">
+            <span className="font-bold  ">
+              {formatDate(_value)}
+            </span>
+          </Box>
+        );
+      },
     },
     {
       key: "status",
@@ -130,7 +143,7 @@ const [, navigate] = useLocation();
         );
       });
 
-      await UpdateStoreStatus({ id: u.id, status: newStatus });
+      await UpdateStoreStatus({ id: u.id, });
 
       toast({
         title: "Status Update",
@@ -153,15 +166,19 @@ const [, navigate] = useLocation();
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      const res = franchiseTableMockData
-      // await fetchStoresList({
-      //   per_page: perPage,
-      //   page,
-      //   search,
-      //   status: filters.status,
-      // });
+      const res =
+        await fetchStoresList({
+          per_page: perPage,
+          page,
+          search,
+          status: filters.status,
+        });
 
-      const mappedStores = res.data
+      const mappedStores = res.data.map((item: any) => ({
+        ...item,
+        territory_id: item?.territory?.name,
+        organization: item?.organization?.company_name,
+      }))
       setHasNext(res.meta.has_next)
       setTotal(res.meta.total)
       setStores(mappedStores);
@@ -212,9 +229,9 @@ const [, navigate] = useLocation();
             setPage(1); // reset page on new search
             // }
           }}
-          setIsModalOpen={(value: boolean) =>{
-               navigate(`/master/stores/manage`)
-    
+          setIsModalOpen={(value: boolean) => {
+            navigate(`/master/stores/manage`)
+
           }
           }
           actions={(row: any) => {
@@ -228,8 +245,8 @@ const [, navigate] = useLocation();
                       mr={2}
                       aria-label="View"
                       onClick={() =>
-        navigate(`/master/stores/manage?id=${row.id}&mode=view`)
-      }
+                        navigate(`/master/stores/manage?id=${row.id}&mode=view`)
+                      }
                     >
                       <EyeIcon />
                     </IconButton>
@@ -237,9 +254,9 @@ const [, navigate] = useLocation();
                       size="xs"
                       mr={2}
                       aria-label="Edit"
-                        onClick={() =>
-        navigate(`/master/stores/manage?id=${row.id}&mode=edit`)
-      }
+                      onClick={() =>
+                        navigate(`/master/stores/manage?id=${row.id}&mode=edit`)
+                      }
                     >
                       <EditIcon />
                     </IconButton>}
@@ -252,7 +269,7 @@ const [, navigate] = useLocation();
           }}
 
         />
-      
+
       </CardContent>
     </Card>
   );

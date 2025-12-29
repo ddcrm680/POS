@@ -127,7 +127,7 @@ export type FloatingRHFSelectProps = {
   name: string
   label: string
   control: Control<any>
- options: Option[] | GroupedOption[]
+  options: Option[] | GroupedOption[]
 
 
   isMulti?: boolean
@@ -145,7 +145,7 @@ export interface UserApiType {
 export interface TerritoryMasterApiType {
   id: number;
 
-  location_name: string;
+  territory_id: string;
 
   assigned_franchise_id: number;
 
@@ -462,29 +462,82 @@ export interface storeFormProp {
     setError: UseFormSetError<storeFormType>
   ) => void;
 }
+// $rules = [
+
+//             'name'  => 'required|string|max:100',
+
+//             'email' => 'required|email',
+
+//             'phone' => 'required|digits:10',
+
+//             'organization_id' => 'required|exists:organizations,id',
+
+//             'territory_id' => 'required|exists:territories,id',
+
+//             'country' => 'required|integer',
+
+//             'state'   => 'required|integer',
+
+//             'city'    => 'required|integer',
+
+//             'pincode' => 'required|string|max:10',
+
+
+//             'registered_address' => 'required|string|max:255',
+
+//             'shipping_address'   => 'required|string|max:255',
+
+//             'gst_no' => 'nullable|string|size:15',
+
+//             'pan_no' => 'nullable|string|size:10',
+
+//             'opening_date'   => 'required|date',
+
+//             'invoice_prefix' => 'required|string|max:10',
+
+//             'notes'          => 'nullable|string|max:255',
+
+//             'pan_card_file'      => 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:2048',
+
+//             'pan_card_file' => 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:2048',
+
+//             'gstin_file'        => 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:2048',
+
+//             'is_active' => 'nullable|boolean',
+
+//         ];
+
+
+
+export interface storeFormApi extends storeFormType{
+  is_active:boolean
+  id:string
+  territory:{
+    id:number
+  }
+}
+
 export type storeFormType = {
-  store_name: string;
+  name: string;
   email: string;
-
-  notes?: string;
-  location_name: string
   phone: string
-  gstin: string;
-  pan_no: string;
-
-  invoice_prefix: string;
-
+  organization_id: string
+  territory_id: string
   country: string;
   state: string;
   city: string;
   pincode: string;
-  address: string;
-  registration_file: File | string;
-  cancelled_cheque: File | string;
-  agreement_file: File | string;
+  registered_address: string;
+  shipping_address: string;
+  gst_no: string;
+  pan_no: string;
   opening_date: string
+  invoice_prefix: string;
+  notes?: string;
+  pan_card_file: File | string;
+  registration_file: File | string;
+  gstin_file: File | string;
 };
-
 
 export type editOrganizationReq = {
   info: {
@@ -524,7 +577,7 @@ export type editOrganizationReq = {
 export type TerritoryFormValues = {
   name: string;
   store_id?: string;
-  notes?:string
+  notes?: string
   country_id: string;
   city_ids: string[]
   state_ids: string[];
@@ -532,7 +585,7 @@ export type TerritoryFormValues = {
 export type TerritoryFormRequestValues = {
   name: string;
   store_id?: number | null;
-  notes?:string
+  notes?: string
   country_id: number;
   city_ids: number[]
   state_ids: number[];
@@ -540,13 +593,15 @@ export type TerritoryFormRequestValues = {
 export type TerritoryFormApiValues = {
   name: string;
   store_id?: string;
-  notes?:string
-  country: {id:number;
-    name:string
+  notes?: string
+  country: {
+    id: number;
+    name: string
   }
   city_ids: string[]
   state_ids: string[];
 };
-export type storeListType = {id:number;
-    name:string
-  }
+export type storeListType = {
+  id: number;
+  name: string
+}

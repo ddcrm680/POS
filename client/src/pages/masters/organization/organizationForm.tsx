@@ -74,6 +74,7 @@ export default function OrganizationForm({
     },
     shouldUnregister: false,
   });
+  
   useEffect(() => {
     if ((mode === "edit" || mode === "view") && initialValues?.org_image) {
       setExistingOrgImage(typeof initialValues.org_image === 'string' ? initialValues.org_image : "");
@@ -129,7 +130,7 @@ export default function OrganizationForm({
       isHydratingRef.current = true;
       try {
         const countryId = findIdByName(countryList, initialValues.country);
-
+    
         if (!countryId) return;
 
         form.setValue("country", String(countryId));

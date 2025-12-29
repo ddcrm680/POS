@@ -156,3 +156,22 @@ export const profileMenu=[
   emoji: Key
 }
 ];
+
+export const storeFormKeys={
+  file:[
+    {label:'PAN card file',
+      key:'pan_card_file'
+    },
+    {label:'Registration file',
+      key:'registration_file'
+    },
+    {label:'GST file',
+      key:'gstin_file'
+    },
+  
+  ],
+  billingTaxFieldList:[{ label: "Invoice prefix", fieldName: "invoice_prefix" },
+                  { label: "GSTIN", fieldName: "gst_no" },
+                  { label: "PAN number", fieldName: "pan_no" }
+                  ]
+}

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
-import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, TerritoryFormRequestValues, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
+import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, storeFormType, TerritoryFormRequestValues, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
 import { DateRangeType, DateValueType } from "react-tailwindcss-datepicker";
 import { setServiceDown } from "./systemStatus";
 
@@ -206,6 +206,20 @@ export async function SaveTerritory(values: TerritoryFormRequestValues) {
 
   }
 }
+export async function SaveStore(values: FormData) {
+  try {
+    const response: any = await api.post(
+      "/api/stores/save", values
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+    throw response
+
+  }
+}
 export async function SaveServicePlan(values: serviceFormType) {
   try {
     const response: any = await api.post(
@@ -290,6 +304,22 @@ export async function EditTerritory(editFormValue: { id: string, info: Territory
 
   }
 }
+export async function EditStore(editFormValue: FormData) {
+
+  try {
+    const response: any = await api.post(
+      `api/stores/update`,editFormValue
+    );
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+  } catch (response: any) {
+
+    throw response
+
+  }
+}
 export async function EditServicePlan(editFormValue: editServicePlanReq) {
 
   try {
@@ -341,6 +371,16 @@ export async function fetchTerritoryById(id: string) {
     return response.data;
   }
   throw new Error(response.data?.message || "Failed to fetch territory info");
+}
+export async function fetchStoreById(id: string) {
+
+  const response: any = await api.get(
+    `/api/stores/view/${id}`,
+  );
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error(response.data?.message || "Failed to fetch store info");
 }
 export async function fetchStoreCrispList() {
 
@@ -554,30 +594,33 @@ export async function fetchStoresList({
   });
   if (status !== "") params.append("status", String(status));
 
-  const response = await api.get(`/api/store?${params.toString()}`);
+  const response = await api.get(`/api/stores?${params.toString()}`);
 
   if (response?.data?.success === true) {
     return response.data;
   }
-  throw new Error("Failed to fetch organization list");
+  throw new Error("Failed to fetch store list");
 }
+
 export async function fetchOrganizationsList({
   page,
   search,
   status,
   per_page
 }: {
-  per_page: number;
-  page: number;
-  search: string;
+  per_page?: number;
+  page?: number;
+  search?: string;
   status?: string | number;
 }) {
-  const params = new URLSearchParams({
-    page: String(page),
-    search,
-    per_page: String(per_page)
-  });
-  if (status !== "") params.append("status", String(status));
+ const params = new URLSearchParams();
+
+if (page !== undefined) params.append("page", String(page));
+if (per_page !== undefined) params.append("per_page", String(per_page));
+if (search) params.append("search", search);
+if (status) params.append("status", String(status));
+
+console.log(params.toString());
 
   const response = await api.get(`/api/organizations?${params.toString()}`);
 
@@ -586,6 +629,16 @@ export async function fetchOrganizationsList({
   }
   throw new Error("Failed to fetch organization list");
 }
+export async function fetchTerritoryOrganizationList() {
+
+  const response = await api.get(`/api/utility/territories-with-organizations`);
+
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error("Failed to fetch territory and organization list");
+}
+
 export async function fetchServicePlanMetaInfo() {
 
   const response = await api.get(`/api/service-plans/meta`);
@@ -690,11 +743,11 @@ export async function UpdateOrganizationStatus(statusInfo: { id: number, }) {
 
   }
 }
-export async function UpdateStoreStatus(statusInfo: { id: number, status: number }) {
+export async function UpdateStoreStatus(statusInfo: { id: number}) {
 
   try {
     const response: any = await api.post(
-      `/api/store/status/${statusInfo.id}`, { status: statusInfo.status }
+      `/api/stores/status/${statusInfo.id}`
     );
     if (response?.data?.success === true) {
       return response.data?.data;
