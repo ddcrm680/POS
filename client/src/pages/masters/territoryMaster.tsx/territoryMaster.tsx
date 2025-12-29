@@ -248,7 +248,7 @@ const [isLoading, setIsLoading] = useState(false);
       <CardContent>
         <CommonTable
           columns={columns}
-          isClear={false}
+          isClear={true}
           data={users}
           isAdd={true}
           perPage={perPage}
