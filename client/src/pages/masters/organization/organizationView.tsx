@@ -111,7 +111,11 @@ export default function OrganizationView({
             <Info label="Account Type" value={info.account_type} />
             <Info label="IFSC Code" value={info.ifsc_code} mono />
             <Info label="Branch Name" value={info.branch_name} />
+                   </div>
+          
+          <div className="grid grid-cols-1 mt-4 gap-4 text-sm">
             <Info label="Bank Address" value={info.bank_address} />
+  
           </div>
         </section>
 
