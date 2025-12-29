@@ -11,8 +11,9 @@ import { baseUrl } from "@/lib/api";
 import { storeFormApi } from "@/lib/types";
 import { ChevronLeft } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatDate, formatTime, isPdfUrl } from "@/lib/utils";
 import { Loader } from "@/components/common/loader";
+import { Button } from "@/components/ui/button";
 
 export default function StoreView() {
   const [searchParams] = useSearchParams();
@@ -117,101 +118,101 @@ export default function StoreView() {
           </h1>
         </div>
         {
-                      loading ? <div className="min-h-[150px] flex justify-center items-center">
-                        <div className="p-6 text-sm "><Loader /></div>
-                      </div> :  <Card className="max-w-6xl mx-auto p-6 space-y-6 rounded-2xl border-0">
-          <section>
-            <h3 className="text-sm font-semibold mb-4 text-gray-700">
-              Store Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4  text-sm">
-              <Info label="Store Name" value={data.name} />
-              <Info label="Email" value={data.email} />
-              <Info label="Phone" value={data.phone || "-"} />
-            </div>
-          </section>
+          loading ? <div className="min-h-[150px] flex justify-center items-center">
+            <div className="p-6 text-sm "><Loader /></div>
+          </div> : <Card className="max-w-6xl mx-auto p-6 space-y-6 rounded-2xl border-0">
+            <section>
+              <h3 className="text-sm font-semibold mb-4 text-gray-700">
+                Store Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4  text-sm">
+                <Info label="Store Name" value={data.name} />
+                <Info label="Email" value={data.email} />
+                <Info label="Phone" value={data.phone || "-"} />
+              </div>
+            </section>
 
 
-          {/* ================= LOCATION & OPERATIONS ================= */}
-          <section>
-            <h3 className="text-sm font-semibold mb-4 text-gray-700">
-              Location & Operations
-            </h3>
-            <div className="gap-4  grid">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm ">
-              <Info label="Organization" value={data.organization?.company_name} />
-              <Info label="Territory" value={data.territory?.name} />
-              <Info label="Opening Date" value={data.opening_date} />
-            </div>
+            {/* ================= LOCATION & OPERATIONS ================= */}
+            <section>
+              <h3 className="text-sm font-semibold mb-4 text-gray-700">
+                Location & Operations
+              </h3>
+              <div className="gap-4  grid">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm ">
+                  <Info label="Organization" value={data.organization?.company_name} />
+                  <Info label="Territory" value={data.territory?.name} />
+                  <Info label="Opening Date" value={data.opening_date} />
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm ">
-              <Info label="Pincode" value={data.pincode} />
-              <Info label="Country" value={data.country_name} />
-              <Info label="State" value={data.state_name} />
-              <Info label="City" value={data.city_name} />
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm ">
+                  <Info label="Pincode" value={data.pincode} />
+                  <Info label="Country" value={data.country_name} />
+                  <Info label="State" value={data.state_name} />
+                  <Info label="City" value={data.city_name} />
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <Info label="Permanent Address" value={data.registered_address} />
-              <Info label="Shipping Address" value={data.shipping_address} />
-            </div>
-            </div>
-          </section>
-
-
-          {/* ================= BILLING & TAX ================= */}
-          <section>
-            <h3 className="text-sm font-semibold mb-4 text-gray-700">
-              Banking Details
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <Info label="Invoice Prefix" value={data.invoice_prefix} />
-              <Info label="GST No" value={data.gst_no} />
-              <Info label="PAN No" value={data.pan_no} />
-            </div>
-          </section>
-
-          <section>
-            <h3 className="text-sm font-semibold mb-4 text-gray-700">
-              Documents
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-
-              {/* PAN */}
-              <DocumentPreview
-                label="PAN Card"
-                src={docPreview(data.pan_card_file)}
-              />
-
-              {/* Registration */}
-              <DocumentPreview
-                label="Registration File"
-                src={docPreview(data.registration_file)}
-              />
-
-              {/* GST */}
-              <DocumentPreview
-                label="GSTIN File"
-                src={docPreview(data.gstin_file)}
-              />
-
-            </div>
-          </section>
-
-          <section>
-            <h3 className="text-sm font-semibold mb-4 text-gray-700  ">
-              Additional Notes
-            </h3>
-            <div className="text-sm">
-  <Info label="Notes" value={data.notes || "-"} />
-
-            </div>
-          
-          </section>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <Info label="Permanent Address" value={data.registered_address} />
+                  <Info label="Shipping Address" value={data.shipping_address} />
+                </div>
+              </div>
+            </section>
 
 
-        </Card>}
-       
+            {/* ================= BILLING & TAX ================= */}
+            <section>
+              <h3 className="text-sm font-semibold mb-4 text-gray-700">
+                Banking Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <Info label="Invoice Prefix" value={data.invoice_prefix} />
+                <Info label="GST No" value={data.gst_no} />
+                <Info label="PAN No" value={data.pan_no} />
+              </div>
+            </section>
+
+            <section>
+              <h3 className="text-sm font-semibold mb-4 text-gray-700">
+                Documents
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+
+                {/* PAN */}
+                <DocumentPreview
+                  label="PAN Card"
+                  src={docPreview(data.pan_card_file)}
+                />
+
+                {/* Registration */}
+                <DocumentPreview
+                  label="Registration File"
+                  src={docPreview(data.registration_file)}
+                />
+
+                {/* GST */}
+                <DocumentPreview
+                  label="GSTIN File"
+                  src={docPreview(data.gstin_file)}
+                />
+
+              </div>
+            </section>
+
+            <section>
+              <h3 className="text-sm font-semibold mb-4 text-gray-700  ">
+                Additional Notes
+              </h3>
+              <div className="text-sm">
+                <Info label="Notes" value={data.notes || "-"} />
+
+              </div>
+
+            </section>
+
+
+          </Card>}
+
       </div>
     </div>
   );
@@ -226,20 +227,83 @@ function DocumentPreview({
   label: string;
   src: string | null;
 }) {
-  return (
-    <div className="space-y-2  text-sm">
-      <p className="text-gray-500 whitespace-nowrap ">{label}</p>
+  if (!src) {
+    return (
+      <div className="space-y-2 text-sm">
+        <p className="text-gray-500 whitespace-nowrap">{label}</p>
+        <div className="h-32 rounded-lg border bg-gray-50 flex items-center justify-center">
+          <span className="text-xs text-gray-400">No document</span>
+        </div>
+      </div>
+    );
+  }
 
-      <div className="h-32 rounded-lg border bg-gray-50 flex  items-center justify-center overflow-hidden">
-        {src ? (
+  const isPdf = isPdfUrl(src);
+
+  return (
+    <div className="space-y-2 text-sm">
+      <p className="text-gray-500 whitespace-nowrap">{label}</p>
+
+      {/* PREVIEW CONTAINER */}
+      <div className="relative h-32 rounded-lg border bg-gray-50 overflow-hidden group">
+
+        {/* FILE PREVIEW */}
+        {isPdf ? (
+          <iframe
+            src={src}
+            className="w-full h-full pointer-events-none"
+            title={label}
+          />
+        ) : (
           <img
             src={src}
             alt={label}
-            className="max-w-full max-h-full object-contain"
+            className="w-full h-full object-contain pointer-events-none"
           />
-        ) : (
-          <span className="text-xs text-gray-400">No document</span>
         )}
+
+        {/* DARK OVERLAY */}
+        <div
+          className="
+            absolute inset-0
+            bg-black/40
+            opacity-0
+            group-hover:opacity-100
+            transition-opacity
+            duration-300
+          "
+        />
+
+        {/* VIEW BUTTON */}
+        <div
+          className="
+    absolute inset-0
+    flex items-center justify-center
+    opacity-0
+    group-hover:opacity-100
+    scale-95
+    group-hover:scale-100
+    transition-all duration-300
+  "
+        >
+          <Button
+            type="button"
+            onClick={() => window.open(src, "_blank")}
+            className="
+      bg-[#FE0000]
+      hover:bg-[rgb(238,6,6)]
+      text-white
+      px-6 py-2
+      text-sm
+      font-semibold
+      rounded-md
+      shadow-lg
+    "
+          >
+            View
+          </Button>
+        </div>
+
       </div>
     </div>
   );

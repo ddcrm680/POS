@@ -29,8 +29,8 @@ import { SectionCard } from "@/components/common/card";
 import { Loader } from "@/components/common/loader";
 import { useAuth } from "@/lib/auth";
 import { baseUrl, EditStore, fetchCityList, fetchOrganizationsList, fetchStateList, fetchStoreById, fetchTerritoryById, fetchTerritoryOrganizationList, SaveStore } from "@/lib/api";
-import { findIdByName } from "@/lib/utils";
-import { ArrowLeft, ArrowLeftIcon, ChevronLeft } from "lucide-react";
+import { findIdByName, isImageFile, isPdfFile } from "@/lib/utils";
+import { ArrowLeft, ArrowLeftIcon, ChevronLeft, FileTextIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { storeFormKeys } from "@/lib/constant";
 
@@ -74,9 +74,16 @@ export default function StoreForm() {
   const { toast } = useToast();
   const { control, handleSubmit, watch, setValue } = form;
   const [initialValues, setInitialValues] = useState<storeFormApi | null>(null)
-  const [filePreview, setFilePreview] = useState<Record<string, string | null>>(
-    {}
-  );
+  const [filePreview, setFilePreview] = useState<
+    Record<
+      string,
+      {
+        url: string;
+        file?: File;
+      } | null
+    >
+  >({});
+
   const { countries } = useAuth();
   const fetchStoreInfo = async () => {
     try {
@@ -250,11 +257,15 @@ export default function StoreForm() {
     (["pan_card_file", "registration_file", "gstin_file"] as const).forEach(key => {
       const val = initialValues[key];
       if (typeof val === "string" && val) {
-        previews[key] = `${baseUrl}/${val}`;
+        setFilePreview(prev => ({
+          ...prev,
+          [key]: {
+            url: `${baseUrl}/${val}`,
+          },
+        }));
       }
     });
 
-    setFilePreview(previews);
     if (mode === "edit" || mode === "view") {
 
       form.reset({
@@ -297,7 +308,14 @@ export default function StoreForm() {
     });
 
     const url = URL.createObjectURL(file);
-    setFilePreview(prev => ({ ...prev, [key]: url }));
+
+    setFilePreview(prev => ({
+      ...prev,
+      [key]: {
+        url,
+        file, 
+      },
+    }));
   };
   const onSubmit = (values: storeFormType) => {
     StoreCommonHandler(values, form.setError)
@@ -607,52 +625,104 @@ export default function StoreForm() {
                 {/* DOCUMENTS */}
                 <SectionCard title="Documents">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {storeFormKeys.file.map((item) => (
-                      <FormField
-                        key={item.key}
-                        name={item.key as any}
-                        control={form.control}
-                        render={({ fieldState }) => {
+                    {storeFormKeys.file.map((item) => {
+                      const preview = filePreview[item.key];
 
-                          const hasError = !!fieldState.error;
-                          return (
-                            <FormItem>
-                              <p className="text-sm font-medium capitalize">
-                                {item.label}
-                              </p>
+                      return (
+                        <FormField
+                          key={item.key}
+                          name={item.key as any}
+                          control={form.control}
+                          render={({ fieldState }) => {
 
-                              <div className="h-32 rounded-lg border bg-gray-50 flex items-center justify-center overflow-hidden">
-                                {filePreview[item.key] ? (
-                                  <img
-                                    src={filePreview[item.key]!}
-                                    className="w-full h-full object-contain"
+                            const hasError = !!fieldState.error;
+                            return (
+                              <FormItem>
+                                <p className="text-sm font-medium capitalize">
+                                  {item.label}
+                                </p>
+
+                              <div className="relative h-32 rounded-lg border bg-gray-50 overflow-hidden group">
+
+  {/* PREVIEW */}
+  {preview ? (
+    isPdfFile(preview.file, preview.url) ? (
+      <iframe
+        src={preview.url}
+        className="w-full h-full pointer-events-none"
+        title={item.label}
+      />
+    ) : (
+      <img
+        src={preview.url}
+        className="w-full h-full object-contain pointer-events-none"
+      />
+    )
+  ) : (
+    <div className="w-full h-full flex items-center justify-center">
+      <span className="text-xs text-gray-400">No preview</span>
+    </div>
+  )}
+
+  {/* DARK OVERLAY */}
+  {preview && (
+    <div
+      className="
+        absolute inset-0
+        bg-black/40
+        opacity-0
+        group-hover:opacity-100
+        transition-opacity duration-300
+      "
+    />
+  )}
+
+  {/* VIEW BUTTON */}
+  {preview && (
+    <div
+      className="
+        absolute inset-0
+        flex items-center justify-center
+        opacity-0
+        group-hover:opacity-100
+        scale-95
+        group-hover:scale-100
+        transition-all duration-300
+      "
+    >
+      <Button
+        type="button"
+        onClick={() => window.open(preview.url, "_blank")}
+        className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
+      >
+        View
+      </Button>
+    </div>
+  )}
+</div>
+
+
+
+                                {!isView && (
+                                  <Input
+                                    className={hasError ? "border-red-500 focus-visible:ring-red-500" : ""}
+
+                                    type="file"
+                                    onChange={(e) =>
+                                      handleFile(
+                                        item.key as any,
+                                        e.target.files?.[0] ?? null
+                                      )
+                                    }
                                   />
-                                ) : (
-                                  <span className="text-xs text-gray-400">
-                                    No preview
-                                  </span>
                                 )}
-                              </div>
-
-                              {!isView && (
-                                <Input
-                                  className={hasError ? "border-red-500 focus-visible:ring-red-500" : ""}
-
-                                  type="file"
-                                  onChange={(e) =>
-                                    handleFile(
-                                      item.key as any,
-                                      e.target.files?.[0] ?? null
-                                    )
-                                  }
-                                />
-                              )}
-                              <FormMessage />
-                            </FormItem>
-                          )
-                        }}
-                      />
-                    ))}
+                                <FormMessage />
+                              </FormItem>
+                            )
+                          }}
+                        />
+                      )
+                    })}
                   </div>
                 </SectionCard>
 

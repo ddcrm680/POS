@@ -164,3 +164,25 @@ export function flattenOptions(
   // flat options
   return options as Option[]
 }
+export const isImageFile = (file: File | string) => {
+  if (file instanceof File) {
+    return file.type.startsWith("image/");
+  }
+  return /\.(jpg|jpeg|png|webp)$/i.test(file);
+};
+
+export const isPdfFile = (file?: File, url?: string) => {
+  if (file) {
+    return file.type === "application/pdf";
+  }
+  if (url) {
+    return /\.pdf$/i.test(url);
+  }
+  return false;
+};
+
+export const isPdfUrl = (url: string) => /\.pdf$/i.test(url);
+export const getFileNameFromUrl = (url?: string) => {
+  if (!url) return "";
+  return url.split("/").pop() ?? "";
+};
