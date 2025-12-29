@@ -88,7 +88,7 @@ export default function Store() {
       },
     },
     {
-      key: "status",
+      key: "is_active",
       label: (
         <ColumnFilter
           label="Status"
@@ -129,7 +129,7 @@ export default function Store() {
 
   const StoreStatusUpdateHandler = useCallback(async (u: any) => {
     try {
-      const newStatus = u.status ? 0 : 1;
+      const newStatus =!u.is_active;
 
       setStores(prevUsers => {
 
@@ -137,7 +137,7 @@ export default function Store() {
           item.id === u.id
             ? {
               ...item,
-              status: newStatus,
+              is_active: newStatus,
             }
             : item
         );

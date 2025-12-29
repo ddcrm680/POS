@@ -27,59 +27,59 @@ export default function StoreView() {
       .then(res => setData(res.data))
       .finally(() => setLoading(false));
   }, [id]);
-  
+
   const { countries } = useAuth();
-useEffect(() => {
-  if (!data) return;
+  useEffect(() => {
+    if (!data) return;
 
-  async function hydrateLocationNames() {
-    try {
-      // 1️⃣ COUNTRY
-      const countryList =countries
-      const country = countryList.find(
-        (c: any) => String(c.id) === String(data.country)
-      );
-
-      // 2️⃣ STATE
-      let state = {
-        id:-1,
-        name:""
-      };
-      if (country) {
-        const states = await fetchStateList(country.id);
-        state = states.find(
-          (s: any) => String(s.id) === String(data.state)
+    async function hydrateLocationNames() {
+      try {
+        // 1️⃣ COUNTRY
+        const countryList = countries
+        const country = countryList.find(
+          (c: any) => String(c.id) === String(data.country)
         );
-      }
 
-      // 3️⃣ CITY
-      let city = {
-        id:-1,
-        name:""
-      };
-      if (state) {
-        const cities = await fetchCityList(state.id);
-        city = cities.find(
-          (c: any) => String(c.id) === String(data.city)
-        );
-      }
+        // 2️⃣ STATE
+        let state = {
+          id: -1,
+          name: ""
+        };
+        if (country) {
+          const states = await fetchStateList(country.id);
+          state = states.find(
+            (s: any) => String(s.id) === String(data.state)
+          );
+        }
 
-      // ✅ UPDATE DATA STATE (KEY PART)
-      setData((prev: any) => ({
-        ...prev,
-        country_name: country?.name ?? "-",
-        state_name: state?.name ?? "-",
-        city_name: city?.name ?? "-",
-        opening_date:`${formatDate(data.opening_date)} `
-       
-      }));
-    } catch (e) {
-      console.error("Failed to resolve location names", e);
+        // 3️⃣ CITY
+        let city = {
+          id: -1,
+          name: ""
+        };
+        if (state) {
+          const cities = await fetchCityList(state.id);
+          city = cities.find(
+            (c: any) => String(c.id) === String(data.city)
+          );
+        }
+
+        // ✅ UPDATE DATA STATE (KEY PART)
+        setData((prev: any) => ({
+          ...prev,
+          country_name: country?.name ?? "-",
+          state_name: state?.name ?? "-",
+          city_name: city?.name ?? "-",
+          opening_date: `${formatDate(data.opening_date)} `
+
+        }));
+      } catch (e) {
+        console.error("Failed to resolve location names", e);
+      }
     }
-  }
 
-  hydrateLocationNames();
-}, [data?.country, data?.state, data?.city,countries]);
+    hydrateLocationNames();
+  }, [data?.country, data?.state, data?.city, countries]);
 
   if (loading) {
     return <EmptyState message="Loading store..." />;
@@ -142,9 +142,9 @@ useEffect(() => {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <Info label="Pincode" value={data.pincode} />
-             <Info label="Country" value={data.country_name} />
-<Info label="State" value={data.state_name} />
-<Info label="City" value={data.city_name} />
+              <Info label="Country" value={data.country_name} />
+              <Info label="State" value={data.state_name} />
+              <Info label="City" value={data.city_name} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
