@@ -106,6 +106,8 @@ export default function StoreForm({
           setStates(stateList);
           setLoadingState(false);
 
+        }catch(e){
+          console.error(e)
         } finally {
           // ✅ hydration completed
           isHydratingRef.current = false;

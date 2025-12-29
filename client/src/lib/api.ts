@@ -427,7 +427,7 @@ export async function fetchTerritoryMasterList({
     search,
     per_page: String(per_page)
   });
-  if (status !== "") params.append("status", String(status));
+  if (status) params.append("status", String(status));
 
   const response = await api.get(`/api/admin/territories/list?${params.toString()}`);
 
