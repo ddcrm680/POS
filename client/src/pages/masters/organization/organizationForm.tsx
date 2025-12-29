@@ -284,7 +284,7 @@ export default function OrganizationForm({
                         </div>
 
                         {/* ✏️ EDIT ICON */}
-                        {!isView && !previewUrl && (
+                        {!isView && (
                           <button
                             type="button"
                             onClick={() => inputRef.current?.click()}
@@ -295,23 +295,6 @@ export default function OrganizationForm({
                           </button>
                         )}
 
-                        {/* 🗑️ DELETE ICON (only when image exists) */}
-                        {!isView && previewUrl && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              field.onChange("");          // clear RHF value
-                              setPreviewUrl(null);         // clear preview
-                              if (inputRef.current) {
-                                inputRef.current.value = "";
-                              }
-                            }}
-                            className="absolute -bottom-1 -right-1 bg-white border rounded-full p-1 shadow hover:bg-red-100 text-red-600"
-                            aria-label="Remove image"
-                          >
-                            <Trash2 size={12} />
-                          </button>
-                        )}
                       </div>
 
                       {/* HIDDEN FILE INPUT */}
