@@ -127,6 +127,7 @@ export type FloatingRHFSelectProps = {
   name: string
   label: string
   control: Control<any>
+  isClear?:boolean
   options: Option[] | GroupedOption[]
 
 
@@ -584,7 +585,7 @@ export type TerritoryFormValues = {
 };
 export type TerritoryFormRequestValues = {
   name: string;
-  store_id?: number | null;
+  store_id?: number | null | string;
   notes?: string
   country_id: number;
   city_ids: number[]

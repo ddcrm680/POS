@@ -307,146 +307,146 @@ export default function TerritoryMasterForm() {
             {
               isInfoLoading ? <div className="min-h-[150px] flex justify-center items-center">
                 <div className="p-6 text-sm "><Loader /></div>
-              </div> : 
-              <div>     {/* -------- TOP FIELDS -------- */}
-                <SectionCard title="Territory Information">
-                  <div className="grid  grid-cols-1 md:grid-cols-3 gap-4">
-                    <FloatingField
-                      isView={false}
-                      isRequired={true}
-                      name={'name'}
-                      label={'Territory Name'}
-                      control={form.control}
-                    />
+              </div> :
+                <div>     {/* -------- TOP FIELDS -------- */}
+                  <SectionCard title="Territory Information">
+                    <div className="grid  grid-cols-1 md:grid-cols-3 gap-4">
+                      <FloatingField
+                        isView={false}
+                        isRequired={true}
+                        name={'name'}
+                        label={'Territory Name'}
+                        control={form.control}
+                      />
 
-                    <FloatingRHFSelect
-                      name="store_id"
-                      label="Store"
-                      control={form.control}
-                      isDisabled={false}
-                      options={storeList.map(c => ({
-                        value: String(c.id),
-                        label: c.name,
-                      }))}
+                      <FloatingRHFSelect
+                        name="store_id"
+                        label="Store"
+                        control={form.control}
+                        isDisabled={false}
+                        options={storeList.map(c => ({
+                          value: String(c.id),
+                          label: c.name,
+                        }))}
+isClear={true}
+                      />
 
-                    />
+                      <FloatingRHFSelect
+                        name="country_id"
+                        label="Country"
+                        control={form.control}
+                        isRequired
+                        isDisabled={isView}
+                        options={countryList.map(c => ({
+                          value: String(c.id),
+                          label: c.name,
+                        }))}
+                        onValueChange={async (value) => {
+                          if (isHydratingRef.current) return;
 
-                    <FloatingRHFSelect
-                      name="country_id"
-                      label="Country"
-                      control={form.control}
-                      isRequired
-                      isDisabled={isView}
-                      options={countryList.map(c => ({
-                        value: String(c.id),
-                        label: c.name,
-                      }))}
-                      onValueChange={async (value) => {
-                        if (isHydratingRef.current) return;
+                          setStates([]);
+                          setCities([]);
+                          form.setValue("state_ids", []);
+                          form.setValue("city_ids", []);
 
-                        setStates([]);
-                        setCities([]);
-                        form.setValue("state_ids", []);
-                        form.setValue("city_ids", []);
+                          setLoadingState(true);
+                          const stateList = await fetchStateList(Number(value));
+                          setStates(stateList);
+                          setLoadingState(false);
+                        }}
+                      />
 
-                        setLoadingState(true);
-                        const stateList = await fetchStateList(Number(value));
-                        setStates(stateList);
-                        setLoadingState(false);
-                      }}
-                    />
+                    </div>
+                    <div className="grid pt-5 gap-4  grid-cols-1 md:grid-cols-2 ">
+                      <FloatingRHFSelect
+                        name="state_ids"
+                        label="State"
+                        isMulti
+                        control={form.control}
+                        isRequired
+                        isDisabled={isView || !form.getValues("country_id")}
+                        options={states.map(s => ({
+                          value: String(s.id),
+                          label: s.name,
+                        }))}
+                        onValueChange={async (values) => {
+                          if (isHydratingRef.current) return;
 
-                  </div>
-                  <div className="grid pt-5 gap-4  grid-cols-1 md:grid-cols-2 ">
-                    <FloatingRHFSelect
-                      name="state_ids"
-                      label="State"
-                      isMulti
-                      control={form.control}
-                      isRequired
-                      isDisabled={isView || !form.getValues("country_id")}
-                      options={states.map(s => ({
-                        value: String(s.id),
-                        label: s.name,
-                      }))}
-                      onValueChange={async (values) => {
-                        if (isHydratingRef.current) return;
+                          const newStateIds = Array.isArray(values) ? values : [];
+                          const prevStateIds = prevStateIdsRef.current;
 
-                        const newStateIds = Array.isArray(values) ? values : [];
-                        const prevStateIds = prevStateIdsRef.current;
+                          // 🆕 added states
+                          const added = newStateIds.filter(id => !prevStateIds.includes(id));
 
-                        // 🆕 added states
-                        const added = newStateIds.filter(id => !prevStateIds.includes(id));
+                          //  removed states
+                          const removed = prevStateIds.filter(id => !newStateIds.includes(id));
 
-                        //  removed states
-                        const removed = prevStateIds.filter(id => !newStateIds.includes(id));
+                          // update ref
+                          prevStateIdsRef.current = newStateIds;
 
-                        // update ref
-                        prevStateIdsRef.current = newStateIds;
+                          /* ================= ADD STATES ================= */
+                          if (added.length > 0) {
+                            setLoadingCity(true);
+                            try {
+                              const newCities = await fetchCitiesByStates(
+                                added.map(Number)
+                              );
 
-                        /* ================= ADD STATES ================= */
-                        if (added.length > 0) {
-                          setLoadingCity(true);
-                          try {
-                            const newCities = await fetchCitiesByStates(
-                              added.map(Number)
+                              // merge (no duplicates)
+                              setCities(prev => {
+                                const map = new Map(prev.map(c => [String(c.id), c]));
+                                newCities.forEach((c: any) => map.set(String(c.id), c));
+                                return Array.from(map.values());
+                              });
+                            } finally {
+                              setLoadingCity(false);
+                            }
+                          }
+
+                          /* ================= REMOVE STATES ================= */
+                          if (removed.length > 0) {
+                            // remove city OPTIONS of removed states
+                            setCities(prev =>
+                              prev.filter(c => !removed.includes(String(c.state_id)))
                             );
 
-                            // merge (no duplicates)
-                            setCities(prev => {
-                              const map = new Map(prev.map(c => [String(c.id), c]));
-                              newCities.forEach((c: any) => map.set(String(c.id), c));
-                              return Array.from(map.values());
+                            // remove SELECTED city_ids of removed states
+                            const selectedCityIds = form.getValues("city_ids");
+
+                            const filteredCityIds = selectedCityIds.filter(cityId => {
+                              const city = cities.find(c => String(c.id) === cityId);
+                              return city && !removed.includes(String(city.state_id));
                             });
-                          } finally {
-                            setLoadingCity(false);
+
+                            form.setValue("city_ids", filteredCityIds);
                           }
-                        }
-
-                        /* ================= REMOVE STATES ================= */
-                        if (removed.length > 0) {
-                          // remove city OPTIONS of removed states
-                          setCities(prev =>
-                            prev.filter(c => !removed.includes(String(c.state_id)))
-                          );
-
-                          // remove SELECTED city_ids of removed states
-                          const selectedCityIds = form.getValues("city_ids");
-
-                          const filteredCityIds = selectedCityIds.filter(cityId => {
-                            const city = cities.find(c => String(c.id) === cityId);
-                            return city && !removed.includes(String(city.state_id));
-                          });
-
-                          form.setValue("city_ids", filteredCityIds);
-                        }
-                      }}
-                    />
+                        }}
+                      />
 
 
-                    <FloatingRHFSelect
-                      name="city_ids"
-                      label="City"
-                      isMulti
+                      <FloatingRHFSelect
+                        name="city_ids"
+                        label="City"
+                        isMulti
+                        control={form.control}
+                        isRequired
+                        isDisabled={isView || !form.getValues("state_ids")}
+                        options={buildGroupedCityOptions(cities, states)}
+
+                      />
+                    </div>
+                  </SectionCard>
+
+                  <SectionCard title="Additional Notes">
+                    <FloatingTextarea
+                      name="notes"
+                      label="Notes"
+                      isView={isView}
                       control={form.control}
-                      isRequired
-                      isDisabled={isView || !form.getValues("state_ids")}
-                      options={buildGroupedCityOptions(cities, states)}
-
                     />
-                  </div>
-                </SectionCard>
 
-                <SectionCard title="Additional Notes">
-                  <FloatingTextarea
-                    name="notes"
-                    label="Notes"
-                    isView={isView}
-                    control={form.control}
-                  />
-
-                </SectionCard>
-              </div>
+                  </SectionCard>
+                </div>
             }
 
 

@@ -16,6 +16,7 @@ export function FloatingRHFSelect({
   options,
   isMulti = false,
   isDisabled = false,
+  isClear=false,
   isRequired = false,
   creatable = false,
   onValueChange
@@ -77,6 +78,7 @@ export function FloatingRHFSelect({
               isMulti={isMulti}
               isDisabled={isDisabled}
               isSearchable
+              isClearable={isClear}
               options={options}
               getOptionValue={(o: any) => o.value}
               getOptionLabel={(o: any) => o.label}

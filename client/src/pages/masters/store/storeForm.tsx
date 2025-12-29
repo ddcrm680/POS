@@ -313,7 +313,7 @@ export default function StoreForm() {
       ...prev,
       [key]: {
         url,
-        file, 
+        file,
       },
     }));
   };
@@ -642,45 +642,45 @@ export default function StoreForm() {
                                   {item.label}
                                 </p>
 
-                              <div className="relative h-32 rounded-lg border bg-gray-50 overflow-hidden group">
+                                <div className="relative h-32 rounded-lg border bg-gray-50 overflow-hidden group">
 
-  {/* PREVIEW */}
-  {preview ? (
-    isPdfFile(preview.file, preview.url) ? (
-      <iframe
-        src={preview.url}
-        className="w-full h-full pointer-events-none"
-        title={item.label}
-      />
-    ) : (
-      <img
-        src={preview.url}
-        className="w-full h-full object-contain pointer-events-none"
-      />
-    )
-  ) : (
-    <div className="w-full h-full flex items-center justify-center">
-      <span className="text-xs text-gray-400">No preview</span>
-    </div>
-  )}
+                                  {/* PREVIEW */}
+                                  {preview ? (
+                                    isPdfFile(preview.file, preview.url) ? (
+                                      <iframe
+                                        src={preview.url}
+                                        className="w-full h-full pointer-events-none"
+                                        title={item.label}
+                                      />
+                                    ) : (
+                                      <img
+                                        src={preview.url}
+                                        className="w-full h-full object-contain pointer-events-none"
+                                      />
+                                    )
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                      <span className="text-xs text-gray-400">No preview</span>
+                                    </div>
+                                  )}
 
-  {/* DARK OVERLAY */}
-  {preview && (
-    <div
-      className="
+                                  {/* DARK OVERLAY */}
+                                  {preview && (
+                                    <div
+                                      className="
         absolute inset-0
         bg-black/40
         opacity-0
         group-hover:opacity-100
         transition-opacity duration-300
       "
-    />
-  )}
+                                    />
+                                  )}
 
-  {/* VIEW BUTTON */}
-  {preview && (
-    <div
-      className="
+                                  {/* VIEW BUTTON */}
+                                  {preview && (
+                                    <div
+                                      className="
         absolute inset-0
         flex items-center justify-center
         opacity-0
@@ -689,17 +689,17 @@ export default function StoreForm() {
         group-hover:scale-100
         transition-all duration-300
       "
-    >
-      <Button
-        type="button"
-        onClick={() => window.open(preview.url, "_blank")}
-        className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
-      >
-        View
-      </Button>
-    </div>
-  )}
-</div>
+                                    >
+                                      <Button
+                                        type="button"
+                                        onClick={() => window.open(preview.url, "_blank")}
+                                        className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
+                                      >
+                                        View
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
 
 
 
