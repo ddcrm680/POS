@@ -12,6 +12,7 @@ import { storeFormApi } from "@/lib/types";
 import { ChevronLeft } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { formatDate, formatTime } from "@/lib/utils";
+import { Loader } from "@/components/common/loader";
 
 export default function StoreView() {
   const [searchParams] = useSearchParams();
@@ -81,13 +82,7 @@ export default function StoreView() {
     hydrateLocationNames();
   }, [data?.country, data?.state, data?.city, countries]);
 
-  if (loading) {
-    return <EmptyState message="Loading store..." />;
-  }
 
-  if (!data) {
-    return <EmptyState message="Store not found" />;
-  }
 
   const docPreview = (path?: string | null) =>
     path ? `${baseUrl}/${path}` : null;
@@ -121,7 +116,10 @@ export default function StoreView() {
             {"View Store"}
           </h1>
         </div>
-        <Card className="max-w-6xl mx-auto p-6 space-y-6 rounded-2xl border-0">
+        {
+                      loading ? <div className="min-h-[150px] flex justify-center items-center">
+                        <div className="p-6 text-sm "><Loader /></div>
+                      </div> :  <Card className="max-w-6xl mx-auto p-6 space-y-6 rounded-2xl border-0">
           <section>
             <h3 className="text-sm font-semibold mb-4 text-gray-700">
               Store Information
@@ -212,7 +210,8 @@ export default function StoreView() {
           </section>
 
 
-        </Card>
+        </Card>}
+       
       </div>
     </div>
   );

@@ -416,7 +416,7 @@ export default function StoreForm() {
             {/* Back Button */}
             <button
               type="button"
-              disabled={isLoading}
+              disabled={isLoading || isInfoLoading}
               onClick={() => window.history.back()}
               className="
       flex items-center gap-1 justify-start -ml-2
@@ -434,240 +434,244 @@ export default function StoreForm() {
               {isView ? "View Store" : id ? "Edit Store" : "Create New Store"}
             </h1>
           </div>
+          {
+            isInfoLoading && id ? <div className="min-h-[150px] flex justify-center items-center">
+              <div className="p-6 text-sm "><Loader /></div>
+            </div> :
+              <div className=" pb-4">
 
-          <div className=" pb-4">
+                {/* STORE INFO */}
+                <SectionCard title="Store Information">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* "name", "email", "phone" */}
+                    {[{ label: "Store Name", fieldName: "name", isRequired: true },
+                    { label: "Email", fieldName: "email", isRequired: true },
+                    { label: "Phone", fieldName: "phone", isRequired: false }
+                    ].map((item) => (
+                      <FloatingField
+                        isView={isView}
+                        isRequired={item.isRequired}
+                        name={item.fieldName}
+                        label={item.label}
+                        control={form.control}
+                      />
+                    ))}
+                  </div>
+                </SectionCard>
 
-            {/* STORE INFO */}
-            <SectionCard title="Store Information">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* "name", "email", "phone" */}
-                {[{ label: "Store Name", fieldName: "name", isRequired: true },
-                { label: "Email", fieldName: "email", isRequired: true },
-                { label: "Phone", fieldName: "phone", isRequired: false }
-                ].map((item) => (
-                  <FloatingField
+                {/* LOCATION */}
+                {/* ================= LOCATION & OPERATIONS ================= */}
+                <SectionCard title="Location & Operations">
+
+                  {/* 🔹 Business Assignment */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <FloatingRHFSelect
+                      name="organization_id"
+                      label="Organization"
+                      control={form.control}
+                      isRequired
+                      isDisabled={isView}
+                      options={organizationTerritoryList.organizations.map((o: any) => ({
+                        value: String(o.id),
+                        label: o.org_name,
+                      }))}
+                    />
+                    <FloatingRHFSelect
+                      name="territory_id"
+                      label="Territory"
+                      control={form.control}
+                      isRequired
+                      isDisabled={isView}
+                      options={organizationTerritoryList.territories}
+                    />
+                    <FloatingField
+                      name="opening_date"
+                      label="Opening Date"
+                      type="date"
+                      control={form.control}
+                      isRequired
+                      isView={isView}
+                    />
+                  </div>
+
+
+                  {/* 🔹 Geographical Location */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <FloatingField
+                      name="pincode"
+                      label="Pincode"
+                      control={form.control}
+                      isRequired
+                      isView={isView}
+                    />
+                    <FloatingRHFSelect
+                      name="country"
+                      label="Country"
+                      control={form.control}
+                      isRequired
+                      isDisabled={isView}
+                      options={countryList.map(c => ({
+                        value: String(c.id),
+                        label: c.name,
+                      }))}
+                      onValueChange={async (value) => {
+                        if (isHydratingRef.current) return;
+
+                        setStates([]);
+                        setCities([]);
+                        form.setValue("state", "");
+                        form.setValue("city", "");
+
+                        setLoadingState(true);
+                        const stateList = await fetchStateList(Number(value));
+                        setStates(stateList);
+                        setLoadingState(false);
+                      }}
+                    />
+
+                    <FloatingRHFSelect
+                      name="state"
+                      label="State"
+                      control={form.control}
+                      isRequired
+                      isDisabled={isView || !form.getValues("country")}
+                      options={states.map(s => ({
+                        value: String(s.id),
+                        label: s.name,
+                      }))}
+                      onValueChange={async (value) => {
+                        if (isHydratingRef.current) return;
+
+                        setCities([]);
+                        form.setValue("city", "");
+
+                        setLoadingCity(true);
+                        const cityList = await fetchCityList(Number(value));
+                        setCities(cityList);
+                        setLoadingCity(false);
+                      }}
+                    />
+
+                    <FloatingRHFSelect
+                      name="city"
+                      label="City"
+                      control={form.control}
+                      isRequired
+                      isDisabled={isView || !form.getValues("state")}
+                      options={cities.map(c => ({
+                        value: String(c.id),
+                        label: c.name,
+                      }))}
+                    />
+
+
+                  </div>
+
+                  {/* 🔹 Address Details */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FloatingTextarea
+                      name="registered_address"
+                      label="Permanent Address"
+                      control={form.control}
+                      isRequired
+                      isView={isView}
+                    />
+
+                    <FloatingTextarea
+                      name="shipping_address"
+                      label="Shipping Address"
+                      control={form.control}
+                      isRequired
+                      isView={isView}
+                    />
+                  </div>
+
+                </SectionCard>
+
+                {/* BILLING */}
+                <SectionCard title="Billing & Tax">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {storeFormKeys.billingTaxFieldList.map((item) => (
+                      <FloatingField
+                        isView={isView}
+                        isRequired={true}
+                        name={item.fieldName}
+                        label={item.label}
+                        control={form.control}
+                      />
+
+                    ))}
+                  </div>
+                </SectionCard>
+
+                {/* DOCUMENTS */}
+                <SectionCard title="Documents">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {storeFormKeys.file.map((item) => (
+                      <FormField
+                        key={item.key}
+                        name={item.key as any}
+                        control={form.control}
+                        render={({ fieldState }) => {
+
+                          const hasError = !!fieldState.error;
+                          return (
+                            <FormItem>
+                              <p className="text-sm font-medium capitalize">
+                                {item.label}
+                              </p>
+
+                              <div className="h-32 rounded-lg border bg-gray-50 flex items-center justify-center overflow-hidden">
+                                {filePreview[item.key] ? (
+                                  <img
+                                    src={filePreview[item.key]!}
+                                    className="w-full h-full object-contain"
+                                  />
+                                ) : (
+                                  <span className="text-xs text-gray-400">
+                                    No preview
+                                  </span>
+                                )}
+                              </div>
+
+                              {!isView && (
+                                <Input
+                                  className={hasError ? "border-red-500 focus-visible:ring-red-500" : ""}
+
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleFile(
+                                      item.key as any,
+                                      e.target.files?.[0] ?? null
+                                    )
+                                  }
+                                />
+                              )}
+                              <FormMessage />
+                            </FormItem>
+                          )
+                        }}
+                      />
+                    ))}
+                  </div>
+                </SectionCard>
+
+                {/* NOTES */}
+                <SectionCard title="Additional Notes">
+                  <FloatingTextarea
+                    name="notes"
+                    label="Notes"
                     isView={isView}
-                    isRequired={item.isRequired}
-                    name={item.fieldName}
-                    label={item.label}
-                    control={form.control}
-                  />
-                ))}
-              </div>
-            </SectionCard>
-
-            {/* LOCATION */}
-            {/* ================= LOCATION & OPERATIONS ================= */}
-            <SectionCard title="Location & Operations">
-
-              {/* 🔹 Business Assignment */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <FloatingRHFSelect
-                  name="organization_id"
-                  label="Organization"
-                  control={form.control}
-                  isRequired
-                  isDisabled={isView}
-                  options={organizationTerritoryList.organizations.map((o: any) => ({
-                    value: String(o.id),
-                    label: o.org_name,
-                  }))}
-                />
-                <FloatingRHFSelect
-                  name="territory_id"
-                  label="Territory"
-                  control={form.control}
-                  isRequired
-                  isDisabled={isView}
-                  options={organizationTerritoryList.territories}
-                />
-                <FloatingField
-                  name="opening_date"
-                  label="Opening Date"
-                  type="date"
-                  control={form.control}
-                  isRequired
-                  isView={isView}
-                />
-              </div>
-
-
-              {/* 🔹 Geographical Location */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <FloatingField
-                  name="pincode"
-                  label="Pincode"
-                  control={form.control}
-                  isRequired
-                  isView={isView}
-                />
-                <FloatingRHFSelect
-                  name="country"
-                  label="Country"
-                  control={form.control}
-                  isRequired
-                  isDisabled={isView}
-                  options={countryList.map(c => ({
-                    value: String(c.id),
-                    label: c.name,
-                  }))}
-                  onValueChange={async (value) => {
-                    if (isHydratingRef.current) return;
-
-                    setStates([]);
-                    setCities([]);
-                    form.setValue("state", "");
-                    form.setValue("city", "");
-
-                    setLoadingState(true);
-                    const stateList = await fetchStateList(Number(value));
-                    setStates(stateList);
-                    setLoadingState(false);
-                  }}
-                />
-
-                <FloatingRHFSelect
-                  name="state"
-                  label="State"
-                  control={form.control}
-                  isRequired
-                  isDisabled={isView || !form.getValues("country")}
-                  options={states.map(s => ({
-                    value: String(s.id),
-                    label: s.name,
-                  }))}
-                  onValueChange={async (value) => {
-                    if (isHydratingRef.current) return;
-
-                    setCities([]);
-                    form.setValue("city", "");
-
-                    setLoadingCity(true);
-                    const cityList = await fetchCityList(Number(value));
-                    setCities(cityList);
-                    setLoadingCity(false);
-                  }}
-                />
-
-                <FloatingRHFSelect
-                  name="city"
-                  label="City"
-                  control={form.control}
-                  isRequired
-                  isDisabled={isView || !form.getValues("state")}
-                  options={cities.map(c => ({
-                    value: String(c.id),
-                    label: c.name,
-                  }))}
-                />
-
-
-              </div>
-
-              {/* 🔹 Address Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FloatingTextarea
-                  name="registered_address"
-                  label="Permanent Address"
-                  control={form.control}
-                  isRequired
-                  isView={isView}
-                />
-
-                <FloatingTextarea
-                  name="shipping_address"
-                  label="Shipping Address"
-                  control={form.control}
-                  isRequired
-                  isView={isView}
-                />
-              </div>
-
-            </SectionCard>
-
-            {/* BILLING */}
-            <SectionCard title="Billing & Tax">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {storeFormKeys.billingTaxFieldList.map((item) => (
-                  <FloatingField
-                    isView={isView}
-                    isRequired={true}
-                    name={item.fieldName}
-                    label={item.label}
                     control={form.control}
                   />
 
-                ))}
-              </div>
-            </SectionCard>
-
-            {/* DOCUMENTS */}
-            <SectionCard title="Documents">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {storeFormKeys.file.map((item) => (
-                  <FormField
-                    key={item.key}
-                    name={item.key as any}
-                    control={form.control}
-                    render={({ fieldState }) => {
-                      
-    const hasError = !!fieldState.error;
-                      return (
-                      <FormItem>
-                        <p className="text-sm font-medium capitalize">
-                          {item.label}
-                        </p>
-
-                        <div className="h-32 rounded-lg border bg-gray-50 flex items-center justify-center overflow-hidden">
-                          {filePreview[item.key] ? (
-                            <img
-                              src={filePreview[item.key]!}
-                               className="w-full h-full object-contain"
-                            />
-                          ) : (
-                            <span className="text-xs text-gray-400">
-                              No preview
-                            </span>
-                          )}
-                        </div>
-
-                        {!isView && (
-                          <Input
-                            className={hasError ? "border-red-500 focus-visible:ring-red-500" : ""}
-          
-                            type="file"
-                            onChange={(e) =>
-                              handleFile(
-                                item.key as any,
-                                e.target.files?.[0] ?? null
-                              )
-                            }
-                          />
-                        )}
-                        <FormMessage />
-                      </FormItem>
-                    )}}
-                  />
-                ))}
-              </div>
-            </SectionCard>
-
-            {/* NOTES */}
-            <SectionCard title="Additional Notes">
-              <FloatingTextarea
-                name="notes"
-                label="Notes"
-                isView={isView}
-                control={form.control}
-              />
-
-            </SectionCard>
-          </div>
+                </SectionCard>
+              </div>}
           {mode !== 'view' && <div className="">
             <div className="border-t px-6 py-4 flex justify-end gap-3">
               <Button
                 variant="outline"
-                disabled={isLoading}
+                disabled={isLoading || isInfoLoading}
                 className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
                 onClick={() => navigate("/master")}
               >
@@ -675,7 +679,7 @@ export default function StoreForm() {
               </Button>
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || isInfoLoading}
                 className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
               >
                 {isLoading && <Loader isShowLoadingText={false} color="#fff" />}
@@ -686,6 +690,7 @@ export default function StoreForm() {
             </div></div>}
 
         </div>
+
       </form>
     </Form>
   );

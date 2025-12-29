@@ -249,7 +249,6 @@ export default function TerritoryMasterForm() {
   };
   useEffect(() => {
     if (!initialValues ) return;
-console.log(initialValues,'initialValues');
 
     if (mode === "edit" || mode === "view") {
       form.reset({
@@ -308,7 +307,8 @@ console.log(initialValues,'initialValues');
             {
               isInfoLoading ? <div className="min-h-[150px] flex justify-center items-center">
                 <div className="p-6 text-sm "><Loader /></div>
-              </div> : <div>     {/* -------- TOP FIELDS -------- */}
+              </div> : 
+              <div>     {/* -------- TOP FIELDS -------- */}
                 <SectionCard title="Territory Information">
                   <div className="grid  grid-cols-1 md:grid-cols-3 gap-4">
                     <FloatingField
