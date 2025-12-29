@@ -122,49 +122,62 @@ export default function StoreView() {
           </h1>
         </div>
         <Card className="max-w-6xl mx-auto p-6 space-y-6 rounded-2xl border-0">
-
-          {/* ================= STORE INFO ================= */}
-          <SectionCard title="Store Information">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <section>
+            <h3 className="text-sm font-semibold mb-4 text-gray-700">
+              Store Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4  text-sm">
               <Info label="Store Name" value={data.name} />
               <Info label="Email" value={data.email} />
               <Info label="Phone" value={data.phone || "-"} />
             </div>
-          </SectionCard>
+          </section>
+
 
           {/* ================= LOCATION & OPERATIONS ================= */}
-          <SectionCard title="Location & Operations">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <section>
+            <h3 className="text-sm font-semibold mb-4 text-gray-700">
+              Location & Operations
+            </h3>
+            <div className="gap-4  grid">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm ">
               <Info label="Organization" value={data.organization?.company_name} />
               <Info label="Territory" value={data.territory?.name} />
               <Info label="Opening Date" value={data.opening_date} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm ">
               <Info label="Pincode" value={data.pincode} />
               <Info label="Country" value={data.country_name} />
               <Info label="State" value={data.state_name} />
               <Info label="City" value={data.city_name} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <Info label="Permanent Address" value={data.registered_address} />
               <Info label="Shipping Address" value={data.shipping_address} />
             </div>
-          </SectionCard>
+            </div>
+          </section>
+
 
           {/* ================= BILLING & TAX ================= */}
-          <SectionCard title="Billing & Tax">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <section>
+            <h3 className="text-sm font-semibold mb-4 text-gray-700">
+              Banking Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <Info label="Invoice Prefix" value={data.invoice_prefix} />
               <Info label="GST No" value={data.gst_no} />
               <Info label="PAN No" value={data.pan_no} />
             </div>
-          </SectionCard>
+          </section>
 
-          {/* ================= DOCUMENTS ================= */}
-          <SectionCard title="Documents">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <section>
+            <h3 className="text-sm font-semibold mb-4 text-gray-700">
+              Documents
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
 
               {/* PAN */}
               <DocumentPreview
@@ -185,12 +198,19 @@ export default function StoreView() {
               />
 
             </div>
-          </SectionCard>
+          </section>
 
-          {/* ================= NOTES ================= */}
-          <SectionCard title="Additional Notes">
-            <Info label="Notes" value={data.notes || "-"} />
-          </SectionCard>
+          <section>
+            <h3 className="text-sm font-semibold mb-4 text-gray-700  ">
+              Additional Notes
+            </h3>
+            <div className="text-sm">
+  <Info label="Notes" value={data.notes || "-"} />
+
+            </div>
+          
+          </section>
+
 
         </Card>
       </div>
@@ -208,10 +228,10 @@ function DocumentPreview({
   src: string | null;
 }) {
   return (
-    <div className="space-y-2">
-      <p className="text-sm font-medium">{label}</p>
+    <div className="space-y-2  text-sm">
+      <p className="text-gray-500 whitespace-nowrap ">{label}</p>
 
-      <div className="h-32 rounded-lg border bg-gray-50 flex items-center justify-center overflow-hidden">
+      <div className="h-32 rounded-lg border bg-gray-50 flex  items-center justify-center overflow-hidden">
         {src ? (
           <img
             src={src}
