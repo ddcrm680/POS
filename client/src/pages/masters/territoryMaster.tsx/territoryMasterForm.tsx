@@ -56,7 +56,9 @@ export default function TerritoryMasterForm() {
 
   const prevStateIdsRef = useRef<string[]>([]);
   const [initialValues, setInitialValues] = useState<TerritoryFormApiValues | null>(null)
-  const [storeList, setStoreList] = useState<storeListType[]>([])
+  const [storeList, setStoreList] = useState<
+    { value: string; label: string; isDisabled?: boolean }[]
+  >([]);
   useEffect(() => {
 
     if (!countryList.length) return;
@@ -158,16 +160,42 @@ export default function TerritoryMasterForm() {
   };
   const fetchStoreList = async () => {
     try {
-      const res =
-        !id ? await fetchUnassignedStoreList() : await fetchStoreCrispList();
-      setStoreList(res?.data)
+      const res = await fetchStoreCrispList();
+
+      let options = res.data.map((store: any) => ({
+        value: String(store.id),
+        label: store.name,
+      }));
+
+      console.log(initialValues,
+        !options.some((o: any) => o.value === String(initialValues?.store_id)), 'initialValuesw543');
+
+      // 👻 GHOST OPTION (edit / view only)
+      if (
+        initialValues?.store_id &&
+        initialValues?.store?.name &&
+        !options.some((o: any) => o.value === String(initialValues.store_id))
+      ) {
+        options = [
+          {
+            value: String(initialValues.store.id),
+            label: initialValues.store.name,
+            isDisabled: true, // 🔒 visible but not selectable
+          },
+          ...options,
+        ];
+      }
+
+      setStoreList(options);
     } catch (e) {
       console.error(e);
-
     }
   };
   useEffect(() => {
+
     fetchStoreList()
+  }, [initialValues])
+  useEffect(() => {
     if (id) {
       fetchTerritoryMaster();
 
@@ -248,11 +276,12 @@ export default function TerritoryMasterForm() {
     }
   };
   useEffect(() => {
-    if (!initialValues ) return;
+    if (!initialValues) return;
 
     if (mode === "edit" || mode === "view") {
       form.reset({
         name: initialValues.name ?? "",
+        storeName: initialValues?.store?.name,
         store_id: initialValues.store_id
           ? String(initialValues.store_id)
           : "",
@@ -324,11 +353,8 @@ export default function TerritoryMasterForm() {
                         label="Store"
                         control={form.control}
                         isDisabled={false}
-                        options={storeList.map(c => ({
-                          value: String(c.id),
-                          label: c.name,
-                        }))}
-isClear={true}
+                        options={storeList}
+                        isClear={true}
                       />
 
                       <FloatingRHFSelect
