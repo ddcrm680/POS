@@ -190,7 +190,7 @@ export default function TerritoryMasterForm() {
       setIsLoading(true);
       const updatedValues = {
         "name": value.name,
-        "store_id": Number(value.store_id),
+        "store_id": value.store_id ? Number(value.store_id) : null,
         "notes": value.notes,
         "country_id": Number(value.country_id),
         "state_ids": value.state_ids.map(item => Number(item)),
@@ -248,7 +248,8 @@ export default function TerritoryMasterForm() {
     }
   };
   useEffect(() => {
-    if (!initialValues || !storeList.length) return;
+    if (!initialValues ) return;
+console.log(initialValues,'initialValues');
 
     if (mode === "edit" || mode === "view") {
       form.reset({

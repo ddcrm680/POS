@@ -61,20 +61,41 @@ export default function OrganizationView({
 
         {/* ================= BASIC INFO ================= */}
         <section>
-          <h3 className="text-sm font-semibold mb-4 text-gray-700">
-            Organization Details
-          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-[0.5fr_1fr] gap-6 items-start">
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            {/* LOGO */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-24 h-24 rounded-full overflow-hidden border bg-muted">
+                <img
+                  src={logoUrl}
+                  alt="Organization Logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
+              <p className="text-xs text-muted-foreground text-center leading-snug">
+                Allowed: JPG, JPEG, PNG, WEBP <br />
+                Max 1 MB
+              </p>
+            </div>
 
-            <Info label="Company Name" value={info.company_name} />
-            <Info label="Email" value={info.email} />
-            <Info label="Invoice Prefix" value={info.invoice_prefix} />
-            <Info label="Service Prefix" value={info.service_prefix} />
+            {/* DETAILS */}
+            <div className="space-y-4">
+
+              {/* ROW 1 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <Info label="Company Name" value={info.company_name} />
+                <Info label="Email" value={info.email} />
+              </div>
+
+              {/* ROW 2 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <Info label="Invoice Prefix" value={info.invoice_prefix} />
+                <Info label="Service Prefix" value={info.service_prefix} />
+              </div>
+
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-   </div>
         </section>
 
         {/* ================= BANKING ================= */}

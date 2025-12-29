@@ -531,7 +531,7 @@ export type TerritoryFormValues = {
 };
 export type TerritoryFormRequestValues = {
   name: string;
-  store_id?: number;
+  store_id?: number | null;
   notes?:string
   country_id: number;
   city_ids: number[]
