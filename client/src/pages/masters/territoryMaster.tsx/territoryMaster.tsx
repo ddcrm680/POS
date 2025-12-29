@@ -216,6 +216,7 @@ const [isLoading, setIsLoading] = useState(false);
           per_page: perPage,
           page,
           search,
+          status:filters.status
         });
 
       const mappedTerritory = res.data
