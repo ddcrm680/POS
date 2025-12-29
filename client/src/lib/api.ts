@@ -398,7 +398,7 @@ export async function fetchUserLogInfo({
 }: {
   per_page: number;
   page: number;
-  id:string
+  id: string
 }) {
   const params = new URLSearchParams({
     page: String(page),
@@ -427,10 +427,10 @@ export async function fetchTerritoryMasterList({
     search,
     per_page: String(per_page)
   });
-  
-if (typeof status === "boolean") {
-  params.append("status", String(status));
-}
+
+  if (typeof status === "boolean") {
+    params.append("status", String(status ? 1 : 0));
+  }
   const response = await api.get(`/api/admin/territories/list?${params.toString()}`);
 
   if (response?.data?.success === true) {
