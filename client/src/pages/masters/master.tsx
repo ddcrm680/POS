@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { masterTabList } from "@/lib/constant";
+import { Constant, masterTabList } from "@/lib/constant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Users from "./user/users";
 import VehicleMaster from "./vehicleMaster/vehicle";
@@ -10,12 +10,17 @@ import Organization from "./organization/organization";
 import Store from "./store/store";
 import SystemLog from "./systemLog/systemLog";
 import TerritoryMaster from "./territoryMaster.tsx/territoryMaster";
+import { useAuth } from "@/lib/auth";
 
 const MASTER_TAB_KEY = "master_active_tab";
 
 export default function Master() {
   const [activeTab, setActiveTab] = useState<string>("users");
-
+  const { user, } = useAuth();
+  const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
+  useEffect(() => {
+    setIsSuperAdmin(user?.role === Constant.superAdmin)
+  }, [user])
   /* 🔹 Load tab from localStorage on mount */
   useEffect(() => {
     const savedTab = localStorage.getItem(MASTER_TAB_KEY);
@@ -48,15 +53,8 @@ export default function Master() {
                   Master Details
                 </h1>
 
-                <TabsList className="h-auto
-    flex 
-    overflow-x-auto
-    scrollbar-hide
-    lg:grid lg:grid-cols-7
-    justify-start
-     lg:w-[40]
-  ">
-                  {masterTabList.map((tab) => {
+                <TabsList className={`h-auto    flex     overflow-x-auto    scrollbar-hide    lg:grid lg:grid-cols-${isSuperAdmin ? "7" : "6"}    justify-start     lg:w-[40]  `}>
+                  {masterTabList.filter((tab) => tab.id === "systemLog" ? isSuperAdmin : true).map((tab) => {
                     const Icon = tab.emoji;
                     return (
                       <TabsTrigger
@@ -64,7 +62,7 @@ export default function Master() {
                         value={tab.id}
                         className="
     flex items-center gap-2
-    whitespace-nowrap px-3 py-2
+    whitespace-nowrap px-1 py-2
     transition-all duration-200
 
     hover:bg-muted
