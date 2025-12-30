@@ -53,7 +53,7 @@ export default function Master() {
                   Master Details
                 </h1>
 
-                <TabsList className={`h-auto    flex     overflow-x-auto    scrollbar-hide    lg:grid lg:grid-cols-${isSuperAdmin ? "7" : "6"}    justify-start     lg:w-[40]  `}>
+                <TabsList className={`h-auto    flex     overflow-x-auto    scrollbar-hide    lg:grid lg:grid-cols-${isSuperAdmin ? "7" : "6"}    justify-start       `}>
                   {masterTabList.filter((tab) => tab.id === "systemLog" ? isSuperAdmin : true).map((tab) => {
                     const Icon = tab.emoji;
                     return (
