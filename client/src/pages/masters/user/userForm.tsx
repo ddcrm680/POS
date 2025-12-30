@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 // import { Box, Input, Textarea } from "@chakra-ui/react";
-import { Eye, EyeOff } from "lucide-react";
+import { Check, Copy, Eye, EyeOff, RefreshCcw } from "lucide-react";
 
 import { Form } from "@/components/ui/form";
 import {
@@ -15,12 +15,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { userFormProp, UserForm as UserFormType,  } from "@/lib/types";
+import { userFormProp, UserForm as UserFormType, } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Box } from "@chakra-ui/react";
 import { Textarea } from "@/components/ui/textarea";
 import { userSchema } from "@/lib/schema";
 import { RequiredMark } from "@/components/common/RequiredMark";
+import { generateStrongPassword } from "@/lib/utils";
+import { CopyButton } from "@/components/common/CopyButton";
 
 export default function UserFormInfo({
   mode,
@@ -31,87 +33,109 @@ export default function UserFormInfo({
   isLoading = false,
   onSubmit,
 }: userFormProp) {
+  const [copied, setCopied] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
 
-const form = useForm<UserFormType>({
-  resolver: zodResolver(userSchema(mode)),
-  defaultValues: {
-    name: "",
-    email: "",
-    phone: "",
-    role_id: -1,
-        ...(mode === "create" ? { password: "" } : {}),
-    address: "",
-    ...initialValues,
-  },
-});
+  const form = useForm<UserFormType>({
+    resolver: zodResolver(userSchema(mode)),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      role_id: -1,
+      ...(mode === "create" ? { password: "" } : {}),
+      address: "",
+      ...initialValues,
+    },
+  });
 
 
   // Reset form when initialValues change (important for edit)
   useEffect(() => {
-    if (mode==='edit'|| mode==="view") {
-      
+    if (mode === 'edit' || mode === "view") {
+
       form.reset({
         name: "",
         email: "",
         phone: "",
         role_id: -1,
         // ...(mode === "create" ? { password: "" } : {}),
-        
+
         ...initialValues,
-        address:initialValues?.address ?? "",
+        address: initialValues?.address ?? "",
       });
     }
   }, [mode]);
-const isView = mode === "view";
-const isCreate = mode === "create";
+  const isView = mode === "view";
+  const isCreate = mode === "create";
+  const handleGeneratePassword = () => {
+    const pwd = generateStrongPassword();
+    form.setValue("password", pwd, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+  };
+
+  const handleCopyPassword = async () => {
+    const password = form.getValues("password");
+    if (!password) return;
+
+    await navigator.clipboard.writeText(password);
+
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 1500);
+  };
   return (
     <Form {...form}>
       <form
         id={id}
-         onSubmit={form.handleSubmit((values) =>
-    onSubmit(values, form.setError)
-  )}
+        onSubmit={form.handleSubmit((values) =>
+          onSubmit(values, form.setError)
+        )}
         className="space-y-6 "
       >  <div className="p-6 space-y-6 max-h-[500px] overflow-auto">
           {/* Row 1 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
-                control={form.control}
-                disabled={mode==='view'}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Full Name<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter full name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              control={form.control}
+              disabled={mode === 'view'}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "#000" }}>Full Name<RequiredMark show={!isView} /></FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter full name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-           <FormField
-                control={form.control}
-                name="email"
-                 disabled={mode==='view'}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Email<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter email" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-           
+            <FormField
+              control={form.control}
+              name="email"
+              disabled={mode === 'view'}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "#000" }}>Email<RequiredMark show={!isView} /></FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter email" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
           </div>
 
           {/* Row 2 */}
-          <div className={`grid grid-cols-1 ${mode!=='view' ? "md:grid-cols-3":"md:grid-cols-2"} gap-4`}>
-            {mode!=='view' && 
+          <div className={`grid grid-cols-1 ${mode !== 'view' ? "md:grid-cols-3" : "md:grid-cols-2"} gap-4`}>
+            {mode !== 'view' &&
               <FormField
                 control={form.control}
                 name="phone"
@@ -135,12 +159,12 @@ const isCreate = mode === "create";
                   </FormItem>
                 )}
               />
-         }
-             {( mode==="view" )&& 
+            }
+            {(mode === "view") &&
               <FormField
                 control={form.control}
                 name="phone"
-                disabled={mode==='view'}
+                disabled={mode === 'view'}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>Phone</FormLabel>
@@ -161,63 +185,85 @@ const isCreate = mode === "create";
                   </FormItem>
                 )}
               />
-           }
-            {mode!=='view'&&
+            }
+            {mode !== "view" && (
               <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "#000" }}>
-                      { "Password"}<RequiredMark show={isCreate} />
+                      Password<RequiredMark show={isCreate} />
                     </FormLabel>
+
                     <FormControl>
                       <div className="relative">
                         <Input
                           {...field}
                           type={showPassword ? "text" : "password"}
                           placeholder="Enter password"
+                          className="pr-[96px]" // ⬅️ IMPORTANT (space for icons)
                         />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword((s) => !s)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2"
-                        >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
+
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                          {/* Show / Hide */}
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((s) => !s)}
+                            className="p-1"
+                            title={showPassword ? "Hide password" : "Show password"}
+                          >
+                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                          </button>
+
+                          {/* Generate */}
+                          <button
+                            type="button"
+                            onClick={handleGeneratePassword}
+                            title="Generate password"
+                            className="p-1"
+                          >
+                            <RefreshCcw size={16} />
+                          </button>
+
+                          {/* Copy */}
+                          <CopyButton value={field.value} />
+                        </div>
                       </div>
+
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
               />
-           }
+            )}
 
             {/* <Box w={mode==='view' ? "50%":"33%"}> */}
-              <FormField
-                control={form.control}
-                name="role_id"
-                 disabled={mode==='view'}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Role<RequiredMark show={!isView} /></FormLabel>
-                    <FormControl>
-                      <select
-                        {...field}
-                        className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
-                      >
-                        <option value="">Select role</option>
-                        {roles.map((r) => (
-                          <option key={r.id} value={Number(r.id)}>
-                            {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="role_id"
+              disabled={mode === 'view'}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "#000" }}>Role<RequiredMark show={!isView} /></FormLabel>
+                  <FormControl>
+                    <select
+                      {...field}
+                      className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="">Select role</option>
+                      {roles.map((r) => (
+                        <option key={r.id} value={Number(r.id)}>
+                          {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             {/* </Box> */}
           </div>
 
@@ -225,7 +271,7 @@ const isCreate = mode === "create";
           <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
             <FormField
               control={form.control}
-               disabled={mode==='view'}
+              disabled={mode === 'view'}
               name="address"
               render={({ field }) => (
                 <FormItem>
@@ -242,14 +288,14 @@ const isCreate = mode === "create";
                 </FormItem>
               )}
             />
-                  </div>
+          </div>
         </div>
         {/* Submit */}
-       {mode!=='view' &&  <div className="">
+        {mode !== 'view' && <div className="">
           <div className="flex justify-end gap-3 pb-6 pr-6  border-t pt-[24px]">
             <Button
               variant="outline"
-                 disabled={isLoading}
+              disabled={isLoading}
               className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
               onClick={onClose}
             >

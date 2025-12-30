@@ -186,3 +186,31 @@ export const getFileNameFromUrl = (url?: string) => {
   if (!url) return "";
   return url.split("/").pop() ?? "";
 };
+export function generateStrongPassword(length = 12) {
+  if (length < 8) length = 8;
+
+  const upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const lower = "abcdefghijkmnopqrstuvwxyz";
+  const digits = "23456789";
+  const special = "@#$!";
+
+  const all = upper + lower + digits + special;
+
+  // guarantee minimum requirements
+  let password =
+    upper[Math.floor(Math.random() * upper.length)] +
+    lower[Math.floor(Math.random() * lower.length)] +
+    digits[Math.floor(Math.random() * digits.length)] +
+    special[Math.floor(Math.random() * special.length)];
+
+  // fill remaining characters
+  for (let i = password.length; i < length; i++) {
+    password += all[Math.floor(Math.random() * all.length)];
+  }
+
+  // shuffle password
+  return password
+    .split("")
+    .sort(() => Math.random() - 0.5)
+    .join("");
+}

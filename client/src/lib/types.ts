@@ -611,3 +611,10 @@ export type storeListType = {
   id: number;
   name: string
 }
+export type CopyButtonProps = {
+  value?: string;
+  size?: number;
+  className?: string;
+  successDuration?: number; // ms
+  disabled?: boolean;
+};
