@@ -647,11 +647,13 @@ export default function StoreForm() {
                                   {/* PREVIEW */}
                                   {preview ? (
                                     isPdfFile(preview.file, preview.url) ? (
-                                      <iframe
-                                        src={preview.url}
-                                        className="w-full h-full pointer-events-none"
-                                        title={item.label}
-                                      />
+                                      <div className="absolute inset-0  overflow-hidden">
+                                        <iframe
+                                          src={preview.url}
+                                          className="w-[120%] h-[120%] "
+                                          scrolling="no"
+                                        />
+                                      </div>
                                     ) : (
                                       <img
                                         src={preview.url}
@@ -665,40 +667,9 @@ export default function StoreForm() {
                                   )}
 
                                   {/* DARK OVERLAY */}
-                                  {preview && (
-                                    <div
-                                      className="
-        absolute inset-0
-        bg-black/40
-        opacity-0
-        group-hover:opacity-100
-        transition-opacity duration-300
-      "
-                                    />
-                                  )}
 
-                                  {/* VIEW BUTTON */}
-                                  {preview && (
-                                    <div
-                                      className="
-        absolute inset-0
-        flex items-center justify-center
-        opacity-0
-        group-hover:opacity-100
-        scale-95
-        group-hover:scale-100
-        transition-all duration-300
-      "
-                                    >
-                                      <Button
-                                        type="button"
-                                        onClick={() => window.open(preview.url, "_blank")}
-                                        className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
-                                      >
-                                        View
-                                      </Button>
-                                    </div>
-                                  )}
+
+
                                 </div>
 
 

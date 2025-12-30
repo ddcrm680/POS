@@ -180,20 +180,20 @@ export default function StoreView() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
 
                 {/* PAN */}
-                 <FilePreviewCard
-      label="PAN Card"
-      src={docPreview(data.pan_card_file)}
-    />
+                <FilePreviewCard
+                  label="PAN Card"
+                  src={docPreview(data.pan_card_file)}
+                />
 
-    <FilePreviewCard
-      label="Registration File"
-      src={docPreview(data.registration_file)}
-    />
+                <FilePreviewCard
+                  label="Registration File"
+                  src={docPreview(data.registration_file)}
+                />
 
-    <FilePreviewCard
-      label="GSTIN File"
-      src={docPreview(data.gstin_file)}
-    />
+                <FilePreviewCard
+                  label="GSTIN File"
+                  src={docPreview(data.gstin_file)}
+                />
 
               </div>
             </section>
