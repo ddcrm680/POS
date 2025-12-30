@@ -719,7 +719,7 @@ export const StoreSchema = z.object({
     .trim()
     .min(10, "Address must be at least 10 characters")
     .max(255, "Address must not exceed 255 characters"),
-  territory_id: z.string().min(1, "Please select territory"),
+  territory_id: z.string().min(1, "Please select location"),
   phone: z.string().max(15),
   gstin_file: fileOrPath
     .refine(val => val !== undefined && val !== "", {
@@ -758,15 +758,13 @@ export const TerritoryMasterSchema = z.object({
       }
     ),
   country_id: z.string().min(1, "Please select country"),
-  state_ids:
-    z
-      .array(
-        z.string().min(1, "Please select state"),
-      ),
+state_ids: z
+    .array(z.string())
+    .min(1, "Please select at least one state"),
+
   city_ids: z
-    .array(
-      z.string().min(1, "Please select city"),
-    ),
+    .array(z.string())
+    .min(1, "Please select at least one city"),
 
 });
 

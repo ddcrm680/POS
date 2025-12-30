@@ -68,7 +68,7 @@ export default function Store() {
 
     },
     {
-      key: "territory_id", label: "Territory", width: "150px",
+      key: "territory_id", label: "Location", width: "150px",
     },
     {
       key: "organization", label: "Organization", width: "150px",

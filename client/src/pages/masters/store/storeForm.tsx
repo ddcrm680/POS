@@ -496,7 +496,7 @@ export default function StoreForm() {
                     />
                     <FloatingRHFSelect
                       name="territory_id"
-                      label="Territory"
+                      label="Location"
                       control={form.control}
                       isRequired
                       isDisabled={isView}

@@ -205,7 +205,7 @@ export default function TerritoryMasterForm() {
   useEffect(() => {
     setCountryList(countries)
   }, [countries])
-  const { control, handleSubmit, watch, setValue } = form;
+  const { control, handleSubmit,getValues, watch, setValue } = form;
 
   const onSubmit = (values: TerritoryFormValues) => {
     TerritoryCommonHandler(values, form.setError)
@@ -293,7 +293,7 @@ export default function TerritoryMasterForm() {
         city_ids: initialValues.city_ids?.map(String) ?? [],
       });
     }
-  }, [mode, initialValues, storeList]);
+  }, [mode, initialValues,]);
 
   useEffect(() => {
     if (initialValues?.state_ids?.length) {
@@ -337,7 +337,7 @@ export default function TerritoryMasterForm() {
               isInfoLoading ? <div className="min-h-[150px] flex justify-center items-center">
                 <div className="p-6 text-sm "><Loader /></div>
               </div> :
-                <div>     {/* -------- TOP FIELDS -------- */}
+                <div className="gap-2 flex flex-col">     {/* -------- TOP FIELDS -------- */}
                   <SectionCard title="Territory Information">
                     <div className="grid  grid-cols-1 md:grid-cols-3 gap-4">
                       <FloatingField

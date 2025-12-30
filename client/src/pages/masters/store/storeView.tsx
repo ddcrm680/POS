@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/auth";
 import { formatDate, formatTime, isPdfUrl } from "@/lib/utils";
 import { Loader } from "@/components/common/loader";
 import { Button } from "@/components/ui/button";
+import { FilePreviewCard } from "@/components/common/FilePreviewCard";
 
 export default function StoreView() {
   const [searchParams] = useSearchParams();
@@ -141,7 +142,7 @@ export default function StoreView() {
               <div className="gap-4  grid">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm ">
                   <Info label="Organization" value={data.organization?.company_name} />
-                  <Info label="Territory" value={data.territory?.name} />
+                  <Info label="Location" value={data.territory?.name} />
                   <Info label="Opening Date" value={data.opening_date} />
                 </div>
 
@@ -179,22 +180,20 @@ export default function StoreView() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
 
                 {/* PAN */}
-                <DocumentPreview
-                  label="PAN Card"
-                  src={docPreview(data.pan_card_file)}
-                />
+                 <FilePreviewCard
+      label="PAN Card"
+      src={docPreview(data.pan_card_file)}
+    />
 
-                {/* Registration */}
-                <DocumentPreview
-                  label="Registration File"
-                  src={docPreview(data.registration_file)}
-                />
+    <FilePreviewCard
+      label="Registration File"
+      src={docPreview(data.registration_file)}
+    />
 
-                {/* GST */}
-                <DocumentPreview
-                  label="GSTIN File"
-                  src={docPreview(data.gstin_file)}
-                />
+    <FilePreviewCard
+      label="GSTIN File"
+      src={docPreview(data.gstin_file)}
+    />
 
               </div>
             </section>
@@ -218,93 +217,4 @@ export default function StoreView() {
   );
 }
 
-/* -------------------- DOCUMENT PREVIEW -------------------- */
 
-function DocumentPreview({
-  label,
-  src,
-}: {
-  label: string;
-  src: string | null;
-}) {
-  if (!src) {
-    return (
-      <div className="space-y-2 text-sm">
-        <p className="text-gray-500 whitespace-nowrap">{label}</p>
-        <div className="h-32 rounded-lg border bg-gray-50 flex items-center justify-center">
-          <span className="text-xs text-gray-400">No document</span>
-        </div>
-      </div>
-    );
-  }
-
-  const isPdf = isPdfUrl(src);
-
-  return (
-    <div className="space-y-2 text-sm">
-      <p className="text-gray-500 whitespace-nowrap">{label}</p>
-
-      {/* PREVIEW CONTAINER */}
-      <div className="relative h-32 rounded-lg border bg-gray-50 overflow-hidden group">
-
-        {/* FILE PREVIEW */}
-        {isPdf ? (
-          <iframe
-            src={src}
-            className="w-full h-full pointer-events-none"
-            title={label}
-          />
-        ) : (
-          <img
-            src={src}
-            alt={label}
-            className="w-full h-full object-contain pointer-events-none"
-          />
-        )}
-
-        {/* DARK OVERLAY */}
-        <div
-          className="
-            absolute inset-0
-            bg-black/40
-            opacity-0
-            group-hover:opacity-100
-            transition-opacity
-            duration-300
-          "
-        />
-
-        {/* VIEW BUTTON */}
-        <div
-          className="
-    absolute inset-0
-    flex items-center justify-center
-    opacity-0
-    group-hover:opacity-100
-    scale-95
-    group-hover:scale-100
-    transition-all duration-300
-  "
-        >
-          <Button
-            type="button"
-            onClick={() => window.open(src, "_blank")}
-            className="
-      bg-[#FE0000]
-      hover:bg-[rgb(238,6,6)]
-      text-white
-      px-6 py-2
-      text-sm
-      font-semibold
-      rounded-md
-      shadow-lg
-    "
-          >
-            View
-          </Button>
-        </div>
-
-      </div>
-    </div>
-  );
-}
