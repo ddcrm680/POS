@@ -8,14 +8,23 @@ import { Router } from "./route";
 import { AuthProvider } from "./lib/auth";
 import { subscribeServiceDown } from "@/lib/systemStatus";
 import ServiceUnavailableOverlay from "./ServiceUnavailableOverlay";
-
+import { useLocation } from "wouter";
 export default function App() {
+  const [location] = useLocation();
+  const hideLayoutList = ["/login"];
+  const isAuthPage = hideLayoutList.includes(location)
   const [serviceDown, setServiceDown] = useState(false);
 
   useEffect(() => {
     return subscribeServiceDown(setServiceDown);
   }, []);
-
+const content = isAuthPage ? (
+  <Router />
+) : (
+  <POSLayout>
+    <Router />
+  </POSLayout>
+);
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -26,13 +35,7 @@ export default function App() {
           {serviceDown && <ServiceUnavailableOverlay />}
 
           {/* 🧠 Layout rendered ONLY when service is healthy */}
-          {!serviceDown ? (
-            <POSLayout>
-              <Router />
-            </POSLayout>
-          ) : (
-            <Router /> // Router still mounted but visually blocked
-          )}
+          {content}
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
