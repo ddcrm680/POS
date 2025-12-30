@@ -132,18 +132,40 @@ export default function POSLayout({ children }: POSLayoutProps) {
 
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="pos-touch-target gap-0 relative " data-testid="button-notifications">
-            <Bell size={18} />
-            <span className="absolute top-2 right-2 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white">
-              3
-            </span>
-          </Button>
+          <Button
+  variant="ghost"
+  size="icon"
+  className="
+    pos-touch-target
+    gap-0
+    relative
+
+    cursor-pointer
+    hover:bg-transparent
+    hover:text-inherit
+    focus-visible:ring-0
+    focus-visible:ring-offset-0
+    active:bg-transparent
+  "
+  data-testid="button-notifications"
+>
+  <Bell size={18} />
+  <span className="absolute top-2 right-2 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white">
+    3
+  </span>
+</Button>
+
 
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
 
-              <Button variant="ghost" className="lg:pos-touch-target p-0 lg:py-2 h-6 lg:h-8  lg:px-4  flex items-center gap-2" data-testid="user-menu-trigger">
+              <Button variant="ghost" className="lg:pos-touch-target p-0 lg:py-2 h-6 lg:h-8 cursor-pointer
+    hover:bg-transparent
+    hover:text-inherit
+    focus-visible:ring-0
+    focus-visible:ring-offset-0
+    active:bg-transparent    flex items-center gap-2" data-testid="user-menu-trigger">
                 <div className="relative">
                   <div className="w-6 lg:w-8 h-6 lg:h-8 bg-gray border-[0.5px] border border-gray overflow-hidden rounded-full flex items-center justify-center">
                     <img
