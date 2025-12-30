@@ -32,10 +32,11 @@ export const BottomTabs = ({
         };
         return (
           <Link key={tab.path} href={tab.path}>
-            <button
-              onClick={handleClick}
-              data-state={isActive ? "active" : "inactive"}
-              className="
+         <button
+  onClick={handleClick}
+  data-state={isActive ? "active" : "inactive"}
+  className="
+    group
     relative
     transition-all duration-200
     pos-touch-target
@@ -52,7 +53,8 @@ export const BottomTabs = ({
     data-[state=active]:text-primary-foreground
     data-[state=active]:shadow
   "
-            >
+>
+
 
               <div className="relative">
                 <Icon
@@ -60,11 +62,25 @@ export const BottomTabs = ({
                   className={isActive ? "" : "opacity-80"}
                 />
 
-                {tab.badge && (
-                  <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white">
-                    {tab.badge}
-                  </span>
-                )}
+               {tab.badge && (
+  <span
+    className="
+      absolute -top-2 -right-2
+      min-w-[16px] h-4 px-1
+      rounded-full
+      flex items-center justify-center
+      text-[10px] font-semibold
+
+      bg-primary border text-white
+      transition-colors
+border-primary
+      group-data-[state=active]:bg-primary-foreground
+      group-data-[state=active]:text-primary
+    "
+  >
+    {tab.badge}
+  </span>
+)}
               </div>
 
               <span
