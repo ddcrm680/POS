@@ -56,7 +56,7 @@ export default function Store() {
     {
       key: "name",
       label: "Store name",
-      width: "250px",
+      width: "150px",
 
     },
     {
