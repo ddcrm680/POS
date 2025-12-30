@@ -260,6 +260,18 @@ export async function DeleteUser(id: string) {
     throw error;
   }
 }
+export async function DeleteSystemLog(id: string) {
+  try {
+    const response = await api.delete(`/api/admin/system-logs/delete/${id}`);
+
+    if (response.data?.success === true) {
+      return response.data.data;
+    }
+  } catch (error) {
+    console.error("Delete system log failed", error);
+    throw error;
+  }
+}
 export async function DeleteTerritory(id: string) {
   try {
     const response = await api.delete(`/api/admin/territories/delete/${id}`);

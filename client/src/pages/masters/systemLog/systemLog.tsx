@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth";
-import { fetchServiceLogList } from "@/lib/api";
+import { DeleteSystemLog, DeleteUser, fetchServiceLogList } from "@/lib/api";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton } from "@chakra-ui/react";
-import { EyeIcon } from "lucide-react";
+import { EyeIcon, Trash2 } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
 
@@ -16,6 +16,8 @@ import SystemLogForm from "./systemLogForm";
 import { systemLogMetaInfoType } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 
 export default function SystemLog() {
   const [systemLogMetaInfo, setSystemLogMetaInfo] = useState<systemLogMetaInfoType>({
@@ -28,7 +30,11 @@ export default function SystemLog() {
     startDate: null,
     endDate: null,
   });
-
+  const { toast } = useToast();
+  const [isSystemLogDeleteModalInfo, setIsSystemLogDeleteModalOpenInfo] = useState<{ open: boolean, info: any }>({
+    open: false,
+    info: {}
+  });
   const { roles } = useAuth();
   const [users, setUsers] = useState<Array<any>>([]);
   const [perPage, setPerPage] = useState(10);
@@ -53,7 +59,29 @@ export default function SystemLog() {
     device_type: "",
     action: ""
   });
+  const SystemLogDeleteHandler = async () => {
+    try {
+      setIsLoading(true);
 
+      await DeleteSystemLog(isSystemLogDeleteModalInfo?.info?.id);
+      toast({ title: `Delete System log`, description: "System log deleted successfully", variant: "success", });
+
+      fetchSystemLog(false)
+
+    } catch (err: any) {
+
+      toast({
+        title: "Error",
+        description:
+          err?.response?.data?.message ||
+          err.message || `Failed to delete system log`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSystemLogDeleteModalOpenInfo({ open: false, info: {} });
+      setIsLoading(false);
+    }
+  };
   const columns = useMemo(() => [
     {
       key: "created_at", label: "Created On", align: "center", width: "100px", render: (_value: any,) => {
@@ -329,7 +357,19 @@ export default function SystemLog() {
                       <EyeIcon />
                     </IconButton>
 
-
+ {
+                      Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id &&
+                      <IconButton
+                        size="xs"
+                        mr={2}
+                        colorScheme="red"
+                        aria-label="Delete"
+                        onClick={() => {
+                          setIsSystemLogDeleteModalOpenInfo({ open: true, info: row });
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </IconButton>}
 
                   </Box>
                 )}
@@ -367,6 +407,20 @@ export default function SystemLog() {
 
 
         </CommonModal>
+        <CommonDeleteModal
+                  width="420px"
+                  maxWidth="420px"
+                  isOpen={isSystemLogDeleteModalInfo.open}
+                  title="Delete System Log"
+                  description={`Are you sure you want to delete this system log? This action cannot be undone.`}
+                  confirmText="Delete"
+                  cancelText="Cancel"
+                  isLoading={isLoading}
+                  onCancel={() =>
+                    setIsSystemLogDeleteModalOpenInfo({ open: false, info: {} })
+                  }
+                  onConfirm={SystemLogDeleteHandler}
+                />
       </CardContent>
     </Card>
   );
