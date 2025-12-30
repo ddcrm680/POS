@@ -262,7 +262,7 @@ export async function DeleteUser(id: string) {
 }
 export async function DeleteSystemLog(id: string) {
   try {
-    const response = await api.delete(`/api/admin/system-logs/delete/${id}`);
+    const response = await api.delete(`/api/admin/delete-logs/${id}`);
 
     if (response.data?.success === true) {
       return response.data.data;
