@@ -11,6 +11,7 @@ import Store from "./store/store";
 import SystemLog from "./systemLog/systemLog";
 import TerritoryMaster from "./territoryMaster.tsx/territoryMaster";
 import { useAuth } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
 const MASTER_TAB_KEY = "master_active_tab";
 
@@ -53,14 +54,18 @@ export default function Master() {
                   Master Details
                 </h1>
 
-                <TabsList className={`h-auto    flex     overflow-x-auto    scrollbar-hide    lg:grid lg:grid-cols-${isSuperAdmin ? "7" : "6"}    justify-start       `}>
-                  {masterTabList.filter((tab) => tab.id === "systemLog" ? isSuperAdmin : true).map((tab) => {
-                    const Icon = tab.emoji;
-                    return (
-                      <TabsTrigger
-                        key={tab.id}
-                        value={tab.id}
-                        className="
+                <TabsList
+                  className={cn(
+                    "h-auto flex overflow-x-auto scrollbar-hide justify-start lg:grid  lg:w-[40]",
+                    isSuperAdmin ? "lg:grid-cols-7" : "lg:grid-cols-6"
+                  )}
+                >     {masterTabList.filter((tab) => tab.id === "systemLog" ? isSuperAdmin : true).map((tab) => {
+                  const Icon = tab.emoji;
+                  return (
+                    <TabsTrigger
+                      key={tab.id}
+                      value={tab.id}
+                      className="
     flex items-center gap-2
     whitespace-nowrap px-1 py-2
     transition-all duration-200
@@ -74,15 +79,15 @@ export default function Master() {
     data-[state=active]:text-[#65758b]
     data-[state=active]:shadow
   "
-                      >
-                        <Icon size={16} />
-                        <span className="hidden sm:inline">
-                          {tab.label}
-                        </span>
-                      </TabsTrigger>
+                    >
+                      <Icon size={16} />
+                      <span className="hidden sm:inline">
+                        {tab.label}
+                      </span>
+                    </TabsTrigger>
 
-                    );
-                  })}
+                  );
+                })}
                 </TabsList>
               </div>
 
