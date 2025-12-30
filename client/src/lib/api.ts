@@ -57,7 +57,14 @@ function createInstance(): AxiosInstance {
           return Promise.reject(error);
         }
         if (status === 403) {
-          window.dispatchEvent(new Event("auth:unauthorized"));
+          window.dispatchEvent(
+            new CustomEvent("auth:forbidden", {
+              detail: {
+                message: "You are not authorized to access this page",
+                from: window.location.pathname + window.location.search,
+              },
+            })
+          );
         }
         if (status === 503) {
           setServiceDown(true);
@@ -320,7 +327,7 @@ export async function EditStore(editFormValue: FormData) {
 
   try {
     const response: any = await api.post(
-      `api/stores/update`,editFormValue
+      `api/stores/update`, editFormValue
     );
     if (response?.data?.success === true) {
       return response.data?.data;
@@ -625,14 +632,14 @@ export async function fetchOrganizationsList({
   search?: string;
   status?: string | number;
 }) {
- const params = new URLSearchParams();
+  const params = new URLSearchParams();
 
-if (page !== undefined) params.append("page", String(page));
-if (per_page !== undefined) params.append("per_page", String(per_page));
-if (search) params.append("search", search);
-if (status) params.append("status", String(status));
+  if (page !== undefined) params.append("page", String(page));
+  if (per_page !== undefined) params.append("per_page", String(per_page));
+  if (search) params.append("search", search);
+  if (status) params.append("status", String(status));
 
-console.log(params.toString());
+  console.log(params.toString());
 
   const response = await api.get(`/api/organizations?${params.toString()}`);
 
@@ -755,7 +762,7 @@ export async function UpdateOrganizationStatus(statusInfo: { id: number, }) {
 
   }
 }
-export async function UpdateStoreStatus(statusInfo: { id: number}) {
+export async function UpdateStoreStatus(statusInfo: { id: number }) {
 
   try {
     const response: any = await api.post(

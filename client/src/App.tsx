@@ -9,6 +9,7 @@ import { AuthProvider } from "./lib/auth";
 import { subscribeServiceDown } from "@/lib/systemStatus";
 import ServiceUnavailableOverlay from "./ServiceUnavailableOverlay";
 import { useLocation } from "wouter";
+import { ForbiddenListener } from "./components/common/ForbiddenListener";
 export default function App() {
   const [location] = useLocation();
   const hideLayoutList = ["/login"];
@@ -18,18 +19,19 @@ export default function App() {
   useEffect(() => {
     return subscribeServiceDown(setServiceDown);
   }, []);
-const content = isAuthPage ? (
-  <Router />
-) : (
-  <POSLayout>
+  const content = isAuthPage ? (
     <Router />
-  </POSLayout>
-);
+  ) : (
+    <POSLayout>
+      <Router />
+    </POSLayout>
+  );
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
           <Toaster />
+          <ForbiddenListener />
 
           {/* 🚨 SYSTEM OVERLAY (NOT ROUTE, NOT LAYOUT) */}
           {serviceDown && <ServiceUnavailableOverlay />}
