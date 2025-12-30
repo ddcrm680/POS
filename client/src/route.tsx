@@ -1,5 +1,5 @@
 import NotFound from "@/pages/not-found";
-import Dashboard from "@/pages/dashboard";
+import Dashboard from "@/pages/DashBoard/nonDefaultDashboard";
 import ManagerDashboard from "@/pages/manager-dashboard";
 import Customers from "@/pages/customers";
 import JobCards from "@/pages/job-cards";
@@ -24,14 +24,25 @@ import Master from "./pages/masters/master";
 import StoreForm from "./pages/masters/store/storeForm";
 import TerritoryMasterForm from "./pages/masters/territoryMaster.tsx/territoryMasterForm";
 import StoreFormHandler from "./pages/masters/store/storeViewHandler";
+import { useAuth } from "./lib/auth";
+import { useEffect, useState } from "react";
+import DefaultDashboard from "./pages/DashBoard/DefaultDashboard";
 export function Router() {
+    const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
+  
+    const { user,  } = useAuth();
+    useEffect(() => {
+      const nonDefaultViewers = ['admin', "super-admin", 'store-manager']
+      setIsDefaultView(!nonDefaultViewers.includes((user?.role)))
+    }, [user])
+    const dashboard = isDefaultView ? DefaultDashboard : Dashboard
   return (
     <Switch>
       <Route path="/login" component={Login} />
       <Route path="/">
         <Redirect to="/login" />
       </Route>
-      <Route path="/home" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/home" component={() => <ProtectedRoute component={  dashboard} />} />
       <Route path="/profile" component={() => <ProtectedRoute component={ProfileDetails} />} />
       <Route path="/master" component={() => <ProtectedRoute component={Master} 
       />} />

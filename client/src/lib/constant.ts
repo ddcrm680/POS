@@ -128,6 +128,10 @@ export const bottomTabs: TabItem[] = [
   { path: "/payments", icon: CreditCard, label: "Payments" },
   { path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
 ];
+export const defaultBottomTabs: TabItem[] = [
+  { path: "/home", icon: Home, label: "Dashboard" },
+ 
+];
 
 export const quickActions = [
   { id: "new-job", label: "New Job", emoji: "📋", color: "bg-primary hover:bg-primary/90" },

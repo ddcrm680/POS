@@ -32,7 +32,15 @@ export default function POSLayout({ children }: POSLayoutProps) {
 
   const [userInfo, setUserInfo] = useState<any>();
   const [roleList, setRoleList] = useState<any>();
-  const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
+  const [roleView, setRoleView] = useState<{
+    store: boolean,
+    admin: boolean,
+    default: boolean
+  }>({
+    store: false,
+    admin: false,
+    default: false
+  });
   useEffect(() => {
     setUserInfo(user || null);
 
@@ -40,15 +48,20 @@ export default function POSLayout({ children }: POSLayoutProps) {
   useEffect(() => {
     const supremeUserRoleList = ['admin', "super-admin"]
     const managerList = ['store-manager']
-    const isDefault = managerList.find((manager) => manager === user?.role) ? false :
-      supremeUserRoleList.find((supremeUser) => supremeUser === user?.role) ? true : true
-    setIsDefaultView(isDefault)
+    const roleList = {
+      store: false,
+      admin: false,
+      default: false
+    }
+    managerList.find((manager) => manager === user?.role) ? roleList.store = true :
+      supremeUserRoleList.find((supremeUser) => supremeUser === user?.role) ? roleList.admin = true : roleList.default = true
+    setRoleView(roleList)
   }, [user, roles])
   useEffect(() => {
     setRoleList(roles || [])
   }, [roles])
   // Update clock every second
-  
+
 
   const handleQuickAction = (actionId: string) => {
     // Handle quick actions
@@ -93,7 +106,7 @@ export default function POSLayout({ children }: POSLayoutProps) {
       {/* Sidebar Toggle (Mobile / Tablet) */}
 
 
-      <header className={`${isDefaultView ? 'h-[68px]' : 'pos-header'} bg-card border-b border-border shadow-sm flex items-center justify-between px-4 md:px-6 flex-shrink-0 z-30`}>
+      <header className={`${roleView.default ? 'h-[68px]' : 'pos-header'} bg-card border-b border-border shadow-sm flex items-center justify-between px-4 md:px-6 flex-shrink-0 z-30`}>
         {/* Left: Business Info & Clock */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
@@ -112,7 +125,7 @@ export default function POSLayout({ children }: POSLayoutProps) {
         </div>
 
         {/* Center: Quick Actions (Desktop) */}
-        {!isDefaultView && <div className="hidden lg:flex items-center gap-3">
+        {roleView.store && <div className="hidden lg:flex items-center gap-3">
           {quickActions.map((action) => (
             <Button
               key={action.id}
@@ -133,9 +146,9 @@ export default function POSLayout({ children }: POSLayoutProps) {
 
           {/* Notifications */}
           <Button
-  variant="ghost"
-  size="icon"
-  className="
+            variant="ghost"
+            size="icon"
+            className="
     pos-touch-target
     gap-0
     relative
@@ -147,13 +160,13 @@ export default function POSLayout({ children }: POSLayoutProps) {
     focus-visible:ring-offset-0
     active:bg-transparent
   "
-  data-testid="button-notifications"
->
-  <Bell size={18} />
-  <span className="absolute top-2 right-2 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white">
-    3
-  </span>
-</Button>
+            data-testid="button-notifications"
+          >
+            <Bell size={18} />
+            <span className="absolute top-2 right-2 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white">
+              3
+            </span>
+          </Button>
 
 
           {/* User Menu */}
@@ -252,7 +265,7 @@ export default function POSLayout({ children }: POSLayoutProps) {
         </>
       )}
 
-      {isDefaultView && (
+      {(roleView.admin || roleView.default) && (
         <div className="hidden  lg:flex items-center justify-center pos-bottom-nav border-b border-gray-300">
           <BottomTabs location={location} variant="top" />
         </div>
@@ -266,7 +279,7 @@ export default function POSLayout({ children }: POSLayoutProps) {
       </main>
 
       {/* Bottom Tab Navigation - Enterprise Terminal Fixed */}
-      {!isDefaultView && (
+      {roleView.store && (
         <nav className="pos-bottom-nav bg-card border-t border-border shadow-lg flex-shrink-0 z-50">
           <div className="flex items-center px-2 pt-2">
             <BottomTabs location={location} variant="bottom" />

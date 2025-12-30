@@ -13,13 +13,13 @@ import {
   Calendar,
   TrendingDown
 } from "lucide-react";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
+import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
 import { useLocation } from "wouter";
-import POSLayout from "../components/layout/pos-layout";
-import { DashboardMetrics } from "../lib/types";
+import POSLayout from "../../components/layout/pos-layout";
+import { DashboardMetrics } from "../../lib/types";
 import { useEffect, useState } from "react";
-import CustomerLookupModal from "../components/modals/customer-lookup-modal";
+import CustomerLookupModal from "../../components/modals/customer-lookup-modal";
 // import { InventoryItem, JobCard, FacilityAsset } from "../schema";
 import type { LucideProps } from "lucide-react";
 import { useAuth } from "@/lib/auth";
