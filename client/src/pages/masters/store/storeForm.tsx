@@ -305,6 +305,7 @@ export default function StoreForm() {
     form.setValue(key, file, {
       shouldDirty: true,
       shouldTouch: true,
+      shouldValidate: true,
     });
 
     const url = URL.createObjectURL(file);
@@ -665,10 +666,6 @@ export default function StoreForm() {
                                       <span className="text-xs text-gray-400">No preview</span>
                                     </div>
                                   )}
-
-                                  {/* DARK OVERLAY */}
-
-
 
                                 </div>
 

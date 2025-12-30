@@ -633,22 +633,23 @@ export const organizationSchema = z.object({
     }
   ),
 });
-const fileOrPath = z.union([
-  z
-    .instanceof(File)
-    .refine(
-      f =>
-        ["image/jpeg", "image/jpg", "image/png", "image/webp", "application/pdf"].includes(
-          f.type
-        ),
-      { message: "Only JPG, JPEG, PNG, WEBP or PDF allowed" }
-    )
-    .refine(f => f.size <= 2 * 1024 * 1024, {
-      message: "File must be 2MB or less",
-    })
-    ,
-  z.string(),
-]);
+const fileOrPath = z
+  .union([
+    z.instanceof(File),
+    z.string().min(1),
+  ])
+  .refine(
+    (val) =>
+      val instanceof File
+        ? ["image/jpeg", "image/jpg", "image/png", "image/webp", "application/pdf"].includes(val.type)
+        : true,
+    { message: "Only JPG, JPEG, PNG, WEBP or PDF allowed" }
+  )
+  .refine(
+    (val) => (val instanceof File ? val.size <= 2 * 1024 * 1024 : true),
+    { message: "File must be 2MB or less" }
+  );
+
 export const StoreSchema = z.object({
   name: z
     .string()
