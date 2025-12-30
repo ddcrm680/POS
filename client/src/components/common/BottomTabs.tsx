@@ -25,6 +25,8 @@ export const BottomTabs = ({
         const isActive =
           location === tab.path ||
           (tab.path !== "/" && location.startsWith(tab.path));
+          console.log(isActive,location,tab.path,'isActive');
+          
         const handleClick = () => {
           if (tab.path === "/master") {
             localStorage.removeItem('master_active_tab');

@@ -117,7 +117,7 @@ export const availableServices: ServiceItem[] = [
 ];
 
 export const bottomTabs: TabItem[] = [
-  { path: "/", icon: Home, label: "Dashboard" },
+  { path: "/home", icon: Home, label: "Dashboard" },
   { path: "/master", icon: Layers, label: "Master", },
   { path: "/manager", icon: Settings, label: "Manager" },
   { path: "/appointments", icon: Calendar, label: "Appointments" },
