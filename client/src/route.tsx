@@ -27,7 +27,7 @@ import StoreFormHandler from "./pages/masters/store/storeViewHandler";
 import { useAuth } from "./lib/auth";
 import { useEffect, useState } from "react";
 import DefaultDashboard from "./pages/DashBoard/DefaultDashboard";
-import StoreDetails from "./pages/storeDetails";
+import StoreDetails from "./pages/storeDetails/storeDetails";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
