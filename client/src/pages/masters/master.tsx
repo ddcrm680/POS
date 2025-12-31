@@ -38,18 +38,14 @@ export default function Master() {
 
   return (
     <div>
-      <div className="grid gap-6 transition-all duration-300 grid-cols-1">
-        <div className="p-6">
-          <div className="mx-auto space-y-6">
+      <div className="grid gap-4 transition-all duration-300 grid-cols-1">
+        <div className="p-4">
+          <div className="mx-auto space-y-4">
 
-            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-              <div className="mb-6 flex justify-between items-center">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+              <div className="mb-4 flex justify-between items-center">
                 <h1 className="
-  text-lg
-  sm:text-xl
-  md:text-2xl
-  font-bold
-  text-gray-900
+text-lg font-semibold
 ">
                   Master Details
                 </h1>

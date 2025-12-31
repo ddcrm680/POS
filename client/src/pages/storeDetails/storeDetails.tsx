@@ -1,14 +1,14 @@
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Eye, EyeIcon, Info, RefreshCcw, ServerOff } from "lucide-react";
+import { ChevronLeft, Info } from "lucide-react";
 import { fetchStateList, fetchCityList, fetchStoreById, baseUrl } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import { formatDate, getFileNameFromLabel, isPdfUrl, normalizeStatus } from "@/lib/utils";
+import { formatDate, normalizeStatus } from "@/lib/utils";
 import { GlobalLoader } from "@/components/common/GlobalLoader";
-import { FileLightbox } from "@/components/common/FileLightbox";
-import { Button } from "@chakra-ui/react";
+import { Row } from "./storeRow";
+import { InfoCard } from "./infoCard";
 
 export default function StoreDetails() {
     const { user, isLoading: authLoading, countries } = useAuth();
@@ -74,28 +74,28 @@ export default function StoreDetails() {
     if (!store) {
         return (
             <div className="h-full flex items-center justify-center text-muted-foreground">
-                     <Card className="w-full max-w-md mx-4 shadow-lg">
-        <CardContent className="pt-8 pb-6 text-center">
-          {/* Icon */}
-          <div className="flex items-center justify-center mb-4">
-            <div className="h-14 w-14 rounded-full bg-blue-50 flex items-center justify-center">
-  <Info className="h-7 w-7 text-blue-500" />
-</div>
+                <Card className="w-full max-w-md mx-4 shadow-lg">
+                    <CardContent className="pt-8 pb-6 text-center">
+                        {/* Icon */}
+                        <div className="flex items-center justify-center mb-4">
+                            <div className="h-14 w-14 rounded-full bg-blue-50 flex items-center justify-center">
+                                <Info className="h-7 w-7 text-blue-500" />
+                            </div>
 
-          </div>
+                        </div>
 
-          {/* Title */}
-          <h1 className="text-2xl font-bold text-gray-900">
-            Store Info
-          </h1>
+                        {/* Title */}
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            Store Info
+                        </h1>
 
-          {/* Description */}
-          <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-            {storeBeMessage}
-          </p>
+                        {/* Description */}
+                        <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                            {storeBeMessage}
+                        </p>
 
-        </CardContent>
-      </Card>
+                    </CardContent>
+                </Card>
             </div>
         );
     }
@@ -191,91 +191,5 @@ export default function StoreDetails() {
                 </InfoCard>
             </div>
         </div>
-    );
-}
-
-
-/* ------------------------------------------------------------------ */
-/* REUSABLE UI PARTS */
-/* ------------------------------------------------------------------ */
-
-function InfoCard({
-    title,
-    children,
-}: {
-    title: string;
-    children: React.ReactNode;
-}) {
-    return (
-        <Card className="rounded-xl">
-            <CardHeader className="pb-2">
-                <h3 className="text-[11px] uppercase font-semibold tracking-wide text-muted-foreground">
-                    {title}
-                </h3>
-            </CardHeader>
-            <CardContent className="space-y-2">
-                {children}
-            </CardContent>
-        </Card>
-    );
-}
-
-function Row({
-    label,
-    value,
-    mono = false,
-    filePath,
-}: {
-    label: string;
-    value?: React.ReactNode;
-    mono?: boolean;
-    filePath?: string | null;
-}) {
-    const [open, setOpen] = useState(false);
-
-    const isFile = Boolean(filePath);
-    const fileName = filePath ? getFileNameFromLabel(label, filePath) : "-";
-    const isPdf = filePath ? isPdfUrl(filePath) : false;
-
-    return (
-        <>
-            <div className="grid grid-cols-12 gap-2 items-center">
-                {/* LABEL */}
-                <span className="col-span-4 text-[11px] text-muted-foreground">
-                    {label}
-                </span>
-
-                {/* VALUE */}
-                <div
-                    className={`col-span-8 flex items-center gap-2 text-[13px] font-medium break-words ${mono ? "font-mono text-[12px]" : ""
-                        }`}
-                >
-                    <span className="truncate max-w-[220px]">
-                        {isFile ? fileName : value ?? "-"}
-                    </span>
-
-                    {isFile && (
-                        <button
-                            type="button"
-                            onClick={() => setOpen(true)}
-                            className="text-[#0000ff] hover:text-[#0000ff]/80"
-                            title="View document"
-                        >
-                            <EyeIcon size={16} />
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            {/* LIGHTBOX */}
-            {isFile && filePath && (
-                <FileLightbox
-                    open={open}
-                    src={filePath}
-                    isPdf={isPdf}
-                    onClose={() => setOpen(false)}
-                />
-            )}
-        </>
     );
 }

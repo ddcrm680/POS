@@ -97,7 +97,7 @@ export default function CommonTable({
 
 
   return (
-    <div className={`w-full space-y-4 pt-6 ${className}`}>
+    <div className={`w-full space-y-4 pt-4 ${className}`}>
       {/* Search Bar */}
       {searchable && (
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
