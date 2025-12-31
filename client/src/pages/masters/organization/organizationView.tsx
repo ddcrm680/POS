@@ -54,7 +54,7 @@ export default function OrganizationView({
 
   return (
     <Card>
-      <CardContent className="p-6 space-y-8 overflow-auto max-h-[500px]">
+      <CardContent className="p-4 space-y-4 overflow-auto max-h-[500px]">
 
         {/* ================= HEADER / LOGO ================= */}
 

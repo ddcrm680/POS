@@ -165,13 +165,13 @@ export default function UserView({
   }, [search, page, perPage]);
   if (isLoading) {
     return <div className="min-h-[150px] flex justify-center items-center">
-      <div className="p-6 text-sm "><Loader /></div>
+      <div className="p-4 text-sm "><Loader /></div>
     </div>;
   }
 
   return (
     <Card>
-      <CardContent className="mb-2 p-6 space-y-6 overflow-auto max-h-[500px]">
+      <CardContent className="mb-2 p-4 space-y-4 overflow-auto max-h-[500px]">
         {!userInfo ? (
           <EmptyState message="No info found" />
 

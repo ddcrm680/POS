@@ -46,7 +46,7 @@ export default function CommonModal({
           }}>
 
           {/* Header */}
-          <div className="flex items-center justify-between border-b px-5 py-4">
+          <div className="flex items-center justify-between border-b px-4 py-4">
             <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
 
             {showCloseIcon && (

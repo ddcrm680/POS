@@ -14,7 +14,7 @@ export default function ServicePlanView({
   if (isLoading) {
     return (
       <div className="min-h-[150px] flex justify-center items-center">
-        <div className="p-6 text-sm">
+        <div className="p-4 text-sm">
           <Loader />
         </div>
       </div>
@@ -27,7 +27,7 @@ export default function ServicePlanView({
 
   return (
     <Card>
-      <CardContent className="p-6 space-y-6 overflow-auto max-h-[500px]">
+      <CardContent className="p-4 space-y-4 overflow-auto max-h-[500px]">
 
         {/* ================= BASIC INFO ================= */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">

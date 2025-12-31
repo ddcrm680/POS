@@ -97,8 +97,8 @@ export default function UserFormInfo({
         onSubmit={form.handleSubmit((values) =>
           onSubmit(values, form.setError)
         )}
-        className="space-y-6 "
-      >  <div className="p-6 space-y-6 max-h-[500px] overflow-auto">
+        className="space-y-4 "
+      >  <div className="p-4 space-y-4 max-h-[500px] overflow-auto">
           {/* Row 1 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
@@ -292,7 +292,7 @@ export default function UserFormInfo({
         </div>
         {/* Submit */}
         {mode !== 'view' && <div className="">
-          <div className="flex justify-end gap-3 pb-6 pr-6  border-t pt-[24px]">
+          <div className="flex justify-end gap-3 pb-4 pr-4  border-t pt-[24px]">
             <Button
               variant="outline"
               disabled={isLoading}

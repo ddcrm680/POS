@@ -228,9 +228,9 @@ export default function OrganizationForm({
         onSubmit={form.handleSubmit((values) =>
           onSubmit(values, form.setError)
         )}
-        className="space-y-6"
+        className="space-y-4"
       >
-        <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+        <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
 
           {/* ================= ROW 1 ================= */}
           <section className="flex flex-col sm:flex-row gap-6 items-start">
@@ -721,7 +721,7 @@ export default function OrganizationForm({
 
         {/* ================= ACTIONS ================= */}
         {mode !== 'view' && <div className="">
-          <div className="flex justify-end gap-3 pb-6 pr-6  border-t pt-[24px]">
+          <div className="flex justify-end gap-3 pb-4 pr-4  border-t pt-[24px]">
             <Button
               variant="outline"
               disabled={isLoading}
