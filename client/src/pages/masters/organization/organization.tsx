@@ -79,7 +79,7 @@ export default function Organization() {
     {
       key: "company_name",
       label: "Company Name",
-      width: "250px",
+      width: "150px",
      
     },
     {

@@ -214,3 +214,19 @@ export function generateStrongPassword(length = 12) {
     .sort(() => Math.random() - 0.5)
     .join("");
 }
+export function getFileNameFromLabel(
+  label: string,
+  filePath?: string | null
+) {
+  if (!filePath) return label;
+
+  // get extension from actual file
+  const extMatch = filePath.match(/\.[^/.]+$/);
+  const ext = extMatch ? extMatch[0] : "";
+
+  return `${label}${ext}`;
+}
+export function normalizeStatus(status: any) {
+  if (status === 1 || status === "1" || status === "active" || status) return "active";
+  return "inactive";
+}

@@ -6,6 +6,7 @@ import {
   LogOut,
   User,
   Menu,
+  Store,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
@@ -221,6 +222,10 @@ export default function POSLayout({ children }: POSLayoutProps) {
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
+             {roleView.store &&  <DropdownMenuItem data-testid="menu-store-details" onClick={() => {navigation[1]('/store-details'); }} >
+                <Store className="mr-2 h-4 w-4" />
+                Store Details
+              </DropdownMenuItem>}
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-destructive" data-testid="menu-logout" onClick={() => { handleLogout() }}>
                 <LogOut className="mr-2 h-4 w-4" />
