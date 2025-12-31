@@ -17,7 +17,7 @@ export default function StoreDetails() {
     const [storeBeMessage, setStoreBeMessage] = useState<any>('');
     /* ---------------- FETCH STORE ---------------- */
     useEffect(() => {
-        if (!user?.id) return;
+        if (!user?.store_id) return;
         async function loadStore() {
             if (user?.role === 'store-manager' && !user.store_id) {
                 setStoreBeMessage('Store not assigned to your account');
@@ -38,7 +38,7 @@ export default function StoreDetails() {
             }
         }
         loadStore();
-    }, [user?.id]);
+    }, [user]);
 
     /* ---------------- RESOLVE LOCATION ---------------- */
     useEffect(() => {

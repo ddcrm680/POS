@@ -697,10 +697,7 @@ export const StoreSchema = z.object({
     .trim()
     .min(1, "Invoice prefix must be at least 1 characters")
     .max(10, "Invoice prefix must not exceed 10 characters")
-    .regex(
-      /^[A-Z0-9]+$/,
-      "Invoice prefix must contain only uppercase letters and numbers"
-    ),
+   ,
   country: z.string().min(1, "Please select country"),
   state: z.string().min(1, "Please select state"),
   city: z.string().min(1, "Please select city"),

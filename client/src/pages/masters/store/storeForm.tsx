@@ -423,313 +423,313 @@ export default function StoreForm() {
     }
   };
   return (
-    <Form {...form}>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="min-h-screen bg-gray-100 p-4 md:p-10"
-      >
-        <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg">
+    <div className="p-4 sm:p-4 space-y-4 max-w-7xl mx-auto">
 
-          {/* HEADER */}
-          <div className="border-b px-6 py-4 flex items-center gap-3">
-            {/* Back Button */}
-            <button
-              type="button"
-              disabled={isLoading || isInfoLoading}
-              onClick={() => window.history.back()}
-              className="
-      flex items-center gap-1 justify-start -ml-2
-      text-sm font-medium
-      text-muted-black
-      hover:text-foreground
-      transition
-    "
-            >
-              <ChevronLeft size={20} />
-            </button>
+      {/* ---------- HEADER ---------- */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => window.history.back()}
+          disabled={isLoading || isInfoLoading}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ChevronLeft size={18} />
+        </button>
 
-            {/* Title */}
-            <h1 className="text-xl font-semibold">
-              {isView ? "View Store" : id ? "Edit Store" : "Create New Store"}
-            </h1>
-          </div>
-          {
-            isInfoLoading && id ? <div className="min-h-[150px] flex justify-center items-center">
-              <div className="p-6 text-sm "><Loader /></div>
-            </div> :
-              <div className=" pb-4">
+        <h1 className="text-lg font-semibold">{isView ? "View Store" : id ? "Edit Store" : "Create New Store"}
+        </h1>
 
-                {/* STORE INFO */}
-                <SectionCard title="Store Information">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* "name", "email", "phone" */}
-                    {[{ label: "Store Name", fieldName: "name", isRequired: true },
-                    { label: "Email", fieldName: "email", isRequired: true },
-                    { label: "Phone", fieldName: "phone", isRequired: false }
-                    ].map((item) => (
-                      <FloatingField
-                        isView={isView}
-                        isRequired={item.isRequired}
-                        name={item.fieldName}
-                        label={item.label}
-                        control={form.control}
-                      />
-                    ))}
-                  </div>
-                </SectionCard>
+      </div>
 
-                {/* LOCATION */}
-                {/* ================= LOCATION & OPERATIONS ================= */}
-                <SectionCard title="Location & Operations">
+      {/* ---------- CONTENT ---------- */}
+      <div className="grid grid-cols-1 rounded-xl bg-white lg:grid-cols-1 gap-4">
 
-                  {/* 🔹 Business Assignment */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <FloatingRHFSelect
-                      name="organization_id"
-                      label="Organization"
-                      control={form.control}
-                      isRequired
-                      isDisabled={isView}
-                      options={organizationTerritoryList.organizations.map((o: any) => ({
-                        value: String(o.id),
-                        label: o.org_name,
-                      }))}
-                    />
-                    <FloatingRHFSelect
-                      name="territory_id"
-                      label="Location"
-                      control={form.control}
-                      isRequired
-                      isDisabled={isView}
-                      options={organizationTerritoryList.territories}
-                    />
-                    <FloatingField
-                      name="opening_date"
-                      label="Opening Date"
-                      type="date"
-                      control={form.control}
-                      isRequired
-                      isView={isView}
-                    />
-                  </div>
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className=""
+          >
+            <div className=" ">
 
+              {
+                isInfoLoading && id ? <div className="min-h-[150px] flex justify-center items-center">
+                  <div className="p-4 text-sm "><Loader /></div>
+                </div> :
+                  <div className=" pb-4">
 
-                  {/* 🔹 Geographical Location */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <FloatingField
-                      name="pincode"
-                      label="Pincode"
-                      control={form.control}
-                      isRequired
-                      isView={isView}
-                    />
-                    <FloatingRHFSelect
-                      name="country"
-                      label="Country"
-                      control={form.control}
-                      isRequired
-                      isDisabled={isView}
-                      options={countryList.map(c => ({
-                        value: String(c.id),
-                        label: c.name,
-                      }))}
-                      onValueChange={async (value) => {
-                        if (isHydratingRef.current) return;
+                    {/* STORE INFO */}
+                    <SectionCard title="Store Information">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* "name", "email", "phone" */}
+                        {[{ label: "Store Name", fieldName: "name", isRequired: true },
+                        { label: "Email", fieldName: "email", isRequired: true },
+                        { label: "Phone", fieldName: "phone", isRequired: false }
+                        ].map((item) => (
+                          <FloatingField
+                            isView={isView}
+                            isRequired={item.isRequired}
+                            name={item.fieldName}
+                            label={item.label}
+                            control={form.control}
+                          />
+                        ))}
+                      </div>
+                    </SectionCard>
 
-                        setStates([]);
-                        setCities([]);
-                        form.setValue("state", "");
-                        form.setValue("city", "");
+                    {/* LOCATION */}
+                    {/* ================= LOCATION & OPERATIONS ================= */}
+                    <SectionCard title="Location & Operations">
 
-                        setLoadingState(true);
-                        const stateList = await fetchStateList(Number(value));
-                        setStates(stateList);
-                        setLoadingState(false);
-                      }}
-                    />
-
-                    <FloatingRHFSelect
-                      name="state"
-                      label="State"
-                      control={form.control}
-                      isRequired
-                      isDisabled={isView || !form.getValues("country")}
-                      options={states.map(s => ({
-                        value: String(s.id),
-                        label: s.name,
-                      }))}
-                      onValueChange={async (value) => {
-                        if (isHydratingRef.current) return;
-
-                        setCities([]);
-                        form.setValue("city", "");
-
-                        setLoadingCity(true);
-                        const cityList = await fetchCityList(Number(value));
-                        setCities(cityList);
-                        setLoadingCity(false);
-                      }}
-                    />
-
-                    <FloatingRHFSelect
-                      name="city"
-                      label="City"
-                      control={form.control}
-                      isRequired
-                      isDisabled={isView || !form.getValues("state")}
-                      options={cities.map(c => ({
-                        value: String(c.id),
-                        label: c.name,
-                      }))}
-                    />
-
-
-                  </div>
-
-                  {/* 🔹 Address Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FloatingTextarea
-                      name="registered_address"
-                      label="Permanent Address"
-                      control={form.control}
-                      isRequired
-                      isView={isView}
-                    />
-
-                    <FloatingTextarea
-                      name="shipping_address"
-                      label="Shipping Address"
-                      control={form.control}
-                      isRequired
-                      isView={isView}
-                    />
-                  </div>
-
-                </SectionCard>
-
-                {/* BILLING */}
-                <SectionCard title="Billing & Tax">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {storeFormKeys.billingTaxFieldList.map((item) => (
-                      <FloatingField
-                        isView={isView}
-                        isRequired={true}
-                        name={item.fieldName}
-                        label={item.label}
-                        control={form.control}
-                      />
-
-                    ))}
-                  </div>
-                </SectionCard>
-
-                {/* DOCUMENTS */}
-                <SectionCard title="Documents">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {storeFormKeys.file.map((item) => {
-                      const preview = filePreview[item.key];
-
-                      return (
-                        <FormField
-                          key={item.key}
-                          name={item.key as any}
+                      {/* 🔹 Business Assignment */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <FloatingRHFSelect
+                          name="organization_id"
+                          label="Organization"
                           control={form.control}
-                          render={({ fieldState }) => {
-
-                            const hasError = !!fieldState.error;
-                            return (
-                              <FormItem>
-                                <p className="text-sm font-medium capitalize">
-                                  {item.label}
-                                </p>
-
-                                <div className="relative h-32 rounded-lg border bg-gray-50 overflow-hidden group">
-
-                                  {/* PREVIEW */}
-                                  {preview ? (
-                                    isPdfFile(preview.file, preview.url) ? (
-                                      <div className="absolute inset-0  overflow-hidden">
-                                        <iframe
-                                          src={preview.url}
-                                          className="w-[120%] h-[120%] "
-                                          scrolling="no"
-                                        />
-                                      </div>
-                                    ) : (
-                                      <img
-                                        src={preview.url}
-                                        className="w-full h-full object-contain pointer-events-none"
-                                      />
-                                    )
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center">
-                                      <span className="text-xs text-gray-400">No preview</span>
-                                    </div>
-                                  )}
-
-                                </div>
+                          isRequired
+                          isDisabled={isView}
+                          options={organizationTerritoryList.organizations.map((o: any) => ({
+                            value: String(o.id),
+                            label: o.org_name,
+                          }))}
+                        />
+                        <FloatingRHFSelect
+                          name="territory_id"
+                          label="Location"
+                          control={form.control}
+                          isRequired
+                          isDisabled={isView}
+                          options={organizationTerritoryList.territories}
+                        />
+                        <FloatingField
+                          name="opening_date"
+                          label="Opening Date"
+                          type="date"
+                          control={form.control}
+                          isRequired
+                          isView={isView}
+                        />
+                      </div>
 
 
+                      {/* 🔹 Geographical Location */}
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <FloatingField
+                          name="pincode"
+                          label="Pincode"
+                          control={form.control}
+                          isRequired
+                          isView={isView}
+                        />
+                        <FloatingRHFSelect
+                          name="country"
+                          label="Country"
+                          control={form.control}
+                          isRequired
+                          isDisabled={isView}
+                          options={countryList.map(c => ({
+                            value: String(c.id),
+                            label: c.name,
+                          }))}
+                          onValueChange={async (value) => {
+                            if (isHydratingRef.current) return;
 
-                                {!isView && (
-                                  <Input
-                                    className={hasError ? "border-red-500 focus-visible:ring-red-500" : ""}
+                            setStates([]);
+                            setCities([]);
+                            form.setValue("state", "");
+                            form.setValue("city", "");
 
-                                    type="file"
-                                    onChange={(e) =>
-                                      handleFile(
-                                        item.key as any,
-                                        e.target.files?.[0] ?? null
-                                      )
-                                    }
-                                  />
-                                )}
-                                <FormMessage />
-                              </FormItem>
-                            )
+                            setLoadingState(true);
+                            const stateList = await fetchStateList(Number(value));
+                            setStates(stateList);
+                            setLoadingState(false);
                           }}
                         />
-                      )
-                    })}
-                  </div>
-                </SectionCard>
 
-                {/* NOTES */}
-                <SectionCard title="Additional Notes">
-                  <FloatingTextarea
-                    name="notes"
-                    label="Notes"
-                    isView={isView}
-                    control={form.control}
-                  />
+                        <FloatingRHFSelect
+                          name="state"
+                          label="State"
+                          control={form.control}
+                          isRequired
+                          isDisabled={isView || !form.getValues("country")}
+                          options={states.map(s => ({
+                            value: String(s.id),
+                            label: s.name,
+                          }))}
+                          onValueChange={async (value) => {
+                            if (isHydratingRef.current) return;
 
-                </SectionCard>
-              </div>}
-          {mode !== 'view' && <div className="">
-            <div className="border-t px-6 py-4 flex justify-end gap-3">
-              <Button
-                variant="outline"
-                disabled={isLoading || isInfoLoading}
-                className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
-                onClick={() => navigate("/master")}
-              >
-                {'Cancel'}
-              </Button>
-              <Button
-                type="submit"
-                disabled={isLoading || isInfoLoading}
-                className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
-              >
-                {isLoading && <Loader isShowLoadingText={false} color="#fff" />}
-                {isLoading
-                  ? id ? "Updating..." : "Adding..."
-                  : id ? "Update " : "Add "}
-              </Button>
-            </div></div>}
+                            setCities([]);
+                            form.setValue("city", "");
 
-        </div>
+                            setLoadingCity(true);
+                            const cityList = await fetchCityList(Number(value));
+                            setCities(cityList);
+                            setLoadingCity(false);
+                          }}
+                        />
 
-      </form>
-    </Form>
+                        <FloatingRHFSelect
+                          name="city"
+                          label="City"
+                          control={form.control}
+                          isRequired
+                          isDisabled={isView || !form.getValues("state")}
+                          options={cities.map(c => ({
+                            value: String(c.id),
+                            label: c.name,
+                          }))}
+                        />
+
+
+                      </div>
+
+                      {/* 🔹 Address Details */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FloatingTextarea
+                          name="registered_address"
+                          label="Permanent Address"
+                          control={form.control}
+                          isRequired
+                          isView={isView}
+                        />
+
+                        <FloatingTextarea
+                          name="shipping_address"
+                          label="Shipping Address"
+                          control={form.control}
+                          isRequired
+                          isView={isView}
+                        />
+                      </div>
+
+                    </SectionCard>
+
+                    {/* BILLING */}
+                    <SectionCard title="Billing & Tax">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {storeFormKeys.billingTaxFieldList.map((item) => (
+                          <FloatingField
+                            isView={isView}
+                            isRequired={true}
+                            name={item.fieldName}
+                            label={item.label}
+                            control={form.control}
+                          />
+
+                        ))}
+                      </div>
+                    </SectionCard>
+
+                    {/* DOCUMENTS */}
+                    <SectionCard title="Documents">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {storeFormKeys.file.map((item) => {
+                          const preview = filePreview[item.key];
+
+                          return (
+                            <FormField
+                              key={item.key}
+                              name={item.key as any}
+                              control={form.control}
+                              render={({ fieldState }) => {
+
+                                const hasError = !!fieldState.error;
+                                return (
+                                  <FormItem>
+                                    <p className="text-sm font-medium capitalize">
+                                      {item.label}
+                                    </p>
+
+                                    <div className="relative h-32 rounded-lg border bg-gray-50 overflow-hidden group">
+
+                                      {/* PREVIEW */}
+                                      {preview ? (
+                                        isPdfFile(preview.file, preview.url) ? (
+                                          <div className="absolute inset-0  overflow-hidden">
+                                            <iframe
+                                              src={preview.url}
+                                              className="w-[120%] h-[120%] "
+                                              scrolling="no"
+                                            />
+                                          </div>
+                                        ) : (
+                                          <img
+                                            src={preview.url}
+                                            className="w-full h-full object-contain pointer-events-none"
+                                          />
+                                        )
+                                      ) : (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                          <span className="text-xs text-gray-400">No preview</span>
+                                        </div>
+                                      )}
+
+                                    </div>
+
+
+
+                                    {!isView && (
+                                      <Input
+                                        className={hasError ? "border-red-500 focus-visible:ring-red-500" : ""}
+
+                                        type="file"
+                                        onChange={(e) =>
+                                          handleFile(
+                                            item.key as any,
+                                            e.target.files?.[0] ?? null
+                                          )
+                                        }
+                                      />
+                                    )}
+                                    <FormMessage />
+                                  </FormItem>
+                                )
+                              }}
+                            />
+                          )
+                        })}
+                      </div>
+                    </SectionCard>
+
+                    {/* NOTES */}
+                    <SectionCard title="Additional Notes">
+                      <FloatingTextarea
+                        name="notes"
+                        label="Notes"
+                        isView={isView}
+                        control={form.control}
+                      />
+
+                    </SectionCard>
+                  </div>}
+              {mode !== 'view' && <div className="">
+                <div className="border-t px-6 py-4 flex justify-end gap-3">
+                  <Button
+                    variant="outline"
+                    disabled={isLoading || isInfoLoading}
+                    className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                    onClick={() => navigate("/master")}
+                  >
+                    {'Cancel'}
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isLoading || isInfoLoading}
+                    className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
+                  >
+                    {isLoading && <Loader isShowLoadingText={false} color="#fff" />}
+                    {isLoading
+                      ? id ? "Updating..." : "Adding..."
+                      : id ? "Update " : "Add "}
+                  </Button>
+                </div></div>}
+
+            </div>
+
+          </form>
+        </Form>
+      </div>
+    </div>
+
   );
 }

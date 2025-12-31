@@ -90,38 +90,30 @@ export default function StoreView() {
     path ? `${baseUrl}/${path}` : null;
 
   return (
-    <div
-      className="min-h-screen bg-gray-100 p-4 md:p-10"
-    >
-      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg">
-
-        {/* HEADER */}
-        <div className="border-b px-6 py-4 flex items-center gap-3">
-          {/* Back Button */}
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => window.history.back()}
-            className="
-          flex items-center gap-1 justify-start -ml-2
-          text-sm font-medium
-          text-muted-black
-          hover:text-foreground
-          transition
-        "
-          >
-            <ChevronLeft size={20} />
-          </button>
-
-          {/* Title */}
-          <h1 className="text-xl font-semibold">
-            {"View Store"}
-          </h1>
-        </div>
-        {
+     <div className="p-4 sm:p-4 space-y-4 max-w-7xl mx-auto">
+    
+          {/* ---------- HEADER ---------- */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => window.history.back()}
+              disabled={loading}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ChevronLeft size={18} />
+            </button>
+    
+            <h1 className="text-lg font-semibold">  {"View Store"}
+            </h1>
+    
+          </div>
+    
+          {/* ---------- CONTENT ---------- */}
+          <div className="grid grid-cols-1 rounded-xl bg-white lg:grid-cols-1 gap-4">
+    
+           {
           loading ? <div className="min-h-[150px] flex justify-center items-center">
-            <div className="p-6 text-sm "><Loader /></div>
-          </div> : <Card className="max-w-6xl mx-auto p-6 space-y-6 rounded-2xl border-0">
+            <div className="p-4 text-sm "><Loader /></div>
+          </div> : <Card className=" p-4 space-y-4 rounded-2xl border-0">
             <section>
               <h3 className="text-sm font-semibold mb-4 text-gray-700">
                 Store Information
@@ -211,9 +203,9 @@ export default function StoreView() {
 
 
           </Card>}
-
-      </div>
-    </div>
+          </div>
+        </div>
+   
   );
 }
 

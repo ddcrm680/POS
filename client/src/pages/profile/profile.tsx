@@ -274,7 +274,7 @@ export default function Profile() {
                   </div>
                 </div>
               </div>
-              <SectionCard className="pt-0 pr-0" title="">
+              <SectionCard className="pt-0 px-0" title="">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* "name", "email", "phone" */}
                   {[{ label: "fullName", fieldName: "fullName", isRequired: true },

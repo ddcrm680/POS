@@ -31,7 +31,7 @@ export default function SystemLogForm({
 
   if (isLoading) {
     return <div className="min-h-[150px] flex justify-center items-center">
-      <div className="p-6 text-sm "><Loader /></div>
+      <div className="p-4 text-sm "><Loader /></div>
     </div>;
   }
 
@@ -39,7 +39,7 @@ export default function SystemLogForm({
 
   return (
     <Card>
-      <CardContent className="p-6 space-y-4 overflow-auto max-h-[500px]">
+      <CardContent className="p-4 space-y-4 overflow-auto max-h-[500px]">
 
         {/* ================= META ================= */}
         <div className="grid  grid-cols-1 md:grid-cols-3 gap-4 text-sm">
