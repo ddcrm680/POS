@@ -2,29 +2,37 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Eye, EyeIcon } from "lucide-react";
+import { ChevronLeft, Eye, EyeIcon, Info, RefreshCcw, ServerOff } from "lucide-react";
 import { fetchStateList, fetchCityList, fetchStoreById, baseUrl } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { formatDate, getFileNameFromLabel, isPdfUrl, normalizeStatus } from "@/lib/utils";
 import { GlobalLoader } from "@/components/common/GlobalLoader";
 import { FileLightbox } from "@/components/common/FileLightbox";
+import { Button } from "@chakra-ui/react";
 
 export default function StoreDetails() {
     const { user, isLoading: authLoading, countries } = useAuth();
     const [store, setStore] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-
+    const [storeBeMessage, setStoreBeMessage] = useState<any>('');
     /* ---------------- FETCH STORE ---------------- */
     useEffect(() => {
         if (!user?.id) return;
-
         async function loadStore() {
+            if (user?.role === 'store-manager' && !user.store_id) {
+                setStoreBeMessage('Store not assigned to your account');
+                setLoading(false);
+                return;
+            }
             try {
-                const res = await fetchStoreById(user?.id ?? "");
+
+                const res = await fetchStoreById(user?.store_id ?? "");
                 setStore(res?.data);
-            }catch(e){
-                console.log(e);
-                
+            } catch (e: any) {
+                console.log(e?.response?.status, 'err?.response?.status');
+                if (e?.response?.status === 404) {
+                    setStoreBeMessage(e?.response?.data?.message)
+                }
             } finally {
                 setLoading(false);
             }
@@ -66,7 +74,28 @@ export default function StoreDetails() {
     if (!store) {
         return (
             <div className="h-full flex items-center justify-center text-muted-foreground">
-                Store not assigned
+                     <Card className="w-full max-w-md mx-4 shadow-lg">
+        <CardContent className="pt-8 pb-6 text-center">
+          {/* Icon */}
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-14 w-14 rounded-full bg-blue-50 flex items-center justify-center">
+  <Info className="h-7 w-7 text-blue-500" />
+</div>
+
+          </div>
+
+          {/* Title */}
+          <h1 className="text-2xl font-bold text-gray-900">
+            Store Info
+          </h1>
+
+          {/* Description */}
+          <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+            {storeBeMessage}
+          </p>
+
+        </CardContent>
+      </Card>
             </div>
         );
     }
@@ -104,8 +133,8 @@ export default function StoreDetails() {
                         value={
                             <Badge
                                 className={`h-5 px-2 text-[11px] ${storeStatus === "active"
-                                        ? "bg-green-100 text-green-700 border border-green-200"
-                                        : "bg-red-100 text-red-700 border border-red-200"
+                                    ? "bg-green-100 text-green-700 border border-green-200"
+                                    : "bg-red-100 text-red-700 border border-red-200"
                                     }`}
                             >
                                 {storeStatus === "active" ? "Active" : "Inactive"}

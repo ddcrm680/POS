@@ -234,7 +234,7 @@ export const profileSchema = z.object({
     max(50, "Full Name must be at most 50 characters")
   ,
   email: z.string().min(1, "Email is required").email("Enter a valid email"),
-  phoneNumber: z
+  phone: z
     .string()
     .nonempty("Phone number is required")
     .min(10, "Phone number must be of 10 characters")

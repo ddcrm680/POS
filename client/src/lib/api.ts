@@ -155,6 +155,7 @@ export async function fetchUserApi() {
   }
   throw new Error(response.data?.message || "Failed to fetch user");
 }
+
 export async function EditProfile(fd: any) {
   try {
     const response: any = await api.post(
@@ -165,7 +166,7 @@ export async function EditProfile(fd: any) {
     }
   } catch (response: any) {
 
-    throw new Error(response.response?.data?.message || "Failed to update user details");
+    throw response
 
   }
 }
@@ -394,7 +395,7 @@ export async function fetchTerritoryById(id: string) {
 export async function fetchStoreById(id: string) {
 
   const response: any = await api.get(
-    `/api/stores/view/${id}`,
+    `/api/stores/view/${44}`,
   );
   if (response?.data?.success === true) {
     return response.data;

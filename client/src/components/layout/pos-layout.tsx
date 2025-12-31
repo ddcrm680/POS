@@ -45,7 +45,7 @@ export default function POSLayout({ children }: POSLayoutProps) {
   useEffect(() => {
     setUserInfo(user || null);
 
-  }, [, user,]);
+  }, [user]);
   useEffect(() => {
     const supremeUserRoleList = ['admin', "super-admin"]
     const managerList = ['store-manager']

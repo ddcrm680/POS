@@ -14,9 +14,11 @@ import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { Box } from "@chakra-ui/react";
 import { api, EditProfile } from "@/lib/api";
-import { ProfileForm,  } from "@/lib/types";
+import { ProfileForm, } from "@/lib/types";
 import { Constant } from '@/lib/constant';
 import { profileSchema } from '@/lib/schema';
+import { FloatingField } from '@/components/common/FloatingField';
+import { SectionCard } from '@/components/common/card';
 
 export default function Profile() {
   const { toast } = useToast();
@@ -34,14 +36,17 @@ export default function Profile() {
     } catch { return null; }
   });
 
+  const isView = mode === "view";
+
   const form = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: (user as any)?.name || "",
-      phoneNumber: (user as any)?.phone || "",
+      phone: (user as any)?.phone || "",
       email: (user as any)?.email || "",
     },
   });
+  const { setError: setformError } = form
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
@@ -80,12 +85,14 @@ export default function Profile() {
     if (!f.type.startsWith("image/")) {
       setError("Please select an image file (jpg,jpeg, png and webp.)");
       e.currentTarget.value = "";
+      setFile(f);
       return;
     }
     // Size validation
     if (f.size > maxSizeBytes) {
       setError(`File size must be at most ${Math.round(maxSizeBytes / 1024 / 1024)} MB`);
       e.currentTarget.value = "";
+      setFile(f);
       return;
     }
     setFile(f);
@@ -104,11 +111,31 @@ export default function Profile() {
     form.reset({
       fullName: (user as any)?.name || "",
       email: (user as any)?.email || "",
-      phoneNumber: (user as any)?.phone || "",
+      phone: (user as any)?.phone || "",
     });
     setPreviewUrl((user as any)?.avatar || null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+  const PROFILE_FIELD_MAP: Record<string, keyof ProfileForm> = {
+    name: "fullName",
+    phone: "phone",
+    email: "email",
+  };
+  const resetToInitialProfile = () => {
+    form.reset({
+      fullName: (user as any)?.name || "",
+      email: (user as any)?.email || "",
+      phone: (user as any)?.phone || "",
+    });
+
+    // reset avatar preview
+    setFile(null);
+    setAvatarFile(null);
+    setPreviewUrl((user as any)?.avatar || null);
+
+    // clear local errors
+    setError(null);
+  };
 
   useEffect(() => {
     if (!avatarFile) return;
@@ -116,58 +143,81 @@ export default function Profile() {
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
   }, [avatarFile]);
+  const updateProfileMutation = async (
+    vals: ProfileForm,
+  ) => {
+    try {
+      if(error) return 
+      setIsLoading(true);
 
-  const updateProfileMutation = useMutation({
-    mutationFn: async (vals: ProfileForm) => {
-      setIsLoading(true)
-      // If avatarFile present, use FormData
       const fd = new FormData();
       fd.append("name", vals.fullName);
-      fd.append("phone", vals.phoneNumber);
+      fd.append("phone", vals.phone);
+
       if (file) {
         fd.append("avatar", file);
       }
-      await EditProfile(fd)
 
-    },
-    onSuccess: async (data: any) => {
+      await EditProfile(fd);
+      toast({
+        title: "Profile updated",
+        description: "Your profile was saved.",
+        variant: "success",
+      });
 
-      toast({ title: "Profile updated", description: "Your profile was saved.", variant: "success" });
+      refreshUser();
+      setIsLoading(false);
+      setMode("view");
+    } catch (err: any) {
+      const apiErrors = err?.response?.data?.errors;
 
-      // Refresh user in auth context (so UI reflects new name/avatar)
-      try {
-        refreshUser();
-        setIsLoading(false)
-        setMode('view')
-      } catch (_) {
-        // also invalidate queries if you store user elsewhere
-        refreshUser();
+      // ✅ FIELD LEVEL ERRORS (VISIBLE NOW)
+      console.log(err?.response?.status, 'err?.response?.status');
+
+      if (apiErrors && err?.response?.status === 422) {
+        Object.entries(apiErrors).forEach(([apiField, messages]) => {
+          const formField = PROFILE_FIELD_MAP[apiField];
+
+          if (!formField) return;
+
+          setformError(formField, {
+            type: "server",
+            message: (messages as string[])[0],
+          });
+        });
+
+        setIsLoading(false);
+        return; // ⛔ stop generic toast
       }
-    },
-    onError: (err: any) => {
 
+      // ❌ GENERIC ERROR
       toast({
         title: "Update failed",
-        description: err?.message || "Failed to update profile",
+        description:
+          err?.response?.data?.message ||
+          err?.message ||
+          "Failed to update profile",
         variant: "destructive",
       });
-      setIsLoading(false)
-    },
 
-  });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   const onSubmit = (vals: ProfileForm) => {
-    updateProfileMutation.mutate(vals);
+    updateProfileMutation(vals);
   };
 
   return (
     <Card className="w-full">
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-6">
-           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-4">
 
-             <div className="flex flex-col items-center md:items-start">
+              <div className="flex flex-col items-center md:items-start p-4 py-0">
                 <div className="flex items-center gap-3 flex-col">
                   <div
                     role="button"
@@ -175,7 +225,7 @@ export default function Profile() {
                     aria-label="Change avatar"
                     onClick={openFilePicker}
                     onKeyDown={handleKeyDown}
-                    className={`w-28 h-28 rounded-full overflow-hidden bg-muted flex items-center justify-center ${mode === 'view' ? 'cursor-not-allowed' : 'cursor-pointer'} border-2 border-transparent hover:border-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
+                    className={`w-24 h-24 rounded-full overflow-hidden bg-muted flex items-center justify-center ${mode === 'view' ? 'cursor-not-allowed' : 'cursor-pointer'} border-2 border-transparent hover:border-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
                     style={{ userSelect: "none" }}
                     title={mode === 'view' ? "View Avatar" : "Change Avatar"}
                   >
@@ -216,85 +266,31 @@ export default function Profile() {
                     />
 
                     <div className="flex flex-col">
-                      {!error && <p className="text-sm text-muted-foreground mt-2 text-center">
+                      {!error && <p className="text-sm !text-[12px] text-muted-foreground mt-2 text-center">
                         Allowed: JPG, JPEG, PNG, WEBP. Max {Math.round(maxSizeBytes / 1024 / 1024)} MB.
                       </p>}
-                      {error && <p className="text-sm text-destructive mt-2">{error}</p>}
+                      {error && <p className="text-sm !text-[12px] text-center text-destructive mt-2">{error}</p>}
                     </div>
                   </div>
                 </div>
               </div>
-            <div className="space-y-4">
+              <SectionCard className="pt-0 pr-0" title="">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
+                  {/* "name", "email", "phone" */}
+                  {[{ label: "fullName", fieldName: "fullName", isRequired: true },
+                  { label: "Email", fieldName: "email", isRequired: true },
+                  { label: "Phone", fieldName: "phone", isRequired: true }
+                  ].map((item) => (
+                    <FloatingField
+                      isView={isView}
+                      isRequired={item.isRequired}
+                      name={item.fieldName}
+                      label={item.label}
                       control={form.control}
-                      name="fullName"
-                      disabled={mode === 'view'}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel style={{ color: "#000" }}> Full Name</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              onChange={(e) => field.onChange(e.target.value)}
-                              placeholder="Enter full name"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
                     />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      disabled
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel style={{ color: "#000" }}>Email</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
+                  ))}
                 </div>
-
-                <div className="md:w-1/2">
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    disabled={mode === 'view'}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel style={{ color: "#000" }}>Phone</FormLabel>
-                        <FormControl>
-                          <Input {...field} inputMode="numeric"
-                            maxLength={10} onChange={(e) => {
-                              let value = e.target.value;
-
-                              // 1️⃣ allow only digits
-                              value = value.replace(/\D/g, "");
-
-                              // 2️⃣ prevent starting with 0
-                              if (value.startsWith("0")) {
-                                value = value.replace(/^0+/, ""); // remove leading zeros
-                              }
-
-                              // 3️⃣ prevent leading space (not needed now but safe)
-                              value = value.trimStart();
-
-                              field.onChange(value);
-                            }} placeholder="Enter phone number" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                </div>
-              </div>
+              </SectionCard>
             </div>
             <div className="flex justify-end gap-3">
               {mode === 'view' && <Button
@@ -331,7 +327,8 @@ export default function Profile() {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setMode('view');
+                    resetToInitialProfile();
+                    setMode("view");
                   }}
                   disabled={isLoading}
                 >
@@ -339,7 +336,7 @@ export default function Profile() {
                   {"Cancel "}
                 </Button>
                   <Button type="submit"
-                   className="
+                    className="
                           bg-[#FE0000] 
                           hover:bg-[rgb(238,6,6)]
                           hover:border-black

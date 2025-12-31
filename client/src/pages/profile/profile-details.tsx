@@ -3,6 +3,7 @@ import { profileMenu } from "@/lib/constant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Password from "./password";
 import Profile from "./profile";
+import { ChevronLeft } from "lucide-react";
 
 export default function ProfileDetails() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -12,18 +13,20 @@ export default function ProfileDetails() {
  
   return (
     <>
-      <div className="  p-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+       <div className="p-4 sm:p-4 space-y-4 max-w-7xl mx-auto">
 
-          <div className=" mb-6 flex justify-between">
-            <div className="flex flex-col">
-              <h1 className="
-  text-lg
-  sm:text-xl
-  md:text-2xl
-  font-bold
-  text-gray-900
-">Profile Details</h1>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+
+          <div className=" flex justify-between">
+            <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => window.history.back()}
+                    className="text-muted-foreground hover:text-foreground"
+                >
+                    <ChevronLeft size={18} />
+                </button>
+                 <h1 className="text-lg font-semibold">Profile Details</h1>
+
 
             </div>
             <TabsList className="h-auto
@@ -64,17 +67,17 @@ export default function ProfileDetails() {
 
           </div>
 
-          <div className={`grid gap-6 transition-all duration-300 ${showServiceHistory ? 'grid-cols-12' : 'grid-cols-1'
+          <div className={`grid gap-4 transition-all duration-300 ${showServiceHistory ? 'grid-cols-12' : 'grid-cols-1'
             }`}>
-            <div className=" mx-auto space-y-6 w-full">
+            <div className=" mx-auto space-y-4 w-full">
               {/* Main Content Tabs */}
               {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-6 mt-0">
+              <TabsContent value="overview" className="space-y-4 mt-0">
                 <Profile />
               </TabsContent>
 
               {/* Vehicle Information Tab */}
-              <TabsContent value="password" className="space-y-6">
+              <TabsContent value="password" className="space-y-4 mt-0">
                 <Password />
               </TabsContent>
             </div>
