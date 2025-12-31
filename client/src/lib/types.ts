@@ -618,3 +618,10 @@ export type CopyButtonProps = {
   successDuration?: number; // ms
   disabled?: boolean;
 };
+export 
+type FloatingPasswordFieldProps = {
+  name: string;
+  label: string;
+  control: Control<any>;
+  isRequired?: boolean;
+};

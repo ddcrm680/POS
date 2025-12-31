@@ -15,13 +15,11 @@ import { UpdatePassword } from "@/lib/api";
 import { Box } from "@chakra-ui/react";
 import { Eye, EyeOff } from "lucide-react";
 import { passwordSchema } from "@/lib/schema";
+import { FloatingPasswordField } from "./FloatingPasswordField";
 
 export default function Password() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showNew, setShowNew] = useState(false);
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
   const form = useForm<PasswordForm>({
     resolver: zodResolver(passwordSchema),
@@ -68,79 +66,27 @@ export default function Password() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
             <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
 
-              <FormField
-                control={form.control}
+              <FloatingPasswordField
                 name="currentPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Current Password</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input {...field} type={showCurrent ? "text" : "password"} placeholder="Current password" />
-                        <button
-                          type="button"
-                          onClick={() => setShowCurrent((s) => !s)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded focus:outline-none"
-                          aria-label={showCurrent ? "Hide password" : "Show password"}
-                        >
-                          {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Current Password"
+                control={form.control}
+                isRequired
               />
 
-              <FormField
-                control={form.control}
+              <FloatingPasswordField
                 name="newPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>New Password</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input {...field} type={showNew ? "text" : "password"} placeholder="New password" />
-                        <button
-                          type="button"
-                          onClick={() => setShowNew((s) => !s)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded focus:outline-none"
-                          aria-label={showCurrent ? "Hide password" : "Show password"}
-                        >
-                          {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
+                label="New Password"
                 control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: "#000" }}>Confirm Password</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input {...field} type={showConfirm ? "text" : "password"} placeholder="Confirm new password" />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirm((s) => !s)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded focus:outline-none"
-                          aria-label={showCurrent ? "Hide password" : "Show password"}
-                        >
-                          {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                isRequired
               />
+
+              <FloatingPasswordField
+                name="confirmPassword"
+                label="Confirm Password"
+                control={form.control}
+                isRequired
+              />
+
             </div>
             <div className="flex justify-end gap-3  ">
               <Button

@@ -218,7 +218,7 @@ export default function Profile() {
             <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-4">
 
               <div className="flex flex-col items-center md:items-start p-4 py-0">
-                <div className="flex items-center gap-3 flex-col">
+                <div className="flex items-center gap-1 flex-col">
                   <div
                     role="button"
                     tabIndex={0}
