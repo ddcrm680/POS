@@ -395,7 +395,7 @@ export async function fetchTerritoryById(id: string) {
 export async function fetchStoreById(id: string) {
 
   const response: any = await api.get(
-    `/api/stores/view/${44}`,
+    `/api/stores/view/${id}`,
   );
   if (response?.data?.success === true) {
     return response.data;

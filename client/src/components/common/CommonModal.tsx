@@ -50,7 +50,7 @@ export default function CommonModal({
             <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
 
             {showCloseIcon && (
-              <Dialog.Close asChild>
+              <Dialog.Close asChild className="text-right flex justify-end">
                 <IconButton aria-label="Close" size="sm" variant="ghost" disabled={isLoading}>
                   <X size={18} />
                 </IconButton>

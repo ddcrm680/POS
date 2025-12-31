@@ -205,7 +205,7 @@ export default function TerritoryMasterForm() {
   useEffect(() => {
     setCountryList(countries)
   }, [countries])
-  const { control, handleSubmit,getValues, watch, setValue } = form;
+  const { control, handleSubmit, getValues, watch, setValue } = form;
 
   const onSubmit = (values: TerritoryFormValues) => {
     TerritoryCommonHandler(values, form.setError)
@@ -302,205 +302,209 @@ export default function TerritoryMasterForm() {
   }, [initialValues]);
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="min-h-screen bg-gray-100 p-5"
-      >
-        <div className="max-w-7xl mx-auto bg-white rounded-xl shadow">
+    <div className="p-4 sm:p-4 space-y-4 max-w-7xl mx-auto">
 
-          {/* HEADER */}
-          <div className="border-b px-6 py-4 flex items-center gap-3">
-            <button
-              type="button"
-              disabled={isLoading}
-              onClick={() => window.history.back()}
-              className="
-                flex items-center gap-1 justify-start -ml-2
-                text-sm font-medium
-                text-muted-black
-                hover:text-foreground
-                transition
-              "
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <h1 className="text-xl font-semibold">
-              {isView ? "View Territory" : id ? "Edit Territory" : "Create New Territory"}
-            </h1>
+      {/* ---------- HEADER ---------- */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => window.history.back()}
+             disabled={isLoading}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ChevronLeft size={18} />
+        </button>
 
-          </div>
+        <h1 className="text-lg font-semibold">  {isView ? "View Territory" : id ? "Edit Territory" : "Create New Territory"}
+        </h1>
+       
+      </div>
+
+      {/* ---------- CONTENT ---------- */}
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 rounded-xl bg-white">
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="  "
+          >
+            {/* <div className="p-4 sm:p-4 space-y-4 max-w-7xl mx-auto"> */}
 
 
-          <div>
-            {
-              isInfoLoading ? <div className="min-h-[150px] flex justify-center items-center">
-                <div className="p-6 text-sm "><Loader /></div>
-              </div> :
-                <div className="gap-2 flex flex-col">     {/* -------- TOP FIELDS -------- */}
-                  <SectionCard title="Territory Information">
-                    <div className="grid  grid-cols-1 md:grid-cols-3 gap-4">
-                      <FloatingField
-                        isView={false}
-                        isRequired={true}
-                        name={'name'}
-                        label={'Territory Name'}
-                        control={form.control}
-                      />
 
-                      <FloatingRHFSelect
-                        name="store_id"
-                        label="Store"
-                        control={form.control}
-                        isDisabled={false}
-                        options={storeList}
-                        isClear={true}
-                      />
 
-                      <FloatingRHFSelect
-                        name="country_id"
-                        label="Country"
-                        control={form.control}
-                        isRequired
-                        isDisabled={isView}
-                        options={countryList.map(c => ({
-                          value: String(c.id),
-                          label: c.name,
-                        }))}
-                        onValueChange={async (value) => {
-                          if (isHydratingRef.current) return;
+            <div className="rounded-xl">
+              {
+                isInfoLoading ? <div className="min-h-[150px] flex justify-center items-center">
+                  <div className=" text-sm "><Loader /></div>
+                </div> :
+                  <div className="gap-2 flex flex-col">     {/* -------- TOP FIELDS -------- */}
+                    <SectionCard  title="Territory Information" >
+                      <div className="grid  grid-cols-1 md:grid-cols-3 gap-4">
+                        <FloatingField
+                          isView={false}
+                          isRequired={true}
+                          name={'name'}
+                          label={'Territory Name'}
+                          control={form.control}
+                        />
 
-                          setStates([]);
-                          setCities([]);
-                          form.setValue("state_ids", []);
-                          form.setValue("city_ids", []);
+                        <FloatingRHFSelect
+                          name="store_id"
+                          label="Store"
+                          control={form.control}
+                          isDisabled={false}
+                          options={storeList}
+                          isClear={true}
+                        />
 
-                          setLoadingState(true);
-                          const stateList = await fetchStateList(Number(value));
-                          setStates(stateList);
-                          setLoadingState(false);
-                        }}
-                      />
+                        <FloatingRHFSelect
+                          name="country_id"
+                          label="Country"
+                          control={form.control}
+                          isRequired
+                          isDisabled={isView}
+                          options={countryList.map(c => ({
+                            value: String(c.id),
+                            label: c.name,
+                          }))}
+                          onValueChange={async (value) => {
+                            if (isHydratingRef.current) return;
 
-                    </div>
-                    <div className="grid pt-5 gap-4  grid-cols-1 md:grid-cols-2 ">
-                      <FloatingRHFSelect
-                        name="state_ids"
-                        label="State"
-                        isMulti
-                        control={form.control}
-                        isRequired
-                        isDisabled={isView || !form.getValues("country_id")}
-                        options={states.map(s => ({
-                          value: String(s.id),
-                          label: s.name,
-                        }))}
-                        onValueChange={async (values) => {
-                          if (isHydratingRef.current) return;
+                            setStates([]);
+                            setCities([]);
+                            form.setValue("state_ids", []);
+                            form.setValue("city_ids", []);
 
-                          const newStateIds = Array.isArray(values) ? values : [];
-                          const prevStateIds = prevStateIdsRef.current;
+                            setLoadingState(true);
+                            const stateList = await fetchStateList(Number(value));
+                            setStates(stateList);
+                            setLoadingState(false);
+                          }}
+                        />
 
-                          // 🆕 added states
-                          const added = newStateIds.filter(id => !prevStateIds.includes(id));
+                      </div>
+                      <div className="grid pt-5 gap-4  grid-cols-1 md:grid-cols-2 ">
+                        <FloatingRHFSelect
+                          name="state_ids"
+                          label="State"
+                          isMulti
+                          control={form.control}
+                          isRequired
+                          isDisabled={isView || !form.getValues("country_id")}
+                          options={states.map(s => ({
+                            value: String(s.id),
+                            label: s.name,
+                          }))}
+                          onValueChange={async (values) => {
+                            if (isHydratingRef.current) return;
 
-                          //  removed states
-                          const removed = prevStateIds.filter(id => !newStateIds.includes(id));
+                            const newStateIds = Array.isArray(values) ? values : [];
+                            const prevStateIds = prevStateIdsRef.current;
 
-                          // update ref
-                          prevStateIdsRef.current = newStateIds;
+                            // 🆕 added states
+                            const added = newStateIds.filter(id => !prevStateIds.includes(id));
 
-                          /* ================= ADD STATES ================= */
-                          if (added.length > 0) {
-                            setLoadingCity(true);
-                            try {
-                              const newCities = await fetchCitiesByStates(
-                                added.map(Number)
+                            //  removed states
+                            const removed = prevStateIds.filter(id => !newStateIds.includes(id));
+
+                            // update ref
+                            prevStateIdsRef.current = newStateIds;
+
+                            /* ================= ADD STATES ================= */
+                            if (added.length > 0) {
+                              setLoadingCity(true);
+                              try {
+                                const newCities = await fetchCitiesByStates(
+                                  added.map(Number)
+                                );
+
+                                // merge (no duplicates)
+                                setCities(prev => {
+                                  const map = new Map(prev.map(c => [String(c.id), c]));
+                                  newCities.forEach((c: any) => map.set(String(c.id), c));
+                                  return Array.from(map.values());
+                                });
+                              } finally {
+                                setLoadingCity(false);
+                              }
+                            }
+
+                            /* ================= REMOVE STATES ================= */
+                            if (removed.length > 0) {
+                              // remove city OPTIONS of removed states
+                              setCities(prev =>
+                                prev.filter(c => !removed.includes(String(c.state_id)))
                               );
 
-                              // merge (no duplicates)
-                              setCities(prev => {
-                                const map = new Map(prev.map(c => [String(c.id), c]));
-                                newCities.forEach((c: any) => map.set(String(c.id), c));
-                                return Array.from(map.values());
+                              // remove SELECTED city_ids of removed states
+                              const selectedCityIds = form.getValues("city_ids");
+
+                              const filteredCityIds = selectedCityIds.filter(cityId => {
+                                const city = cities.find(c => String(c.id) === cityId);
+                                return city && !removed.includes(String(city.state_id));
                               });
-                            } finally {
-                              setLoadingCity(false);
+
+                              form.setValue("city_ids", filteredCityIds);
                             }
-                          }
-
-                          /* ================= REMOVE STATES ================= */
-                          if (removed.length > 0) {
-                            // remove city OPTIONS of removed states
-                            setCities(prev =>
-                              prev.filter(c => !removed.includes(String(c.state_id)))
-                            );
-
-                            // remove SELECTED city_ids of removed states
-                            const selectedCityIds = form.getValues("city_ids");
-
-                            const filteredCityIds = selectedCityIds.filter(cityId => {
-                              const city = cities.find(c => String(c.id) === cityId);
-                              return city && !removed.includes(String(city.state_id));
-                            });
-
-                            form.setValue("city_ids", filteredCityIds);
-                          }
-                        }}
-                      />
+                          }}
+                        />
 
 
-                      <FloatingRHFSelect
-                        name="city_ids"
-                        label="City"
-                        isMulti
+                        <FloatingRHFSelect
+                          name="city_ids"
+                          label="City"
+                          isMulti
+                          control={form.control}
+                          isRequired
+                          isDisabled={isView || !form.getValues("state_ids")}
+                          options={buildGroupedCityOptions(cities, states)}
+
+                        />
+                      </div>
+                    </SectionCard>
+
+                    <SectionCard  title="Additional Notes">
+                      <FloatingTextarea
+                        name="notes"
+                        label="Notes"
+                        isView={isView}
                         control={form.control}
-                        isRequired
-                        isDisabled={isView || !form.getValues("state_ids")}
-                        options={buildGroupedCityOptions(cities, states)}
-
                       />
-                    </div>
-                  </SectionCard>
 
-                  <SectionCard title="Additional Notes">
-                    <FloatingTextarea
-                      name="notes"
-                      label="Notes"
-                      isView={isView}
-                      control={form.control}
-                    />
-
-                  </SectionCard>
-                </div>
-            }
+                    </SectionCard>
+                  </div>
+              }
 
 
-            {/* FOOTER */}
-            {mode !== 'view' && <div className="mt-5">
-              <div className="border-t px-5 py-4 flex justify-end gap-3">
-                <Button
-                  variant="outline"
-                  disabled={isLoading || isInfoLoading}
-                  className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
-                  onClick={() => navigate("/master")}
-                >
-                  {'Cancel'}
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading || isInfoLoading}
-                  className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
-                >
-                  {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
-                  {isLoading
-                    ? id ? "Updating..." : "Adding..."
-                    : id ? "Update " : "Add "}
-                </Button>
-              </div></div>}
-          </div>
-        </div>
-      </form>
-    </Form>
+              {/* FOOTER */}
+              {mode !== 'view' && <div className="mt-5">
+                <div className="border-t px-5 py-4 flex justify-end gap-3">
+                  <Button
+                    variant="outline"
+                    disabled={isLoading || isInfoLoading}
+                    className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                    onClick={() => navigate("/master")}
+                  >
+                    {'Cancel'}
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isLoading || isInfoLoading}
+                    className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
+                  >
+                    {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
+                    {isLoading
+                      ? id ? "Updating..." : "Adding..."
+                      : id ? "Update " : "Add "}
+                  </Button>
+                </div></div>}
+            </div>
+          </form>
+        </Form>
+
+      </div>
+    </div>
+
+
+
   );
 }

@@ -40,8 +40,8 @@ export default function CommonDeleteModal({
       cancelTextClass="hover:bg-[#E3EDF6] hover:text-[#000]"
       primaryColor="bg-red-600 hover:bg-red-700"
     >
-      <div className="space-y-6 ">
-        <p className="text-sm text-gray-600 px-5 py-4">
+      <div className="space-y-4 ">
+        <p className="text-sm text-gray-600 px-4 py-4">
           {description}
         </p>
 
