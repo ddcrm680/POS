@@ -50,7 +50,6 @@ export default function ProfileDetails() {
     hover:bg-muted
     hover:text-foreground
     hover:shadow-sm
-    hover:-translate-y-[1px]
 
     data-[state=active]:bg-white
     data-[state=active]:text-[#65758b]

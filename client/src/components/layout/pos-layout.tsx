@@ -262,7 +262,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
       {/* ================= MOBILE BOTTOM TABS ================= */}
       {roleView.store && (
         <nav className="pos-bottom-nav bg-card border-t border-border shadow-lg flex-shrink-0 z-50 hidden lg:block">
-          <div className="flex items-center px-2 pt-2">
+          <div className="flex items-center px-2 pt-1">
             <BottomTabs location={location} variant="bottom" />
           </div>
         </nav>
