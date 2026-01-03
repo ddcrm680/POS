@@ -101,7 +101,7 @@ export default function CommonTable({
       {/* Search Bar */}
       {searchable && (
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-          <div className="relative flex-1 max-w-md">
+         <div className="relative flex-1 max-w-sm">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2
              text-gray-400 w-4 h-4
@@ -115,7 +115,20 @@ export default function CommonTable({
                 hasUserTyped.current = true;   // 👈 user action
                 setLocalSearch(e.target.value);
               }}
-              className="pl-10"
+     className="
+  pl-9 h-9 text-sm
+  bg-white
+  border border-gray-300
+  rounded-md
+
+  focus-visible:outline-none
+  focus-visible:ring-0
+  focus-visible:ring-offset-0
+  focus-visible:border-gray-400
+
+  hover:border-gray-400
+  transition-colors
+"
             />
           </div>
           <Box className="flex flex-col md:flex-row gap-2 ">
@@ -145,14 +158,18 @@ export default function CommonTable({
         renderCardView()
       ) : (<div className="relative overflow-x-auto rounded-lg border">
         <Table.Root size="sm" className="min-w-[900px]" >
-          <Table.Header className="sticky top-0 z-10 bg-gray-100">
+         <Table.Header className="sticky top-0 z-20 bg-gray-50 backdrop-blur border-b">
             <Table.Row className="!bg-gray-100 border-b border-gray-200">
               {columns.map((col: any) => (
                 <Table.ColumnHeader
                   key={col.key}
                   textAlign={col.align || "start"}
                   width={col.width}
-                  className="!py-3 !px-4 text-sm font-semibold text-gray-700"
+                 className="
+  !py-2 !px-3
+  text-xs font-semibold uppercase tracking-wide
+  text-gray-600
+"
                 >
                   {col.label}
                 </Table.ColumnHeader>
@@ -160,8 +177,8 @@ export default function CommonTable({
 
               {actions && (
                 <Table.ColumnHeader
-                  width="120px"
-                  className="!py-3 !px-4 text-sm font-semibold text-gray-700 "
+                  width="100px"
+                 className="sticky right-0 bg-gray-50 z-30"
                 >
                   Actions
                 </Table.ColumnHeader>
@@ -195,19 +212,21 @@ export default function CommonTable({
                 <Table.Row
                   key={row.id ?? rowIndex}
                   onClick={() => onRowClick?.(row, rowIndex)}
-                  className={`
-  transition-all
+                 className="
+  group
+  transition-colors
   border-b border-gray-100
-  hover:bg-gray-50
-  ${onRowClick ? "cursor-pointer active:bg-gray-100" : ""}
-`}
+  hover:bg-blue-50/40
+  focus-within:bg-blue-50/60
+  cursor-pointer
+"
                 >
                   {columns.map((col: any) => (
                     <Table.Cell
                       key={col.key}
                       textAlign={col.align || "start"}
                       width={col.width}
-                      className="!py-3 !px-4 text-sm text-gray-700"
+                    className="!py-2 !px-3 text-[13px] text-gray-700 leading-snug"
                     >
                       {col.render
                         ? col.render(row[col.key], row, rowIndex)
@@ -216,7 +235,8 @@ export default function CommonTable({
                   ))}
 
                   {actions && (
-                    <Table.Cell width="120px" className="!py-3 !px-4">
+                    <Table.Cell  width="100px"
+  className="sticky right-0 bg-white z-10">
                       {actions(row)}
                     </Table.Cell>
                   )}
@@ -257,24 +277,25 @@ export default function CommonTable({
             <Button
               variant="outline"
               disabled={page === 1}
+              className="py-1 h-[27.2px] rounded"
               onClick={() => setPage((p: number) => p - 1)}
             >
-              Prev
-            </Button>
+      Prev
+    </Button>
 
             <span className="text-sm">
               <strong>{page}</strong> of <strong>{lastPage}</strong>
             </span>
 
             <Button
-              variant="outline"
+              variant="outline"  className="py-1 h-[27.2px] rounded"
               disabled={!hasNext || page === lastPage}
               onClick={() => setPage((p: number) => p + 1)}
             >
-              Next
-            </Button>
+      Next
+    </Button>
              
-          </div></>
+</div></>
 }
           {/* Per Page selector */}
         
