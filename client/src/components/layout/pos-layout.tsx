@@ -230,7 +230,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
     top-0
     bg-card border-r border-border
     transition-all duration-300
-    ${collapsed ? "w-16" : "w-64"}
+    ${collapsed ? "w-16" : "w-52"}
     ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
     lg:translate-x-0
   `}

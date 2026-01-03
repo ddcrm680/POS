@@ -20,19 +20,21 @@ export default function Sidebar({
   roleName,
   previewUrl,
 }: SidebarProps) {
-  const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
+  const [isDefaultView, setIsDefaultView] = useState(false);
 
   useEffect(() => {
-    const nonDefaultViewers = ['admin', "super-admin", 'store-manager']
-    setIsDefaultView(!nonDefaultViewers.includes((user?.role)))
-  }, [user])
-  const bottomTabList = isDefaultView ? defaultBottomTabs : bottomTabs
-  return (
-    <aside className="h-full flex flex-col bg-card">
+    const nonDefaultViewers = ["admin", "super-admin", "store-manager"];
+    setIsDefaultView(!nonDefaultViewers.includes(user?.role));
+  }, [user]);
 
-      {/* ===== PROFILE (HIDDEN WHEN COLLAPSED) ===== */}
+  const tabs = isDefaultView ? defaultBottomTabs : bottomTabs;
+
+  return (
+    <aside className="h-full flex flex-col bg-card border-r border-border">
+
+      {/* ===== PROFILE (MOBILE + EXPANDED ONLY) ===== */}
       {!collapsed && (
-        <div className="px-4 py-4 border-b border-border lg:hidden">
+        <div className="px-4 py-5 border-b border-border lg:hidden">
           <div className="flex items-center gap-3">
             <div className="relative">
               <div className="w-10 h-10 rounded-full overflow-hidden border">
@@ -46,16 +48,15 @@ export default function Sidebar({
                 />
               </div>
               <span
-                className={`
-                  absolute top-0 right-0
-                  w-3 h-3 rounded-full border-2 border-white
-                  ${user?.is_active ? "bg-green-500" : "bg-red-500"}
-                `}
+                className={`absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-white
+                ${user?.is_active ? "bg-green-500" : "bg-red-500"}`}
               />
             </div>
 
             <div>
-              <p className="text-sm font-semibold">{user?.name ?? "—"}</p>
+              <p className="text-sm font-semibold leading-tight">
+                {user?.name ?? "—"}
+              </p>
               <p className="text-xs text-muted-foreground">
                 {roleName ?? "—"}
               </p>
@@ -65,8 +66,8 @@ export default function Sidebar({
       )}
 
       {/* ===== NAV ===== */}
-      <nav className="flex-1 px-2 py-3 space-y-1">
-        {bottomTabList.map((tab) => {
+      <nav className="flex-1 px-2 py-2 space-y-1">
+        {tabs.map((tab) => {
           const Icon = tab.icon;
           const active =
             location === tab.path ||
@@ -78,27 +79,51 @@ export default function Sidebar({
                 <button
                   onClick={onClose}
                   className={`
-                    w-full flex items-center gap-3 rounded-md
-                    px-3 py-2 text-sm font-medium transition
-                    ${active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-muted"}
+                    relative w-full flex items-center gap-3
+                    px-3 py-2.5 rounded-lg text-sm font-medium
+                    transition-all duration-200
+                    ${
+                      active
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                    }
                   `}
                 >
-                  <Icon size={18} />
-                  {!collapsed && <span>{tab.label}</span>}
+                  {/* ACTIVE INDICATOR */}
+                  {active && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-full bg-primary" />
+                  )}
+
+                  {/* ICON CONTAINER */}
+                  <span
+                    className={`
+                      flex items-center justify-center
+                      w-6 h-6 rounded-md
+                      transition
+                      ${
+                        active
+                          ? "bg-primary/15 text-primary"
+                          : "bg-muted/40 group-hover:bg-muted"
+                      }
+                    `}
+                  >
+                    <Icon size={18} />
+                  </span>
+
+                  {/* LABEL */}
+                  {!collapsed && (
+                    <span className="truncate">{tab.label}</span>
+                  )}
                 </button>
 
-                {/* TOOLTIP WHEN COLLAPSED */}
+                {/* TOOLTIP (COLLAPSED) */}
                 {collapsed && (
                   <span
                     className="
-                      pointer-events-none
-                      absolute left-full top-1/2 -translate-y-1/2 ml-2
-                      whitespace-nowrap rounded bg-gray-900 text-white
-                      px-2 py-1 text-xs opacity-0
-                      group-hover:opacity-100 transition
-                      z-50
+                      pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3
+                      rounded-md bg-gray-900 text-white text-xs
+                      px-2 py-1 opacity-0 group-hover:opacity-100 
+                      transition whitespace-nowrap z-50
                     "
                   >
                     {tab.label}
