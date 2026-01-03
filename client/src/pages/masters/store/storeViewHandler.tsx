@@ -23,7 +23,7 @@ export default function StoreFormHandler() {
 
   const [searchParams] = useSearchParams();
   const mode = searchParams.get("mode");
-  const isView = mode === "view";
+  const isView = mode === "view"  || mode === "store-detail-view";
   return (
     <>{isView ?<StoreView/> :<StoreForm/> }</>
   );

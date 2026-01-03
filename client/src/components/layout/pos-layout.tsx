@@ -26,11 +26,12 @@ import { BottomTabs } from "../common/BottomTabs";
 import { Sidebar } from "../common/Sidebar";
 
 export default function POSLayout({ children }: POSLayoutProps) {
-  const [location] = useLocation();
+  const [location,] = useLocation();
   const [currentTime, setCurrentTime] = useState(new Date());
   const { user, isLoading, roles } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const [, navigate] = useLocation();
   const [userInfo, setUserInfo] = useState<any>();
   const [roleList, setRoleList] = useState<any>();
   const [roleView, setRoleView] = useState<{
@@ -222,7 +223,7 @@ export default function POSLayout({ children }: POSLayoutProps) {
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
-             {roleView.store &&  <DropdownMenuItem data-testid="menu-store-details" onClick={() => {navigation[1]('/store-details'); }} >
+             {roleView.store &&  <DropdownMenuItem data-testid="menu-store-details" onClick={() => {navigate(`/master/stores/manage?id=${user?.store_id}&mode=store-detail-view`) }} >
                 <Store className="mr-2 h-4 w-4" />
                 Store Details
               </DropdownMenuItem>}

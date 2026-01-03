@@ -17,7 +17,7 @@ import {
   MapPin,
   Calendar,
   Building2,
-  Landmark,
+  Landmark, Info as InfoIcon,
   FileText,
 } from "lucide-react";
 
@@ -27,24 +27,42 @@ import { baseUrl } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 import { Loader } from "@/components/common/loader";
 import { FilePreviewCard } from "@/components/common/FilePreviewCard";
+import { GlobalLoader } from "@/components/common/GlobalLoader";
 
 export default function StoreView() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
-
-  const { countries } = useAuth();
+  const mode = searchParams.get('mode')
+  const [storeBeMessage, setStoreBeMessage] = useState<any>('');
+  const { user, isLoading: authLoading, countries } = useAuth();
 
   const [data, setData] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   /* ================= FETCH STORE ================= */
   useEffect(() => {
-    if (!id) return;
 
-    setLoading(true);
-    fetchStoreById(id)
-      .then(res => setData(res.data))
-      .finally(() => setLoading(false));
+    async function loadStore() {
+      if (!id) return;
+      if (user?.role === 'store-manager' && !id) {
+        setStoreBeMessage('Store not assigned to your account');
+        setLoading(false);
+        return;
+      }
+
+      try {
+
+        const res = await fetchStoreById(id ?? "");
+        setData(res?.data);
+      } catch (e: any) {
+        if (e?.response?.status === 404) {
+          setStoreBeMessage(e?.response?.data?.message)
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadStore();
   }, [id]);
 
   /* ================= HYDRATE LOCATION ================= */
@@ -100,40 +118,70 @@ export default function StoreView() {
   /* ================= LOADING ================= */
   if (loading) {
     return (
-      <div className="min-h-[200px] flex items-center justify-center">
-        <Loader />
+      <div className="min-h-full flex items-center justify-center">
+        <GlobalLoader />
       </div>
     );
   }
+  if (!data && mode === 'store-detail-view') {
+    return (
+      <div className="h-full flex items-center justify-center text-muted-foreground">
+        <Card className="w-full max-w-md mx-4 shadow-lg">
+          <CardContent className="pt-8 pb-6 text-center">
+            {/* Icon */}
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-14 w-14 rounded-full bg-blue-50 flex items-center justify-center">
+                <InfoIcon className="h-7 w-7 text-blue-500" />
+              </div>
 
-  if (!data) return null;
+            </div>
+
+            {/* Title */}
+            <h1 className="text-2xl font-bold text-gray-900">
+              Store Info
+            </h1>
+
+            {/* Description */}
+            <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+              {storeBeMessage ? storeBeMessage : "Store details not found"}
+            </p>
+
+          </CardContent>
+        </Card>
+      </div>
+    );
+  } else if (!data) return <div className="h-full flex items-center justify-center text-muted-foreground">
+    <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+      No data found
+    </p>
+  </div>
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-4">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-           <button
-              onClick={() => window.history.back()}
-              disabled={loading}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ChevronLeft size={18} />
-            </button>
+        <button
+          onClick={() => window.history.back()}
+          disabled={loading}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ChevronLeft size={18} />
+        </button>
 
         <div className="flex-1">
           <h1 className="text-lg font-semibold">{data.name}</h1>
-          
+
         </div>
 
         <Badge
-  className={
-    data.is_active
-      ? "border-green-600 bg-green-50 text-green-700"
-      : "border-red-600 bg-red-50 text-red-700"
-  }
->
-  {data.is_active ? "Active" : "Inactive"}
-</Badge>
+          className={
+            data.is_active
+              ? "border-green-600 bg-green-50 text-green-700"
+              : "border-red-600 bg-red-50 text-red-700"
+          }
+        >
+          {data.is_active ? "Active" : "Inactive"}
+        </Badge>
       </div>
 
       {/* Layout */}
@@ -150,7 +198,7 @@ export default function StoreView() {
             </CardHeader>
             <CardContent className="grid sm:grid-cols-2 gap-4 text-sm">
               <Info label=" Name" value={data.name} />
-              <Info label="Email" value={data.email}  />
+              <Info label="Email" value={data.email} />
               <Info label="Phone" value={data.phone || "-"} />
               <Info
                 label="Organization"
