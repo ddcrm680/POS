@@ -21,7 +21,7 @@ export function FilePreviewCard({
   if (!src) {
     return (
       <div className="space-y-2 text-sm">
-        {label && <p className="text-gray-500">{label}</p>}
+        {label && <p className="text-xs text-muted-foreground">{label}</p>}
         <div className={`${height} rounded-lg border bg-gray-50 flex items-center justify-center`}>
           <span className="text-xs text-gray-400">No document</span>
         </div>
@@ -34,7 +34,7 @@ export function FilePreviewCard({
   return (
     <>
       <div className="space-y-2 text-sm">
-        {label && <p className="text-gray-500">{label}</p>}
+        {label && <p className="text-xs text-muted-foreground">{label}</p>}
 
         <div className={`relative ${height} rounded-lg border bg-gray-50 overflow-hidden group`}>
           {/* PREVIEW */}
