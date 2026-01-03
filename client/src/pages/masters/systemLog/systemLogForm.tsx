@@ -86,7 +86,7 @@ export default function SystemLogForm({
           {stripDiffMeta(log.meta) && (
             <div className="mt-4">
               <h4 className="text-sm font-semibold mb-2">
-                 Related Information
+                 Extra Information
               </h4>
               <MetaJsonViewer meta={stripDiffMeta(log.meta)} />
             </div>
