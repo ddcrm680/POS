@@ -230,3 +230,9 @@ export function normalizeStatus(status: any) {
   if (status === 1 || status === "1" || status === "active" || status) return "active";
   return "inactive";
 }
+export function stripDiffMeta(meta: any) {
+  if (!meta || typeof meta !== "object") return null;
+
+  const { before, after, ...rest } = meta;
+  return Object.keys(rest).length ? rest : null;
+}

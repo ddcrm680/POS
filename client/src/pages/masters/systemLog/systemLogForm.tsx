@@ -3,7 +3,7 @@ import { Info } from "@/components/common/viewInfo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { fetchServiceLogItem } from "@/lib/api";
-import { formatDate, formatTime, getDiff, isObject } from "@/lib/utils";
+import { formatDate, formatTime, getDiff, isObject, stripDiffMeta } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 export default function SystemLogForm({
@@ -58,7 +58,7 @@ export default function SystemLogForm({
             label="Browser / Platform"
             value={`${log.browser} · ${log.platform} · ${log.device_type}`}
           />
-           <Info
+          <Info
             label="Description"
             value={`${log.description}`}
           />
@@ -68,16 +68,28 @@ export default function SystemLogForm({
         </div>
         {/* ================= DIFF ================= */}
         <div>
-          <h4 className="text-sm font-semibold mb-3">
+        
+          {log.meta && (log.meta.before || log.meta.after) && (
+          <>
+            <h4 className="text-sm font-semibold mb-3">
             Changes
           </h4>
-          {log.meta && (log.meta.before || log.meta.after) ? (
             <BeforeAfterDiff
               before={log.meta.before}
               after={log.meta.after}
             />
-          ) : (
-            <MetaJsonViewer meta={log.meta} />
+          </>
+        
+          )}
+
+          {/* ===== OTHER META DATA ===== */}
+          {stripDiffMeta(log.meta) && (
+            <div className="mt-4">
+              <h4 className="text-sm font-semibold mb-2">
+                 Related Information
+              </h4>
+              <MetaJsonViewer meta={stripDiffMeta(log.meta)} />
+            </div>
           )}
         </div>
 
