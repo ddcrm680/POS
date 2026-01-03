@@ -142,7 +142,7 @@ export default function CustomerAnalyticsCharts({ className = "" }: CustomerAnal
                       ))}
                     </Pie>
                     <Tooltip 
-                      formatter={(value: number, name: string, props: any) => [
+                      formatter={(value: any, name: any, props: any) => [
                         `${value} customers`, 
                         props.payload.segment
                       ]}
@@ -187,7 +187,7 @@ export default function CustomerAnalyticsCharts({ className = "" }: CustomerAnal
                     <XAxis dataKey="tier" />
                     <YAxis />
                     <Tooltip 
-                      formatter={(value: number) => [`${value} customers`, 'Count']}
+                      formatter={(value: any) => [`${value} customers`, 'Count']}
                     />
                     <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                       {segmentation.loyaltyTierDistribution.map((entry, index) => (
@@ -241,7 +241,7 @@ export default function CustomerAnalyticsCharts({ className = "" }: CustomerAnal
                       ))}
                     </Pie>
                     <Tooltip 
-                      formatter={(value: number, name: string, props: any) => [
+                      formatter={(value: any, name: any, props: any) => [
                         `${value} customers`, 
                         props.payload.stage
                       ]}
@@ -290,7 +290,7 @@ export default function CustomerAnalyticsCharts({ className = "" }: CustomerAnal
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip 
-                    formatter={(value: number, name: string) => [
+                    formatter={(value: any, name: any) => [
                       `${value} customers`, 
                       name === 'newCustomers' ? 'New Customers' : 'Churned Customers'
                     ]}
@@ -341,7 +341,7 @@ export default function CustomerAnalyticsCharts({ className = "" }: CustomerAnal
                     <XAxis type="number" />
                     <YAxis dataKey="source" type="category" width={80} />
                     <Tooltip 
-                      formatter={(value: number) => [`${value} customers`, 'Count']}
+                      formatter={(value: any) => [`${value} customers`, 'Count']}
                     />
                     <Bar dataKey="count" fill="#3B82F6" radius={[0, 4, 4, 0]} />
                   </BarChart>
