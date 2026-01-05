@@ -236,10 +236,10 @@ export function stripDiffMeta(meta: any) {
   const { before, after, ...rest } = meta;
   return Object.keys(rest).length ? rest : null;
 }
-export function isChildActive(path: string, location: string,sidebarContext?: string | null) {
-  console.log(location,path,location === path , location.startsWith(path + "/") , location.includes(path),'location');
+export function isChildActive(path: string, location: string,id:string,sidebarContext?: string | null,) {
+  console.log( id, location.includes(path),'location');
   
-  return ((location === path || location.startsWith(path + "/") || location.includes(path)) && sidebarContext == 'stores');
+  return ((location === path || location.startsWith(path + "/") || location.includes(path)) && sidebarContext == id);
 }
 
 export function isParentActive(
@@ -267,8 +267,8 @@ export function isParentActive(
 
   return false;
 }
-export function getActiveChild(tab: any, location: string,sidebarContext?: string | null) {
+export function getActiveChild(tab: any, location: string,id:string,sidebarContext?: string | null) {
   return tab.children?.find((c: any) =>
-    isChildActive(c.path, location,sidebarContext)
+    isChildActive(c.path, location,id,sidebarContext)
   );
 }

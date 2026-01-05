@@ -113,7 +113,7 @@ export default function Sidebar({
                   if (tab.children) {
 
                     setOpenParent(expanded ? null : tab.id);
-                    const activeChild = getActiveChild(tab, location, sidebarContext);
+                    const activeChild = getActiveChild(tab, location,tab.id, sidebarContext,);
                     const target =
                       activeChild?.path ||
                       tab.children.find(c => c.id === tab.defaultChildId)?.path;
@@ -157,7 +157,7 @@ export default function Sidebar({
               {!collapsed && tab.children && expanded && (
                 <div className="ml-9 mt-1 space-y-1">
                   {tab.children.map((child) => {
-                    const childActive = isChildActive(child.path, location, sidebarContext ?? "");
+                    const childActive = isChildActive(child.path, location,tab?.id, sidebarContext ?? "" ,);
 
                     return (
                       <Link key={child.id} href={child.path}>
