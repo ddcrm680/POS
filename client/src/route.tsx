@@ -49,7 +49,7 @@ export function Router() {
       <Route path="/profile" component={() => <ProtectedRoute component={ProfileDetails} />} />
       <Route path="/master" component={() => <ProtectedRoute component={Master} 
       />} />
-        <Route path="/store" component={() => <ProtectedRoute component={Store} 
+        <Route path="/stores" component={() => <ProtectedRoute component={Store} 
       />} />
       {/* <Route path="/master/stores" component={() => <ProtectedRoute component={Store} 
       />} /> */}

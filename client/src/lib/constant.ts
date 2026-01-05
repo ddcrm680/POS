@@ -115,33 +115,57 @@ export const availableServices: ServiceItem[] = [
   { id: '5', name: 'Full Car PPF Installation', price: 18000, description: 'Complete paint protection film', category: 'Protection' },
   { id: '6', name: 'Engine Bay Cleaning', price: 800, description: 'Professional engine compartment cleaning', category: 'Detailing' }
 ];
-
+export function isStoreManagementRoute(location: string) {
+  return STORE_MANAGEMENT_ROUTES.some(
+    (path) =>
+      location === path || location.startsWith(path + "?")
+  );
+}
+export const STORE_MANAGEMENT_ROUTES = [
+  "/store",
+  "/store-details",
+  "/master/stores",
+  "/master/stores/manage",
+];  
 export const bottomTabs: TabItem[] = [
   { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },
 
-  { id: "store", path: "/store", icon: Store, label: "Store" },
+    {
+      id: "stores",
+      path: "/stores",
+      icon: Store,
+      defaultChildId: "store",
+      label: "Store Management",
+      children: [
+        { id: "store", path: "/stores", label: "Store List" },
+        { id: "facility", path: "/facility-management", label: "Facility" },
+      ],
+    },
   {
     id: "master",
     path: "/master",
     icon: Layers,
     label: "Master",
-    // defaultChildId: "master-store",
-    // children: [
-    //   { id: "master-manager", path: "/test", label: "Manager" },
-    //   { id: "master-store", path: "/master/stores", label: "Store" },
-    // ],
-  },
-
-  { id: "manager", path: "/manager", icon: Settings, label: "Manager" ,
-     
+ 
   },
   { id: "appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
-  { id: "facility", path: "/facility-management", icon: Building, label: "Facility" },
-  { id: "team", path: "/employee-management", icon: UserCheck, label: "Team" },
-  { id: "jobs", path: "/job-cards", icon: ClipboardList, label: "Jobs", badge: 3 },
+  { id: "jobs", path: "/job-cards", icon: ClipboardList, label: "Jobs" },
   { id: "customers", path: "/customers", icon: Users, label: "Customers" },
   { id: "payments", path: "/payments", icon: CreditCard, label: "Payments" },
-  { id: "inventory", path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
+  { id: "inventory", path: "/inventory", icon: Package, label: "Inventory" },
+
+  {
+    id: "manager",
+    path: "/manager",
+    icon: Settings,
+    
+      defaultChildId: "manager",
+    label: "Staff Management",
+    children: [
+        { id: "manager", path: "/manager", label: "Manager" },
+      { id: "team", path: "/employee-management", label: "Team" },
+    ],
+  },
 ];
 export const defaultBottomTabs: TabItem[] = [
   { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },

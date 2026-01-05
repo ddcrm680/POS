@@ -214,14 +214,14 @@ export default function POSLayout({ children }: { children: ReactNode }) {
                 <Settings className="mr-2 h-4 w-4" /> Settings
               </DropdownMenuItem>
 
-              {roleView.store && <DropdownMenuItem data-testid="menu-store-details" onClick={() => { 
+              {/* {roleView.store && <DropdownMenuItem data-testid="menu-store-details" onClick={() => { 
                 localStorage.setItem("sidebar_active_parent", 'store-details');
 
                 navigate(`/master/stores/manage?id=${user?.store_id}&mode=store-detail-view`) 
                 }} >
                 <Store className="mr-2 h-4 w-4" />
                 Store Details
-              </DropdownMenuItem>}
+              </DropdownMenuItem>} */}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive"
@@ -252,7 +252,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
     top-0
     bg-card border-r border-border
     transition-all duration-300
-    ${collapsed ? "w-16" : "w-52"}
+    ${collapsed ? "w-16" : "w-60"}
     ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
     lg:translate-x-0
   `}

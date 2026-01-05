@@ -1,32 +1,98 @@
 import { Link, useLocation } from "wouter";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
+
+import dummyProfile from "@/lib/images/dummy-Profile.webp"; 
 import { SidebarProps } from "@/lib/types";
-import { bottomTabs } from "@/lib/constant";
+import { bottomTabs, Constant } from "@/lib/constant";
 import { getActiveChild, isChildActive, isParentActive } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
 
 
 export default function Sidebar({
   collapsed,
   onClose,
+  roleName,
+  previewUrl,
 }: SidebarProps) {
+  const { user, isLoading, Logout, roles } = useAuth();
 
   const sidebarContext =
     localStorage.getItem("sidebar_active_parent");
   const [location, navigate] = useLocation();
   const [openParent, setOpenParent] = useState<string | null>(null);
-
+  const [roleView, setRoleView] = useState<{
+    store: boolean,
+    admin: boolean,
+    default: boolean
+  }>({
+    store: false,
+    admin: false,
+    default: false
+  });
+  useEffect(() => {
+    const supremeUserRoleList = ['admin', "super-admin"]
+    const managerList = ['store-manager']
+    const roleList = {
+      store: false,
+      admin: false,
+      default: false
+    }
+    managerList.find((manager) => manager === user?.role) ? roleList.store = true :
+      supremeUserRoleList.find((supremeUser) => supremeUser === user?.role) ? roleList.admin = true : roleList.default = true
+    setRoleView(roleList)
+  }, [user, roles])
   useEffect(() => {
     const active = bottomTabs.find((tab) =>
       isParentActive(tab, location, sidebarContext)
     );
     setOpenParent(active?.id ?? null);
   }, [location]);
+  
+  const filterTab = !roleView.store ? 
+  bottomTabs.map((item) => {
+    return item.path === '/store' ? 
+  { ...item, children: item.children?.filter((child) => child.path !== '/store-details') } 
+  : item
+  }) : bottomTabs
 
   return (
     <aside className="h-full bg-card border-r">
+         {/* ===== PROFILE (MOBILE + EXPANDED ONLY) ===== */}
+      {!collapsed && (
+        <div className="px-4 py-5 border-b border-border lg:hidden">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full overflow-hidden border">
+                <img
+                  src={
+                    previewUrl
+                      ? `${Constant.REACT_APP_BASE_URL}/${previewUrl}`
+                      : dummyProfile
+                  }
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <span
+                className={`absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-white
+                ${user?.is_active ? "bg-green-500" : "bg-red-500"}`}
+              />
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold leading-tight">
+                {user?.name ?? "—"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {roleName ?? "—"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <nav className="px-2 py-2 space-y-1">
-        {bottomTabs.map((tab) => {
+        {filterTab.map((tab) => {
           const Icon = tab.icon;
           const parentActive = isParentActive(
             tab,
@@ -66,6 +132,7 @@ export default function Sidebar({
                     : "text-muted-foreground hover:bg-muted"}
   `}
               >
+
                 <span className="w-6 h-6 flex items-center justify-center rounded-md bg-muted/40">
                   <Icon size={18} />
                 </span>

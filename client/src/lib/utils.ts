@@ -237,7 +237,9 @@ export function stripDiffMeta(meta: any) {
   return Object.keys(rest).length ? rest : null;
 }
 export function isChildActive(path: string, location: string,sidebarContext?: string | null) {
-  return (location === path || location.startsWith(path + "/") && sidebarContext !== 'store');
+  console.log(location,path,location === path , location.startsWith(path + "/") , location.includes(path),'location');
+  
+  return ((location === path || location.startsWith(path + "/") || location.includes(path)) && sidebarContext == 'stores');
 }
 
 export function isParentActive(
@@ -252,12 +254,12 @@ export function isParentActive(
   }
 
   // 2️⃣ Parent path match
-  if (location.startsWith(tab.path) && sidebarContext !== 'store') {
+  if (location.startsWith(tab.path) && sidebarContext !== 'stores') {
     return true;
   }
 
   // 3️⃣ Any child active
-  if (tab.children && sidebarContext !== 'store') {
+  if (tab.children && sidebarContext !== 'stores') {
     return tab.children.some((c: any) =>
       location.startsWith(c.path)
     );
