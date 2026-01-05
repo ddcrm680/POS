@@ -1,5 +1,5 @@
 import { useAuth } from "@/lib/auth";
-import { bottomTabs, defaultBottomTabs } from "@/lib/constant";
+import { bottomTabs, defaultBottomTabs, nonAdminTabs } from "@/lib/constant";
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 
@@ -22,7 +22,7 @@ export const BottomTabs = ({
     setIsDefaultView(!nonDefaultViewers.includes(user?.role));
   }, [user]);
 
-  const tabs = isDefaultView ? defaultBottomTabs : bottomTabs;
+  const tabs = isDefaultView ? defaultBottomTabs : nonAdminTabs;
 
   const sidebarContext =
     localStorage.getItem("sidebar_active_parent");

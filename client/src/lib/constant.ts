@@ -1,4 +1,4 @@
-import { ServiceItem, TabItem } from "./types";
+import { nonAdminTabsItem, ServiceItem, TabItem } from "./types";
 import {
   Home,
   Calculator,
@@ -127,6 +127,17 @@ export const STORE_MANAGEMENT_ROUTES = [
   "/master/stores",
   "/master/stores/manage",
 ];  
+export const nonAdminTabs: nonAdminTabsItem[] = [
+  { path: "/home", icon: Home, label: "Dashboard" },
+  { path: "/manager", icon: Settings, label: "Manager" },
+  { path: "/appointments", icon: Calendar, label: "Appointments" },
+  { path: "/facility-management", icon: Building, label: "Facility" },
+  { path: "/employee-management", icon: UserCheck, label: "Team" },
+  { path: "/job-cards", icon: ClipboardList, label: "Jobs", badge: 3 },
+  { path: "/customers", icon: Users, label: "Customers" },
+  { path: "/payments", icon: CreditCard, label: "Payments" },
+  { path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
+];
 export const bottomTabs: TabItem[] = [
   { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },
 

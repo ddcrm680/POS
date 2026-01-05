@@ -199,6 +199,14 @@ export interface POSLayoutProps {
   children: ReactNode;
 }
 
+export interface nonAdminTabsItem {
+  path: string;
+  icon: React.ComponentType<any>;
+  label: string;
+  defaultChildId?:string
+  badge?: number;
+   
+}
 export interface TabItem {
   id:string
   path: string;
