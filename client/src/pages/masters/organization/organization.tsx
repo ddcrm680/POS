@@ -19,6 +19,9 @@ import ServiceForm from "./organizationForm";
 import { organizationFormType, organizationMetaInfoType, serviceFormType, serviceMetaInfoType, UserFormType } from "@/lib/types";
 import OrganizationForm from "./organizationForm";
 import OrganizationView from "./organizationView";
+import { Constant } from "@/lib/constant";
+import building from "@/lib/images/building.webp";
+
 
 export default function Organization() {
   const { toast } = useToast();
@@ -33,6 +36,9 @@ export default function Organization() {
     type: 'create',
     info: {}
   });
+    const logoUrl = isOrganizationModalOpenInfo.info?.org_image
+    ? `${Constant.REACT_APP_BASE_URL}/${isOrganizationModalOpenInfo.info.org_image}`
+    : building;
   const [lastPage, setLastPage] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -80,7 +86,7 @@ export default function Organization() {
       key: "company_name",
       label: "Company Name",
       width: "150px",
-     
+
     },
     {
       key: "email", label: "Email", width: "150px",
@@ -143,7 +149,7 @@ export default function Organization() {
 
   const OrganizationStatusUpdateHandler = useCallback(async (u: any) => {
     try {
-      const newStatus = u.status ==='active' ? 'inactive' : "active" ;
+      const newStatus = u.status === 'active' ? 'inactive' : "active";
 
       setUsers(prevUsers => {
 
@@ -157,7 +163,7 @@ export default function Organization() {
         );
       });
 
-      await UpdateOrganizationStatus({ id: u.id,  });
+      await UpdateOrganizationStatus({ id: u.id, });
 
       toast({
         title: "Status Update",
@@ -175,124 +181,124 @@ export default function Organization() {
       });
     }
   }, []);
-const buildOrganizationFormData = (
-  value: organizationFormType,
-  id?: number
-) => {
-  const formData = new FormData();
+  const buildOrganizationFormData = (
+    value: organizationFormType,
+    id?: number
+  ) => {
+    const formData = new FormData();
 
-  if (id) {
-    formData.append("id", String(id));
-  }
-console.log(value,'valuevalue3');
+    if (id) {
+      formData.append("id", String(id));
+    }
+    console.log(value, 'valuevalue3');
 
-  // Company details
-  formData.append("company_name", value.company_name);
-  formData.append("company_name_in_bank", value.company_name_in_bank);
-  formData.append("email", value.email);
-  formData.append("company_gstin", value.company_gstin);
-  formData.append("company_pan_no", value.company_pan_no);
-  formData.append("aadhar_no", value.aadhar_no ?? "");
-  formData.append("org_address", value.org_address);
+    // Company details
+    formData.append("company_name", value.company_name);
+    formData.append("company_name_in_bank", value.company_name_in_bank);
+    formData.append("email", value.email);
+    formData.append("company_gstin", value.company_gstin);
+    formData.append("company_pan_no", value.company_pan_no);
+    formData.append("aadhar_no", value.aadhar_no ?? "");
+    formData.append("org_address", value.org_address);
 
-  // Bank details
-  formData.append("bank_name", value.bank_name);
-  formData.append("account_no", value.account_no);
-  formData.append("account_type", value.account_type ?? "");
-  formData.append("ifsc_code", value.ifsc_code);
-  formData.append("branch_name", value.branch_name ?? "");
-  formData.append("bank_address", value.bank_address);
+    // Bank details
+    formData.append("bank_name", value.bank_name);
+    formData.append("account_no", value.account_no);
+    formData.append("account_type", value.account_type ?? "");
+    formData.append("ifsc_code", value.ifsc_code);
+    formData.append("branch_name", value.branch_name ?? "");
+    formData.append("bank_address", value.bank_address);
 
-  // Invoice / Service
-  formData.append("invoice_prefix", value.invoice_prefix);
-  formData.append("service_prefix", value.service_prefix);
+    // Invoice / Service
+    formData.append("invoice_prefix", value.invoice_prefix);
+    formData.append("service_prefix", value.service_prefix);
 
-  // Location
-  formData.append("country", value.country.toString());
-  formData.append("state", value.state.toString());
-  formData.append("city", value.city.toString());
-  formData.append("district", value.district);
-  formData.append("pin_code", value.pin_code);
+    // Location
+    formData.append("country", value.country.toString());
+    formData.append("state", value.state.toString());
+    formData.append("city", value.city.toString());
+    formData.append("district", value.district);
+    formData.append("pin_code", value.pin_code);
 
-  // Document (important)
-  if (value.org_image instanceof File) {
-    formData.append("org_image", value.org_image);
-  }
-
-  return formData;
-};
-const OrganizationCommonHandler = async (
-  value: organizationFormType,
-  setError: UseFormSetError<organizationFormType>
-) => {
-  try {
-    setIsLoading(true);
-
-    if (isOrganizationModalOpenInfo.type === "edit") {
-      const formData = buildOrganizationFormData(
-        value,
-        isOrganizationModalOpenInfo.info.id
-      );
-
-      await EditOrganization(formData);
-
-      toast({
-        title: "Edit Organization",
-        description: "Organization updated successfully",
-        variant: "success",
-      });
-    } else {
-      const formData = buildOrganizationFormData(value);
-
-      await SaveOrganizations(formData);
-
-      toast({
-        title: "Add Organization",
-        description: "Organization added successfully",
-        variant: "success",
-      });
+    // Document (important)
+    if (value.org_image instanceof File) {
+      formData.append("org_image", value.org_image);
     }
 
-    setIsOrganizationModalOpenInfo({ open: false, type: "create", info: {} });
-    fetchOrganizations(false);
-  } catch (err: any) {
-    const apiErrors = err?.response?.data?.errors;
+    return formData;
+  };
+  const OrganizationCommonHandler = async (
+    value: organizationFormType,
+    setError: UseFormSetError<organizationFormType>
+  ) => {
+    try {
+      setIsLoading(true);
 
-    if (apiErrors && err?.response?.status === 422) {
-      Object.entries(apiErrors).forEach(([field, messages]) => {
-        setError(field as keyof organizationFormType, {
-          type: "server",
-          message: (messages as string[])[0],
+      if (isOrganizationModalOpenInfo.type === "edit") {
+        const formData = buildOrganizationFormData(
+          value,
+          isOrganizationModalOpenInfo.info.id
+        );
+
+        await EditOrganization(formData);
+
+        toast({
+          title: "Edit Organization",
+          description: "Organization updated successfully",
+          variant: "success",
         });
-      });
-      return;
-    }
+      } else {
+        const formData = buildOrganizationFormData(value);
 
-    toast({
-      title: "Error",
-      description:
-        err?.response?.data?.message ||
-        err.message ||
-        "Something went wrong",
-      variant: "destructive",
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
+        await SaveOrganizations(formData);
+
+        toast({
+          title: "Add Organization",
+          description: "Organization added successfully",
+          variant: "success",
+        });
+      }
+
+      setIsOrganizationModalOpenInfo({ open: false, type: "create", info: {} });
+      fetchOrganizations(false);
+    } catch (err: any) {
+      const apiErrors = err?.response?.data?.errors;
+
+      if (apiErrors && err?.response?.status === 422) {
+        Object.entries(apiErrors).forEach(([field, messages]) => {
+          setError(field as keyof organizationFormType, {
+            type: "server",
+            message: (messages as string[])[0],
+          });
+        });
+        return;
+      }
+
+      toast({
+        title: "Error",
+        description:
+          err?.response?.data?.message ||
+          err.message ||
+          "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
 
   const fetchOrganizations = async (isLoaderHide = false) => {
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      const res = 
-      await fetchOrganizationsList({
-        per_page: perPage,
-        page,
-        search,
-        status: filters.status,
-      });
+      const res =
+        await fetchOrganizationsList({
+          per_page: perPage,
+          page,
+          search,
+          status: filters.status,
+        });
 
       const mappedUsers = res.data
       setHasNext(res.meta.has_next)
@@ -394,36 +400,48 @@ const OrganizationCommonHandler = async (
         <CommonModal
           isOpen={isOrganizationModalOpenInfo.open}
           onClose={() => setIsOrganizationModalOpenInfo({ open: false, type: 'create', info: {} })}
-          title={isOrganizationModalOpenInfo.type === 'view' ? "View Organization" : isOrganizationModalOpenInfo.type === 'create' ? "Add Organization" : "Edit Organization"}
+          title={isOrganizationModalOpenInfo.type === 'view' ?  <div className="flex items-center gap-4">
+                  <div className="h-16 w-16 overflow-hidden rounded-full border bg-white">
+                    <img
+                      src={logoUrl}
+                      alt="Organization Logo"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold">{isOrganizationModalOpenInfo.info.company_name}</h2>
+                    <p className="text-sm text-muted-foreground">{isOrganizationModalOpenInfo.info.email}</p>
+                  </div>
+                </div> : isOrganizationModalOpenInfo.type === 'create' ? "Add Organization" : "Edit Organization"}
           isLoading={isLoading}
           primaryText={isOrganizationModalOpenInfo.type === 'create' ? "Add" : "Edit"}
           cancelTextClass='hover:bg-[#E3EDF6] hover:text-[#000]'
           primaryColor="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
         >
           {
-                      isOrganizationModalOpenInfo.type === 'view' ?
-                        <OrganizationView
-                          info={isOrganizationModalOpenInfo.info}
-                        />
-                        : 
-          <OrganizationForm
-            id="organization-form"
-            organizationMetaInfo={organizationMetaInfo}
-            initialValues={
-              isOrganizationModalOpenInfo.type === "edit" || isOrganizationModalOpenInfo.type === "view"
-                ? isOrganizationModalOpenInfo.info
-                : {}
-            }
-            isLoading={isLoading}
-            mode={isOrganizationModalOpenInfo.type === 'view' ? "view" : isOrganizationModalOpenInfo.type === "create" ? "create" : "edit"}
-            onClose={() =>
-              setIsOrganizationModalOpenInfo({ open: false, type: "create", info: {} })
-            }
-            roles={roles}
-            onSubmit={(values, setError) => {
-              OrganizationCommonHandler(values, setError);
-            }}
-          />}
+            isOrganizationModalOpenInfo.type === 'view' ?
+              <OrganizationView
+                info={isOrganizationModalOpenInfo.info}
+              />
+              :
+              <OrganizationForm
+                id="organization-form"
+                organizationMetaInfo={organizationMetaInfo}
+                initialValues={
+                  isOrganizationModalOpenInfo.type === "edit" || isOrganizationModalOpenInfo.type === "view"
+                    ? isOrganizationModalOpenInfo.info
+                    : {}
+                }
+                isLoading={isLoading}
+                mode={isOrganizationModalOpenInfo.type === 'view' ? "view" : isOrganizationModalOpenInfo.type === "create" ? "create" : "edit"}
+                onClose={() =>
+                  setIsOrganizationModalOpenInfo({ open: false, type: "create", info: {} })
+                }
+                roles={roles}
+                onSubmit={(values, setError) => {
+                  OrganizationCommonHandler(values, setError);
+                }}
+              />}
 
         </CommonModal>
       </CardContent>

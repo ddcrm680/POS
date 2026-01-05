@@ -3,15 +3,21 @@ export function Info({
   value,
   mono = false,
   link = false,
+  justify,
+  colon = true,
+  gap='gap-2'
 }: {
   label: string;
   value?: string;
   mono?: boolean;
   link?: boolean;
+  justify?: string
+  colon?: boolean
+  gap?:string
 }) {
   return (
-    <div className="flex gap-2">
-      <p className="text-gray-500 whitespace-nowrap">{`${label} :`} </p>
+    <div className={`flex ${gap}  ${justify ? justify : ""}`}>
+      <p className="text-gray-500 whitespace-nowrap">{`${label} ${colon ? ":" : ""}`} </p>
       {link ? (
         <a
           href={value}

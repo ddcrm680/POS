@@ -1,41 +1,39 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { EmptyState } from "@/components/common/emptyState";
-import { Info } from "@/components/common/viewInfo";
-import { Constant } from "@/lib/constant";
-import building from "@/lib/images/building.webp";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth";
 import { fetchStateList, fetchCityList } from "@/lib/api";
+import { Constant } from "@/lib/constant";
+import { Info } from "@/components/common/viewInfo";
 
-export default function OrganizationView({
-  info,
-}: {
-  info: any;
-}) {
+
+export default function OrganizationView({ info }: { info: any }) {
   const { countries } = useAuth();
 
   const [countryName, setCountryName] = useState("-");
   const [stateName, setStateName] = useState("-");
   const [cityName, setCityName] = useState("-");
 
-  /* ================= RESOLVE LOCATION NAMES ================= */
   useEffect(() => {
     if (!info || !countries?.length) return;
 
-    const country = countries.find(c => String(c.id) === String(info.country));
+    const country = countries.find(
+      (c) => String(c.id) === String(info.country)
+    );
     setCountryName(country?.name ?? "-");
 
     async function hydrate() {
       if (country?.id && info.state) {
         const states = await fetchStateList(country.id);
-        const state = states.find((s: any) => String(s.id) === String(info.state));
+        const state = states.find(
+          (s: any) => String(s.id) === String(info.state)
+        );
         setStateName(state?.name ?? "-");
 
         if (state?.id && info.city) {
           const cities = await fetchCityList(state.id);
-          const city = cities.find((c: any) => String(c.id) === String(info.city));
+          const city = cities.find(
+            (c: any) => String(c.id) === String(info.city)
+          );
           setCityName(city?.name ?? "-");
         }
       }
@@ -44,114 +42,85 @@ export default function OrganizationView({
     hydrate();
   }, [info, countries]);
 
-  if (!info) {
-    return <EmptyState message="No organization information found" />;
-  }
 
-  const logoUrl = info.org_image
-    ? `${Constant.REACT_APP_BASE_URL}/${info.org_image}`
-    : building;
 
   return (
-    <Card>
-      <CardContent className="p-4 space-y-4 overflow-auto max-h-[500px]">
-
-        {/* ================= HEADER / LOGO ================= */}
+    <div className="space-y-6 p-4">
+      {/* ================= HEADER ================= */}
 
 
-        {/* ================= BASIC INFO ================= */}
-        <section>
-          <div className="grid grid-cols-1 md:grid-cols-[0.5fr_1fr] gap-6 items-start">
-
-            {/* LOGO */}
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-24 h-24 rounded-full overflow-hidden border bg-muted">
-                <img
-                  src={logoUrl}
-                  alt="Organization Logo"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <p className="text-xs text-muted-foreground text-center leading-snug">
-                Allowed: JPG, JPEG, PNG, WEBP <br />
-                Max 1 MB
-              </p>
-            </div>
-
-            {/* DETAILS */}
-            <div className="space-y-4">
-
-              {/* ROW 1 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <Info label="Company Name" value={info.company_name} />
-                <Info label="Email" value={info.email} />
-              </div>
-
-              {/* ROW 2 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <Info label="Invoice Prefix" value={info.invoice_prefix} />
-                <Info label="Service Prefix" value={info.service_prefix} />
-              </div>
-
-            </div>
+      {/* ================= GRID ================= */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Company */}
+        <Card className="p-4">
+            <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+              Company Information
+            </CardTitle>
+          <div className="space-y-2">
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Company Name" value={info.company_name} />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Email" value={info.email} />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Invoice Prefix" value={info.invoice_prefix} />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Service Prefix" value={info.service_prefix} />
           </div>
-        </section>
+        </Card>
 
-        {/* ================= BANKING ================= */}
-        <section>
-          <h3 className="text-sm font-semibold mb-4 text-gray-700">
-            Banking Details
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <Info label="Company Name in Bank" value={info.company_name_in_bank} />
-            <Info label="Bank Name" value={info.bank_name} />
-            <Info label="Account No." value={info.account_no} mono />
-            <Info label="Account Type" value={info.account_type} />
-            <Info label="IFSC Code" value={info.ifsc_code} mono />
-            <Info label="Branch Name" value={info.branch_name} />
-                   </div>
-          
-          <div className="grid grid-cols-1 mt-4 gap-4 text-sm">
-            <Info label="Bank Address" value={info.bank_address} />
-  
+        {/* Banking */}
+        <Card className="p-4">
+            <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+              Banking Details
+            </CardTitle>
+          {/* <h3 className="mb-3 text-sm font-semibold">Banking Details</h3> */}
+          <div className="space-y-2">
+            
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Company Name In Bank" value={info.company_name_in_bank} />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Bank Name" value={info.bank_name} />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Account Type" value={info.account_type} />
+            <Info gap="gap-12" colon={false} justify="justify-between"
+              label="Account No."
+              value={info.account_no}
+              mono
+            />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="IFSC" value={info.ifsc_code} mono />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Branch" value={info.branch_name} />
+            
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Bank Address " value={info.bank_address} />
           </div>
-        </section>
+        </Card>
 
-        {/* ================= TAX ================= */}
-        <section>
-          <h3 className="text-sm font-semibold mb-4 text-gray-700">
-            Tax Information
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <Info label="Company GSTIN" value={info.company_gstin} mono />
-            <Info label="Company PAN No." value={info.company_pan_no} mono />
-            <Info label="Aadhaar No." value={info.aadhar_no} mono />
+        {/* Tax */}
+        <Card className="p-4">
+            <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+              Tax Information
+            </CardTitle>
+          <div className="space-y-2">
+            <Info gap="gap-12" colon={false} justify="justify-between" label="GSTIN" value={info.company_gstin} mono />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="PAN" value={info.company_pan_no} mono />
+            <Info gap="gap-12" colon={false} justify="justify-between"
+              label="Aadhaar"
+              value={info.aadhar_no}
+              mono
+            />
           </div>
-        </section>
+        </Card>
 
-        {/* ================= ADDRESS ================= */}
-        <section>
-          <h3 className="text-sm font-semibold mb-4 text-gray-700">
-            Address
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <Info label="Country" value={countryName} />
-            <Info label="State" value={stateName} />
-            <Info label="City" value={cityName} />
-            <Info label="District" value={info.district} />
-            <Info label="Pincode" value={info.pin_code} />
+        {/* Address */}
+        <Card className="p-4 lg:col-span-3">
+            <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+              Address
+            </CardTitle>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Country" value={countryName} />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="State" value={stateName} />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="City" value={cityName} />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="District" value={info.district} />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Pincode" value={info.pin_code} />
+            <Info gap="gap-12" colon={false} justify="justify-between" label="Full Address" value={info.org_address} />
+       
           </div>
 
-          <div className="grid grid-cols-1 mt-4 gap-4 text-sm">
-            <Info label="Company Address" value={info.org_address} />
-          </div>
-        </section>
-
-      </CardContent>
-    </Card>
+         
+        </Card>
+      </div>
+    </div>
   );
 }
