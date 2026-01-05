@@ -200,6 +200,7 @@ export interface POSLayoutProps {
 }
 
 export interface TabItem {
+  id:string
   path: string;
   icon: React.ComponentType<any>;
   label: string;

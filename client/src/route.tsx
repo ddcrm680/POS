@@ -28,6 +28,7 @@ import { useAuth } from "./lib/auth";
 import { useEffect, useState } from "react";
 import DefaultDashboard from "./pages/DashBoard/DefaultDashboard";
 import StoreDetails from "./pages/storeDetails/storeDetails";
+import Store from "./pages/masters/store/store";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -47,6 +48,8 @@ export function Router() {
       <Route path="/store-details" component={() => <ProtectedRoute component={StoreDetails} />} />
       <Route path="/profile" component={() => <ProtectedRoute component={ProfileDetails} />} />
       <Route path="/master" component={() => <ProtectedRoute component={Master} 
+      />} />
+        <Route path="/store" component={() => <ProtectedRoute component={Store} 
       />} />
        <Route path="/master/territory/manage" component={() => <ProtectedRoute component={TerritoryMasterForm} />} />
   

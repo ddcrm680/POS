@@ -12,12 +12,14 @@ import SystemLog from "./systemLog/systemLog";
 import TerritoryMaster from "./territoryMaster.tsx/territoryMaster";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { useLocation } from "wouter";
 
 const MASTER_TAB_KEY = "master_active_tab";
 
 export default function Master() {
-  const [activeTab, setActiveTab] = useState<string>("users");
+  const [activeTab, setActiveTab] = useState<string>("store");
   const { user, } = useAuth();
+  const [location] = useLocation();
   const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
   useEffect(() => {
     setIsSuperAdmin(user?.role === Constant.superAdmin)
@@ -27,6 +29,14 @@ export default function Master() {
     const savedTab = localStorage.getItem(MASTER_TAB_KEY);
     if (savedTab) {
       setActiveTab(savedTab);
+    }
+    return () => {
+      const isOnMasterRoute = location.startsWith("/master");
+      console.log(isOnMasterRoute, 'isOnMasterRoute');
+
+      if (!isOnMasterRoute) {
+        setActiveTab("store")
+      }
     }
   }, []);
 
@@ -63,7 +73,7 @@ text-lg font-semibold
                       value={tab.id}
                       className="
     flex items-center gap-2
-    whitespace-nowrap px-1 py-2
+    whitespace-nowrap px-2 py-2
     transition-all duration-200
 
     hover:bg-muted

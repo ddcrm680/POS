@@ -70,9 +70,13 @@ export default function Sidebar({
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active =
-            location === tab.path ||
+            location.startsWith(tab.path) ||
             (tab.path !== "/" && location.startsWith(tab.path));
-
+            console.log(tab,'sdfghgfdsad');
+            
+          if (tab.id !== 'master' && !location.startsWith('/master')) {
+            localStorage.removeItem('master_active_tab');
+          }
           return (
             <Link key={tab.path} href={tab.path}>
               <div className="relative group">
@@ -82,10 +86,9 @@ export default function Sidebar({
                     relative w-full flex items-center gap-3
                     px-3 py-2.5 rounded-lg text-sm font-medium
                     transition-all duration-200
-                    ${
-                      active
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                    ${active
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                     }
                   `}
                 >
@@ -100,10 +103,9 @@ export default function Sidebar({
                       flex items-center justify-center
                       w-6 h-6 rounded-md
                       transition
-                      ${
-                        active
-                          ? "bg-primary/15 text-primary"
-                          : "bg-muted/40 group-hover:bg-muted"
+                      ${active
+                        ? "bg-primary/15 text-primary"
+                        : "bg-muted/40 group-hover:bg-muted"
                       }
                     `}
                   >

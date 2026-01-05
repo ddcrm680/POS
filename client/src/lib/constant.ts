@@ -29,7 +29,7 @@ import {
 export const Constant = {
   REACT_APP_BASE_URL: 'https://pos.detailingdevils.com',
   REACT_APP_API_TIMEOUT: 30000,
-  superAdmin:"super-admin",
+  superAdmin: "super-admin",
   REACT_APP_API_RETRY_COUNT: 2,
   login: {
     logoUrl: "https://mycrm.detailingdevils.com/assets/images/logo.png",
@@ -80,8 +80,8 @@ export const Constant = {
       notesPlaceholder: "Enter notes",
       GSTIN: "Enter GSTIN",
       PANPlaceholder: "Enter PAN number",
-         phonePlaceholder: "Enter phone",
-         locationNamePlaceholder: "Enter location name",
+      phonePlaceholder: "Enter phone",
+      locationNamePlaceholder: "Enter location name",
     }
   },
 }
@@ -117,20 +117,23 @@ export const availableServices: ServiceItem[] = [
 ];
 
 export const bottomTabs: TabItem[] = [
-  { path: "/home", icon: Home, label: "Dashboard" },
-  { path: "/master", icon: Layers, label: "Master", },
-  { path: "/manager", icon: Settings, label: "Manager" },
-  { path: "/appointments", icon: Calendar, label: "Appointments" },
-  { path: "/facility-management", icon: Building, label: "Facility" },
-  { path: "/employee-management", icon: UserCheck, label: "Team" },
-  { path: "/job-cards", icon: ClipboardList, label: "Jobs", badge: 3 },
-  { path: "/customers", icon: Users, label: "Customers" },
-  { path: "/payments", icon: CreditCard, label: "Payments" },
-  { path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
+  { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },
+
+  { id: "store", path: "/store", icon: Store, label: "Store" },
+  { id: "master", path: "/master", icon: Layers, label: "Master" },
+
+  { id: "manager", path: "/manager", icon: Settings, label: "Manager" },
+  { id: "appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
+  { id: "facility", path: "/facility-management", icon: Building, label: "Facility" },
+  { id: "team", path: "/employee-management", icon: UserCheck, label: "Team" },
+  { id: "jobs", path: "/job-cards", icon: ClipboardList, label: "Jobs", badge: 3 },
+  { id: "customers", path: "/customers", icon: Users, label: "Customers" },
+  { id: "payments", path: "/payments", icon: CreditCard, label: "Payments" },
+  { id: "inventory", path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
 ];
 export const defaultBottomTabs: TabItem[] = [
-  { path: "/home", icon: Home, label: "Dashboard" },
- 
+  { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },
+
 ];
 
 export const quickActions = [
@@ -139,44 +142,50 @@ export const quickActions = [
   { id: "inventory-check", label: "Stock Check", emoji: "📦", color: "bg-orange-600 hover:bg-orange-700" },
 ];
 export const masterTabList = [
-  { id: "users", label: "Users", emoji: Users, color: "bg-blue-600 hover:bg-blue-700" },
-  { id: "vehicleMaster", label: "Vehicle Master", emoji: Car, color: "bg-blue-600 hover:bg-blue-700" },
-  { id: "servicePlan", label: "Service Plan", emoji: Wrench, color: "bg-blue-600 hover:bg-blue-700" },
-  { id: "organization", label: "Organization", emoji: Building, color: "bg-blue-600 hover:bg-blue-700" },
   { id: "store", label: "Store", emoji: Store, color: "bg-blue-600 hover:bg-blue-700" },
-  { id: "systemLog", label: "System Log",  emoji: FileText , color: "bg-blue-600 hover:bg-blue-700" },
-  { id: "territoryMaster", label: "Territory Master",  emoji: MapPinned  , color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "servicePlan", label: "Service Plan", emoji: Wrench, color: "bg-blue-600 hover:bg-blue-700" },
+
+  { id: "users", label: "Users", emoji: Users, color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "organization", label: "Organization", emoji: Building, color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "territoryMaster", label: "Territory Master", emoji: MapPinned, color: "bg-blue-600 hover:bg-blue-700" },
+
+  { id: "vehicleMaster", label: "Vehicle Master", emoji: Car, color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "systemLog", label: "System Log", emoji: FileText, color: "bg-blue-600 hover:bg-blue-700" },
+
 ];
-export const profileMenu=[
-{
-  value:"overview",
-  dataTestId:"tab-overview",
-  label:"Overview",
-  emoji: BarChart3
-},
-{
-  value:"password",
-  dataTestId:"tab-vehicles",
-  label:"Password",
-  emoji: Key
-}
+export const profileMenu = [
+  {
+    value: "overview",
+    dataTestId: "tab-overview",
+    label: "Overview",
+    emoji: BarChart3
+  },
+  {
+    value: "password",
+    dataTestId: "tab-vehicles",
+    label: "Password",
+    emoji: Key
+  }
 ];
 
-export const storeFormKeys={
-  file:[
-    {label:'PAN card file',
-      key:'pan_card_file'
+export const storeFormKeys = {
+  file: [
+    {
+      label: 'PAN card file',
+      key: 'pan_card_file'
     },
-    {label:'Registration file',
-      key:'registration_file'
+    {
+      label: 'Registration file',
+      key: 'registration_file'
     },
-    {label:'GST file',
-      key:'gstin_file'
+    {
+      label: 'GST file',
+      key: 'gstin_file'
     },
-  
+
   ],
-  billingTaxFieldList:[{ label: "Invoice prefix", fieldName: "invoice_prefix" },
-                  { label: "GSTIN", fieldName: "gst_no" },
-                  { label: "PAN number", fieldName: "pan_no" }
-                  ]
+  billingTaxFieldList: [{ label: "Invoice prefix", fieldName: "invoice_prefix" },
+  { label: "GSTIN", fieldName: "gst_no" },
+  { label: "PAN number", fieldName: "pan_no" }
+  ]
 }
