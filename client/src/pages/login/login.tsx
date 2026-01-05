@@ -41,6 +41,7 @@ export default function LoginPage() {
 
     if (!isLoading && user) {
       setLocation("/home");
+      localStorage.removeItem('sidebar_active_parent')
     }
   }, [isLoading, user, setLocation]);
 
