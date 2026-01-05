@@ -51,9 +51,13 @@ export function Router() {
       />} />
         <Route path="/store" component={() => <ProtectedRoute component={Store} 
       />} />
+      {/* <Route path="/master/stores" component={() => <ProtectedRoute component={Store} 
+      />} /> */}
        <Route path="/master/territory/manage" component={() => <ProtectedRoute component={TerritoryMasterForm} />} />
   
       <Route path="/master/stores/manage" component={() => <ProtectedRoute component={StoreFormHandler} />} />
+      
+      {/* <Route path="/test" component={() => <ProtectedRoute component={ManagerDashboard} />} /> */}
       <Route path="/manager" component={() => <ProtectedRoute component={ManagerDashboard} />} />
       <Route path="/customers" component={() => <ProtectedRoute component={Customers} />} />
       <Route path="/job-cards" component={() => <ProtectedRoute component={JobCards} />} />

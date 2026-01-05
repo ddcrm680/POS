@@ -120,9 +120,21 @@ export const bottomTabs: TabItem[] = [
   { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },
 
   { id: "store", path: "/store", icon: Store, label: "Store" },
-  { id: "master", path: "/master", icon: Layers, label: "Master" },
+  {
+    id: "master",
+    path: "/master",
+    icon: Layers,
+    label: "Master",
+    // defaultChildId: "master-store",
+    // children: [
+    //   { id: "master-manager", path: "/test", label: "Manager" },
+    //   { id: "master-store", path: "/master/stores", label: "Store" },
+    // ],
+  },
 
-  { id: "manager", path: "/manager", icon: Settings, label: "Manager" },
+  { id: "manager", path: "/manager", icon: Settings, label: "Manager" ,
+     
+  },
   { id: "appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
   { id: "facility", path: "/facility-management", icon: Building, label: "Facility" },
   { id: "team", path: "/employee-management", icon: UserCheck, label: "Team" },

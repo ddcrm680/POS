@@ -204,7 +204,13 @@ export interface TabItem {
   path: string;
   icon: React.ComponentType<any>;
   label: string;
+  defaultChildId?:string
   badge?: number;
+    children?: {
+    id: string;
+    path: string;
+    label: string;
+  }[];
 }
 export interface CustomerAnalyticsOverview {
   totalCustomers: number;
@@ -625,4 +631,14 @@ type FloatingPasswordFieldProps = {
   label: string;
   control: Control<any>;
   isRequired?: boolean;
+};
+
+export type SidebarProps = {
+  location: string;
+  collapsed: boolean;
+  onClose?: () => void;
+  user?: any;
+  roleName?: string;
+  previewUrl?: string | null;
+
 };

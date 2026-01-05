@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { FloatingRHFSelectProps, GroupedOption, Option } from "./types";
+import { FloatingRHFSelectProps, GroupedOption, Option, SidebarProps, TabItem } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -235,4 +235,18 @@ export function stripDiffMeta(meta: any) {
 
   const { before, after, ...rest } = meta;
   return Object.keys(rest).length ? rest : null;
+}
+export function isChildActive(path: string, location: string) {
+  return location === path || location.startsWith(path + "/");
+}
+
+export function isParentActive(tab: any, location: string) {
+  if (location.startsWith(tab.path)) return true;
+  return tab.children?.some((c: any) => isChildActive(c.path, location));
+}
+
+export function getActiveChild(tab: any, location: string) {
+  return tab.children?.find((c: any) =>
+    isChildActive(c.path, location)
+  );
 }
