@@ -44,6 +44,8 @@ export default function Master() {
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     localStorage.setItem(MASTER_TAB_KEY, value);
+    
+  localStorage.setItem("sidebar_active_parent", "master");
   };
 
   return (

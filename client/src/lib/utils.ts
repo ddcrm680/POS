@@ -236,17 +236,38 @@ export function stripDiffMeta(meta: any) {
   const { before, after, ...rest } = meta;
   return Object.keys(rest).length ? rest : null;
 }
-export function isChildActive(path: string, location: string) {
-  return location === path || location.startsWith(path + "/");
+export function isChildActive(path: string, location: string,sidebarContext?: string | null) {
+  return (location === path || location.startsWith(path + "/") && sidebarContext !== 'store');
 }
 
-export function isParentActive(tab: any, location: string) {
-  if (location.startsWith(tab.path)) return true;
-  return tab.children?.some((c: any) => isChildActive(c.path, location));
-}
+export function isParentActive(
+  tab: any,
+  location: string,
+  sidebarContext?: string | null
+) {
+  // 1️⃣ Context wins (explicit navigation intent)
+  console.log(sidebarContext,tab.id,'sidebarContext');
+  
+  if (sidebarContext && sidebarContext === tab.id) {
+    return true;
+  }
 
-export function getActiveChild(tab: any, location: string) {
+  // 2️⃣ Parent path match
+  if (location.startsWith(tab.path) && sidebarContext !== 'store') {
+    return true;
+  }
+
+  // 3️⃣ Any child active
+  if (tab.children && sidebarContext !== 'store') {
+    return tab.children.some((c: any) =>
+      location.startsWith(c.path)
+    );
+  }
+
+  return false;
+}
+export function getActiveChild(tab: any, location: string,sidebarContext?: string | null) {
   return tab.children?.find((c: any) =>
-    isChildActive(c.path, location)
+    isChildActive(c.path, location,sidebarContext)
   );
 }

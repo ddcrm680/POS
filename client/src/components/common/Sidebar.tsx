@@ -10,12 +10,15 @@ export default function Sidebar({
   collapsed,
   onClose,
 }: SidebarProps) {
+
+  const sidebarContext =
+    localStorage.getItem("sidebar_active_parent");
   const [location, navigate] = useLocation();
   const [openParent, setOpenParent] = useState<string | null>(null);
 
   useEffect(() => {
     const active = bottomTabs.find((tab) =>
-      isParentActive(tab, location)
+      isParentActive(tab, location, sidebarContext)
     );
     setOpenParent(active?.id ?? null);
   }, [location]);
@@ -25,18 +28,26 @@ export default function Sidebar({
       <nav className="px-2 py-2 space-y-1">
         {bottomTabs.map((tab) => {
           const Icon = tab.icon;
-          const parentActive = isParentActive(tab, location);
+          const parentActive = isParentActive(
+            tab,
+            location,
+            sidebarContext
+          );
           const expanded = openParent === tab.id;
-
+          if (tab.id !== 'master' && !location.startsWith('/master')) {
+            localStorage.removeItem('master_active_tab');
+          }
           return (
             <div key={tab.id}>
               {/* ===== PARENT ===== */}
               <button
                 onClick={() => {
+                  localStorage.setItem("sidebar_active_parent", tab.id);
+
                   if (tab.children) {
 
                     setOpenParent(expanded ? null : tab.id);
-                    const activeChild = getActiveChild(tab, location);
+                    const activeChild = getActiveChild(tab, location, sidebarContext);
                     const target =
                       activeChild?.path ||
                       tab.children.find(c => c.id === tab.defaultChildId)?.path;
@@ -79,7 +90,7 @@ export default function Sidebar({
               {!collapsed && tab.children && expanded && (
                 <div className="ml-9 mt-1 space-y-1">
                   {tab.children.map((child) => {
-                    const childActive = isChildActive(child.path, location);
+                    const childActive = isChildActive(child.path, location, sidebarContext ?? "");
 
                     return (
                       <Link key={child.id} href={child.path}>
