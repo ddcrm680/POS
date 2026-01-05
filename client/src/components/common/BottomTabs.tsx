@@ -24,6 +24,8 @@ export const BottomTabs = ({
 
   const tabs = isDefaultView ? defaultBottomTabs : bottomTabs;
 
+  const sidebarContext =
+    localStorage.getItem("sidebar_active_parent");
   return (
     <div
       className={
@@ -35,10 +37,11 @@ export const BottomTabs = ({
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive =
-          location === tab.path ||
-          (tab.path !== "/" && location.startsWith(tab.path));
+         ( location === tab.path ||
+          (tab.path !== "/" && location.startsWith(tab.path))) && sidebarContext!=='store-details'
 
         const handleClick = () => {
+           localStorage.removeItem("sidebar_active_parent");
           if (tab.path === "/master") {
             localStorage.removeItem("master_active_tab");
           }

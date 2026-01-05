@@ -246,7 +246,6 @@ export function isParentActive(
   sidebarContext?: string | null
 ) {
   // 1️⃣ Context wins (explicit navigation intent)
-  console.log(sidebarContext,tab.id,'sidebarContext');
   
   if (sidebarContext && sidebarContext === tab.id) {
     return true;
