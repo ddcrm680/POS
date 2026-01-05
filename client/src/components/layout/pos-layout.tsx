@@ -49,6 +49,8 @@ export default function POSLayout({ children }: { children: ReactNode }) {
   }, [user]);
 
   const [, navigate] = useLocation();
+  
+  const navigation = useLocation();
   const [roleView, setRoleView] = useState<{
     store: boolean,
     admin: boolean,
@@ -189,8 +191,9 @@ export default function POSLayout({ children }: { children: ReactNode }) {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" /> Profile
+              <DropdownMenuItem data-testid="menu-profile" onClick={() => { navigation[1]('/profile'); }}>
+                <User className="mr-2 h-4 w-4" />
+                Profile
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" /> Settings
