@@ -63,10 +63,7 @@ export default function Store() {
       key: "email", label: "Email", width: "150px",
 
     },
-    {
-      key: "phone", label: "Phone", width: "150px",
-
-    },
+   
     {
       key: "territory_id", label: "Location", width: "150px",
     },
