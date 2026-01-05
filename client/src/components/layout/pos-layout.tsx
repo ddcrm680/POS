@@ -96,7 +96,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
     <div className="h-screen flex flex-col bg-background overflow-hidden">
 
       {/* ================= HEADER (FULL WIDTH) ================= */}
-      <header className="h-[68px] bg-card border-b border-border shadow-sm flex items-center justify-between px-4 md:px-6 shrink-0">
+      <header className="h-[50px] bg-card border-b border-border shadow-sm flex items-center justify-between px-4 md:px-6 shrink-0">
 
         {/* LEFT */}
         <div className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
             <Menu />
           </Button>
 
-          <img src={Logo} alt="Detailing Devils" className="h-8" />
+          <img src={Logo} alt="Detailing Devils" className="h-6" />
 
           <Button
             variant="ghost"
@@ -133,16 +133,31 @@ export default function POSLayout({ children }: { children: ReactNode }) {
         {/* CENTER */}
         {roleView.store && <div className="hidden lg:flex items-center gap-3">
           {quickActions.map((action) => (
-            <Button
-              key={action.id}
-              className={`pos-quick-action flex flex-col gap-1 h-14 px-4 text-white ${action.color}`}
-              onClick={() => handleQuickAction(action.id)}
-              data-testid={`quick-action-${action.id}`}
-            >
-              <span className="text-lg">{action.emoji}</span>
-              <span className="text-xs font-medium leading-none">{action.label}</span>
-            </Button>
-          ))}
+  <button
+    key={action.id}
+    onClick={() => handleQuickAction(action.id)}
+    className={`
+      group flex items-center gap-1.5
+      h-7 px-3 rounded-[8px]
+      py-2
+      text-xs font-medium text-white
+      transition
+      ${action.color}
+
+      hover:brightness-110
+      active:scale-[0.97]
+    `}
+  >
+    <span className="text-[13px] leading-none">
+      {action.emoji}
+    </span>
+
+    <span className="leading-none">
+      {action.label}
+    </span>
+  </button>
+))}
+
         </div>
         }
 
@@ -160,8 +175,8 @@ export default function POSLayout({ children }: { children: ReactNode }) {
     focus-visible:ring-offset-0
     active:bg-transparent
   ">
-            <Bell size={18} />
-            <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">
+            <Bell size={16} />
+            <span className="absolute top-2 right-2 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white flex items-center justify-center">
               3
             </span>
           </Button>
@@ -174,7 +189,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
     focus-visible:ring-0
     focus-visible:ring-offset-0
     active:bg-transparent    flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full overflow-hidden border">
+                <div className="w-7 h-7 rounded-full overflow-hidden border">
                   <img
                     src={
                       previewUrl
@@ -185,7 +200,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
                   />
                 </div>
                 <div className="hidden lg:block text-left">
-                  <p className="font-medium  text-foreground text-sm leading-tight" data-testid="cashier-name">{userInfo?.name ?? "-"}</p>
+                  <p className="font-small  text-foreground text-sm leading-tight" data-testid="cashier-name">{userInfo?.name ?? "-"}</p>
                   <p className="text-muted-foreground text-xs leading-tight">{roleList && roleList.length > 0 ? roleList.find((role: { name: string, id: number, slug: string }) => role.slug === userInfo?.role)?.name : "-"}</p>
                 </div>              </Button>
             </DropdownMenuTrigger>
