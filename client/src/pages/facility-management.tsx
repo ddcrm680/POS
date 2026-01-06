@@ -406,7 +406,7 @@ export default function FacilityManagement() {
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                <h1 className="text-xl font-semibold">
                   Facility Management
                 </h1>
                 <p className="text-muted-foreground">

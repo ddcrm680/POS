@@ -29,6 +29,7 @@ import { useEffect, useState } from "react";
 import DefaultDashboard from "./pages/DashBoard/DefaultDashboard";
 import StoreDetails from "./pages/storeDetails/storeDetails";
 import Store from "./pages/masters/store/store";
+import StoreList from "./pages/masters/store/storeList";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -49,7 +50,7 @@ export function Router() {
       <Route path="/profile" component={() => <ProtectedRoute component={ProfileDetails} />} />
       <Route path="/master" component={() => <ProtectedRoute component={Master} 
       />} />
-        <Route path="/stores" component={() => <ProtectedRoute component={Store} 
+        <Route path="/stores" component={() => <ProtectedRoute component={StoreList} 
       />} />
       {/* <Route path="/master/stores" component={() => <ProtectedRoute component={Store} 
       />} /> */}
