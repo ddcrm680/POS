@@ -35,7 +35,7 @@ export function initRealtimeNotifications(
   });
 
   const channelName = `private-App.Models.User.${userId}`;
- //console.log("📡 Subscribing to:", channelName);
+ console.log("📡 Subscribing to:", channelName);
 
   const channel = pusher.subscribe(channelName);
 
