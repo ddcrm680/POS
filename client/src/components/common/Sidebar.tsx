@@ -14,13 +14,11 @@ export default function Sidebar({
   collapsed,
   onClose,
   roleName,
+  setIsUserLogoutModalOpenInfo,
   previewUrl,
 }: SidebarProps) {
   const { user, isLoading, Logout, roles } = useAuth();
- const [isUserLogoutModalInfo, setIsUserLogoutModalOpenInfo] = useState<{ open: boolean, info: any }>({
-    open: false,
-    info: {}
-  });
+
 
   const sidebarContext =
     localStorage.getItem("sidebar_active_parent");
@@ -203,7 +201,7 @@ export default function Sidebar({
       <div className="mt-auto px-2 py-2 border-t border-border">
         <button
         >
-          <div onClick={()=>{setIsUserLogoutModalOpenInfo({info:{},open:true})}}
+          <div onClick={() => { setIsUserLogoutModalOpenInfo({ info: {}, open: true }) }}
             className="
       w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
       text-sm font-medium
@@ -214,22 +212,8 @@ export default function Sidebar({
             <LogOut className="mr-2 h-4 w-4" /> Logout</div>
         </button>
       </div>
-       <CommonDeleteModal
-                width="420px"
-                maxWidth="420px"
-                isOpen={isUserLogoutModalInfo.open}
-                title="Logout"
-                loadingText="Logging out..."
-                description={`Are you sure you want to logout?`}
-                confirmText="Yes"
-                cancelText="Cancel"
-                isLoading={isLoading}
-                onCancel={() =>
-                  setIsUserLogoutModalOpenInfo({ open: false, info: {} })
-                }
-                onConfirm={handleLogout}
-              />
-      
+
+
     </aside>
   );
 }

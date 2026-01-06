@@ -4,6 +4,7 @@ import { cookieStore } from "./cookie";
 import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, storeFormType, TerritoryFormRequestValues, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
 import { DateRangeType, DateValueType } from "react-tailwindcss-datepicker";
 import { setServiceDown } from "./systemStatus";
+import { mockNotifications } from "./mockData";
 
 export const baseUrl =
   process.env.REACT_APP_BASE_URL || Constant.REACT_APP_BASE_URL;
@@ -792,4 +793,93 @@ export async function UpdateTerritoryStatus(statusInfo: { id: number, }) {
     throw response
 
   }
+}
+
+// export async function fetchNotifications() {
+//   const response: any = await api.get(
+//     "/api/notifications",
+
+//   );
+//   if (response?.data?.success === true) {
+//     return response.data?.data ?? [];
+//   }
+//   throw new Error(response.data?.message || "Failed to fetch user");
+// }
+
+// export async function fetchUnreadNotificationCount() {
+//   const response: any = await api.get(
+//     "/api/notifications/unread-count",
+
+//   );
+//   if (response?.data?.success === true) {
+//     return response.data?.count ?? 0;
+//   }
+//   throw new Error(response.data?.message || "Failed to fetch user");
+// }
+
+// export async function  markNotificationRead(id: string) {
+
+//   try {
+//     const response: any = await api.post(
+//       `/api/notifications/${id}/read`
+//     );
+//     if (response?.data?.success === true) {
+//       return response.data?.data;
+//     }
+
+//   } catch (response: any) {
+//     throw response
+
+//   }
+// }
+// export async function markAllNotificationsRead() {
+
+//   try {
+//     const response: any = await api.post(
+//       `/api/notifications/read-all`
+//     );
+//     if (response?.data?.success === true) {
+//       return response.data?.data;
+//     }
+
+//   } catch (response: any) {
+//     throw response
+
+//   }
+// }
+
+let notifications = [...mockNotifications];
+
+export async function fetchNotifications() {
+  return new Promise<any[]>((resolve) => {
+    setTimeout(() => resolve([...notifications]), 400);
+  });
+}
+
+export async function fetchUnreadNotificationCount() {
+  return new Promise<number>((resolve) => {
+    setTimeout(
+      () => resolve(notifications.filter((n) => !n.is_read).length),
+      200
+    );
+  });
+}
+
+export async function markNotificationRead(id: string) {
+  return new Promise((resolve) => {
+    notifications = notifications.map((n) =>
+      n.id === id ? { ...n, is_read: true } : n
+    );
+    setTimeout(resolve, 200);
+  });
+}
+
+export async function markAllNotificationsRead() {
+  return new Promise((resolve) => {
+    notifications = notifications.map((n) => ({
+      ...n,
+      is_read: true,
+    }));
+    setTimeout(resolve, 200);
+  });
 }

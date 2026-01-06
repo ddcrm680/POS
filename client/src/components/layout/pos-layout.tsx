@@ -24,11 +24,16 @@ import { useAuth } from "@/lib/auth";
 import { Constant, quickActions } from "@/lib/constant";
 import { BottomTabs } from "../common/BottomTabs";
 import Sidebar from "../common/Sidebar";
+import CommonDeleteModal from "../common/CommonDeleteModal";
+import NotificationDropdown from "../common/NotificationDropdown";
 
 export default function POSLayout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const { user, isLoading, Logout, roles } = useAuth();
-
+  const [isUserLogoutModalInfo, setIsUserLogoutModalOpenInfo] = useState<{ open: boolean, info: any }>({
+    open: false,
+    info: {}
+  });
   const [userInfo, setUserInfo] = useState<any>();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -49,7 +54,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
   }, [user]);
 
   const [, navigate] = useLocation();
-  
+
   const navigation = useLocation();
   const [roleView, setRoleView] = useState<{
     store: boolean,
@@ -133,10 +138,10 @@ export default function POSLayout({ children }: { children: ReactNode }) {
         {/* CENTER */}
         {roleView.store && <div className="hidden lg:flex items-center gap-3">
           {quickActions.map((action) => (
-  <button
-    key={action.id}
-    onClick={() => handleQuickAction(action.id)}
-    className={`
+            <button
+              key={action.id}
+              onClick={() => handleQuickAction(action.id)}
+              className={`
       group flex items-center gap-1.5
       h-7 px-3 rounded-[8px]
       py-2
@@ -147,23 +152,24 @@ export default function POSLayout({ children }: { children: ReactNode }) {
       hover:brightness-110
       active:scale-[0.97]
     `}
-  >
-    <span className="text-[13px] leading-none">
-      {action.emoji}
-    </span>
+            >
+              <span className="text-[13px] leading-none">
+                {action.emoji}
+              </span>
 
-    <span className="leading-none">
-      {action.label}
-    </span>
-  </button>
-))}
+              <span className="leading-none">
+                {action.label}
+              </span>
+            </button>
+          ))}
 
         </div>
         }
 
         {/* RIGHT */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="
+          <NotificationDropdown />
+          {/* <Button variant="ghost" size="icon" className="
     pos-touch-target
     gap-0
     relative
@@ -179,7 +185,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
             <span className="absolute top-2 right-2 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white flex items-center justify-center">
               3
             </span>
-          </Button>
+          </Button> */}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -214,18 +220,18 @@ export default function POSLayout({ children }: { children: ReactNode }) {
                 <Settings className="mr-2 h-4 w-4" /> Settings
               </DropdownMenuItem>
 
-              {roleView.store && <DropdownMenuItem data-testid="menu-store-details" onClick={() => { 
+              {roleView.store && <DropdownMenuItem data-testid="menu-store-details" onClick={() => {
                 localStorage.setItem("sidebar_active_parent", 'store-details');
 
-                navigate(`/master/stores/manage?id=${user?.store_id}&mode=store-detail-view`) 
-                }} >
+                navigate(`/master/stores/manage?id=${user?.store_id}&mode=store-detail-view`)
+              }} >
                 <Store className="mr-2 h-4 w-4" />
                 Store Details
               </DropdownMenuItem>}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive"
-                onClick={handleLogout}
+                onClick={() => { setIsUserLogoutModalOpenInfo({ info: {}, open: true }) }}
               >
                 <LogOut className="mr-2 h-4 w-4" /> Logout
               </DropdownMenuItem>
@@ -259,6 +265,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
         >
           <Sidebar
             location={location}
+            setIsUserLogoutModalOpenInfo={setIsUserLogoutModalOpenInfo}
             collapsed={collapsed}
             onClose={() => setMobileOpen(false)}
             user={user}
@@ -289,6 +296,21 @@ export default function POSLayout({ children }: { children: ReactNode }) {
           </div>
         </nav>
       )}
+      <CommonDeleteModal
+        width="420px"
+        maxWidth="420px"
+        isOpen={isUserLogoutModalInfo.open}
+        title="Logout"
+        loadingText="Logging out..."
+        description={`Are you sure you want to logout?`}
+        confirmText="Yes"
+        cancelText="Cancel"
+        isLoading={isLoading}
+        onCancel={() =>
+          setIsUserLogoutModalOpenInfo({ open: false, info: {} })
+        }
+        onConfirm={handleLogout}
+      />
     </div>
   );
 }

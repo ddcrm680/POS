@@ -641,13 +641,26 @@ type FloatingPasswordFieldProps = {
   control: Control<any>;
   isRequired?: boolean;
 };
-
+export type UserLogoutModalState = {
+  info: Record<string, any>; // or a proper interface if you know the shape
+  open: boolean;
+};
 export type SidebarProps = {
   location: string;
   collapsed: boolean;
+   setIsUserLogoutModalOpenInfo: React.Dispatch<
+    React.SetStateAction<UserLogoutModalState>
+  >
   onClose?: () => void;
   user?: any;
   roleName?: string;
   previewUrl?: string | null;
 
+};
+export type Notification = {
+  id: string;
+  title: string;
+  message: string;
+  created_at: string;
+  is_read: boolean;
 };

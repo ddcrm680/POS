@@ -577,3 +577,38 @@ export const tiles = [
     description: "View analytics",
   },
 ];
+
+export const mockNotifications = [
+  {
+    id: "1",
+    title: "New Job Created",
+    message: "A new job card was created for Customer John Doe",
+    is_read: false,
+    created_at: new Date(Date.now() - 2 * 60 * 1000).toISOString(), // 2 min ago
+    type: "job",
+  },
+  {
+    id: "2",
+    title: "Payment Pending",
+    message: "Invoice #INV-1023 is awaiting payment",
+    is_read: false,
+    created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(), // 45 min ago
+    type: "billing",
+  },
+  {
+    id: "3",
+    title: "Low Inventory Alert",
+    message: "Brake cleaner stock is below minimum threshold",
+    is_read: true,
+    created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hrs ago
+    type: "inventory",
+  },
+  {
+    id: "4",
+    title: "Service Completed",
+    message: "Job #JB-883 is ready for pickup",
+    is_read: true,
+    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // yesterday
+    type: "job",
+  },
+];
