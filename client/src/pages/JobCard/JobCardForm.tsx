@@ -99,7 +99,190 @@ export default function JobCardForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="">
 
       {/*content  */}
+<SectionCard title="Customer & Job Details">
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    {/* Customer selector */}
+    <FloatingRHFSelect
+      name="customer_id"
+      label="Customer"
+      isRequired
+      control={form.control}
+      options={[
+        { label: "Add New", value: "new" },
+        { label: "Jatin Chopra", value: "1" },
+      ]}
+    />
 
+    <FloatingField
+      name="first_name"
+      label="Name"
+      isRequired
+      control={form.control}
+    />
+
+    {/* Job Date */}
+    <div className="relative">
+      <label className="text-sm font-medium">
+        Date <span className="text-red-500">*</span>
+      </label>
+      <Datepicker
+        asSingle
+        useRange={false}
+        value={serviceDate}
+        onChange={(val) => {
+          setServiceDate(val as any);
+          form.setValue(
+            "service_date",
+            val?.startDate
+              ? val.startDate.toISOString().split("T")[0]
+              : "",
+            { shouldValidate: true }
+          );
+        }}
+        placeholder="Select date"
+        showShortcuts={false}
+        popoverDirection="down"
+        inputClassName="w-full border rounded-md py-2.5 px-3 text-sm"
+      />
+    </div>
+
+    <FloatingField
+      name="mobile_no"
+      label="Contact No."
+      isRequired
+      control={form.control}
+    />
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+    <FloatingField name="email" label="Email" control={form.control} />
+    <FloatingField name="aadhar" label="Aadhar" control={form.control} />
+    <FloatingField name="pan" label="PAN Card" control={form.control} />
+  </div>
+
+  <div className="mt-4">
+    <FloatingTextarea
+      name="address"
+      label="Address"
+      isRequired
+      control={form.control}
+    />
+  </div>
+</SectionCard>
+
+{/* =========================
+   VEHICLE DETAILS
+========================= */}
+<SectionCard title="Vehicle Details">
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <FloatingRHFSelect
+      name="vehicle_type"
+      label="Vehicle Type"
+      isRequired
+      control={form.control}
+      options={[
+        { label: "Mini SUV", value: "mini_suv" },
+        { label: "SUV", value: "suv" },
+        { label: "Sedan", value: "sedan" },
+      ]}
+    />
+
+    <FloatingRHFSelect
+      name="vehicle_make"
+      label="Vehicle Make"
+      isRequired
+      control={form.control}
+      options={[
+        { label: "Hyundai", value: "HYUNDAI" },
+        { label: "Honda", value: "HONDA" },
+      ]}
+    />
+
+    <FloatingRHFSelect
+      name="vehicle_model"
+      label="Vehicle Model"
+      isRequired
+      control={form.control}
+      options={[
+        { label: "Creta", value: "CRETA" },
+        { label: "Verna", value: "VERNA" },
+      ]}
+    />
+
+    <FloatingField
+      name="vehicle_color"
+      label="Vehicle Color"
+      control={form.control}
+    />
+
+    <FloatingRHFSelect
+      name="make_year"
+      label="Make Year"
+      isRequired
+      control={form.control}
+      options={[
+        { label: "2025", value: "2025" },
+        { label: "2024", value: "2024" },
+      ]}
+    />
+
+    <FloatingField
+      name="registration_no"
+      label="Registration No."
+      isRequired
+      control={form.control}
+    />
+
+    <FloatingField
+      name="chassis_no"
+      label="Chassis No."
+      control={form.control}
+    />
+
+    <FloatingRHFSelect
+      name="srs"
+      label="SRS (Required)"
+      isRequired
+      control={form.control}
+      options={[
+        { label: "Brand New", value: "brand_new" },
+        { label: "Used", value: "used" },
+      ]}
+    />
+
+    <FloatingField
+      name="service_amount"
+      label="Servicing Amount"
+      control={form.control}
+    />
+
+    <FloatingField
+      name="vehicle_remark"
+      label="Remark"
+      control={form.control}
+    />
+  </div>
+</SectionCard>
+
+{/* =========================
+   PAINT CONDITION
+========================= */}
+<SectionCard title="Vehicle Paint Condition">
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+    <label className="flex items-center gap-2">
+      <Checkbox /> Repainted Vehicle
+    </label>
+    <label className="flex items-center gap-2">
+      <Checkbox /> Single Stage Paint
+    </label>
+    <label className="flex items-center gap-2">
+      <Checkbox /> Paint Thickness below 2 MIL
+    </label>
+    <label className="flex items-center gap-2">
+      <Checkbox /> Vehicle older than 5 years
+    </label>
+  </div>
+</SectionCard>
             {/* FOOTER */}
             <div className="border-t px-5 py-4 flex justify-end gap-3 mt-4">
               <Button
