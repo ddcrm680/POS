@@ -719,3 +719,36 @@ export type CustomerFormValues = {
   gst_pincode?: string;
   gst_address?: string;
 };
+export type JobCardFormValues = {
+  /* ===== CUSTOMER SNAPSHOT (readonly / selectable) ===== */
+  customer_id?: string; // existing customer
+  customer_name?: string;
+  contact_no?: string;
+  email?: string;
+  address?: string;
+
+  /* ===== JOB CARD META ===== */
+  jobcard_date: string;
+
+  /* ===== VEHICLE ===== */
+  vehicle_type: string;
+  vehicle_make: string;
+  vehicle_model: string;
+  vehicle_color?: string;
+  make_year?: string;
+  registration_no?: string;
+  chassis_no?: string;
+  srs: string;
+
+  /* ===== SERVICE ===== */
+  service_type: string[];     // multi
+  service_opted: string;
+  service_amount?: string;
+  remark?: string;
+
+  /* ===== VEHICLE CONDITION ===== */
+  repainted_vehicle?: boolean;
+  single_stage_paint?: boolean;
+  paint_thickness_below_2mil?: boolean;
+  vehicle_older_than_5_years?: boolean;
+};
