@@ -107,12 +107,12 @@ export default function Customers() {
 
   return (
     <>
-      <div className="p-6">
+      <div className="p-4">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Customer Management</h1>
+              <h1 className="text-xl font-bold">Customer Management</h1>
               <p className="text-muted-foreground">
                 Comprehensive customer analytics and management dashboard
               </p>

@@ -25,7 +25,7 @@ export default function ProfileDetails() {
                 >
                     <ChevronLeft size={18} />
                 </button>
-                 <h1 className="text-lg font-semibold">Profile Details</h1>
+                 <h1 className="text-xl font-semibold">Profile Details</h1>
 
 
             </div>

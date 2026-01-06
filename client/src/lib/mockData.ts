@@ -1,3 +1,15 @@
+import {
+  ShoppingCart,
+  Activity,
+  CreditCard,
+  Package,
+  BarChart3,
+  Users,
+  Receipt,
+  AlertTriangle,
+  Calendar,
+} from "lucide-react";
+
 export const vehicleListInfo = {
   data: [
     {
@@ -479,3 +491,89 @@ export const franchiseTableMockData = {
     has_next: false,
   },
 };
+/* ================= DUMMY DATA ================= */
+export const metrics = {
+  todayRevenue: 45280,
+  servicesCompleted: 18,
+  customerSatisfaction: 4.6,
+};
+
+export const counts = {
+  activeJobs: 7,
+  readyPickup: 3,
+  billingPending: 2,
+  criticalStock: 2,
+  expiringSoon: 4,
+};
+
+export const tiles = [
+  {
+    id: "new-sale",
+    title: "New Sale",
+    icon: ShoppingCart,
+    color: "bg-gradient-to-br from-emerald-500 to-emerald-700",
+    description: "Start new service",
+  },
+  {
+    id: "workflow",
+    title: "Workflow Board",
+    icon: Activity,
+    color: "bg-gradient-to-br from-blue-500 to-blue-700",
+    badge: counts.activeJobs,
+    description: "Active jobs",
+  },
+  {
+    id: "pickup",
+    title: "Ready for Pickup",
+    icon: CreditCard,
+    color: "bg-gradient-to-br from-green-500 to-green-700",
+    badge: counts.readyPickup,
+    description: "Completed jobs",
+  },
+  {
+    id: "billing",
+    title: "Billing",
+    icon: Receipt,
+    color: "bg-gradient-to-br from-amber-500 to-amber-700",
+    badge: counts.billingPending,
+    description: "Pending payments",
+  },
+  {
+    id: "inventory",
+    title: "Inventory",
+    icon: Package,
+    color: "bg-gradient-to-br from-indigo-500 to-indigo-700",
+    badge: counts.criticalStock,
+    description: "Stock overview",
+  },
+  {
+    id: "critical",
+    title: "Critical Stock",
+    icon: AlertTriangle,
+    color: "bg-gradient-to-br from-red-500 to-red-700",
+    badge: counts.criticalStock,
+    description: "Immediate attention",
+  },
+  {
+    id: "expiring",
+    title: "Expiring Soon",
+    icon: Calendar,
+    color: "bg-gradient-to-br from-orange-500 to-orange-700",
+    badge: counts.expiringSoon,
+    description: "Within 30 days",
+  },
+  {
+    id: "customers",
+    title: "Customers",
+    icon: Users,
+    color: "bg-gradient-to-br from-cyan-500 to-cyan-700",
+    description: "Search customers",
+  },
+  {
+    id: "reports",
+    title: "Reports",
+    icon: BarChart3,
+    color: "bg-gradient-to-br from-purple-500 to-purple-700",
+    description: "View analytics",
+  },
+];

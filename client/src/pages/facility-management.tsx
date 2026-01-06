@@ -400,17 +400,17 @@ export default function FacilityManagement() {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <div className="  p-6">
+        <div className="  p-4">
           
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                   Facility Management
                 </h1>
                 <p className="text-muted-foreground">
-                  {format(new Date(), "EEEE, MMMM d, yyyy")} • Daily checklist and maintenance tracking
+                 Daily checklist and maintenance tracking
                 </p>
               </div>
               <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">

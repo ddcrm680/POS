@@ -284,7 +284,7 @@ export default function EODProcedures() {
                 End of Day Procedures
               </CardTitle>
               <CardDescription>
-                {format(new Date(), 'EEEE, MMMM do, yyyy')} - Complete all tasks before clocking out
+               Complete all tasks before clocking out
               </CardDescription>
             </div>
             <Badge className={`text-lg px-4 py-2 ${

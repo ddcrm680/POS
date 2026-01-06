@@ -159,11 +159,11 @@ export default function PaymentsPage() {
   }
 
   return (
-    <div className="space-y-6 p-6" data-testid="payments-dashboard">
+    <div className="space-y-6 p-4" data-testid="payments-dashboard">
       {/* Header with Quick Actions */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight" data-testid="page-title">
+          <h1 className="text-xl font-bold tracking-tight" data-testid="page-title">
             Payment Management
           </h1>
           <p className="text-muted-foreground">

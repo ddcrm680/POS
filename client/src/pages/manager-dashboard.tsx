@@ -369,14 +369,14 @@ export default function ManagerDashboard() {
 
   return (
     <>
-      <div className="p-6 space-y-6" data-testid="manager-dashboard">
+      <div className="p-4 space-y-6" data-testid="manager-dashboard">
         
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-                  <h1 className="text-2xl font-semibold flex gap-2">  <Shield className="h-8 w-8 text-primary" />
+                  <h1 className="text-xl font-semibold flex gap-2">  
 Manager Dashboard</h1>
-              <p className="text-muted-foreground">    {format(new Date(), 'EEEE, MMMM do, yyyy')} - Complete daily operations management
+              <p className="text-muted-foreground">     Complete daily operations management
         </p>
           </div>
           

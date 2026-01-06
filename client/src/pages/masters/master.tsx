@@ -55,13 +55,18 @@ export default function Master() {
           <div className="mx-auto space-y-4">
 
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-              <div className="mb-4 flex justify-between items-center">
+              <div className="mb-6 flex justify-between items-center">
+               
+  <div>
                 <h1 className="
-text-lg font-semibold
+text-xl font-semibold
 ">
                   Master Details
                 </h1>
-
+                <p className="text-muted-foreground">
+                   Control and manage all foundational business records
+                </p>
+              </div>
                 <TabsList
                   className={cn(
                     "h-auto flex overflow-x-auto scrollbar-hide justify-start lg:grid  lg:w-[40]",
