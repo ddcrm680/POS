@@ -8,7 +8,7 @@ type FloatingTextareaProps = {
   name: string
   label: string
   control: Control<any>
-  isView: boolean
+  isView?: boolean
   isRequired?: boolean
 }
 

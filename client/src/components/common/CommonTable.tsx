@@ -218,7 +218,6 @@ export default function CommonTable({
   border-b border-gray-100
   hover:bg-blue-50/40
   focus-within:bg-blue-50/60
-  cursor-pointer
 "
                 >
                   {columns.map((col: any) => (

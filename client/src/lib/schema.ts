@@ -766,3 +766,64 @@ state_ids: z
 
 });
 
+export const CustomerNewSchema = z.object({
+  first_name: z.string().min(1, "Required"),
+  last_name: z.string().min(1, "Required"),
+  mobile_no: z.string().min(10),
+  email: z.string().email(),
+
+  country_id: z.string(),
+  state_ids: z.array(z.string()).default([]),
+  city_ids: z.array(z.string()).default([]),
+
+  district: z.string().optional(),
+  pincode: z.string(),
+  address: z.string().optional(),
+  message: z.string().optional(),
+
+  vehicle_make: z.string(),
+  vehicle_model: z.string(),
+  vehicle_color: z.string(),
+  make_year: z.string(),
+  registration_no: z.string(),
+  chassis_no: z.string().optional(),
+  srs: z.string(),
+
+  service_amount: z.string().optional(),
+  vehicle_remark: z.string().optional(),
+
+  vehicle_type: z.string(),
+  service_type: z.array(z.string()).min(1),
+  service_opted: z.string(),
+  service_date: z.string(),
+
+  add_gst: z.boolean().default(false),
+
+  gst_company_name: z.string().optional(),
+  gst_contact_no: z.string().optional(),
+  gstin: z.string().optional(),
+  gst_country_id: z.string().optional(),
+  gst_state_id: z.string().optional(),
+  gst_city_id: z.string().optional(),
+  gst_district: z.string().optional(),
+  gst_pincode: z.string().optional(),
+  gst_address: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.add_gst) {
+    if (!data.gst_company_name) {
+      ctx.addIssue({
+        path: ["gst_company_name"],
+        message: "Company name is required",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    if (!data.gstin) {
+      ctx.addIssue({
+        path: ["gstin"],
+        message: "GSTIN is required",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  }
+});

@@ -1,7 +1,6 @@
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/DashBoard/nonDefaultDashboard";
 import ManagerDashboard from "@/pages/manager-dashboard";
-import Customers from "@/pages/customers";
 import JobCards from "@/pages/job-cards";
 import Workflow from "@/pages/workflow";
 import Inventory from "@/pages/inventory";
@@ -30,6 +29,8 @@ import DefaultDashboard from "./pages/DashBoard/DefaultDashboard";
 import StoreDetails from "./pages/storeDetails/storeDetails";
 import Store from "./pages/masters/store/store";
 import StoreList from "./pages/masters/store/storeList";
+import Customer from "./pages/Customer/Customer";
+import CustomerForm from "./pages/Customer/CustomerForm";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -55,12 +56,13 @@ export function Router() {
       {/* <Route path="/master/stores" component={() => <ProtectedRoute component={Store} 
       />} /> */}
        <Route path="/master/territory/manage" component={() => <ProtectedRoute component={TerritoryMasterForm} />} />
+   <Route path="/customers/manage" component={() => <ProtectedRoute component={CustomerForm} />} />
   
       <Route path="/master/stores/manage" component={() => <ProtectedRoute component={StoreFormHandler} />} />
       
       {/* <Route path="/test" component={() => <ProtectedRoute component={ManagerDashboard} />} /> */}
       <Route path="/manager" component={() => <ProtectedRoute component={ManagerDashboard} />} />
-      <Route path="/customers" component={() => <ProtectedRoute component={Customers} />} />
+      <Route path="/customers" component={() => <ProtectedRoute component={Customer} />} />
       <Route path="/job-cards" component={() => <ProtectedRoute component={JobCards} />} />
       <Route path="/appointments" component={() => <ProtectedRoute component={AppointmentsPage} />} />
       <Route path="/facility-management" component={() => <ProtectedRoute component={FacilityManagement} />} />

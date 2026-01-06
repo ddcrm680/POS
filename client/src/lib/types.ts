@@ -664,3 +664,58 @@ export type Notification = {
   created_at: string;
   is_read: boolean;
 };
+export type CustomerFormValues = {
+  /* ======================
+     CUSTOMER
+  ====================== */
+  first_name: string;
+  last_name: string;
+  mobile_no: string;
+  email: string;
+
+  country_id: string;
+  state_ids: string[];
+  city_ids: string[];
+  district: string;
+  pincode: string;
+  address: string;
+  message: string;
+
+  /* ======================
+     VEHICLE
+  ====================== */
+  vehicle_make: string;
+  vehicle_model: string;
+  vehicle_color: string;
+  make_year: string;
+  registration_no: string;
+  chassis_no: string;
+  srs: string;
+  service_amount: string;
+  vehicle_remark: string;
+
+  /* ======================
+     SERVICE
+  ====================== */
+  vehicle_type: string;
+  service_type: string;
+  service_opted: string;
+  service_date: string;
+
+  /* ======================
+     GST (OPTIONAL)
+  ====================== */
+  add_gst: boolean;
+
+  gst_company_name?: string;
+  gst_contact_no?: string;
+  gstin?: string;
+
+  gst_country_id?: string;
+  gst_state_id?: string;
+  gst_city_id?: string;
+
+  gst_district?: string;
+  gst_pincode?: string;
+  gst_address?: string;
+};
