@@ -17,6 +17,7 @@ export default function NotificationRealtimeBridge() {
       toast({
         title: payload?.data?.title ?? "New notification",
         description: payload?.data?.message ?? "",
+        variant: "info",
       });
 
       // 🔁 REFRESH DATA

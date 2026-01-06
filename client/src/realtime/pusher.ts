@@ -18,7 +18,7 @@ export function initRealtimeNotifications(
     return;
   }
 
-  console.log("🚀 Initializing Pusher");
+  //console.log("🚀 Initializing Pusher");
 
   pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY!, {
     cluster: process.env.REACT_APP_PUSHER_CLUSTER!,
