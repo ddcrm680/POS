@@ -172,7 +172,6 @@ export default function Profile() {
       const apiErrors = err?.response?.data?.errors;
 
       // ✅ FIELD LEVEL ERRORS (VISIBLE NOW)
-      console.log(err?.response?.status, 'err?.response?.status');
 
       if (apiErrors && err?.response?.status === 422) {
         Object.entries(apiErrors).forEach(([apiField, messages]) => {

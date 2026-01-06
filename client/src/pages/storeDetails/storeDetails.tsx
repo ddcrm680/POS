@@ -29,7 +29,6 @@ export default function StoreDetails() {
                 const res = await fetchStoreById(user?.store_id ?? "");
                 setStore(res?.data);
             } catch (e: any) {
-                console.log(e?.response?.status, 'err?.response?.status');
                 if (e?.response?.status === 404) {
                     setStoreBeMessage(e?.response?.data?.message)
                 }

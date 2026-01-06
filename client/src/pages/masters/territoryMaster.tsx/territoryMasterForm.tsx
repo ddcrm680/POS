@@ -167,9 +167,7 @@ export default function TerritoryMasterForm() {
         label: store.name,
       }));
 
-      console.log(initialValues,
-        !options.some((o: any) => o.value === String(initialValues?.store_id)), 'initialValuesw543');
-
+    
       // 👻 GHOST OPTION (edit / view only)
       if (
         initialValues?.store_id &&

@@ -190,7 +190,6 @@ export default function Organization() {
     if (id) {
       formData.append("id", String(id));
     }
-    console.log(value, 'valuevalue3');
 
     // Company details
     formData.append("company_name", value.company_name);

@@ -74,7 +74,6 @@ export default function AddCustomerForm() {
 });
   const addGST = form.watch("add_gst");
   const onSubmit = (data: CustomerFormValues) => {
-    console.log("FINAL PAYLOAD", data);
   };
 
   return (

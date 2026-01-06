@@ -32,7 +32,6 @@ export default function Master() {
     }
     return () => {
       const isOnMasterRoute = location.startsWith("/master");
-      console.log(isOnMasterRoute, 'isOnMasterRoute');
 
       if (!isOnMasterRoute) {
         setActiveTab("store")

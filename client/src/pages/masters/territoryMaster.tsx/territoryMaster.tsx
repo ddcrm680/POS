@@ -174,7 +174,6 @@ const [isLoading, setIsLoading] = useState(false);
   const TerritoryStatusUpdateHandler = useCallback(async (u: any) => {
     try {
       const newStatus = u.is_active ? false : true;
-      console.log(newStatus,u.is_active , 'newStatus');
 
       setUsers(prevUsers => {
 

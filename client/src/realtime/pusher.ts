@@ -19,7 +19,7 @@ export function initRealtimeNotifications(
     return;
   }
 
-  console.log("🚀 Initializing Pusher");
+  // console.log("🚀 Initializing Pusher");
 
   pusher = new Pusher(Constant.REACT_APP_PUSHER_KEY, {
     cluster: Constant.REACT_APP_PUSHER_CLUSTER!,
@@ -44,12 +44,12 @@ export function initRealtimeNotifications(
   });
 
   channel.bind("pusher_internal:subscription_succeeded", () => {
-    console.log("✅ AUTH SUCCESS");
+    // console.log("✅ AUTH SUCCESS");
   });
   channel.bind(
     "Illuminate\\Notifications\\Events\\BroadcastNotificationCreated",
     (payload: any) => {
-      console.log("🔔 Realtime notification received:", payload);
+      // console.log("🔔 Realtime notification received:", payload);
       onNotification(payload);
     }
   );

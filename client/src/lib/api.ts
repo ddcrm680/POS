@@ -641,7 +641,6 @@ export async function fetchOrganizationsList({
   if (search) params.append("search", search);
   if (status) params.append("status", String(status));
 
-  console.log(params.toString());
 
   const response = await api.get(`/api/organizations?${params.toString()}`);
 

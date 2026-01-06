@@ -32,7 +32,6 @@ export function formatTime(dateString: string) {
   return `${timePart}`;
 }
 export const findIdByName = (list: any[], name?: string) =>{
-console.log(list,name,'listlistlist');
 
    return list.find(item => item.id === Number(name))?.id ?? "";
 }
@@ -237,7 +236,6 @@ export function stripDiffMeta(meta: any) {
   return Object.keys(rest).length ? rest : null;
 }
 export function isChildActive(path: string, location: string,id:string,sidebarContext?: string | null,) {
-  console.log( id, location.includes(path),'location');
   
   return ((location === path || location.startsWith(path + "/") || location.includes(path)) && sidebarContext == id);
 }
