@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -18,6 +18,7 @@ import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import Datepicker from "react-tailwindcss-datepicker";
+import { FloatingDateField } from "@/components/common/FloatingDateField";
 
 /* ============================
    MAIN FORM
@@ -39,6 +40,7 @@ export default function AddCustomerForm() {
     defaultValues: {
       first_name: "",
       last_name: "",
+      service_date:"",
       mobile_no: "",
       email: "",
       country_id: "",
@@ -62,20 +64,22 @@ export default function AddCustomerForm() {
       vehicle_type: "",
       service_type: "",
       service_opted: "",
-      service_date: "",
     },
   });
   const [serviceDate, setServiceDate] = useState<{
-  startDate: Date | null;
-  endDate: Date | null;
-}>({
-  startDate: null,
-  endDate: null,
-});
+    startDate: Date | null;
+    endDate: Date | null;
+  }>({
+    startDate: null,
+    endDate: null,
+  });
   const addGST = form.watch("add_gst");
   const onSubmit = (data: CustomerFormValues) => {
   };
+useEffect(()=>{
+  console.log(form.getValues(),'asdfgdsdfgwe');
 
+},[form])
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
       {/* HEADER */}
@@ -283,207 +287,172 @@ export default function AddCustomerForm() {
             )}
 
             {/* STEP 2 */}
-        {step === 2 && (
-  <SectionCard title="Vehicle Information">
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      
-      <FloatingRHFSelect
-        name="vehicle_make"
-        label="Vehicle Make"
-        isRequired
-        control={form.control}
-        options={[
-          { value: "HYUNDAI", label: "Hyundai" },
-          { value: "HONDA", label: "Honda" },
-          { value: "TOYOTA", label: "Toyota" },
-        ]}
-      />
+            {step === 2 && (
+              <SectionCard title="Vehicle Information">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-      <FloatingRHFSelect
-        name="vehicle_model"
-        label="Vehicle Model"
-        isRequired
-        control={form.control}
-        options={[
-          { value: "VERNA", label: "Verna" },
-          { value: "CITY", label: "City" },
-          { value: "INNOVA", label: "Innova" },
-        ]}
-      />
+                  <FloatingRHFSelect
+                    name="vehicle_make"
+                    label="Vehicle Make"
+                    isRequired
+                    control={form.control}
+                    options={[
+                      { value: "HYUNDAI", label: "Hyundai" },
+                      { value: "HONDA", label: "Honda" },
+                      { value: "TOYOTA", label: "Toyota" },
+                    ]}
+                  />
 
-      <FloatingField
-        name="vehicle_color"
-        label="Vehicle Color"
-        isRequired
-        control={form.control}
-      />
+                  <FloatingRHFSelect
+                    name="vehicle_model"
+                    label="Vehicle Model"
+                    isRequired
+                    control={form.control}
+                    options={[
+                      { value: "VERNA", label: "Verna" },
+                      { value: "CITY", label: "City" },
+                      { value: "INNOVA", label: "Innova" },
+                    ]}
+                  />
 
-      <FloatingRHFSelect
-        name="make_year"
-        label="Make Year"
-        isRequired
-        control={form.control}
-        options={[
-          { value: "2025", label: "2025" },
-          { value: "2024", label: "2024" },
-          { value: "2023", label: "2023" },
-        ]}
-      />
+                  <FloatingField
+                    name="vehicle_color"
+                    label="Vehicle Color"
+                    isRequired
+                    control={form.control}
+                  />
 
-      <FloatingField
-        name="registration_no"
-        label="Registration No"
-        isRequired
-        control={form.control}
-      />
+                  <FloatingRHFSelect
+                    name="make_year"
+                    label="Make Year"
+                    isRequired
+                    control={form.control}
+                    options={[
+                      { value: "2025", label: "2025" },
+                      { value: "2024", label: "2024" },
+                      { value: "2023", label: "2023" },
+                    ]}
+                  />
 
-      <FloatingField
-        name="chassis_no"
-        label="Chassis No"
-        control={form.control}
-      />
+                  <FloatingField
+                    name="registration_no"
+                    label="Registration No"
+                    isRequired
+                    control={form.control}
+                  />
 
-      <FloatingRHFSelect
-        name="srs"
-        label="SRS Condition"
-        isRequired
-        control={form.control}
-        options={[
-          { value: "brand_new", label: "Brand New" },
-          { value: "minor_damage", label: "Minor Damage" },
-          { value: "major_damage", label: "Major Damage" },
-        ]}
-      />
+                  <FloatingField
+                    name="chassis_no"
+                    label="Chassis No"
+                    control={form.control}
+                  />
 
-      <FloatingField
-        name="service_amount"
-        label="Service Amount"
-        control={form.control}
-      />
-    </div>
+                  <FloatingRHFSelect
+                    name="srs"
+                    label="SRS Condition"
+                    isRequired
+                    control={form.control}
+                    options={[
+                      { value: "brand_new", label: "Brand New" },
+                      { value: "minor_damage", label: "Minor Damage" },
+                      { value: "major_damage", label: "Major Damage" },
+                    ]}
+                  />
 
-    <div className="mt-4">
-      <FloatingTextarea
-        name="vehicle_remark"
-        label="Remark"
-        control={form.control}
-      />
-    </div>
+                  <FloatingField
+                    name="service_amount"
+                    label="Service Amount"
+                    control={form.control}
+                  />
+                </div>
 
-    {/* PAINT CONDITION */}
-    <div className="mt-4">
-      <p className="text-sm font-semibold mb-3">Vehicle Paint Condition</p>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <label className="flex items-center gap-2 text-sm">
-          <Checkbox /> Repainted Vehicle
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <Checkbox /> Single Stage Paint
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <Checkbox /> Paint Thickness below 2 MIL
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <Checkbox /> Vehicle older than 5 years
-        </label>
-      </div>
-    </div>
-  </SectionCard>
-)}
+                <div className="mt-4">
+                  <FloatingTextarea
+                    name="vehicle_remark"
+                    label="Remark"
+                    control={form.control}
+                  />
+                </div>
+
+                {/* PAINT CONDITION */}
+                <div className="mt-4">
+                  <p className="text-sm font-semibold mb-3">Vehicle Paint Condition</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <label className="flex items-center gap-2 text-sm">
+                      <Checkbox /> Repainted Vehicle
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <Checkbox /> Single Stage Paint
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <Checkbox /> Paint Thickness below 2 MIL
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <Checkbox /> Vehicle older than 5 years
+                    </label>
+                  </div>
+                </div>
+              </SectionCard>
+            )}
 
 
-        {/* STEP 3 */}
-{step === 3 && (
-  <SectionCard title="Service Information">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* Vehicle Type */}
-      <FloatingRHFSelect
-        name="vehicle_type"
-        label="Vehicle Type"
-        isRequired
-        control={form.control}
-        options={[
-          { label: "Bike", value: "bike" },
-          { label: "Hatchback", value: "hatchback" },
-          { label: "Sedan", value: "sedan" },
-          { label: "SUV", value: "suv" },
-        ]}
-      />
+            {/* STEP 3 */}
+            {step === 3 && (
+              <SectionCard title="Service Information">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Vehicle Type */}
+                  <FloatingRHFSelect
+                    name="vehicle_type"
+                    label="Vehicle Type"
+                    isRequired
+                    control={form.control}
+                    options={[
+                      { label: "Bike", value: "bike" },
+                      { label: "Hatchback", value: "hatchback" },
+                      { label: "Sedan", value: "sedan" },
+                      { label: "SUV", value: "suv" },
+                    ]}
+                  />
 
-      {/* Service Type (Multi) */}
-      <FloatingRHFSelect
-        name="service_type"
-        label="Service Type"
-        isMulti
-        isRequired
-        control={form.control}
-        options={[
-          { label: "Exterior Detailing", value: "exterior_detailing" },
-          { label: "Interior Detailing", value: "interior_detailing" },
-          { label: "Exterior Protection", value: "exterior_protection" },
-          { label: "PPF / Ceramic", value: "ppf_ceramic" },
-        ]}
-      />
+                  {/* Service Type (Multi) */}
+                  <FloatingRHFSelect
+                    name="service_type"
+                    label="Service Type"
+                    isMulti
+                    isRequired
+                    control={form.control}
+                    options={[
+                      { label: "Exterior Detailing", value: "exterior_detailing" },
+                      { label: "Interior Detailing", value: "interior_detailing" },
+                      { label: "Exterior Protection", value: "exterior_protection" },
+                      { label: "PPF / Ceramic", value: "ppf_ceramic" },
+                    ]}
+                  />
 
-      {/* Service Opted */}
-      <FloatingRHFSelect
-        name="service_opted"
-        label="Service Opted"
-        isRequired
-        control={form.control}
-        options={[
-          { label: "Standard", value: "standard" },
-          { label: "Premium", value: "premium" },
-          { label: "Custom", value: "custom" },
-        ]}
-      />
-    </div>
+                  {/* Service Opted */}
+                  <FloatingRHFSelect
+                    name="service_opted"
+                    label="Service Opted"
+                    isRequired
+                    control={form.control}
+                    options={[
+                      { label: "Standard", value: "standard" },
+                      { label: "Premium", value: "premium" },
+                      { label: "Custom", value: "custom" },
+                    ]}
+                  />
+                </div>
 
-    {/* Service Date */}
-    <div className="relative max-w-xs mt-6">
-<label
-  className={`
-    absolute left-3 px-1 bg-white text-[0.875rem] text-[#71717a] transition-all duration-200
-    z-20 pointer-events-none
-    ${
-      serviceDate?.startDate
-        ? "-top-2 text-primary"
-        : "top-3 text-muted-foreground"
-    }
-    group-focus-within:-top-2
-    group-focus-within:text-primary
-  `}
->
-  Service Date <span className="text-red-500">*</span>
-</label>
-
-<Datepicker
-  asSingle
-  useRange={false}
-  value={serviceDate}
-  onChange={(val) => {
-    setServiceDate(val as any);
-    form.setValue(
-      "service_date",
-      val?.startDate
-        ? val.startDate.toISOString().split("T")[0]
-        : "",
-      { shouldValidate: true }
-    );
-  }}
-  placeholder=" "
-  showShortcuts={false}
-  popoverDirection="down"
-  containerClassName="relative z-10"
-  inputClassName="
-    w-full border rounded-md
-    pt-4 pb-2 px-3 text-sm
-    focus:ring-1 focus:ring-red-500
-  "
-/>
-</div>
-  </SectionCard>
-)}
+                {/* Service Date */}
+                <FloatingDateField
+                  name="service_date"
+                  label="Service Date"
+                  isRequired
+                  control={form.control}
+                  className="max-w-xs mt-6"
+                />
+              </SectionCard>
+            )}
 
             {/* FOOTER */}
             <div className="border-t px-5 py-4 flex justify-end gap-3 mt-4">

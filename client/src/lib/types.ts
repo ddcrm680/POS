@@ -752,3 +752,10 @@ export type JobCardFormValues = {
   paint_thickness_below_2mil?: boolean;
   vehicle_older_than_5_years?: boolean;
 };
+export type FloatingDateFieldProps = {
+  name: string;
+  label: string;
+  control: Control<any>;
+  isRequired?: boolean;
+  className?: string;
+};

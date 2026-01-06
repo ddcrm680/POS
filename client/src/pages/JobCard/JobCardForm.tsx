@@ -18,6 +18,7 @@ import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import Datepicker from "react-tailwindcss-datepicker";
+import { FloatingDateField } from "@/components/common/FloatingDateField";
 
 /* ============================
    MAIN FORM
@@ -118,32 +119,14 @@ export default function JobCardForm() {
       isRequired
       control={form.control}
     />
-
-    {/* Job Date */}
-    <div className="relative">
-      <label className="text-sm font-medium">
-        Date <span className="text-red-500">*</span>
-      </label>
-      <Datepicker
-        asSingle
-        useRange={false}
-        value={serviceDate}
-        onChange={(val) => {
-          setServiceDate(val as any);
-          form.setValue(
-            "service_date",
-            val?.startDate
-              ? val.startDate.toISOString().split("T")[0]
-              : "",
-            { shouldValidate: true }
-          );
-        }}
-        placeholder="Select date"
-        showShortcuts={false}
-        popoverDirection="down"
-        inputClassName="w-full border rounded-md py-2.5 px-3 text-sm"
-      />
-    </div>
+  <FloatingDateField
+                  name="service_date"
+                  label="Date"
+                  isRequired
+                  control={form.control}
+                  className="max-w-xs "
+                />
+   
 
     <FloatingField
       name="mobile_no"
@@ -292,20 +275,8 @@ export default function JobCardForm() {
               >
                 {'Cancel'}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={step === 1}
-                onClick={() => setStep((s) => s - 1)}
-              >
-                Previous
-              </Button>
-              {step < 3 ? (
-                <Button className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]" type="button" onClick={() => setStep((s) => s + 1)}>
-                  Next
-                </Button>
-              ) : (
-                <Button type="submit"
+             
+              <Button type="submit"
                   disabled={isLoading || isInfoLoading}
                   className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
                   {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
@@ -313,7 +284,6 @@ export default function JobCardForm() {
                     ? id ? "Updating..." : "Adding..."
                     : id ? "Update " : "Add "}
                 </Button>
-              )}
 
             </div>
           </form>

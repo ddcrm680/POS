@@ -39,9 +39,6 @@ export function initRealtimeNotifications(
   console.log("📡 Subscribing to:", channelName);
 
   const channel = pusher.subscribe(channelName);
-  channel.bind("pusher:subscription_error", (err: any) => {
-    console.error("❌ SUBSCRIPTION ERROR", err);
-  });
 
   channel.bind("pusher_internal:subscription_succeeded", () => {
     // console.log("✅ AUTH SUCCESS");
