@@ -827,3 +827,27 @@ export const CustomerNewSchema = z.object({
     }
   }
 });
+export const NewJobCardSchema = z.object({
+  customer_id: z.string().optional(),
+
+  jobcard_date: z.string().min(1, "Date is required"),
+
+  vehicle_type: z.string().min(1, "Vehicle type required"),
+  vehicle_make: z.string().min(1),
+  vehicle_model: z.string().min(1),
+  vehicle_color: z.string().optional(),
+  make_year: z.string().optional(),
+  registration_no: z.string().optional(),
+  chassis_no: z.string().optional(),
+  srs: z.string().min(1),
+
+  service_type: z.array(z.string()).min(1, "Select at least one service"),
+  service_opted: z.string().min(1),
+  service_amount: z.string().optional(),
+  remark: z.string().optional(),
+
+  repainted_vehicle: z.boolean().optional(),
+  single_stage_paint: z.boolean().optional(),
+  paint_thickness_below_2mil: z.boolean().optional(),
+  vehicle_older_than_5_years: z.boolean().optional(),
+});

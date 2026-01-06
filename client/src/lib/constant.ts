@@ -160,7 +160,7 @@ export const bottomTabs: TabItem[] = [
  
   },
   { id: "appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
-  { id: "jobs", path: "/job-cards", icon: ClipboardList, label: "Jobs" },
+  { id: "jobs", path: "/job-cards", icon: ClipboardList, label: "Job Card" },
   { id: "customers", path: "/customers", icon: Users, label: "Customers" },
   { id: "payments", path: "/payments", icon: CreditCard, label: "Payments" },
   { id: "inventory", path: "/inventory", icon: Package, label: "Inventory" },
