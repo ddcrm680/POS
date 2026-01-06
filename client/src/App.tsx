@@ -10,6 +10,9 @@ import { subscribeServiceDown } from "@/lib/systemStatus";
 import ServiceUnavailableOverlay from "./ServiceUnavailableOverlay";
 import { useLocation } from "wouter";
 import { ForbiddenListener } from "./components/common/ForbiddenListener";
+import NotificationRealtimeBridge from "./components/system/NotificationRealtimeBridge";
+
+
 export default function App() {
   const [location] = useLocation();
   const hideLayoutList = ["/login"];
@@ -29,6 +32,9 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+         {/* 🔔 REALTIME NOTIFICATIONS */}
+          <NotificationRealtimeBridge />
+
         <TooltipProvider>
           <Toaster />
           <ForbiddenListener />
