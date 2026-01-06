@@ -42,7 +42,7 @@ export function initRealtimeNotifications(
   channel.bind(
     "Illuminate\\Notifications\\Events\\BroadcastNotificationCreated",
     (payload: any) => {
-      //console.log("🔔 Realtime notification received:", payload);
+      console.log("🔔 Realtime notification received:", payload);
       onNotification(payload);
     }
   );
