@@ -9,19 +9,15 @@ export default function NotificationRealtimeBridge() {
   const { user } = useAuth();
 
   useEffect(() => {
-
     if (!user?.id) return;
 
     initRealtimeNotifications(Number(user.id), (payload) => {
-      // SHOW TOAST
-      
       toast({
         title: payload?.data?.title ?? "New notification",
         description: payload?.data?.message ?? "",
-        variant:"info"
+        variant: "info",
       });
 
-      // 🔁 REFRESH DATA
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       queryClient.invalidateQueries({ queryKey: ["notifications-unread"] });
     });
@@ -29,3 +25,4 @@ export default function NotificationRealtimeBridge() {
 
   return null;
 }
+
