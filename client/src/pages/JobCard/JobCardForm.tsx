@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -6,228 +9,135 @@ import { Button } from "@/components/ui/button";
 import { SectionCard } from "@/components/common/card";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
-import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
+
 import { Checkbox } from "@/components/ui/checkbox";
-
+import { CustomerNewSchema } from "@/lib/schema";
+import { CustomerFormValues } from "@/lib/types";
+import { ChevronLeft } from "lucide-react";
+import { useLocation, useSearchParams } from "wouter";
+import { Loader } from "@/components/common/loader";
+import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import Datepicker from "react-tailwindcss-datepicker";
-import { JobCardFormValues } from "@/lib/types";
-import { JobCardSchema } from "@/lib/schema";
 
-
+/* ============================
+   MAIN FORM
+============================ */
 export default function JobCardForm() {
+  const [step, setStep] = useState(1);
+  const [, navigate] = useLocation();
+
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const mode = searchParams.get("mode");
+  const isView = mode === "view";
+
+  const [isInfoLoading, setIsInfoLoading] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<any>({
-    resolver: zodResolver(JobCardSchema),
+    resolver: zodResolver(CustomerNewSchema),
     defaultValues: {
-      service_type: [],
-      repainted_vehicle: false,
-      single_stage_paint: false,
-      paint_thickness_below_2mil: false,
-      vehicle_older_than_5_years: false,
+      first_name: "",
+      last_name: "",
+      mobile_no: "",
+      email: "",
+      country_id: "",
+      state_ids: [],
+      city_ids: [],
+      district: "",
+      pincode: "",
+      address: "",
+      message: "",
+
+      vehicle_make: "",
+      vehicle_model: "",
+      vehicle_color: "",
+      make_year: "",
+      registration_no: "",
+      chassis_no: "",
+      srs: "",
+      service_amount: "",
+      vehicle_remark: "",
+
+      vehicle_type: "",
+      service_type: "",
+      service_opted: "",
+      service_date: "",
     },
   });
-
-  const onSubmit = (data: JobCardFormValues) => {
-    console.log("JOB CARD PAYLOAD", data);
+  const [serviceDate, setServiceDate] = useState<{
+  startDate: Date | null;
+  endDate: Date | null;
+}>({
+  startDate: null,
+  endDate: null,
+});
+  const addGST = form.watch("add_gst");
+  const onSubmit = (data: CustomerFormValues) => {
+    console.log("FINAL PAYLOAD", data);
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-white rounded-xl">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      {/* HEADER */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => window.history.back()}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ChevronLeft size={18} />
+        </button>
+        <div>
+          <h1 className="text-xl font-semibold">
+            {isView ? "View Job Card" : id ? "Edit Job Card" : "Create New Job Card"}
+          </h1>
 
-          {/* ================= CUSTOMER + DATE ================= */}
-          <SectionCard title="Job Card Information">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <FloatingRHFSelect
-                name="customer_id"
-                label="Customer"
-                control={form.control}
-                options={[
-                  { label: "Add New", value: "new" },
-                  { label: "Jatin Chopra", value: "1" },
-                ]}
-              />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 rounded-xl bg-white">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="">
 
-              <FormField
-                control={form.control}
-                name="jobcard_date"
-                render={() => (
-                  <div className="relative">
-                    <label className="text-sm font-medium">
-                      Date <span className="text-red-500">*</span>
-                    </label>
-                    <Datepicker
-                      asSingle
-                      useRange={false}
-                      value={{
-                        startDate: form.watch("jobcard_date")
-                          ? new Date(form.watch("jobcard_date"))
-                          : null,
-                        endDate: null,
-                      }}
-                      onChange={(val) =>
-                        form.setValue(
-                          "jobcard_date",
-                          val?.startDate
-                            ? new Date(val.startDate)
-                                .toISOString()
-                                .split("T")[0]
-                            : ""
-                        )
-                      }
-                      inputClassName="w-full border rounded-md px-3 py-2"
-                    />
-                  </div>
-                )}
-              />
+      {/*content  */}
+
+            {/* FOOTER */}
+            <div className="border-t px-5 py-4 flex justify-end gap-3 mt-4">
+              <Button
+                variant="outline"
+                disabled={isLoading || isInfoLoading}
+                className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                onClick={() => navigate("/customers")}
+              >
+                {'Cancel'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={step === 1}
+                onClick={() => setStep((s) => s - 1)}
+              >
+                Previous
+              </Button>
+              {step < 3 ? (
+                <Button className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]" type="button" onClick={() => setStep((s) => s + 1)}>
+                  Next
+                </Button>
+              ) : (
+                <Button type="submit"
+                  disabled={isLoading || isInfoLoading}
+                  className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
+                  {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
+                  {isLoading
+                    ? id ? "Updating..." : "Adding..."
+                    : id ? "Update " : "Add "}
+                </Button>
+              )}
+
             </div>
-          </SectionCard>
-
-          {/* ================= VEHICLE ================= */}
-          <SectionCard title="Vehicle Details">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <FloatingRHFSelect
-                name="vehicle_type"
-                label="Vehicle Type"
-                control={form.control}
-                options={[
-                  { label: "Bike", value: "bike" },
-                  { label: "Hatchback", value: "hatchback" },
-                  { label: "Sedan", value: "sedan" },
-                  { label: "SUV", value: "suv" },
-                ]}
-              />
-
-              <FloatingRHFSelect
-                name="vehicle_make"
-                label="Vehicle Make"
-                control={form.control}
-                options={[
-                  { label: "Hyundai", value: "HYUNDAI" },
-                  { label: "Honda", value: "HONDA" },
-                ]}
-              />
-
-              <FloatingRHFSelect
-                name="vehicle_model"
-                label="Vehicle Model"
-                control={form.control}
-                options={[
-                  { label: "Verna", value: "VERNA" },
-                  { label: "City", value: "CITY" },
-                ]}
-              />
-
-              <FloatingField
-                name="vehicle_color"
-                label="Vehicle Color"
-                control={form.control}
-              />
-
-              <FloatingField
-                name="make_year"
-                label="Make Year"
-                control={form.control}
-              />
-
-              <FloatingField
-                name="registration_no"
-                label="Registration No"
-                control={form.control}
-              />
-
-              <FloatingField
-                name="chassis_no"
-                label="Chassis No"
-                control={form.control}
-              />
-
-              <FloatingRHFSelect
-                name="srs"
-                label="SRS Condition"
-                control={form.control}
-                options={[
-                  { label: "Brand New", value: "brand_new" },
-                  { label: "Minor Damage", value: "minor_damage" },
-                  { label: "Major Damage", value: "major_damage" },
-                ]}
-              />
-            </div>
-          </SectionCard>
-
-          {/* ================= SERVICE ================= */}
-          <SectionCard title="Service Details">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FloatingRHFSelect
-                name="service_type"
-                label="Service Type"
-                isMulti
-                control={form.control}
-                options={[
-                  { label: "Exterior Detailing", value: "exterior" },
-                  { label: "Interior Detailing", value: "interior" },
-                  { label: "PPF / Ceramic", value: "ppf" },
-                ]}
-              />
-
-              <FloatingRHFSelect
-                name="service_opted"
-                label="Service Opted"
-                control={form.control}
-                options={[
-                  { label: "Standard", value: "standard" },
-                  { label: "Premium", value: "premium" },
-                ]}
-              />
-
-              <FloatingField
-                name="service_amount"
-                label="Servicing Amount"
-                control={form.control}
-              />
-            </div>
-
-            <div className="mt-4">
-              <FloatingTextarea
-                name="remark"
-                label="Remark"
-                control={form.control}
-              />
-            </div>
-          </SectionCard>
-
-          {/* ================= PAINT CONDITION ================= */}
-          <SectionCard title="Vehicle Paint Condition">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox {...form.register("repainted_vehicle")} />
-                Repainted Vehicle
-              </label>
-
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox {...form.register("single_stage_paint")} />
-                Single Stage Paint
-              </label>
-
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox {...form.register("paint_thickness_below_2mil")} />
-                Paint Thickness below 2 MIL
-              </label>
-
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox {...form.register("vehicle_older_than_5_years")} />
-                Vehicle older than 5 years
-              </label>
-            </div>
-          </SectionCard>
-
-          {/* ================= FOOTER ================= */}
-          <div className="flex justify-end gap-3 border-t pt-4">
-            <Button variant="outline">Cancel</Button>
-            <Button className="bg-primary">Save Job Card</Button>
-          </div>
-        </form>
-      </Form>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }
+
