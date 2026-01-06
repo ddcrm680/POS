@@ -1,5 +1,6 @@
 import Pusher from "pusher-js";
 import { getRawToken } from "@/lib/api";
+import { Constant } from "@/lib/constant";
 
 let pusher: Pusher | null = null;
 
@@ -20,12 +21,12 @@ export function initRealtimeNotifications(
 
   console.log("🚀 Initializing Pusher");
 
-  pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY!, {
-    cluster: process.env.REACT_APP_PUSHER_CLUSTER!,
+  pusher = new Pusher(Constant.REACT_APP_PUSHER_KEY, {
+    cluster: Constant.REACT_APP_PUSHER_CLUSTER!,
     forceTLS: true,
 
     // 🔐 TOKEN-BASED AUTH (Sanctum)
-    authEndpoint: `${process.env.REACT_APP_BASE_URL}/api/broadcasting/auth`,
+    authEndpoint: `${Constant.REACT_APP_BASE_URL}/api/broadcasting/auth`,
     auth: {
       headers: {
         Authorization: `Bearer ${token}`,

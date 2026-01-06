@@ -29,6 +29,8 @@ import {
 export const Constant = {
   REACT_APP_BASE_URL: 'https://pos.detailingdevils.com',
   REACT_APP_API_TIMEOUT: 30000,
+  REACT_APP_PUSHER_KEY: "99a4e310f0775a0c4dea",
+  REACT_APP_PUSHER_CLUSTER: "ap2",
   superAdmin: "super-admin",
   REACT_APP_API_RETRY_COUNT: 2,
   login: {
@@ -126,7 +128,7 @@ export const STORE_MANAGEMENT_ROUTES = [
   "/store-details",
   "/master/stores",
   "/master/stores/manage",
-];  
+];
 export const nonAdminTabs: nonAdminTabsItem[] = [
   { path: "/home", icon: Home, label: "Dashboard" },
   { path: "/manager", icon: Settings, label: "Manager" },
@@ -141,23 +143,23 @@ export const nonAdminTabs: nonAdminTabsItem[] = [
 export const bottomTabs: TabItem[] = [
   { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },
 
-    {
-      id: "stores",
-      path: "/stores",
-      icon: Store,
-      defaultChildId: "store",
-      label: "Store Management",
-      children: [
-        { id: "store", path: "/stores", label: "Store List" },
-        { id: "facility", path: "/facility-management", label: "Facility" },
-      ],
-    },
+  {
+    id: "stores",
+    path: "/stores",
+    icon: Store,
+    defaultChildId: "store",
+    label: "Store Management",
+    children: [
+      { id: "store", path: "/stores", label: "Store List" },
+      { id: "facility", path: "/facility-management", label: "Facility" },
+    ],
+  },
   {
     id: "master",
     path: "/master",
     icon: Layers,
     label: "Master",
- 
+
   },
   { id: "appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
   { id: "jobs", path: "/job-cards", icon: ClipboardList, label: "Job Card" },
@@ -169,11 +171,11 @@ export const bottomTabs: TabItem[] = [
     id: "manager",
     path: "/manager",
     icon: Settings,
-    
-      defaultChildId: "manager",
+
+    defaultChildId: "manager",
     label: "Staff Management",
     children: [
-        { id: "manager", path: "/manager", label: "Manager" },
+      { id: "manager", path: "/manager", label: "Manager" },
       { id: "team", path: "/employee-management", label: "Team" },
     ],
   },
