@@ -9,7 +9,7 @@ export function initRealtimeNotifications(
   onNotification: (data: any) => void
 ) {
   if (pusher) {
-   // console.log("ℹ️ Pusher already initialized");
+    // console.log("ℹ️ Pusher already initialized");
     return;
   }
 
@@ -36,10 +36,16 @@ export function initRealtimeNotifications(
   });
 
   const channelName = `private-App.Models.User.${userId}`;
- console.log("📡 Subscribing to:", channelName);
+  console.log("📡 Subscribing to:", channelName);
 
   const channel = pusher.subscribe(channelName);
+  channel.bind("pusher:subscription_error", (err: any) => {
+    console.error("❌ SUBSCRIPTION ERROR", err);
+  });
 
+  channel.bind("pusher_internal:subscription_succeeded", () => {
+    console.log("✅ AUTH SUCCESS");
+  });
   channel.bind(
     "Illuminate\\Notifications\\Events\\BroadcastNotificationCreated",
     (payload: any) => {
@@ -49,7 +55,7 @@ export function initRealtimeNotifications(
   );
 
   channel.bind("pusher:subscription_succeeded", () => {
-   // console.log("✅ Realtime subscription successful");
+    // console.log("✅ Realtime subscription successful");
   });
 
   channel.bind("pusher:subscription_error", (err: any) => {
