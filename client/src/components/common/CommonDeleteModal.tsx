@@ -13,6 +13,7 @@ export default function CommonDeleteModal({
   confirmText = "Delete",
   cancelText = "Cancel",
   isLoading = false,
+  loadingText="Deleting...",
   maxWidth,
   onConfirm,
   onCancel,
@@ -78,7 +79,7 @@ export default function CommonDeleteModal({
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
               />
-            </svg>}   {isLoading ? "Deleting..." : confirmText}
+            </svg>}   {isLoading ? loadingText ?? "Deleting..." : confirmText}
           </Button>
         </div>
       </div>

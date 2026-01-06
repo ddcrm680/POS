@@ -1,12 +1,13 @@
 import { Link, useLocation } from "wouter";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import dummyProfile from "@/lib/images/dummy-Profile.webp"; 
+import dummyProfile from "@/lib/images/dummy-Profile.webp";
 import { SidebarProps } from "@/lib/types";
 import { bottomTabs, Constant } from "@/lib/constant";
 import { getActiveChild, isChildActive, isParentActive } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
+import CommonDeleteModal from "./CommonDeleteModal";
 
 
 export default function Sidebar({
@@ -16,6 +17,10 @@ export default function Sidebar({
   previewUrl,
 }: SidebarProps) {
   const { user, isLoading, Logout, roles } = useAuth();
+ const [isUserLogoutModalInfo, setIsUserLogoutModalOpenInfo] = useState<{ open: boolean, info: any }>({
+    open: false,
+    info: {}
+  });
 
   const sidebarContext =
     localStorage.getItem("sidebar_active_parent");
@@ -48,17 +53,21 @@ export default function Sidebar({
     );
     setOpenParent(active?.id ?? null);
   }, [location]);
-  
-  const filterTab = !roleView.store ? 
-  bottomTabs.map((item) => {
-    return item.path === '/store' ? 
-  { ...item, children: item.children?.filter((child) => child.path !== '/store-details') } 
-  : item
-  }) : bottomTabs
 
+  const filterTab = !roleView.store ?
+    bottomTabs.map((item) => {
+      return item.path === '/store' ?
+        { ...item, children: item.children?.filter((child) => child.path !== '/store-details') }
+        : item
+    }) : bottomTabs
+  async function handleLogout() {
+    await Logout();
+    window.location.href = "/login";
+  }
   return (
-    <aside className="h-full bg-card border-r">
-         {/* ===== PROFILE (MOBILE + EXPANDED ONLY) ===== */}
+    <aside className="h-full bg-card border-r flex flex-col justify-between">
+      {/* <div className="flex flex col justify-between"></div> */}
+      {/* ===== PROFILE (MOBILE + EXPANDED ONLY) ===== */}
       {!collapsed && (
         <div className="px-4 py-5 border-b border-border lg:hidden">
           <div className="flex items-center gap-3">
@@ -113,7 +122,7 @@ export default function Sidebar({
                   if (tab.children) {
 
                     setOpenParent(expanded ? null : tab.id);
-                    const activeChild = getActiveChild(tab, location,tab.id, sidebarContext,);
+                    const activeChild = getActiveChild(tab, location, tab.id, sidebarContext,);
                     const target =
                       activeChild?.path ||
                       tab.children.find(c => c.id === tab.defaultChildId)?.path;
@@ -155,9 +164,10 @@ export default function Sidebar({
 
               {/* ===== CHILDREN ===== */}
               {!collapsed && tab.children && expanded && (
+
                 <div className="ml-9 mt-1 space-y-1">
                   {tab.children.map((child) => {
-                    const childActive = isChildActive(child.path, location,tab?.id, sidebarContext ?? "" ,);
+                    const childActive = isChildActive(child.path, location, tab?.id, sidebarContext ?? "",);
 
                     return (
                       <Link key={child.id} href={child.path}>
@@ -182,11 +192,44 @@ export default function Sidebar({
                     );
                   })}
                 </div>
+
+                // </div>
+
               )}
             </div>
           );
         })}
       </nav>
+      <div className="mt-auto px-2 py-2 border-t border-border">
+        <button
+        >
+          <div onClick={()=>{setIsUserLogoutModalOpenInfo({info:{},open:true})}}
+            className="
+      w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+      text-sm font-medium
+      text-destructive
+      hover:bg-destructive/10
+      transition
+    ">
+            <LogOut className="mr-2 h-4 w-4" /> Logout</div>
+        </button>
+      </div>
+       <CommonDeleteModal
+                width="420px"
+                maxWidth="420px"
+                isOpen={isUserLogoutModalInfo.open}
+                title="Logout"
+                loadingText="Logging out..."
+                description={`Are you sure you want to logout?`}
+                confirmText="Yes"
+                cancelText="Cancel"
+                isLoading={isLoading}
+                onCancel={() =>
+                  setIsUserLogoutModalOpenInfo({ open: false, info: {} })
+                }
+                onConfirm={handleLogout}
+              />
+      
     </aside>
   );
 }

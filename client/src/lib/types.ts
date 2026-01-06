@@ -114,6 +114,7 @@ export interface CommonDeleteModalProps {
   maxWidth?: string
   description?: string;
   confirmText?: string;
+  loadingText?:string
   cancelText?: string;
   isLoading?: boolean;
   onConfirm: () => void;

@@ -39,8 +39,12 @@ export default function CommonModal({
 
         {/* Content */}
         <Dialog.Content
-          className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[60%] rounded-lg bg-white shadow-xl z-[10000]"
-          style={{
+         className="
+  fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+  w-[calc(100%-2rem)]
+
+  rounded-lg bg-white shadow-xl z-[10000]
+"   style={{
             width: width ?? "80%",
             maxWidth: maxWidth ?? "80%",
           }}>
