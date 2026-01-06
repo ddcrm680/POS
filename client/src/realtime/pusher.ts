@@ -8,24 +8,16 @@ export function initRealtimeNotifications(
   userId: number,
   onNotification: (data: any) => void
 ) {
-  if (pusher) {
-    // console.log("ℹ️ Pusher already initialized");
-    return;
-  }
+  if (pusher) return;
 
   const token = getRawToken();
-  if (!token) {
-    console.warn("🔕 No token found, realtime disabled");
-    return;
-  }
-
-  // console.log("🚀 Initializing Pusher");
+  if (!token) return;
 
   pusher = new Pusher(Constant.REACT_APP_PUSHER_KEY, {
-    cluster: Constant.REACT_APP_PUSHER_CLUSTER!,
+    cluster: Constant.REACT_APP_PUSHER_CLUSTER,
     forceTLS: true,
 
-    // 🔐 TOKEN-BASED AUTH (Sanctum)
+    // 🔐 Sanctum-authenticated private channels
     authEndpoint: `${Constant.REACT_APP_BASE_URL}/api/broadcasting/auth`,
     auth: {
       headers: {
@@ -36,29 +28,17 @@ export function initRealtimeNotifications(
   });
 
   const channelName = `private-App.Models.User.${userId}`;
-  console.log("📡 Subscribing to:", channelName);
-
   const channel = pusher.subscribe(channelName);
-  channel.bind("pusher:subscription_error", (err: any) => {
-    console.error("❌ SUBSCRIPTION ERROR", err);
-  });
 
-  channel.bind("pusher_internal:subscription_succeeded", () => {
-    // console.log("✅ AUTH SUCCESS");
-  });
   channel.bind(
     "Illuminate\\Notifications\\Events\\BroadcastNotificationCreated",
     (payload: any) => {
-      // console.log("🔔 Realtime notification received:", payload);
       onNotification(payload);
     }
   );
 
-  channel.bind("pusher:subscription_succeeded", () => {
-    // console.log("✅ Realtime subscription successful");
-  });
-
+  //ONLY one error handler
   channel.bind("pusher:subscription_error", (err: any) => {
-    console.error("❌ Realtime subscription error:", err);
+    console.error("Realtime subscription error", err);
   });
 }
