@@ -280,7 +280,7 @@ const columns = useMemo(() => [
             width="420px"
             maxWidth="420px"
             isOpen={isJobCardDeleteModalInfo.open}
-            title="Delete JobCard"
+            title="Delete Job Card"
             description={`Are you sure you want to delete this job card? This action cannot be undone.`}
             confirmText="Delete"
             cancelText="Cancel"

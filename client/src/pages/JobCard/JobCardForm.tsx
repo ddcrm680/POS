@@ -99,7 +99,7 @@ export default function JobCardForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="">
 
       {/*content  */}
-<SectionCard title="Customer & Job Details">
+<SectionCard title="Customer Details">
   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
     {/* Customer selector */}
     <FloatingRHFSelect
@@ -271,7 +271,7 @@ export default function JobCardForm() {
                 variant="outline"
                 disabled={isLoading || isInfoLoading}
                 className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
-                onClick={() => navigate("/customers")}
+                onClick={() => navigate("/job-cards")}
               >
                 {'Cancel'}
               </Button>
