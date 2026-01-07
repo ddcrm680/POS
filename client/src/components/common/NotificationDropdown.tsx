@@ -6,11 +6,7 @@ import {
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { useNotifications } from "@/lib/hooks/useNotifications";
-
-dayjs.extend(relativeTime);
 
 export default function NotificationDropdown() {
   const {
@@ -24,8 +20,11 @@ export default function NotificationDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative hover:text-black hover:bg-transparent">
-
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative hover:text-black hover:bg-transparent"
+        >
           <Bell size={16} />
           {unreadCount > 0 && (
             <span className="absolute top-[4px] right-[4px] h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
@@ -35,18 +34,13 @@ export default function NotificationDropdown() {
         </Button>
       </DropdownMenuTrigger>
 
-   <DropdownMenuContent
-  side="bottom"
-  align="end"
-  sideOffset={-2}
-  collisionPadding={12}
-  className="
-    p-0 overflow-hidden
-     max-w-[80%] md:max-w-full
-    sm:w-96
-    max-w-full
-  "
->
+      <DropdownMenuContent
+        side="bottom"
+        align="end"
+        sideOffset={-2}
+        collisionPadding={12}
+        className="p-0 overflow-hidden sm:w-96 max-w-full"
+      >
         {/* ===== HEADER ===== */}
         <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
           <p className="font-semibold text-sm">Notifications</p>
@@ -76,7 +70,7 @@ export default function NotificationDropdown() {
           )}
 
           {!loading &&
-            notifications.map((n, idx) => (
+            notifications.map((n: any, idx: number) => (
               <div key={n.id}>
                 <button
                   onClick={() => !n.is_read && readNotification(n.id)}
@@ -86,7 +80,7 @@ export default function NotificationDropdown() {
                     ${!n.is_read ? "bg-muted/50" : ""}
                   `}
                 >
-                  {/* Unread indicator (short & elegant) */}
+                  {/* Unread indicator */}
                   {!n.is_read && (
                     <span
                       className="
@@ -101,21 +95,22 @@ export default function NotificationDropdown() {
                   {/* Content */}
                   <div className="flex-1 space-y-0.5">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium">{n.title}</p>
+                      <p className="text-sm font-medium">
+                        {n.data?.title}
+                      </p>
                       <span className="text-[10px] text-muted-foreground shrink-0">
-                        {dayjs(n.created_at).fromNow()}
+                        {n.created_at}
                       </span>
                     </div>
 
                     <p className="text-xs text-muted-foreground leading-snug">
-                      {n.message}
+                      {n.data?.message}
                     </p>
                   </div>
                 </button>
 
-                {/* Separator */}
                 {idx !== notifications.length - 1 && (
-                  <div className=" border-b border-[#ebf0f7]" />
+                  <div className="border-b border-[#ebf0f7]" />
                 )}
               </div>
             ))}

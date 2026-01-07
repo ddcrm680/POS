@@ -794,91 +794,62 @@ export async function UpdateTerritoryStatus(statusInfo: { id: number, }) {
   }
 }
 
-// export async function fetchNotifications() {
-//   const response: any = await api.get(
-//     "/api/notifications",
 
-//   );
-//   if (response?.data?.success === true) {
-//     return response.data?.data ?? [];
-//   }
-//   throw new Error(response.data?.message || "Failed to fetch user");
-// }
-
-// export async function fetchUnreadNotificationCount() {
-//   const response: any = await api.get(
-//     "/api/notifications/unread-count",
-
-//   );
-//   if (response?.data?.success === true) {
-//     return response.data?.count ?? 0;
-//   }
-//   throw new Error(response.data?.message || "Failed to fetch user");
-// }
-
-// export async function  markNotificationRead(id: string) {
-
-//   try {
-//     const response: any = await api.post(
-//       `/api/notifications/${id}/read`
-//     );
-//     if (response?.data?.success === true) {
-//       return response.data?.data;
-//     }
-
-//   } catch (response: any) {
-//     throw response
-
-//   }
-// }
-// export async function markAllNotificationsRead() {
-
-//   try {
-//     const response: any = await api.post(
-//       `/api/notifications/read-all`
-//     );
-//     if (response?.data?.success === true) {
-//       return response.data?.data;
-//     }
-
-//   } catch (response: any) {
-//     throw response
-
-//   }
-// }
-
-let notifications = [...mockNotifications];
-
-export async function fetchNotifications() {
-  return new Promise<any[]>((resolve) => {
-    setTimeout(() => resolve([...notifications]), 400);
-  });
-}
-
-export async function fetchUnreadNotificationCount() {
-  return new Promise<number>((resolve) => {
-    setTimeout(
-      () => resolve(notifications.filter((n) => !n.is_read).length),
-      200
+export async function fetchNotifications(params?: {
+  page?: number;
+  per_page?: number;
+}) {
+  try {
+    const response: any = await api.get(
+      "/api/notifications",
+      { params }
     );
-  });
+
+    if (response?.data?.success === true) {
+      return response.data?.data ?? [];
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to fetch notifications"
+    );
+  } catch (response: any) {
+    throw response;
+  }
 }
+
 
 export async function markNotificationRead(id: string) {
-  return new Promise((resolve) => {
-    notifications = notifications.map((n) =>
-      n.id === id ? { ...n, is_read: true } : n
+  try {
+    const response: any = await api.post(
+      `/api/notifications/${id}/read`
     );
-    setTimeout(resolve, 200);
-  });
+
+    if (response?.data?.success === true) {
+      return response.data?.data;
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to mark notification as read"
+    );
+  } catch (response: any) {
+    throw response;
+  }
 }
 
 export async function markAllNotificationsRead() {
-  return new Promise((resolve) => {
-    notifications = notifications.map((n) => ({
-      ...n,
-      is_read: true,
-    }));
-    setTimeout(resolve, 200);
-  });
+  try {
+    const response: any = await api.post(
+      `/api/notifications/read-all`
+    );
+
+    if (response?.data?.success === true) {
+      return true;
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to mark all notifications as read"
+    );
+  } catch (response: any) {
+    throw response;
+  }
 }

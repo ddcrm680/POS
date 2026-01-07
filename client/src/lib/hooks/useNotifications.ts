@@ -1,68 +1,44 @@
-import { useEffect, useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
-    fetchNotifications,
-    fetchUnreadNotificationCount,
-    markNotificationRead,
-    markAllNotificationsRead,
+  fetchNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
 } from "@/lib/api";
+import { queryClient } from "@/lib/queryClient";
 
 export function useNotifications() {
-    const [notifications, setNotifications] = useState<any[]>([]);
-    const [unreadCount, setUnreadCount] = useState(0);
-    const [loading, setLoading] = useState(false);
+  /*FETCH NOTIFICATIONS*/
+  const { data = [], isLoading } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: () => fetchNotifications(),
+  });
 
-    async function loadNotifications() {
-        setLoading(true);
-        try {
-            const [list, count] = await Promise.all([
-                fetchNotifications(),
-                fetchUnreadNotificationCount(),
-            ]);
-            setNotifications(list);
-            setUnreadCount(count);
-        } catch (e) {
-            console.error(e)
-        } finally {
-            setLoading(false);
-        }
-    }
 
-    async function readNotification(id: string) {
-        try {
-            await markNotificationRead(id);
-            setNotifications((prev) =>
-                prev.map((n) =>
-                    n.id === id ? { ...n, is_read: true } : n
-                )
-            );
-            setUnreadCount((c) => Math.max(0, c - 1));
-        } catch (e) {
-            console.error(e)
-        }
-    }
+  /*DERIVE UNREAD COUNT*/
+  const unreadCount = data.filter((n: any) => !n.is_read).length;
 
-    async function readAll() {
-        try {
-            await markAllNotificationsRead();
-            setNotifications((prev) =>
-                prev.map((n) => ({ ...n, is_read: true }))
-            );
-            setUnreadCount(0);
-        } catch (e) {
-            console.error(e)
-        }
-    }
+  /*MARK SINGLE AS READ */
+  const readMutation = useMutation({
+    mutationFn: (id: string) => markNotificationRead(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
 
-    useEffect(() => {
-        loadNotifications();
-    }, []);
+  /*MARK ALL AS READ */
+  const readAllMutation = useMutation({
+    mutationFn: () => markAllNotificationsRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
 
-    return {
-        notifications,
-        unreadCount,
-        loading,
-        reload: loadNotifications,
-        readNotification,
-        readAll,
-    };
+  return {
+    notifications: data,
+    unreadCount,
+    loading: isLoading,
+    readNotification: (id: string) => readMutation.mutate(id),
+    readAll: () => readAllMutation.mutate(),
+  };
+  
 }
