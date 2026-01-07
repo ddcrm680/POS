@@ -23,7 +23,7 @@ export default function NotificationDropdown() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative hover:text-black hover:bg-transparent"
+          className="relative hover:bg-transparent"
         >
           <Bell size={16} />
           {unreadCount > 0 && (
@@ -37,8 +37,6 @@ export default function NotificationDropdown() {
       <DropdownMenuContent
         side="bottom"
         align="end"
-        sideOffset={-2}
-        collisionPadding={12}
         className="p-0 overflow-hidden sm:w-96 max-w-full"
       >
         {/* ===== HEADER ===== */}
@@ -58,19 +56,15 @@ export default function NotificationDropdown() {
         {/* ===== BODY ===== */}
         <div className="max-h-[360px] overflow-y-auto">
           {loading && (
-            <div className="flex items-center justify-center p-2">
-            <p className="p-4 text-sm text-muted-foreground">
+            <p className="p-4 text-sm text-muted-foreground text-center">
               Loading notifications…
             </p>
-          </div>
           )}
 
           {!loading && notifications.length === 0 && (
-            <div className="flex items-center justify-center p-2">
-            <p className="p-4 text-sm text-muted-foreground">
+            <p className="p-4 text-sm text-muted-foreground text-center">
               You’re all caught up 🎉
             </p>
-          </div>
           )}
 
           {!loading &&
@@ -79,27 +73,18 @@ export default function NotificationDropdown() {
                 <button
                   onClick={() => !n.is_read && readNotification(n.id)}
                   className={`
-                    relative w-full text-left px-4 py-3 flex gap-3
-                    hover:bg-muted/40 transition
-                    ${!n.is_read ? "bg-muted/50" : ""}
+                    w-full text-left px-4 py-3
+                    transition hover:bg-muted/40
+                    ${!n.is_read ? "bg-[#eef6ff]" : "bg-transparent"}
                   `}
                 >
-                  {/* Unread indicator */}
-                  {!n.is_read && (
-                    <span
-                      className="
-                        absolute left-1 top-1/2
-                        h-6 w-1
-                        -translate-y-1/2
-                        bg-primary rounded-full
-                      "
-                    />
-                  )}
-
-                  {/* Content */}
-                  <div className="flex-1 space-y-0.5">
+                  <div className="space-y-0.5">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium">
+                      <p
+                        className={`text-sm ${
+                          !n.is_read ? "font-medium" : "text-muted-foreground"
+                        }`}
+                      >
                         {n.data?.title}
                       </p>
                       <span className="text-[10px] text-muted-foreground shrink-0">
@@ -119,6 +104,15 @@ export default function NotificationDropdown() {
               </div>
             ))}
         </div>
+
+        {/* ===== FOOTER ===== */}
+        {!loading && notifications.length > 0 && (
+          <div className="border-t px-4 py-2 text-center">
+            <button className="text-sm text-primary hover:underline">
+              See all
+            </button>
+          </div>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
