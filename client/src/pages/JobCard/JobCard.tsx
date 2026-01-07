@@ -10,14 +10,13 @@ import { useLocation } from "wouter";
 import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
-import { Box, IconButton, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, Trash2 } from "lucide-react";
+import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
+import { EditIcon, EyeIcon, PrinterIcon, Trash2 } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
-import TerritoryMasterForm from "./JobCardForm";
-import { customerMockData, territoryMasterMockData } from "@/lib/mockData";
+import { customerMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 
 export default function JobCard() {
   const { toast } = useToast();
@@ -65,99 +64,170 @@ export default function JobCard() {
       setIsLoading(false);
     }
   };
-const columns = useMemo(() => [
-  /* ================= CREATED ON ================= */
+const columns = [
+  /* ================= DATE / CREATED BY ================= */
   {
     key: "created_at",
-    label: " Created On",
-    align: "center",
-    width: "140px",
+    label: "Created On",
+      align: "center",
+    width: "170px",
     render: (value: string, row: any) => (
-       <Box className="flex flex-col justify-center items-center">
-            <span className="font-bold  ">
-              {formatDate(value)}
-            </span>
-            <span className="text-sm font-medium  text-gray-700">
-              {formatTime(value)}
-            </span></Box>
+     <Box className="flex flex-col justify-center items-center">
+                <span className="font-bold  ">
+                  {formatDate(value)}
+                </span>
+                <span className="text-sm font-medium  text-gray-700">
+                  {formatTime(value)}
+                </span></Box>
     ),
   },
+  {
+    key: "job_card_no",
+    label: "JC No.",
+    width: "100px",
+    render: (value: string) => (
+      <span className="text-primary font-medium cursor-pointer">
+        {value}
+      </span>
+    ),
+  },
+
 
   /* ================= NAME ================= */
   {
     key: "name",
-    label: "Name",
-    width: "150px",
-  },
-
-  /* ================= MOBILE ================= */
-  {
-    key: "mobile_no",
-    label: "Mobile No.",
-    width: "150px",
-   
-  },
-
-  /* ================= VEHICLE TYPE ================= */
-  {
-    key: "vehicle_type",
-    label: "Vehicle Type",
-    width: "160px",
+    label: "Customer",
+    width: "180px",
     render: (value: string) => (
-      <span className="text-sm text-gray-700">
-        {value || "-"}
+      <span className="text-primary font-medium cursor-pointer">
+        {value}
       </span>
     ),
   },
-
-  /* ================= INTERESTED IN ================= */
+  /* ================= JOB CARD DATE ================= */
   {
-    key: "interested_in",
-    label: "Interested In",
-    width: "160px",
+    key: "job_card_date",
+    label: "Service Date",
+    width: "140px",
     render: (value: string) => (
-      <span className="text-sm text-gray-700 capitalize">
-        {value || "-"}
+      <span className="text-sm">
+        {formatDate(value)}
       </span>
     ),
   },
-
-  /* ================= SOURCE ================= */
+  /* ================= VEHICLE CATEGORY ================= */
   {
-    key: "source",
-    label: "Source",
+    key: "vehicle_category",
+    label: "Vehicle Category",
     width: "150px",
-    render: (value: string) => (
-      <span className="text-sm text-gray-700">
-        {value || "-"}
-      </span>
-    ),
   },
 
-  /* ================= ADDRESS ================= */
+  /* ================= BRAND ================= */
   // {
-  //   key: "address",
-  //   label: "Address",
-  //   width: "240px",
+  //   key: "brand",
+  //   label: "Brand",
+  //   width: "110px",
+  // },
+
+  /* ================= CAR MODEL ================= */
+  {
+    key: "car_model",
+    label: "Car Model",
+    width: "120px",
+  },
+
+  /* ================= SERVICE PLAN ================= */
+  // {
+  //   key: "service_plan",
+  //   label: "Service Plan",
+  //   width: "340px",
   //   render: (value: string) => (
   //     <span
-  //       className="text-sm text-gray-700 cursor-help"
+  //       className="text-sm text-gray-700"
   //       title={value}
   //     >
-  //       {value || "-"}
+  //       {value}
   //     </span>
   //   ),
   // },
 
- 
-], []);
+  /* ================= REG NO ================= */
+  {
+    key: "registration_no",
+    label: "Reg No.",
+    width: "130px",
+  },
 
+  /* ================= JOB CARD NO ================= */
+
+
+  /* ================= STATUS ================= */
+  {
+    key: "status",
+    label: "Status",
+    width: "90px",
+    render: (value: string) => (
+       <Badge
+          className={
+            `  px-3 py-1 text-xs font-medium  rounded-full ${
+            value === "open"
+              ? "bg-emerald-100 text-emerald-700"
+              : value === "cancel"
+              ? "bg-red-100 text-red-700"
+              : "bg-gray-100 text-gray-700"
+          }`
+          }
+        >
+          {value ==='open' ? "Open" : "Cancel"}
+        </Badge>
+     
+    ),
+  },
+
+  /* ================= INVOICE NO ================= */
+{
+  key: "invoice_no",
+  label: "Invoice No.",
+  width: "150px",
+  render: (_: any, row: any) => {
+    // CASE 1: Invoice exists
+    if (row.invoice_no) {
+      return (
+        <span
+          className="text-primary font-medium cursor-pointer hover:underline"
+          onClick={() => navigate(`/invoice/view/${row.invoice_no}`)}
+        >
+          {row.invoice_no}
+        </span>
+      );
+    }
+
+    // CASE 2: No invoice → show action
+    return (
+      <button
+        onClick={() =>
+          navigate(`/invoice/manage?job_card_id=${row.id}`)
+        }
+        className="
+          px-3 py-1 text-xs font-medium
+          rounded-md border border-primary
+          text-primary hover:bg-primary hover:text-white
+          transition
+        "
+      >
+        Create Invoice
+      </button>
+    );
+  },
+}
+
+];
   const fetchJobCard = async (isLoaderHide = false) => {
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
       const res ={
-        data:customerMockData}
+        data:jobCardMockData}
         // await fetchCustomerList({
         //   per_page: perPage,
         //   page,
@@ -232,6 +302,16 @@ const columns = useMemo(() => [
 
                   {(
                     <Box className="gap-3">
+                           <IconButton
+                      size="xs"
+                      mr={2}
+                      aria-label="Print"
+                      onClick={() =>
+                       {}
+                      }
+                    >
+                      <PrinterIcon />
+                    </IconButton>
                        <IconButton
                       size="xs"
                       mr={2}

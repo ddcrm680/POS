@@ -30,9 +30,10 @@ import StoreDetails from "./pages/storeDetails/storeDetails";
 import Store from "./pages/masters/store/store";
 import StoreList from "./pages/masters/store/storeList";
 import Customer from "./pages/Customer/Customer";
-import CustomerForm from "./pages/Customer/CustomerForm";
-import JobCardForm from "./pages/JobCard/JobCardForm";
 import JobCard from "./pages/JobCard/JobCard";
+import { JobForm } from "./pages/JobCard/JobForm";
+import Invoice from "./pages/Invoices/Invoice";
+import InvoiceForm from "./pages/Invoices/InvoiceForm";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -55,11 +56,14 @@ export function Router() {
       />} />
         <Route path="/stores" component={() => <ProtectedRoute component={StoreList} 
       />} />
+       <Route path="/invoices" component={() => <ProtectedRoute component={Invoice} 
+      />} />
+      <Route path="/invoice/manage" component={() => <ProtectedRoute component={InvoiceForm} />} />
+ 
       {/* <Route path="/master/stores" component={() => <ProtectedRoute component={Store} 
       />} /> */}
        <Route path="/master/territory/manage" component={() => <ProtectedRoute component={TerritoryMasterForm} />} />
-   <Route path="/customers/manage" component={() => <ProtectedRoute component={CustomerForm} />} />
-     <Route path="/jobCard/manage" component={() => <ProtectedRoute component={JobCardForm} />} />
+     <Route path="/jobCard/manage" component={() => <ProtectedRoute component={JobForm} />} />
   
       <Route path="/master/stores/manage" component={() => <ProtectedRoute component={StoreFormHandler} />} />
       

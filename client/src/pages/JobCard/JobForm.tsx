@@ -1,6 +1,4 @@
-"use client";
-
-import { useEffect, useState } from "react";
+ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -20,11 +18,8 @@ import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import Datepicker from "react-tailwindcss-datepicker";
 import { FloatingDateField } from "@/components/common/FloatingDateField";
 
-/* ============================
-   MAIN FORM
-============================ */
-export default function AddCustomerForm() {
-  const [step, setStep] = useState(1);
+export function JobForm(){
+ const [step, setStep] = useState(1);
   const [, navigate] = useLocation();
 
   const [searchParams] = useSearchParams();
@@ -92,7 +87,7 @@ useEffect(()=>{
         </button>
         <div>
           <h1 className="text-xl font-semibold">
-            {isView ? "View Customer" : id ? "Edit Customer" : "Create New Customer"}
+            {isView ? "View Job Card" : id ? "Edit Job Card" : "Create New Job Card"}
           </h1>
 
         </div>

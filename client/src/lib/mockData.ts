@@ -669,4 +669,446 @@ export const customerMockData = [
     address: "D-50 Sector-2 Noida",
   },
 ];
+export const jobCardMockData = [
+  {
+    id: 1,
+    created_at: "2026-01-07T10:25:00",
+    created_by: "Rajat Ahooja",
+
+    job_card_date: "2026-01-13",
+
+    name: "Detailing Devils ss",
+    mobile_no: "6647123413",
+
+    vehicle_category: "Luxury Mini SUV",
+    vehicle_type: "Mini SUV",
+    brand: "HYUNDAI",
+    car_model: "CRETA",
+
+    service_plan:
+      "Front Bumper Coating, Front Right Door Coating",
+
+    registration_no: "WQDWE12",
+    job_card_no: "#172509",
+
+    status: "open",
+    invoice_no: null,
+  },
+
+  {
+    id: 2,
+    created_at: "2026-01-07T12:10:00",
+    created_by: "Detailing Devils",
+
+    job_card_date: "2026-01-07",
+
+    name: "Jatin Chopra",
+    mobile_no: "+917290004718",
+
+    vehicle_category: "Mini SUV",
+    vehicle_type: "Mini SUV",
+    brand: "HYUNDAI",
+    car_model: "i20",
+
+    service_plan: "Boot Coating",
+
+    registration_no: "WQDWE12",
+    job_card_no: "#346905",
+
+    status: "open",
+    invoice_no: null,
+  },
+
+  {
+    id: 3,
+    created_at: "2025-12-09T09:30:00",
+    created_by: "Rajat Ahooja",
+
+    job_card_date: "2025-12-09",
+
+    name: "Jatin Chopra",
+    mobile_no: "+917290004718",
+
+    vehicle_category: "Luxury SUV",
+    vehicle_type: "SUV",
+    brand: "HYUNDAI",
+    car_model: "i20",
+
+    service_plan:
+      "Boot Coating, Bonnet Coating, Rear Bumper Coating",
+
+    registration_no: "WQDWE12",
+    job_card_no: "#309703",
+
+    status: "open",
+    invoice_no: "CO/25-26/1",
+  },
+
+  {
+    id: 4,
+    created_at: "2025-04-15T15:40:00",
+    created_by: "Detailing Devils",
+
+    job_card_date: "2025-04-15",
+
+    name: "Test DD",
+    mobile_no: "9643147619",
+
+    vehicle_category: "Luxury Hatchback",
+    vehicle_type: "Hatchback",
+    brand: "BMW",
+    car_model: "X2",
+
+    service_plan: "Rear Left Door Coating",
+
+    registration_no: "ABCDG45688",
+    job_card_no: "#328671",
+
+    status: "open",
+    invoice_no: "CO/25-26/2",
+  },
+
+  {
+    id: 5,
+    created_at: "2024-10-28T11:00:00",
+    created_by: "Rajat Ahooja",
+
+    job_card_date: "2024-10-28",
+
+    name: "Nripesh Mishra",
+    mobile_no: "8468941555",
+
+    vehicle_category: "Bike",
+    vehicle_type: "Bike",
+    brand: "HYUNDAI",
+    car_model: "VERNA",
+
+    service_plan: "Armor Absolute",
+
+    registration_no: "DL-8468944",
+    job_card_no: "#285904",
+
+    status: "open",
+    invoice_no: null,
+  },
+
+  {
+    id: 6,
+    created_at: "2024-09-04T16:20:00",
+    created_by: "Rajat Ahooja",
+
+    job_card_date: "2024-09-04",
+
+    name: "Devil Admin1 User 2",
+    mobile_no: "8468941555",
+
+    vehicle_category: "Hatchback",
+    vehicle_type: "Hatchback",
+    brand: "HYUNDAI",
+    car_model: "VERNA",
+
+    service_plan: "Front Bumper Coating",
+
+    registration_no: "ABCDG456887777",
+    job_card_no: "#114216",
+
+    status: "cancel",
+    invoice_no: null,
+  },
+
+  {
+    id: 7,
+    created_at: "2024-07-10T14:00:00",
+    created_by: "Rajat Ahooja",
+
+    job_card_date: "2024-07-15",
+
+    name: "Mishra Nripesh",
+    mobile_no: "8468941554",
+
+    vehicle_category: "Hatchback",
+    vehicle_type: "Hatchback",
+    brand: "HYUNDAI",
+    car_model: "VERNA",
+
+    service_plan: "Boot Coating",
+
+    registration_no: "ABCDG456887777",
+    job_card_no: "#244656",
+
+    status: "open",
+    invoice_no: "CO/24-25/9",
+  },
+];
+export const invoiceMockData = [
+  {
+    id: 1,
+    created_at: "2025-04-15T16:29:00",
+    created_by: "Detailing Devils",
+    consumer: "test dd",
+    invoice_no: "CO/25-26/2",
+
+    amount: 2006,
+    invoice_total: 2006,
+    already_received: 0,
+    balance_due: 2006,
+    due_amount: 2006,
+
+    received_amount: 0,
+    net_amount: 0,
+
+    payment_mode: "",
+    payment_date: "",
+    tax_deducted: "no",
+    withholding_tax: 0,
+
+    payment_status: "Pending",
+    note: "",
+  },
+  {
+    id: 2,
+    created_at: "2025-12-09T15:24:00",
+    created_by: "Rajat Ahooja",
+    consumer: "Jatin Chopra",
+    invoice_no: "CO/25-26/1",
+
+    amount: 11275,
+    invoice_total: 11275,
+    already_received: 0,
+    balance_due: 11275,
+    due_amount: 11275,
+
+    received_amount: 0,
+    net_amount: 0,
+
+    payment_mode: "",
+    payment_date: "",
+    tax_deducted: "no",
+    withholding_tax: 0,
+
+    payment_status: "Pending",
+    note: "",
+  },
+  {
+    id: 3,
+    created_at: "2024-07-10T16:03:00",
+    created_by: "Rajat Ahooja",
+    consumer: "Mishra Nripesh",
+    invoice_no: "CO/24-25/9",
+
+    amount: 1770,
+    invoice_total: 1770,
+    already_received: 0,
+    balance_due: 1770,
+    due_amount: 1770,
+
+    received_amount: 0,
+    net_amount: 0,
+
+    payment_mode: "",
+    payment_date: "",
+    tax_deducted: "no",
+    withholding_tax: 0,
+
+    payment_status: "Pending",
+    note: "",
+  },
+  {
+    id: 4,
+    created_at: "2024-06-18T17:35:00",
+    created_by: "Rajat Ahooja",
+    consumer: "AB C",
+    invoice_no: "CO/24-25/8",
+
+    amount: 32450,
+    invoice_total: 32450,
+    already_received: 32450,
+    balance_due: 0,
+    due_amount: 0,
+
+    received_amount: 0,
+    net_amount: 32450,
+
+    payment_mode: "bank",
+    payment_date: "2024-06-18",
+    tax_deducted: "no",
+    withholding_tax: 0,
+
+    payment_status: "Paid",
+    note: "Full payment received",
+  },
+  {
+    id: 5,
+    created_at: "2024-06-18T18:29:00",
+    created_by: "Rajat Ahooja",
+    consumer: "Mishra Nripesh",
+    invoice_no: "CO/24-25/7",
+
+    amount: 118000,
+    invoice_total: 118000,
+    already_received: 0,
+    balance_due: 118000,
+    due_amount: 118000,
+
+    received_amount: 0,
+    net_amount: 0,
+
+    payment_mode: "",
+    payment_date: "",
+    tax_deducted: "no",
+    withholding_tax: 0,
+
+    payment_status: "Pending",
+    note: "",
+  },
+  {
+    id: 6,
+    created_at: "2024-06-19T13:48:00",
+    created_by: "Rajat Ahooja",
+    consumer: "Sachin Mishra",
+    invoice_no: "CO/24-25/6",
+
+    amount: 112100,
+    invoice_total: 112100,
+    already_received: 0,
+    balance_due: 112100,
+    due_amount: 112100,
+
+    received_amount: 0,
+    net_amount: 0,
+
+    payment_mode: "",
+    payment_date: "",
+    tax_deducted: "no",
+    withholding_tax: 0,
+
+    payment_status: "Cancel",
+    note: "Invoice cancelled",
+  },
+  {
+    id: 7,
+    created_at: "2024-06-18T19:17:00",
+    created_by: "Rajat Ahooja",
+    consumer: "rajat ahooja",
+    invoice_no: "CO/24-25/5",
+
+    amount: 1770,
+    invoice_total: 1770,
+    already_received: 1770,
+    balance_due: 0,
+    due_amount: 0,
+
+    received_amount: 0,
+    net_amount: 1770,
+
+    payment_mode: "cash",
+    payment_date: "2024-06-18",
+    tax_deducted: "no",
+    withholding_tax: 0,
+
+    payment_status: "Paid",
+    note: "Cash received",
+  },
+  {
+    id: 8,
+    created_at: "2024-06-18T18:52:00",
+    created_by: "Rajat Ahooja",
+    consumer: "Amit Mishra",
+    invoice_no: "CO/24-25/4",
+
+    amount: 127440,
+    invoice_total: 127440,
+    already_received: 127440,
+    balance_due: 0,
+    due_amount: 0,
+
+    received_amount: 0,
+    net_amount: 127440,
+
+    payment_mode: "upi",
+    payment_date: "2024-06-18",
+    tax_deducted: "yes",
+    withholding_tax: 0,
+
+    payment_status: "Paid",
+    note: "UPI payment",
+  },
+  {
+    id: 9,
+    created_at: "2024-06-18T17:47:00",
+    created_by: "Rajat Ahooja",
+    consumer: "AB C",
+    invoice_no: "CO/24-25/3",
+
+    amount: 17700,
+    invoice_total: 17700,
+    already_received: 17700,
+    balance_due: 0,
+    due_amount: 0,
+
+    received_amount: 0,
+    net_amount: 17700,
+
+    payment_mode: "bank",
+    payment_date: "2024-06-18",
+    tax_deducted: "no",
+    withholding_tax: 0,
+
+    payment_status: "Paid",
+    note: "Settled",
+  },
+  {
+    id: 10,
+    created_at: "2024-06-14T16:12:00",
+    created_by: "Rajat Ahooja",
+    consumer: "Jatin Chopra",
+    invoice_no: "CO/24-25/2",
+
+    amount: 2950,
+    invoice_total: 2950,
+    already_received: 1100,
+    balance_due: 1850,
+    due_amount: 1850,
+
+    received_amount: 0,
+    net_amount: 1100,
+
+    payment_mode: "cash",
+    payment_date: "2024-06-14",
+    tax_deducted: "no",
+    withholding_tax: 0,
+
+    payment_status: "Partially-Paid",
+    note: "Advance received",
+  },
+];
+export const invoicePlanMockData = [
+  {
+    id: 1,
+    plan_name: "Front Right Door Coating",
+    sac: "9997",
+    visits: 1,
+    price: 3000,
+    discount_percent: 0,
+    discount_amount: 0,
+    sub_amount: 3000,
+    igst_percent: 18,
+    igst_amount: 540,
+    total_amount: 3540,
+  },
+  {
+    id: 2,
+    plan_name: "Front Bumper Coating",
+    sac: "9997",
+    visits: 1,
+    price: 3000,
+    discount_percent: 32,
+    discount_amount: 960,
+    sub_amount: 2040,
+    igst_percent: 18,
+    igst_amount: 367.2,
+    total_amount: 2407.2,
+  },
+];
+
 

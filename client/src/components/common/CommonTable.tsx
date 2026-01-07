@@ -177,7 +177,7 @@ export default function CommonTable({
 
               {actions && (
                <Table.ColumnHeader
-  width="120px"
+  width="160px"
   className="sticky right-0 z-30 bg-inherit text-xs font-semibold    text-gray-600 uppercase"
 >
   Actions

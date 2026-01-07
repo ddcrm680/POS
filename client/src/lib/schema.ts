@@ -851,3 +851,32 @@ export const NewJobCardSchema = z.object({
   paint_thickness_below_2mil: z.boolean().optional(),
   vehicle_older_than_5_years: z.boolean().optional(),
 });
+export const invoicePaymentSchema = z
+  .object({
+    invoice_total: z.number(),
+    already_received: z.number(),
+    due_amount: z.number(),
+
+    received_amount: z
+      .number({ invalid_type_error: "Enter amount" })
+      .min(1, "Amount must be greater than 0"),
+
+    net_amount: z.number(),
+
+    payment_mode: z.string().min(1, "Select payment mode"),
+    payment_date: z.string().min(1, "Select payment date"),
+
+    tax_deducted: z.enum(["no", "yes"]),
+    withholding_tax: z.number().optional(),
+
+    note: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.tax_deducted === "yes" && !data.withholding_tax) {
+      ctx.addIssue({
+        path: ["withholding_tax"],
+        message: "Withholding tax is required",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });

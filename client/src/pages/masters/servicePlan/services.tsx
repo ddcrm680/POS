@@ -368,8 +368,12 @@ export default function Services() {
     fetchServicePlan(false);
   }, [search, page, filters, perPage]);
      async function getServiceMetaInfo() {
-      const res = await fetchServicePlanMetaInfo()
+     try{
+       const res = await fetchServicePlanMetaInfo()
       setServiceMetaInfo(res)
+     }catch(e){
+      console.error(e)
+     }
     }
   useEffect(() => {
  

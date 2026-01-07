@@ -324,6 +324,39 @@ export interface organizationMetaInfoType {
   city: { label: string, value: string }[],
 
 }
+export type InvoicePaymentFormValues = {
+  invoice_total: number;
+  already_received: number;
+  due_amount: number;
+
+  received_amount: number;
+  net_amount: number;
+
+  payment_mode: string;
+  payment_date: string;
+
+  tax_deducted: "no" | "yes";
+  withholding_tax?: number;
+
+  note?: string;
+};
+
+export interface InvoicePaymentFormProp {
+  mode: "create" | "edit" | "view";
+  roles: any[];
+  organizationMetaInfo?: organizationMetaInfoType
+  id?: string;
+
+  initialValues?: Partial<InvoicePaymentFormValues>;
+  isLoading?: boolean;
+  onClose: () => void;
+
+  // 👇 IMPORTANT
+  onSubmit: (
+    values: InvoicePaymentFormValues,
+    setError: UseFormSetError<InvoicePaymentFormValues>
+  ) => void;
+}
 export interface organizationFormProp {
   mode: "create" | "edit" | "view";
   roles: any[];

@@ -16,7 +16,6 @@ import CommonModal from "@/components/common/CommonModal";
 import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
-import TerritoryMasterForm from "./CustomerForm";
 import { customerMockData, territoryMasterMockData } from "@/lib/mockData";
 
 export default function Customer() {
@@ -242,7 +241,7 @@ const columns = useMemo(() => [
             columns={columns}
             isClear={true}
             data={customers}
-            isAdd={true}
+            isAdd={false}
             perPage={perPage}
             setPerPage={setPerPage}
             resetFilter={resetFilter}
@@ -261,8 +260,6 @@ const columns = useMemo(() => [
               setPage(1); // reset page on new search
               // }
             }}
-            setIsModalOpen={(value: boolean) => {    navigate(`/customers/manage`)
-}}
             actions={(row: any) => {
               return (
                 <>
@@ -279,18 +276,6 @@ const columns = useMemo(() => [
                     >
                       <EyeIcon />
                     </IconButton>
-                      {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
-                        size="xs"
-                        mr={2}
-                        aria-label="Edit"
-                        onClick={() => {
-                          navigate(`/customers/manage?id=${row.id}&mode=edit`)
-
-                        }
-                        }
-                      >
-                        <EditIcon />
-                      </IconButton>}
 
                       {
                         Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && !row.store &&
