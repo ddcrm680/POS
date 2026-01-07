@@ -58,15 +58,19 @@ export default function NotificationDropdown() {
         {/* ===== BODY ===== */}
         <div className="max-h-[360px] overflow-y-auto">
           {loading && (
+            <div className="flex items-center justify-center p-2">
             <p className="p-4 text-sm text-muted-foreground">
               Loading notifications…
             </p>
+          </div>
           )}
 
           {!loading && notifications.length === 0 && (
+            <div className="flex items-center justify-center p-2">
             <p className="p-4 text-sm text-muted-foreground">
               You’re all caught up 🎉
             </p>
+          </div>
           )}
 
           {!loading &&
