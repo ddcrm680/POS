@@ -18,8 +18,8 @@ export default function NotificationRealtimeBridge() {
         variant: "info",
       });
 
+      // 🔁 Re-fetch notifications list only
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      queryClient.invalidateQueries({ queryKey: ["notifications-unread"] });
     });
   }, [user?.id]);
 
