@@ -224,7 +224,14 @@ const costSummary = useMemo(() => {
     <div className="max-w-7xl mx-auto p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <ChevronLeft size={18} className="cursor-pointer" />
+        <button
+          onClick={() => window.history.back()}
+          // disabled={loading}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ChevronLeft size={18} />
+        </button>
+
         <h1 className="text-lg font-semibold flex-1">Invoice #{d.invoice_no}</h1>
         <Badge
           className={

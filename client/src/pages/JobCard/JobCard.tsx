@@ -195,7 +195,7 @@ const columns = [
       return (
         <span
           className="text-primary font-medium cursor-pointer hover:underline"
-          onClick={() => navigate(`/invoice/view/${row.invoice_no}`)}
+          onClick={() => navigate(`/invoice/manage?job_card_id=${row.id}`)}
         >
           {row.invoice_no}
         </span>
