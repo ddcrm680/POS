@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import {
   DropdownMenu,
@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/lib/hooks/useNotifications";
+import { useLocation } from "wouter";
 
 export default function NotificationDropdown() {
   const {
@@ -17,13 +18,16 @@ export default function NotificationDropdown() {
     loading,
   } = useNotifications();
 
+  const [, navigate] = useLocation();
+  const [open, setOpen] = useState(false);
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
-          className="relative hover:bg-transparent"
+          className="relative hover:text-black hover:bg-transparent"
         >
           <Bell size={16} />
           {unreadCount > 0 && (
@@ -37,9 +41,11 @@ export default function NotificationDropdown() {
       <DropdownMenuContent
         side="bottom"
         align="end"
+        sideOffset={-2}
+        collisionPadding={12}
         className="p-0 overflow-hidden sm:w-96 max-w-full"
       >
-        {/* ===== HEADER ===== */}
+        {/* HEADER */}
         <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
           <p className="font-semibold text-sm">Notifications</p>
 
@@ -53,7 +59,7 @@ export default function NotificationDropdown() {
           )}
         </div>
 
-        {/* ===== BODY ===== */}
+        {/* BODY */}
         <div className="max-h-[360px] overflow-y-auto">
           {loading && (
             <p className="p-4 text-sm text-muted-foreground text-center">
@@ -82,17 +88,19 @@ export default function NotificationDropdown() {
                     <div className="flex items-center justify-between gap-2">
                       <p
                         className={`text-sm ${
-                          !n.is_read ? "font-medium" : "text-muted-foreground"
+                          !n.is_read
+                            ? "font-medium"
+                            : "text-muted-foreground"
                         }`}
                       >
                         {n.data?.title}
                       </p>
-                      <span className="text-[10px] text-muted-foreground shrink-0">
+                      <span className="text-[10px] text-muted-foreground">
                         {n.created_at}
                       </span>
                     </div>
 
-                    <p className="text-xs text-muted-foreground leading-snug">
+                    <p className="text-xs text-muted-foreground">
                       {n.data?.message}
                     </p>
                   </div>
@@ -105,10 +113,20 @@ export default function NotificationDropdown() {
             ))}
         </div>
 
-        {/* ===== FOOTER ===== */}
+        {/* FOOTER */}
         {!loading && notifications.length > 0 && (
           <div className="border-t px-4 py-2 text-center">
-            <button className="text-sm text-primary hover:underline">
+            <button
+              className="text-sm text-primary hover:underline"
+              onClick={() => {
+                localStorage.removeItem("sidebar_active_parent");
+                localStorage.removeItem("master_active_tab");
+
+                readAll();
+                setOpen(false); // ✅ CLOSE DROPDOWN
+                navigate("/notifications");
+              }}
+            >
               See all
             </button>
           </div>

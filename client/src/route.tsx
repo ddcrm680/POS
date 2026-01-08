@@ -34,6 +34,7 @@ import JobCard from "./pages/JobCard/JobCard";
 import { JobForm } from "./pages/JobCard/JobForm";
 import Invoice from "./pages/Invoices/Invoice";
 import InvoiceForm from "./pages/Invoices/InvoiceForm";
+import Notification from "./pages/Notification/Noitification";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -55,6 +56,8 @@ export function Router() {
       <Route path="/master" component={() => <ProtectedRoute component={Master} 
       />} />
         <Route path="/stores" component={() => <ProtectedRoute component={StoreList} 
+      />} />
+            <Route path="/notifications" component={() => <ProtectedRoute component={Notification} 
       />} />
        <Route path="/invoices" component={() => <ProtectedRoute component={Invoice} 
       />} />
