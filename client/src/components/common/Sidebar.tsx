@@ -108,7 +108,9 @@ export default function Sidebar({
               <button
                 onClick={() => {
                   localStorage.setItem("sidebar_active_parent", tab.id);
-
+if (tab.path === "/master") {
+            localStorage.removeItem("master_active_tab");
+          }
                   if (tab.children) {
                     setOpenParent(expanded ? null : tab.id);
 
