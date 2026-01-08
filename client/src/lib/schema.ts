@@ -835,3 +835,6 @@ export const invoicePaymentSchema = z
       });
     }
   });
+  export const invoiceSchema = z.object({
+  billing_address: z.string().min(1, "Billing address is required"),
+});

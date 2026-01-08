@@ -21,7 +21,7 @@ import { Box } from "@chakra-ui/react";
 import { Constant } from "@/lib/constant";
 import { invoicePlanMockData, warrantyType } from "@/lib/mockData";
 import { InvoicePaymentFormProp, InvoicePaymentFormValues, organizationFormType, serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
-import { invoicePaymentSchema, organizationSchema, servicePlanSchema, userSchema } from "@/lib/schema";
+import { invoicePaymentSchema, invoiceSchema, organizationSchema, servicePlanSchema, userSchema } from "@/lib/schema";
 import RHFSelect from "@/components/RHFSelect";
 import { Textarea } from "@/components/ui/textarea";
 import { unknown } from "zod";
@@ -42,6 +42,9 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, FileText } from "lucide-react";
 import CommonTable from "@/components/common/CommonTable";
 import { Info } from "@/components/common/viewInfo";
+import { useLocation, useSearchParams } from "wouter";
+import { Loader } from "@/components/common/loader";
+import { useToast } from "@/hooks/use-toast";
 
 const invoiceViewMock = {
   invoice_no: "CO/25-26/2",
@@ -112,7 +115,20 @@ const availablePlansMock = [
 export default function InvoiceForm() {
   const d = invoiceViewMock;
   const [plans, setPlans] = useState(invoicePlanMockData);
-const [selectedPlanId, setSelectedPlanId] = useState<string>("");
+
+  const [, navigate] = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const [isInfoLoading, setIsInfoLoading] = useState(false);
+
+
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const [invoiceInfo, setInvoiceInfo] = useState<{
+    selectedPlanId: string, billingAddress: string
+  }>({
+    selectedPlanId: "", billingAddress: ""
+  });
   const [extraDiscountPercent, setExtraDiscountPercent] = useState(0);
   const planColumns = useMemo(() => [
     {
@@ -197,29 +213,104 @@ const [selectedPlanId, setSelectedPlanId] = useState<string>("");
 
 
   ], []);
-const costSummary = useMemo(() => {
-  const totalItems = plans.length;
+  const costSummary = useMemo(() => {
+    const totalItems = plans.length;
 
-  const subTotal = plans.reduce(
-    (sum, item) => sum + Number(item.sub_amount || 0),
-    0
-  );
+    const subTotal = plans.reduce(
+      (sum, item) => sum + Number(item.sub_amount || 0),
+      0
+    );
 
-  const igstTotal = plans.reduce(
-    (sum, item) => sum + Number(item.igst_amount || 0),
-    0
-  );
+    const igstTotal = plans.reduce(
+      (sum, item) => sum + Number(item.igst_amount || 0),
+      0
+    );
 
-  const extraDiscountAmount =
-    (subTotal * Number(extraDiscountPercent || 0)) / 100;
+    const extraDiscountAmount =
+      (subTotal * Number(extraDiscountPercent || 0)) / 100;
 
-  return {
-    totalItems,
-    subTotal,
-    extraDiscountAmount,
-    igstTotal,
-  };
-}, [plans, extraDiscountPercent]);
+    return {
+      totalItems,
+      subTotal,
+      extraDiscountAmount,
+      igstTotal,
+    };
+  }, [plans, extraDiscountPercent]);
+  useEffect(() => {
+    if (!invoiceInfo.billingAddress && d.customer.address) {
+      setInvoiceInfo((prev) => ({
+        ...prev,
+        billingAddress: d.customer.address,
+      }));
+    }
+  }, [d.customer.address]);
+  const form = useForm({
+    resolver: zodResolver(invoiceSchema),
+    defaultValues: {
+      billing_address: d.customer.address ?? "",
+    },
+  });
+  
+  const { toast } = useToast();
+  const mode = searchParams.get("mode");
+   async function handleInvoiceSubmission(values: any) {
+      setIsLoading(true);
+  
+      try {
+        if (mode === "edit") {
+          // await EditStore(value);
+  
+          toast({
+            title: "Edit Invoice",
+            description: "Invoice updated successfully",
+            variant: "success",
+          });
+  
+        } else {
+  
+          //const res= await SaveStore(value);
+  
+          toast({
+            title: "Add Invoice",
+            description: " Invoice added successfully",
+            variant: "success",
+          });
+          // ✅ ONLY open modal here
+         
+        }
+  
+  
+          navigate("/invoices")
+      } catch (err: any) {
+        const apiErrors = err?.response?.data?.errors;
+  
+  
+        // 👇 THIS IS THE KEY PART
+        if (apiErrors && err?.response?.status === 422) {
+          // Object.entries(apiErrors).forEach(([field, messages]) => {
+          //   setError(field as keyof any, {
+          //     type: "server",
+          //     message: (messages as string[])[0],
+          //   });
+          // });
+          return;
+        }
+        if (err?.response?.status === 403) {
+          navigate("/invoices")
+        }
+        toast({
+          title: "Error",
+          description:
+            err?.response?.data?.message ||
+            err.message ||
+            `Failed to ${mode === "create" ? "add" : "update"
+            } store`,
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-4">
       {/* Header */}
@@ -293,51 +384,62 @@ const costSummary = useMemo(() => {
       {/* Plans */}
       <Card className="p-4 lg:col-span-3">
         <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
-           PLAN INFO
+          PLAN INFO
         </CardTitle>
+ <Form {...form}>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-1 gap-4">
+              <FloatingTextarea
+                name="billing_address"
+                rows={2}
+                label="Billing Address"
+                control={form.control}
+                isRequired
+              />
+            </div>
+          </Form>
+        <div className="flex items-end gap-3 mt-3 ">
+         
+          <div className="w-72">
 
-<div className="flex items-end gap-3 mt-3 ">
-  <div className="w-72">
 
+            <select
+              value={invoiceInfo.selectedPlanId}
+              onChange={(e) => setInvoiceInfo((prev) => ({ ...prev, selectedPlanId: e.target.value }))}
+              className="w-full border rounded-md px-3 py-2 text-sm"
+            >
+              <option value="">Select Plan</option>
+              {availablePlansMock.map((plan) => (
+                <option key={plan.id} value={plan.id}>
+                  {plan.plan_name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-    <select
-      value={selectedPlanId}
-      onChange={(e) => setSelectedPlanId(e.target.value)}
-      className="w-full border rounded-md px-3 py-2 text-sm"
-    >
-      <option value="">Select Plan</option>
-      {availablePlansMock.map((plan) => (
-        <option key={plan.id} value={plan.id}>
-          {plan.plan_name}
-        </option>
-      ))}
-    </select>
-  </div>
+          <Button
+            size="sm"
+            onClick={() => {
+              if (!invoiceInfo.selectedPlanId) return;
 
-  <Button
-    size="sm"
-    onClick={() => {
-      if (!selectedPlanId) return;
+              const plan = availablePlansMock.find(
+                (p) => String(p.id) === invoiceInfo.selectedPlanId
+              );
 
-      const plan = availablePlansMock.find(
-        (p) => String(p.id) === selectedPlanId
-      );
+              if (!plan) return;
 
-      if (!plan) return;
+              // ❌ prevent duplicate
+              if (plans.some((p) => p.id === plan.id)) return;
 
-      // ❌ prevent duplicate
-      if (plans.some((p) => p.id === plan.id)) return;
-
-      setPlans((prev) => [...prev, plan]);
-      setSelectedPlanId("");
-    }}
-  >
-    Add Plan
-  </Button>
-</div>
+              setPlans((prev) => [...prev, plan]);
+              setInvoiceInfo((prev) => ({ ...prev, selectedPlanId: "" }));
+            }}
+          >
+            Add Plan
+          </Button>
+        </div>
         <CommonTable
           columns={planColumns}
-        data={plans}
+          data={plans}
           searchable={false}
           isAdd={false}
           perPage={10}
@@ -429,6 +531,30 @@ const costSummary = useMemo(() => {
           </div>
         </div>
       </Card>
+      
+                    <div className="  pb-4 flex justify-end gap-3 mt-4">
+                      <Button
+                        variant="outline"
+                        disabled={isLoading || isInfoLoading}
+                        className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                        onClick={() => navigate("/invoices")}
+                      >
+                        {'Cancel'}
+                      </Button>
+      
+                      {(
+                        <Button type="button"
+                          disabled={isLoading || isInfoLoading}
+                          onClick={form.handleSubmit(handleInvoiceSubmission)}
+                          className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
+                          {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
+                          {isLoading
+                            ? id ? "Updating..." : "Adding..."
+                            : id ? "Update " : "Add "}
+                        </Button>
+                      )}
+      
+                    </div>
 
     </div>
   );

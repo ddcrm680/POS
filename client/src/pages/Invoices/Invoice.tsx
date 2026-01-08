@@ -89,8 +89,9 @@ export default function Invoice() {
             key: "invoice_no",
             label: "Invoice No.",
             width: "130px",
-            render: (value: string) => (
-                <span className="text-primary font-medium cursor-pointer">
+            render: (value: string,row:any) => (
+                <span className="text-primary font-medium cursor-pointer" onClick={()=>  navigate(`/invoice/manage?id=${row.id}&mode=view`)
+}>
                     {value}
                 </span>
             ),
@@ -102,7 +103,9 @@ export default function Invoice() {
             label: "Customer",
             width: "180px",
             render: (value: string) => (
-                <span className="text-primary font-medium cursor-pointer">
+                <span className="text-primary font-medium cursor-pointer" onClick={()=>{
+                    localStorage.setItem("sidebar_active_parent","customers")
+                    navigate("/customers")}}>
                     {value}
                 </span>
             ),
@@ -293,7 +296,10 @@ export default function Invoice() {
                                                 size="xs"
                                                 mr={2}
                                                 aria-label="View"
-                                                onClick={() => { }
+                                                onClick={() => {
+                                                        navigate(`/invoice/manage?id=${row.id}&mode=view`)
+
+                                                 }
                                                 }
                                             >
                                                 <EyeIcon />

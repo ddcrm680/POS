@@ -9,6 +9,7 @@ type FloatingTextareaProps = {
   label: string
   control: Control<any>
   isView?: boolean
+  rows?:number
   isRequired?: boolean
 }
 
@@ -17,6 +18,7 @@ export function FloatingTextarea({
   label,
   control,
   isView,
+  rows=2,
   isRequired = false,
 }: FloatingTextareaProps) {
   const [focused, setFocused] = useState(false)
@@ -35,11 +37,12 @@ export function FloatingTextarea({
             <Textarea
               {...field}
               disabled={isView}
-              pt="18px"
+              pt="8px"
                pl="18px"
+               rows={rows}
+               minH={'45px'}
                  pr="18px"
               pb="8px"
-              minH="80px"
               border="1px solid"
               borderColor={error ? "red.500" : "#e1e7ef"}
               _focus={{

@@ -522,19 +522,20 @@ export async function fetchServicePlanList({
   status,
   per_page
 }: {
-  per_page: number;
-  page: number;
-  search: string;
+  per_page?: number;
+  page?: number;
+  search?: string;
   vehicle_category?: string | number;
   plan_name?: string | number;
   category_name?: string | number;
   status?: string | number;
 }) {
-  const params = new URLSearchParams({
-    page: String(page),
-    search,
-    per_page: String(per_page)
-  });
+  const params = new URLSearchParams();
+  if (page) params.append("page", String(page));
+  if (search) params.append("search", String(search));
+
+  if (per_page) params.append("per_page", String(per_page));
+
   if (plan_name) params.append("plan_name", String(plan_name));
   if (vehicle_category) params.append("vehicle_category", String(vehicle_category));
 
