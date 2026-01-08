@@ -23,6 +23,7 @@ export default function CommonTable({
   tabType,
   setIsUserModalOpenInfo,
   searchable = true,
+  isTotal=true,
   lastPage,
   setPage,
   isAdd = false,
@@ -299,9 +300,9 @@ export default function CommonTable({
 }
           {/* Per Page selector */}
         
-         <span className="text-sm text-gray-600">
+       {isTotal &&   <span className="text-sm text-gray-600">
             Total : <strong>{total}</strong>
-          </span>
+          </span>}
           {/* )} */}
 
         </div>
