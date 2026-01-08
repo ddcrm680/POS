@@ -47,6 +47,7 @@ export default function CommonModal({
 "   style={{
             width: width ?? "80%",
             maxWidth: maxWidth ?? "80%",
+            minWidth: maxWidth ?? "80%",
           }}>
 
           {/* Header */}

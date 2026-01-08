@@ -50,6 +50,7 @@ import { findIdByName } from "@/lib/utils";
 import { fetchCityList, fetchStateList } from "@/lib/api";
 import { NewJobCardSchema } from "@/lib/schema";
 import { useAuth } from "@/lib/auth";
+import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 
 interface ServiceItem {
   id: string;
@@ -98,7 +99,6 @@ export default function JobForm() {
     defaultValues: {
       customer_id: undefined,
 
-      jobcard_date: "",
       service_date: "",
 
       vehicle_type: "",
@@ -287,6 +287,10 @@ export default function JobForm() {
   }, [mode, countryList]);
   const onSubmit = (data: JobCardFormValues) => {
   };
+  const [isJobCardSubmissionDeleteModalInfo, setIsJobCardSubmissionModalOpenInfo] = useState<{ open: boolean, info: any }>({
+    open: false,
+    info: {}
+  });
   useEffect(() => {
     if (!initialValues) return;
 
@@ -317,10 +321,6 @@ export default function JobForm() {
         address: initialValues.address ?? "",
         message: initialValues.message ?? "",
 
-        /* ===== JOB / SERVICE ===== */
-        jobcard_date: initialValues.jobcard_date
-          ? new Date(initialValues.jobcard_date).toISOString().slice(0, 10)
-          : "",
 
         service_date: initialValues.service_date
           ? new Date(initialValues.service_date).toISOString().slice(0, 10)
@@ -421,9 +421,14 @@ export default function JobForm() {
     hydrateGstLocation();
   }, [initialValues, addGST, countryList]);
   useEffect(() => {
-    console.log(form.formState.errors,form.getValues(), 'form.formState.errors');
+    console.log(form.formState.errors, form.getValues(), 'form.formState.errors');
 
   })
+  async function handleJobCardSubmission() {
+    console.log(form.getValues(), 'values---------');
+    setIsJobCardSubmissionModalOpenInfo({ open: false, info: "" })
+
+  }
   return (
     <>
       <div className="max-w-7xl  mx-auto px-4 py-4 space-y-4">
@@ -578,17 +583,22 @@ export default function JobForm() {
                   </div>
 
                   {/* GST OPTIONAL */}
+                  
                   <div className="mt-4 flex items-center gap-2">
-                    <Checkbox
-                      checked={addGST}
+                      <FormField
+                          control={form.control}
+                          name="add_gst"
+                          render={({ field }) => (
+                            <label className="flex items-center gap-2 font-bold text-sm cursor-pointer">
+                              <Checkbox
+                                 checked={addGST}
                       onCheckedChange={(val) => form.setValue("add_gst", Boolean(val))}
-                    />
-                    <label
-                      htmlFor="add_gst"
-                      className="text-sm font-bold "
-                    >
-                      Add GST Details (Optional)
-                    </label>
+                   />
+                              Add GST Details (Optional)
+                            </label>
+                          )}
+                        />
+                    
                   </div>
                   {
                     addGST
@@ -793,18 +803,60 @@ export default function JobForm() {
                     <div className="mt-4">
                       <p className="text-sm font-semibold mb-3">Vehicle Paint Condition</p>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <label className="flex items-center gap-2 text-sm">
-                          <Checkbox /> Repainted Vehicle
-                        </label>
-                        <label className="flex items-center gap-2 text-sm">
-                          <Checkbox /> Single Stage Paint
-                        </label>
-                        <label className="flex items-center gap-2 text-sm">
-                          <Checkbox /> Paint Thickness below 2 MIL
-                        </label>
-                        <label className="flex items-center gap-2 text-sm">
-                          <Checkbox /> Vehicle older than 5 years
-                        </label>
+                        <FormField
+                          control={form.control}
+                          name="repainted_vehicle"
+                          render={({ field }) => (
+                            <label className="flex items-center gap-2 text-sm cursor-pointer">
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={(val) => field.onChange(Boolean(val))}
+                              />
+                              Repainted Vehicle
+                            </label>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="single_stage_paint"
+                          render={({ field }) => (
+                            <label className="flex items-center gap-2 text-sm cursor-pointer">
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={(val) => field.onChange(Boolean(val))}
+                              />
+                              Single Stage Paint
+                            </label>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="paint_thickness_below_2mil"
+                          render={({ field }) => (
+                            <label className="flex items-center gap-2 text-sm cursor-pointer">
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={(val) => field.onChange(Boolean(val))}
+                              />
+                              Paint Thickness below 2 MIL
+                            </label>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="vehicle_older_than_5_years"
+                          render={({ field }) => (
+                            <label className="flex items-center gap-2 text-sm cursor-pointer">
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={(val) => field.onChange(Boolean(val))}
+                              />
+                              Vehicle older than 5 years
+                            </label>
+                          )}
+                        />
                       </div>
                     </div>
                   </SectionCard>
@@ -864,16 +916,21 @@ export default function JobForm() {
                               key={service.id}
                               onClick={() => toggleService(service.id)}
                               className={`
-            cursor-pointer transition-all border
-            ${isSelected
+    cursor-pointer transition-all border
+    ${isSelected
                                   ? "border-primary bg-primary/5 shadow-sm"
                                   : "hover:border-muted-foreground/30"}
-          `}
+  `}
                             >
                               <CardContent className="p-4">
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="flex items-start gap-2">
-                                    <Checkbox checked={isSelected} />
+                                    <Checkbox
+                                      checked={isSelected}
+                                      onCheckedChange={() => toggleService(service.id)}
+                                      onClick={(e) => e.stopPropagation()} // 🔴 IMPORTANT
+                                    />
+
                                     <div>
                                       <p className="font-medium leading-tight">
                                         {service.name}
@@ -921,8 +978,9 @@ export default function JobForm() {
                 </Button>
 
                 {(
-                  <Button type="submit"
+                  <Button type="button"
                     disabled={isLoading || isInfoLoading}
+                    onClick={() => { setIsJobCardSubmissionModalOpenInfo({ open: true, info: id }) }}
                     className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
                     {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
                     {isLoading
@@ -935,6 +993,20 @@ export default function JobForm() {
             </form>
           </Form>
         </div>
+        <CommonDeleteModal
+          width="420px"
+          maxWidth="420px"
+          isOpen={isJobCardSubmissionDeleteModalInfo.open}
+          title="Job Card Created"
+          description="Would you like to proceed with invoice creation for this job card?"
+          confirmText="Yes, create invoice"
+          cancelText="No, finish job card only"
+          isLoading={isLoading}
+          onCancel={handleJobCardSubmission}
+          onConfirm={() => {
+            navigate(`/invoice/manage?job_card_id=${id}`);
+          }}
+        />
       </div>
     </>
   );

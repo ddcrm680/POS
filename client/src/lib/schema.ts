@@ -775,7 +775,6 @@ export const NewJobCardSchema =
     customer_id: z.string().optional(),
 
     service_type: z.array(z.string()).min(1, "Select at least one service"),
-    jobcard_date: z.string().min(1, "Date is required"),
     country_id: z.string().min(1, "Please select country"),
     state_id: z.string().min(1, "Please select state"),
     city_id: z.string().min(1, "Please select city"),
