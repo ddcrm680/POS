@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormSetError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -91,7 +91,7 @@ export default function JobForm() {
       : [...selectedServices, serviceId];
 
     setSelectedServices(newSelection);
-    form.setValue('service_type', newSelection);
+    form.setValue('service_opted', newSelection);
   };
 
   const form = useForm<JobCardFormValues>({
@@ -111,8 +111,8 @@ export default function JobForm() {
       chassis_no: "",
       srs: "",
 
-      service_opted: "",
-      service_amount: "",
+      service_opted: [],
+      // service_amount: "",
 
       vehicle_remark: "",
 
@@ -121,23 +121,22 @@ export default function JobForm() {
       paint_thickness_below_2mil: false,
       vehicle_older_than_5_years: false,
       service_type: [],
-      first_name: "",
-      last_name: "",
+      name: "",
       mobile_no: "",
       email: "",
       country_id: "India",
-      district: "",
-      city_id: "",
+      // district: "",
+      // city_id: "",
       state_id: "",
-      pincode: "",
+      // pincode: "",
       address: "",
-      message: "",
+      // message: "",
 
       add_gst: false,
     },
   });
 
-
+  const { toast } = useToast();
   const addGST = form.watch("add_gst");
   const { countries } = useAuth();
   const [countryList, setCountryList] = useState<
@@ -162,7 +161,7 @@ export default function JobForm() {
 
     form.setValue("gst_country_id", String(india.id));
     form.setValue("gst_state_id", "");
-    form.setValue("gst_city_id", "");
+    // form.setValue("gst_city_id", "");
 
     setGstStates([]);
     setGstCities([]);
@@ -245,7 +244,7 @@ export default function JobForm() {
         const cityId = findIdByName(cityList, initialValues.city);
         if (!cityId) return;
 
-        form.setValue("city_id", String(cityId));
+        // form.setValue("city_id", String(cityId));
 
       } finally {
         // ✅ hydration completed
@@ -299,8 +298,7 @@ export default function JobForm() {
         /* ===== CUSTOMER ===== */
         customer_id: initialValues.customer_id ?? undefined,
 
-        first_name: initialValues.first_name ?? "",
-        last_name: initialValues.last_name ?? "",
+        name: initialValues.name ?? "",
         mobile_no: initialValues.mobile_no ?? "",
         email: initialValues.email ?? "",
 
@@ -312,14 +310,14 @@ export default function JobForm() {
           ? String(initialValues.state_id)
           : "",
 
-        city_id: initialValues.city_id
-          ? String(initialValues.city_id)
-          : "",
+        // city_id: initialValues.city_id
+        //   ? String(initialValues.city_id)
+        //   : "",
 
-        district: initialValues.district ?? "",
-        pincode: initialValues.pincode ?? "",
+        // district: initialValues.district ?? "",
+        // pincode: initialValues.pincode ?? "",
         address: initialValues.address ?? "",
-        message: initialValues.message ?? "",
+        // message: initialValues.message ?? "",
 
 
         service_date: initialValues.service_date
@@ -337,8 +335,8 @@ export default function JobForm() {
         chassis_no: initialValues.chassis_no ?? "",
         srs: initialValues.srs ?? "",
 
-        service_opted: initialValues.service_opted ?? "",
-        service_amount: initialValues.service_amount ?? "",
+        service_opted: initialValues.service_opted ?? [],
+        // service_amount: initialValues.service_amount ?? "",
 
         vehicle_remark: initialValues.vehicle_remark ?? "",
 
@@ -412,7 +410,7 @@ export default function JobForm() {
         const cityId = findIdByName(cityList, initialValues.gst_city);
         if (!cityId) return;
 
-        form.setValue("gst_city_id", String(cityId));
+        // form.setValue("gst_city_id", String(cityId));
       } finally {
         isGstHydratingRef.current = false;
       }
@@ -424,11 +422,69 @@ export default function JobForm() {
     console.log(form.formState.errors, form.getValues(), 'form.formState.errors');
 
   })
-  async function handleJobCardSubmission() {
-    console.log(form.getValues(), 'values---------');
-    setIsJobCardSubmissionModalOpenInfo({ open: false, info: "" })
 
+  async function handleJobCardSubmission(values: JobCardFormValues) {
+    setIsLoading(true);
+
+    try {
+      if (mode === "edit") {
+        // await EditStore(value);
+
+        toast({
+          title: "Edit Job Card",
+          description: "Job Card updated successfully",
+          variant: "success",
+        });
+
+        navigate("/job-cards")
+      } else {
+
+        //const res= await SaveStore(value);
+
+        toast({
+          title: "Add Job Card",
+          description: " Job Card added successfully",
+          variant: "success",
+        });
+        // ✅ ONLY open modal here
+        setIsJobCardSubmissionModalOpenInfo({
+          open: true,
+          info: id,
+        });
+      }
+
+
+    } catch (err: any) {
+      const apiErrors = err?.response?.data?.errors;
+
+
+      // 👇 THIS IS THE KEY PART
+      if (apiErrors && err?.response?.status === 422) {
+        // Object.entries(apiErrors).forEach(([field, messages]) => {
+        //   setError(field as keyof any, {
+        //     type: "server",
+        //     message: (messages as string[])[0],
+        //   });
+        // });
+        return;
+      }
+      if (err?.response?.status === 403) {
+        navigate("/master")
+      }
+      toast({
+        title: "Error",
+        description:
+          err?.response?.data?.message ||
+          err.message ||
+          `Failed to ${mode === "create" ? "add" : "update"
+          } store`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
+
   return (
     <>
       <div className="max-w-7xl  mx-auto px-4 py-4 space-y-4">
@@ -462,18 +518,12 @@ export default function JobForm() {
                   {/* BASIC INFO */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FloatingField
-                      name="first_name"
-                      label="First Name"
+                      name="name"
+                      label="Name"
                       isRequired
                       control={form.control}
                     />
 
-                    <FloatingField
-                      name="last_name"
-                      label="Last Name"
-                      isRequired
-                      control={form.control}
-                    />
 
                     <FloatingField
                       name="mobile_no"
@@ -506,7 +556,7 @@ export default function JobForm() {
                         setStates([]);
                         setCities([]);
                         form.setValue("state_id", "");
-                        form.setValue("city_id", "");
+                        // form.setValue("city_id", "");
 
                         setLoadingState(true);
                         const stateList = await fetchStateList(Number(value));
@@ -530,7 +580,7 @@ export default function JobForm() {
                         if (isHydratingRef.current) return;
 
                         setCities([]);
-                        form.setValue("city_id", "");
+                        // form.setValue("city_id", "");
 
                         setLoadingCity(true);
                         const cityList = await fetchCityList(Number(value));
@@ -538,7 +588,7 @@ export default function JobForm() {
                         setLoadingCity(false);
                       }}
                     />
-
+{/* 
                     <FloatingRHFSelect
                       name="city_id"
                       label="City"
@@ -549,9 +599,9 @@ export default function JobForm() {
                         value: String(c.id),
                         label: c.name,
                       }))}
-                    />
+                    /> */}
 
-                    <FloatingField
+                    {/* <FloatingField
                       name="district"
                       label="District"
                       isRequired
@@ -563,7 +613,7 @@ export default function JobForm() {
                       label="Pincode"
                       isRequired
                       control={form.control}
-                    />
+                    /> */}
                   </div>
 
                   {/* ADDRESS + MESSAGE */}
@@ -575,30 +625,30 @@ export default function JobForm() {
                       control={form.control}
                     />
 
-                    <FloatingTextarea
+                    {/* <FloatingTextarea
                       name="message"
                       label="Message"
                       control={form.control}
-                    />
+                    /> */}
                   </div>
 
                   {/* GST OPTIONAL */}
-                  
+
                   <div className="mt-4 flex items-center gap-2">
-                      <FormField
-                          control={form.control}
-                          name="add_gst"
-                          render={({ field }) => (
-                            <label className="flex items-center gap-2 font-bold text-sm cursor-pointer">
-                              <Checkbox
-                                 checked={addGST}
-                      onCheckedChange={(val) => form.setValue("add_gst", Boolean(val))}
-                   />
-                              Add GST Details (Optional)
-                            </label>
-                          )}
-                        />
-                    
+                    <FormField
+                      control={form.control}
+                      name="add_gst"
+                      render={({ field }) => (
+                        <label className="flex items-center gap-2 font-bold text-sm cursor-pointer">
+                          <Checkbox
+                            checked={addGST}
+                            onCheckedChange={(val) => form.setValue("add_gst", Boolean(val))}
+                          />
+                          Add GST Details (Optional)
+                        </label>
+                      )}
+                    />
+
                   </div>
                   {
                     addGST
@@ -643,7 +693,7 @@ export default function JobForm() {
                               setGstStates([]);
                               setGstCities([]);
                               form.setValue("gst_state_id", "");
-                              form.setValue("gst_city_id", "");
+                              // form.setValue("gst_city_id", "");
 
                               setLoadingGstState(true);
                               const stateList = await fetchStateList(Number(value));
@@ -664,7 +714,7 @@ export default function JobForm() {
                               if (isGstHydratingRef.current) return;
 
                               setGstCities([]);
-                              form.setValue("gst_city_id", "");
+                              // form.setValue("gst_city_id", "");
 
                               setLoadingGstCity(true);
                               const cityList = await fetchCityList(Number(value));
@@ -673,7 +723,7 @@ export default function JobForm() {
                             }}
                           />
 
-                          <FloatingRHFSelect
+                          {/* <FloatingRHFSelect
                             name="gst_city_id"
                             label="City"
                             control={form.control}
@@ -687,22 +737,22 @@ export default function JobForm() {
                             name="gst_district"
                             label="District"
                             control={form.control}
-                          />
+                          /> */}
 
-                          <FloatingField
+                          {/* <FloatingField
                             name="gst_pincode"
                             label="Pincode"
                             control={form.control}
-                          />
+                          /> */}
                         </div>
 
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                           <FloatingTextarea
                             name="gst_address"
                             label="Company Address"
                             control={form.control}
                           />
-                        </div>
+                        </div> */}
                       </div>
                     )}
                 </SectionCard>
@@ -784,24 +834,18 @@ export default function JobForm() {
                         ]}
                       />
 
-                      <FloatingField
+                      {/* <FloatingField
                         name="service_amount"
                         label="Service Amount"
                         control={form.control}
-                      />
+                      /> */}
                     </div>
-
+  {/* PAINT CONDITION */}
                     <div className="mt-4">
-                      <FloatingTextarea
-                        name="vehicle_remark"
-                        label="Remark"
-                        control={form.control}
-                      />
-                    </div>
+                          <p className="mb-3 block text-sm font-medium text-[gray]">
+                     Vehicle Paint Condition
+                      </p>
 
-                    {/* PAINT CONDITION */}
-                    <div className="mt-4">
-                      <p className="text-sm font-semibold mb-3">Vehicle Paint Condition</p>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <FormField
                           control={form.control}
@@ -859,6 +903,15 @@ export default function JobForm() {
                         />
                       </div>
                     </div>
+                    <div className="mt-4">
+                      <FloatingTextarea
+                        name="vehicle_remark"
+                        label="Remark"
+                        control={form.control}
+                      />
+                    </div>
+
+                  
                   </SectionCard>
                 </Card>
 
@@ -887,24 +940,27 @@ export default function JobForm() {
                         isRequired
                         control={form.control}
                       />
-                      {/* Service Opted */}
-                      <FloatingRHFSelect
-                        name="service_opted"
-                        label="Service Opted"
-                        isRequired
-                        control={form.control}
-                        options={[
-                          { label: "Standard", value: "standard" },
-                          { label: "Premium", value: "premium" },
-                          { label: "Custom", value: "custom" },
-                        ]}
-                      />
+                      {/* Service Type */}
+                       <FloatingRHFSelect
+                    name="service_type"
+                    label="Service Type"
+                    isMulti
+                    isRequired
+                    control={form.control}
+                    options={[
+                      { label: "Exterior Detailing", value: "exterior_detailing" },
+                      { label: "Interior Detailing", value: "interior_detailing" },
+                      { label: "Exterior Protection", value: "exterior_protection" },
+                      { label: "PPF / Ceramic", value: "ppf_ceramic" },
+                    ]}
+                  />
+
                       {/* Service Type (Multi) */}
 
                     </div>
                     <div className="mt-4">
                       <p className="mb-3 block text-sm font-medium text-[gray]">
-                        Service Type <span className="text-red-500">*</span>
+                       Select Services <span className="text-red-500">*</span>
                       </p>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -958,7 +1014,7 @@ export default function JobForm() {
 
                       {/* Validation error */}
                       <FormMessage className="pt-1 text-[0.75rem]">
-                        {form.formState.errors.service_type?.message}
+                        {form.formState.errors.service_opted?.message}
                       </FormMessage>
                     </div>
 
@@ -980,7 +1036,7 @@ export default function JobForm() {
                 {(
                   <Button type="button"
                     disabled={isLoading || isInfoLoading}
-                    onClick={() => { setIsJobCardSubmissionModalOpenInfo({ open: true, info: id }) }}
+                    onClick={form.handleSubmit(handleJobCardSubmission)}
                     className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
                     {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
                     {isLoading
@@ -994,18 +1050,15 @@ export default function JobForm() {
           </Form>
         </div>
         <CommonDeleteModal
-          width="420px"
-          maxWidth="420px"
           isOpen={isJobCardSubmissionDeleteModalInfo.open}
           title="Job Card Created"
           description="Would you like to proceed with invoice creation for this job card?"
           confirmText="Yes, create invoice"
-          cancelText="No, finish job card only"
-          isLoading={isLoading}
-          onCancel={handleJobCardSubmission}
-          onConfirm={() => {
-            navigate(`/invoice/manage?job_card_id=${id}`);
-          }}
+          cancelText="No"
+          onCancel={() => navigate("/job-cards")}
+          onConfirm={() =>
+            navigate(`/invoice/manage?job_card_id=${isJobCardSubmissionDeleteModalInfo.info}`)
+          }
         />
       </div>
     </>

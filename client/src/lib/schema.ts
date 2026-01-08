@@ -768,23 +768,22 @@ export const TerritoryMasterSchema = z.object({
 
 export const NewJobCardSchema =
   z.object({
-    first_name: z.string().min(1, "First name required"),
-    last_name: z.string().min(1, "Last name required"),
+    name: z.string().min(1, "Name required"),
     mobile_no: z.string().min(10, "Mobile number required"),
     email: z.string().email("Invalid email"),
     customer_id: z.string().optional(),
 
-    service_type: z.array(z.string()).min(1, "Select at least one service"),
+    service_type: z.array(z.string()).min(1, "Select at least one service type"),
     country_id: z.string().min(1, "Please select country"),
     state_id: z.string().min(1, "Please select state"),
-    city_id: z.string().min(1, "Please select city"),
+    // city_id: z.string().min(1, "Please select city"),
     gst_country_id: z.string(),
     gst_state_id: z.string(),
-    gst_city_id: z.string(),
-    district: z.string().min(1),
-    pincode: z.string().min(1),
+    // gst_city_id: z.string(),
+    // district: z.string().min(1),
+    // pincode: z.string().min(1),
     address: z.string().min(1),
-    message: z.string().optional(),
+    // message: z.string().optional(),
 
     add_gst: z.boolean(),
     vehicle_make: z.string().min(1),
@@ -796,7 +795,7 @@ export const NewJobCardSchema =
     chassis_no: z.string().optional(),
     srs: z.string().min(1),
 
-    service_amount: z.string().min(1, "Service amount is required"),
+    // service_amount: z.string().min(1, "Service amount is required"),
     vehicle_remark: z.string().optional(),
 
     repainted_vehicle: z.boolean().optional(),
@@ -804,7 +803,7 @@ export const NewJobCardSchema =
     paint_thickness_below_2mil: z.boolean().optional(),
     vehicle_older_than_5_years: z.boolean().optional(),
     vehicle_type: z.string().min(1),
-    service_opted: z.string().min(1),
+    service_opted: z.array(z.string()).min(1, "Select at least one service"),
     service_date: z.string().min(1, "Service date required"),
   })
 export const invoicePaymentSchema = z
