@@ -17,6 +17,7 @@ import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
+import { jobCardStatusList } from "@/lib/constant";
 
 export default function JobCard() {
   const { toast } = useToast();
@@ -28,6 +29,7 @@ export default function JobCard() {
   const [, navigate] = useLocation();
   const [filters, setFilters] = useState({
     status: "",
+    customer:""
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -96,10 +98,23 @@ const columns = [
   /* ================= NAME ================= */
   {
     key: "name",
-    label: "Customer",
+     label: (
+        <ColumnFilter
+          label= "Customer"
+          value={filters.customer}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, category_type: val }));
+            setPage(1);
+          }}
+          options={[{ label: 'All', value: '' }, ...jobCards].map(r => ({
+            label: r.label,
+            value: r.value,
+          }))}
+        />
+      ),
     width: "180px",
     render: (value: string) => (
-      <span className="text-primary font-medium cursor-pointer">
+      <span className="text-sm">
         {value}
       </span>
     ),
@@ -164,7 +179,17 @@ const columns = [
   /* ================= STATUS ================= */
   {
     key: "status",
-    label: "Status",
+      label: (
+        <ColumnFilter
+          label="Status"
+          value={filters.status}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, status: val }));
+            setPage(1);
+          }}
+          options={jobCardStatusList}
+        />
+      ),
     width: "90px",
     render: (value: string) => (
        <Badge
@@ -178,7 +203,7 @@ const columns = [
           }`
           }
         >
-          {value ==='open' ? "Open" : "Cancel"}
+          {jobCardStatusList.find((status)=>status.value==value)?.label ??""}
         </Badge>
      
     ),
@@ -227,7 +252,8 @@ const columns = [
       if (!isLoaderHide)
         setIsListLoading(true);
       const res ={
-        data:jobCardMockData}
+        data:jobCardMockData.map((item)=>({...item,label:item.name,value:item.name}))
+      }
         // await fetchCustomerList({
         //   per_page: perPage,
         //   page,
@@ -256,7 +282,8 @@ const columns = [
     setSearch('')
     setPage(1)
     setFilters({
-      status: ""
+      status: "",
+      customer:""
     })
   }
   return (

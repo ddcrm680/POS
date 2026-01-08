@@ -133,20 +133,6 @@ const columns = useMemo(() => [
     ),
   },
 
-  /* ================= ADDRESS ================= */
-  // {
-  //   key: "address",
-  //   label: "Address",
-  //   width: "240px",
-  //   render: (value: string) => (
-  //     <span
-  //       className="text-sm text-gray-700 cursor-help"
-  //       title={value}
-  //     >
-  //       {value || "-"}
-  //     </span>
-  //   ),
-  // },
 
  
 ], []);
@@ -239,7 +225,7 @@ const columns = useMemo(() => [
         <CardContent>
           <CommonTable
             columns={columns}
-            isClear={true}
+            isClear={false}
             data={customers}
             isAdd={false}
             perPage={perPage}

@@ -41,16 +41,16 @@ export function FloatingDateField({
             {/* FLOATING LABEL */}
             <label
               className={`
-                absolute left-3 px-1 bg-white text-[0.875rem]
+                absolute left-3 px-1 bg-white text-[0.75rem]
                 transition-all duration-200 pointer-events-none
                 z-20
                 ${
                   hasValue
-                    ? "-top-2 text-primary"
+                    ? "-top-2 text-[#71717a]"
                     : "top-3 text-muted-foreground"
                 }
                 group-focus-within:-top-2
-                group-focus-within:text-primary
+                group-focus-within:text-[#71717a]
               `}
             >
               {label}

@@ -242,3 +242,9 @@ export const storeFormKeys = {
   { label: "PAN number", fieldName: "pan_no" }
   ]
 }
+export const jobCardStatusList=[
+            { label: 'All', value: '' },
+            { label: "Open", value: 'open' },
+            { label: "Cancel", value: 'cancel' },
+            { label: "Partially Paid", value: 'partially-paid' },
+          ]

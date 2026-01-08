@@ -697,14 +697,14 @@ export const StoreSchema = z.object({
     .trim()
     .min(1, "Invoice prefix must be at least 1 characters")
     .max(10, "Invoice prefix must not exceed 10 characters")
-   ,
+  ,
   country: z.string().min(1, "Please select country"),
   state: z.string().min(1, "Please select state"),
   city: z.string().min(1, "Please select city"),
   pincode: z
     .string()
     .min(1, "Pincode is required")
-    .max(10,"Pincode must not exceed 10 digits")
+    .max(10, "Pincode must not exceed 10 digits")
     .regex(/^\d{6}$/, "Pincode must be exactly 6 digits"),
 
   registered_address: z
@@ -756,7 +756,7 @@ export const TerritoryMasterSchema = z.object({
       }
     ),
   country_id: z.string().min(1, "Please select country"),
-state_ids: z
+  state_ids: z
     .array(z.string())
     .min(1, "Please select at least one state"),
 
@@ -766,91 +766,48 @@ state_ids: z
 
 });
 
-export const CustomerNewSchema = z.object({
-  first_name: z.string().min(1, "Required"),
-  last_name: z.string().min(1, "Required"),
-  mobile_no: z.string().min(10),
-  email: z.string().email(),
+export const NewJobCardSchema =
+  z.object({
+    first_name: z.string().min(1, "First name required"),
+    last_name: z.string().min(1, "Last name required"),
+    mobile_no: z.string().min(10, "Mobile number required"),
+    email: z.string().email("Invalid email"),
+    customer_id: z.string().optional(),
 
-  country_id: z.string(),
-  state_ids: z.array(z.string()).default([]),
-  city_ids: z.array(z.string()).default([]),
+    service_type: z.array(z.string()).min(1, "Select at least one service"),
+    jobcard_date: z.string().min(1, "Date is required"),
+    country_id: z.string().min(1, "Please select country"),
+    state_id: z.string().min(1, "Please select state"),
+    city_id: z.string().min(1, "Please select city"),
+    gst_country_id: z.string(),
+    gst_state_id: z.string(),
+    gst_city_id: z.string(),
+    district: z.string().min(1),
+    pincode: z.string().min(1),
+    address: z.string().min(1),
+    message: z.string().optional(),
 
-  district: z.string().optional(),
-  pincode: z.string(),
-  address: z.string().optional(),
-  message: z.string().optional(),
+    add_gst: z.boolean(),
+    vehicle_make: z.string().min(1),
+    vehicle_model: z.string().min(1),
+    vehicle_color: z.string().min(1),
+    make_year: z.string().min(1),
+    registration_no: z.string().min(1),
 
-  vehicle_make: z.string(),
-  vehicle_model: z.string(),
-  vehicle_color: z.string(),
-  make_year: z.string(),
-  registration_no: z.string(),
-  chassis_no: z.string().optional(),
-  srs: z.string(),
+    chassis_no: z.string().optional(),
+    srs: z.string().min(1),
 
-  service_amount: z.string().optional(),
-  vehicle_remark: z.string().optional(),
+    service_amount: z.string().min(1, "Service amount is required"),
+    vehicle_remark: z.string().optional(),
 
-  vehicle_type: z.string(),
-  service_type: z.array(z.string()).min(1),
-  service_opted: z.string(),
-  service_date: z.string(),
-
-  add_gst: z.boolean().default(false),
-
-  gst_company_name: z.string().optional(),
-  gst_contact_no: z.string().optional(),
-  gstin: z.string().optional(),
-  gst_country_id: z.string().optional(),
-  gst_state_id: z.string().optional(),
-  gst_city_id: z.string().optional(),
-  gst_district: z.string().optional(),
-  gst_pincode: z.string().optional(),
-  gst_address: z.string().optional(),
-}).superRefine((data, ctx) => {
-  if (data.add_gst) {
-    if (!data.gst_company_name) {
-      ctx.addIssue({
-        path: ["gst_company_name"],
-        message: "Company name is required",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-
-    if (!data.gstin) {
-      ctx.addIssue({
-        path: ["gstin"],
-        message: "GSTIN is required",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-  }
-});
-export const NewJobCardSchema = z.object({
-  customer_id: z.string().optional(),
-
-  jobcard_date: z.string().min(1, "Date is required"),
-
-  vehicle_type: z.string().min(1, "Vehicle type required"),
-  vehicle_make: z.string().min(1),
-  vehicle_model: z.string().min(1),
-  vehicle_color: z.string().optional(),
-  make_year: z.string().optional(),
-  registration_no: z.string().optional(),
-  chassis_no: z.string().optional(),
-  srs: z.string().min(1),
-
-  service_type: z.array(z.string()).min(1, "Select at least one service"),
-  service_opted: z.string().min(1),
-  service_amount: z.string().optional(),
-  remark: z.string().optional(),
-
-  repainted_vehicle: z.boolean().optional(),
-  single_stage_paint: z.boolean().optional(),
-  paint_thickness_below_2mil: z.boolean().optional(),
-  vehicle_older_than_5_years: z.boolean().optional(),
-});
+    repainted_vehicle: z.boolean().optional(),
+    single_stage_paint: z.boolean().optional(),
+    paint_thickness_below_2mil: z.boolean().optional(),
+    vehicle_older_than_5_years: z.boolean().optional(),
+    vehicle_type: z.string().min(1),
+    service_opted: z.string().min(1),
+    service_date: z.string().min(1, "Service date required"),
+  })
 export const invoicePaymentSchema = z
   .object({
     invoice_total: z.number(),

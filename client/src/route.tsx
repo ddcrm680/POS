@@ -31,10 +31,10 @@ import Store from "./pages/masters/store/store";
 import StoreList from "./pages/masters/store/storeList";
 import Customer from "./pages/Customer/Customer";
 import JobCard from "./pages/JobCard/JobCard";
-import { JobForm } from "./pages/JobCard/JobForm";
 import Invoice from "./pages/Invoices/Invoice";
 import InvoiceForm from "./pages/Invoices/InvoiceForm";
 import Notification from "./pages/Notification/Noitification";
+import JobForm from "./pages/JobCard/JobForm";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   

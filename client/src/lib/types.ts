@@ -1,5 +1,5 @@
 import { Control, ControllerRenderProps, UseFormSetError } from "react-hook-form";
-import { CustomerSchema, InsertCustomerSchema, JobCardSchema, loginSchema, passwordSchema, posJobSchema, profileSchema, userSchema, VehicleSchema } from "./schema";
+import { CustomerSchema, InsertCustomerSchema, JobCardSchema, loginSchema, NewJobCardSchema, passwordSchema, posJobSchema, profileSchema, userSchema, VehicleSchema } from "./schema";
 import z from "zod";
 import { ReactNode } from "react";
 
@@ -114,7 +114,7 @@ export interface CommonDeleteModalProps {
   maxWidth?: string
   description?: string;
   confirmText?: string;
-  loadingText?:string
+  loadingText?: string
   cancelText?: string;
   isLoading?: boolean;
   onConfirm: () => void;
@@ -128,7 +128,7 @@ export type FloatingRHFSelectProps = {
   name: string
   label: string
   control: Control<any>
-  isClear?:boolean
+  isClear?: boolean
   options: Option[] | GroupedOption[]
 
 
@@ -204,18 +204,18 @@ export interface nonAdminTabsItem {
   path: string;
   icon: React.ComponentType<any>;
   label: string;
-  defaultChildId?:string
+  defaultChildId?: string
   badge?: number;
-   
+
 }
 export interface TabItem {
-  id:string
+  id: string
   path: string;
   icon: React.ComponentType<any>;
   label: string;
-  defaultChildId?:string
+  defaultChildId?: string
   badge?: number;
-    children?: {
+  children?: {
     id: string;
     path: string;
     label: string;
@@ -559,11 +559,11 @@ export interface storeFormProp {
 
 
 
-export interface storeFormApi extends storeFormType{
-  is_active:boolean
-  id:string
-  territory:{
-    id:number
+export interface storeFormApi extends storeFormType {
+  is_active: boolean
+  id: string
+  territory: {
+    id: number
   }
 }
 
@@ -631,7 +631,7 @@ export type TerritoryFormValues = {
   country_id: string;
   city_ids: string[]
   state_ids: string[];
-  storeName?:string
+  storeName?: string
 };
 export type TerritoryFormRequestValues = {
   name: string;
@@ -643,9 +643,9 @@ export type TerritoryFormRequestValues = {
 };
 export type TerritoryFormApiValues = {
   name: string;
-  store:{
-    id:number,
-    name:string
+  store: {
+    id: number,
+    name: string
   }
   store_id?: string;
   notes?: string
@@ -667,13 +667,13 @@ export type CopyButtonProps = {
   successDuration?: number; // ms
   disabled?: boolean;
 };
-export 
-type FloatingPasswordFieldProps = {
-  name: string;
-  label: string;
-  control: Control<any>;
-  isRequired?: boolean;
-};
+export
+  type FloatingPasswordFieldProps = {
+    name: string;
+    label: string;
+    control: Control<any>;
+    isRequired?: boolean;
+  };
 export type UserLogoutModalState = {
   info: Record<string, any>; // or a proper interface if you know the shape
   open: boolean;
@@ -681,7 +681,7 @@ export type UserLogoutModalState = {
 export type SidebarProps = {
   location: string;
   collapsed: boolean;
-   setIsUserLogoutModalOpenInfo: React.Dispatch<
+  setIsUserLogoutModalOpenInfo: React.Dispatch<
     React.SetStateAction<UserLogoutModalState>
   >
   onClose?: () => void;
@@ -697,94 +697,7 @@ export type Notification = {
   created_at: string;
   is_read: boolean;
 };
-export type CustomerFormValues = {
-  /* ======================
-     CUSTOMER
-  ====================== */
-  first_name: string;
-  last_name: string;
-  mobile_no: string;
-  email: string;
-
-  country_id: string;
-  state_ids: string[];
-  city_ids: string[];
-  district: string;
-  pincode: string;
-  address: string;
-  message: string;
-
-  /* ======================
-     VEHICLE
-  ====================== */
-  vehicle_make: string;
-  vehicle_model: string;
-  vehicle_color: string;
-  make_year: string;
-  registration_no: string;
-  chassis_no: string;
-  srs: string;
-  service_amount: string;
-  vehicle_remark: string;
-
-  /* ======================
-     SERVICE
-  ====================== */
-  vehicle_type: string;
-  service_type: string;
-  service_opted: string;
-  service_date: string;
-
-  /* ======================
-     GST (OPTIONAL)
-  ====================== */
-  add_gst: boolean;
-
-  gst_company_name?: string;
-  gst_contact_no?: string;
-  gstin?: string;
-
-  gst_country_id?: string;
-  gst_state_id?: string;
-  gst_city_id?: string;
-
-  gst_district?: string;
-  gst_pincode?: string;
-  gst_address?: string;
-};
-export type JobCardFormValues = {
-  /* ===== CUSTOMER SNAPSHOT (readonly / selectable) ===== */
-  customer_id?: string; // existing customer
-  customer_name?: string;
-  contact_no?: string;
-  email?: string;
-  address?: string;
-
-  /* ===== JOB CARD META ===== */
-  jobcard_date: string;
-
-  /* ===== VEHICLE ===== */
-  vehicle_type: string;
-  vehicle_make: string;
-  vehicle_model: string;
-  vehicle_color?: string;
-  make_year?: string;
-  registration_no?: string;
-  chassis_no?: string;
-  srs: string;
-
-  /* ===== SERVICE ===== */
-  service_type: string[];     // multi
-  service_opted: string;
-  service_amount?: string;
-  remark?: string;
-
-  /* ===== VEHICLE CONDITION ===== */
-  repainted_vehicle?: boolean;
-  single_stage_paint?: boolean;
-  paint_thickness_below_2mil?: boolean;
-  vehicle_older_than_5_years?: boolean;
-};
+export type JobCardFormValues = z.infer<typeof NewJobCardSchema>;
 export type FloatingDateFieldProps = {
   name: string;
   label: string;

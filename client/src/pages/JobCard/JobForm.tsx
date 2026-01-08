@@ -1,25 +1,78 @@
- import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import { Form, FormField } from "@/components/ui/form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { SectionCard } from "@/components/common/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { type Customer, type Vehicle, JobCard, JobCardFormValues } from "@/lib/types";
+import {
+  User,
+  Phone,
+  Mail,
+  Car,
+  Key,
+  MapPin,
+  Calculator,
+  Search,
+  Plus,
+  UserPlus,
+  CheckCircle,
+  ArrowRight,
+  DollarSign,
+  Percent,
+  Receipt,
+  Clock,
+  Loader2,
+  ChevronLeft
+} from "lucide-react";
+import { z } from "zod";
+import POSLayout from "@/components/layout/pos-layout";
+import InlineCustomerForm from "@/components/forms/inline-customer-form";
+import ServiceHistoryPanel from "@/components/customer/service-history-panel";
+import { useLocation, useSearchParams } from "wouter";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
-
-import { Checkbox } from "@/components/ui/checkbox";
-import { CustomerNewSchema } from "@/lib/schema";
-import { CustomerFormValues } from "@/lib/types";
-import { ChevronLeft } from "lucide-react";
-import { useLocation, useSearchParams } from "wouter";
-import { Loader } from "@/components/common/loader";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
-import Datepicker from "react-tailwindcss-datepicker";
+import { SectionCard } from "@/components/common/card";
+import { Loader } from "@/components/common/loader";
 import { FloatingDateField } from "@/components/common/FloatingDateField";
+import { findIdByName } from "@/lib/utils";
+import { fetchCityList, fetchStateList } from "@/lib/api";
+import { NewJobCardSchema } from "@/lib/schema";
+import { useAuth } from "@/lib/auth";
 
-export function JobForm(){
- const [step, setStep] = useState(1);
+interface ServiceItem {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  category: string;
+  selected?: boolean;
+}
+
+// Available services for POS
+const availableServices: ServiceItem[] = [
+  { id: '1', name: 'Basic Exterior Wash', price: 500, description: 'Exterior wash and dry', category: 'Basic' },
+  { id: '2', name: 'Premium Interior Detailing', price: 1200, description: 'Complete interior cleaning and protection', category: 'Premium' },
+  { id: '3', name: 'Ceramic Coating Kit', price: 4500, description: '6-month ceramic protection', category: 'Protection' },
+  { id: '4', name: 'Paint Correction Service', price: 3000, description: 'Remove scratches and swirl marks', category: 'Correction' },
+  { id: '5', name: 'Full Car PPF Installation', price: 18000, description: 'Complete paint protection film', category: 'Protection' },
+  { id: '6', name: 'Engine Bay Cleaning', price: 800, description: 'Professional engine compartment cleaning', category: 'Detailing' }
+];
+
+
+export default function JobForm() {
+  const [step, setStep] = useState(1);
   const [, navigate] = useLocation();
 
   const [searchParams] = useSearchParams();
@@ -29,527 +82,860 @@ export function JobForm(){
 
   const [isInfoLoading, setIsInfoLoading] = useState(false);
 
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const form = useForm<any>({
-    resolver: zodResolver(CustomerNewSchema),
-    defaultValues: {
-      first_name: "",
-      last_name: "",
-      service_date:"",
-      mobile_no: "",
-      email: "",
-      country_id: "",
-      state_ids: [],
-      city_ids: [],
-      district: "",
-      pincode: "",
-      address: "",
-      message: "",
+  const toggleService = (serviceId: string) => {
+    const newSelection = selectedServices.includes(serviceId)
+      ? selectedServices.filter(id => id !== serviceId)
+      : [...selectedServices, serviceId];
 
+    setSelectedServices(newSelection);
+    form.setValue('service_type', newSelection);
+  };
+
+  const form = useForm<JobCardFormValues>({
+    resolver: zodResolver(NewJobCardSchema),
+    defaultValues: {
+      customer_id: undefined,
+
+      jobcard_date: "",
+      service_date: "",
+
+      vehicle_type: "",
       vehicle_make: "",
       vehicle_model: "",
       vehicle_color: "",
+
       make_year: "",
       registration_no: "",
       chassis_no: "",
       srs: "",
+
+      service_opted: "",
       service_amount: "",
+
       vehicle_remark: "",
 
-      vehicle_type: "",
-      service_type: "",
-      service_opted: "",
+      repainted_vehicle: false,
+      single_stage_paint: false,
+      paint_thickness_below_2mil: false,
+      vehicle_older_than_5_years: false,
+      service_type: [],
+      first_name: "",
+      last_name: "",
+      mobile_no: "",
+      email: "",
+      country_id: "India",
+      district: "",
+      city_id: "",
+      state_id: "",
+      pincode: "",
+      address: "",
+      message: "",
+
+      add_gst: false,
     },
   });
-  const [serviceDate, setServiceDate] = useState<{
-    startDate: Date | null;
-    endDate: Date | null;
-  }>({
-    startDate: null,
-    endDate: null,
-  });
+
+
   const addGST = form.watch("add_gst");
-  const onSubmit = (data: CustomerFormValues) => {
+  const { countries } = useAuth();
+  const [countryList, setCountryList] = useState<
+    { id: number; name: string; slug?: string }[]
+  >([]);
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+  const [gstStates, setGstStates] = useState<any[]>([]);
+  const [gstCities, setGstCities] = useState<any[]>([]);
+  const [loadingGstState, setLoadingGstState] = useState(false);
+  const [loadingGstCity, setLoadingGstCity] = useState(false);
+
+  const isGstHydratingRef = useRef(false);
+
+  useEffect(() => {
+    if (!addGST || !countryList.length) return;
+
+    const india = countryList.find(c => c.name === "India");
+    if (!india) return;
+
+    isGstHydratingRef.current = true;
+
+    form.setValue("gst_country_id", String(india.id));
+    form.setValue("gst_state_id", "");
+    form.setValue("gst_city_id", "");
+
+    setGstStates([]);
+    setGstCities([]);
+
+    isGstHydratingRef.current = false;
+  }, [addGST, countryList]);
+  const [loadingState, setLoadingState] = useState(false);
+  const [loadingCity, setLoadingCity] = useState(false);
+
+  const isHydratingRef = useRef(false);
+  useEffect(() => {
+
+    setCountryList(countries)
+  }, [countries])
+
+  const [initialValues, setInitialValues] = useState<any | null>(null)
+  useEffect(() => {
+
+    if ((mode == "create" || !mode) &&
+      countryList.length) {
+      const hydrateLocation = async () => {
+        // 1️⃣ COUNTRY
+        isHydratingRef.current = true;
+        try {
+          const countryId = findIdByName(countryList, '101');
+
+          if (!countryId) return;
+
+          form.setValue("country_id", String(countryId));
+
+          // 2️⃣ STATES
+          setLoadingState(true);
+          const stateList = await fetchStateList(countryId);
+          setStates(stateList);
+          setLoadingState(false);
+
+        } catch (e) {
+          console.error(e)
+        } finally {
+          // ✅ hydration completed
+          isHydratingRef.current = false;
+        }
+      };
+      hydrateLocation()
+    }
+    if (
+      (mode !== "edit" && mode !== "view") ||
+      !initialValues ||
+      !countryList.length
+    ) return;
+
+    const hydrateLocation = async () => {
+      // 1️⃣ COUNTRY
+      isHydratingRef.current = true;
+      try {
+        const countryId = findIdByName(countryList, initialValues.country);
+
+        if (!countryId) return;
+
+        form.setValue("country_id", String(countryId));
+
+        // 2️⃣ STATES
+        setLoadingState(true);
+        const stateList = await fetchStateList(countryId);
+        setStates(stateList);
+        setLoadingState(false);
+
+        const stateId = findIdByName(stateList, initialValues.state);
+
+        if (!stateId) return;
+
+        form.setValue("state_id", String(stateId));
+
+        // 3️⃣ CITIES
+        setLoadingCity(true);
+        const cityList = await fetchCityList(stateId);
+        setCities(cityList);
+        setLoadingCity(false);
+
+        const cityId = findIdByName(cityList, initialValues.city);
+        if (!cityId) return;
+
+        form.setValue("city_id", String(cityId));
+
+      } finally {
+        // ✅ hydration completed
+        isHydratingRef.current = false;
+      }
+    };
+
+    hydrateLocation();
+  }, [mode, initialValues, countryList]);
+
+  const fetchJobFormInfo = async () => {
+    try {
+      setIsInfoLoading(true);
+      //  const res =
+      //    await fetchStoreById(id ?? "");
+
+      //  const updatedInfo = { ...res?.data, territory_id: res?.data?.territory?.id ?? "" }
+      //  setInitialValues(updatedInfo)
+    } catch (e) {
+      console.error(e);
+
+    } finally {
+      setIsInfoLoading(false);
+    }
   };
-useEffect(()=>{
-  console.log(form.getValues(),'asdfgdsdfgwe');
+  useEffect(() => {
+    if (id) {
+      fetchJobFormInfo();
 
-},[form])
+    }
+  }, [id]);
+  useEffect(() => {
+    if (mode !== "create" || !countryList.length) return;
+
+    const india = countryList.find(c => c.name === "India");
+    if (!india) return;
+
+    form.setValue("country_id", String(india.id));
+  }, [mode, countryList]);
+  const onSubmit = (data: JobCardFormValues) => {
+  };
+  useEffect(() => {
+    if (!initialValues) return;
+
+    if (mode === "edit" || mode === "view") {
+      form.reset({
+        /* ===== CUSTOMER ===== */
+        customer_id: initialValues.customer_id ?? undefined,
+
+        first_name: initialValues.first_name ?? "",
+        last_name: initialValues.last_name ?? "",
+        mobile_no: initialValues.mobile_no ?? "",
+        email: initialValues.email ?? "",
+
+        country_id: initialValues.country_id
+          ? String(initialValues.country_id)
+          : "India",
+
+        state_id: initialValues.state_id
+          ? String(initialValues.state_id)
+          : "",
+
+        city_id: initialValues.city_id
+          ? String(initialValues.city_id)
+          : "",
+
+        district: initialValues.district ?? "",
+        pincode: initialValues.pincode ?? "",
+        address: initialValues.address ?? "",
+        message: initialValues.message ?? "",
+
+        /* ===== JOB / SERVICE ===== */
+        jobcard_date: initialValues.jobcard_date
+          ? new Date(initialValues.jobcard_date).toISOString().slice(0, 10)
+          : "",
+
+        service_date: initialValues.service_date
+          ? new Date(initialValues.service_date).toISOString().slice(0, 10)
+          : "",
+
+        /* ===== VEHICLE ===== */
+        vehicle_type: initialValues.vehicle_type ?? "",
+        vehicle_make: initialValues.vehicle_make ?? "",
+        vehicle_model: initialValues.vehicle_model ?? "",
+        vehicle_color: initialValues.vehicle_color ?? "",
+
+        make_year: initialValues.make_year ?? "",
+        registration_no: initialValues.registration_no ?? "",
+        chassis_no: initialValues.chassis_no ?? "",
+        srs: initialValues.srs ?? "",
+
+        service_opted: initialValues.service_opted ?? "",
+        service_amount: initialValues.service_amount ?? "",
+
+        vehicle_remark: initialValues.vehicle_remark ?? "",
+
+        /* ===== VEHICLE CONDITION ===== */
+        repainted_vehicle: Boolean(initialValues.repainted_vehicle),
+        single_stage_paint: Boolean(initialValues.single_stage_paint),
+        paint_thickness_below_2mil: Boolean(initialValues.paint_thickness_below_2mil),
+        vehicle_older_than_5_years: Boolean(initialValues.vehicle_older_than_5_years),
+
+        /* ===== GST ===== */
+        service_type: initialValues.service_type ?? [],
+        add_gst: Boolean(initialValues.add_gst),
+      });
+    }
+  }, [mode, initialValues, form]);
+  useEffect(() => {
+
+    if ((mode == "create" || !mode) &&
+      countryList.length) {
+      const hydrateLocation = async () => {
+        // 1️⃣ COUNTRY
+        isGstHydratingRef.current = true;
+        try {
+          const countryId = findIdByName(countryList, '101');
+
+          if (!countryId) return;
+
+          form.setValue("gst_country_id", String(countryId));
+
+          // 2️⃣ STATES
+          setLoadingGstState(true);
+          const stateList = await fetchStateList(countryId);
+          setGstStates(stateList);
+          setLoadingGstState(false);
+
+        } catch (e) {
+          console.error(e)
+        } finally {
+          // ✅ hydration completed
+          isGstHydratingRef.current = false;
+        }
+      };
+      hydrateLocation()
+    }
+    if (!initialValues || !addGST || !countryList.length) return;
+
+    const hydrateGstLocation = async () => {
+      isGstHydratingRef.current = true;
+
+      try {
+        const countryId = findIdByName(countryList, initialValues.gst_country);
+        if (!countryId) return;
+
+        form.setValue("gst_country_id", String(countryId));
+
+        setLoadingGstState(true);
+        const stateList = await fetchStateList(countryId);
+        setGstStates(stateList);
+        setLoadingGstState(false);
+
+        const stateId = findIdByName(stateList, initialValues.gst_state);
+        if (!stateId) return;
+
+        form.setValue("gst_state_id", String(stateId));
+
+        setLoadingGstCity(true);
+        const cityList = await fetchCityList(stateId);
+        setGstCities(cityList);
+        setLoadingGstCity(false);
+
+        const cityId = findIdByName(cityList, initialValues.gst_city);
+        if (!cityId) return;
+
+        form.setValue("gst_city_id", String(cityId));
+      } finally {
+        isGstHydratingRef.current = false;
+      }
+    };
+
+    hydrateGstLocation();
+  }, [initialValues, addGST, countryList]);
+  useEffect(() => {
+    console.log(form.formState.errors,form.getValues(), 'form.formState.errors');
+
+  })
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-      {/* HEADER */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => window.history.back()}
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <ChevronLeft size={18} />
-        </button>
-        <div>
-          <h1 className="text-xl font-semibold">
-            {isView ? "View Job Card" : id ? "Edit Job Card" : "Create New Job Card"}
-          </h1>
+    <>
+      <div className="max-w-7xl  mx-auto px-4 py-4 space-y-4">
+        {/* HEADER */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => window.history.back()}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <div>
+            <h1 className="text-xl font-semibold">
+              {isView ? "View Job Card" : id ? "Edit Job Card" : "Create New Job Card"}
+            </h1>
 
+          </div>
         </div>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 rounded-xl bg-white">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="">
-            <Stepper step={step} />
 
-            {/* STEP 1 */}
-            {step === 1 && (
-              <SectionCard title="Customer Information">
-                {/* BASIC INFO */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <FloatingField
-                    name="first_name"
-                    label="First Name"
-                    isRequired
-                    control={form.control}
-                  />
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 rounded-xl ">
 
-                  <FloatingField
-                    name="last_name"
-                    label="Last Name"
-                    isRequired
-                    control={form.control}
-                  />
 
-                  <FloatingField
-                    name="mobile_no"
-                    label="Mobile No"
-                    isRequired
-                    control={form.control}
-                  />
 
-                  <FloatingField
-                    name="email"
-                    label="Email"
-                    isRequired
-                    control={form.control}
-                  />
+          {/* Main Job Creation Form */}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="">
 
-                  {/* COUNTRY */}
-                  <FloatingRHFSelect
-                    name="country_id"
-                    label="Country"
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { value: "India", label: "India" },
-                    ]}
-                  />
+              {/* Customer Lookup Section */}
+              <Card className="mb-6">
+                <SectionCard title="Customer Information" className="pb-4">
+                  {/* BASIC INFO */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FloatingField
+                      name="first_name"
+                      label="First Name"
+                      isRequired
+                      control={form.control}
+                    />
 
-                  {/* STATE */}
-                  <FloatingRHFSelect
-                    name="state_ids"
-                    label="State"
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { value: "Andaman and Nicobar Islands", label: "Andaman and Nicobar Islands" },
-                    ]}
-                  />
+                    <FloatingField
+                      name="last_name"
+                      label="Last Name"
+                      isRequired
+                      control={form.control}
+                    />
 
-                  {/* CITY */}
-                  <FloatingRHFSelect
-                    name="city_ids"
-                    label="City"
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { value: "Nicobar", label: "Nicobar" },
-                    ]}
-                  />
+                    <FloatingField
+                      name="mobile_no"
+                      label="Mobile No"
+                      isRequired
+                      control={form.control}
+                    />
 
-                  <FloatingField
-                    name="district"
-                    label="District"
-                    isRequired
-                    control={form.control}
-                  />
+                    <FloatingField
+                      name="email"
+                      label="Email"
+                      isRequired
+                      control={form.control}
+                    />
 
-                  <FloatingField
-                    name="pincode"
-                    label="Pincode"
-                    isRequired
-                    control={form.control}
-                  />
-                </div>
+                    {/* COUNTRY */}
+                    <FloatingRHFSelect
+                      name="country_id"
+                      label="Country"
+                      control={form.control}
+                      isRequired
+                      isDisabled={isView}
+                      options={countryList.map(c => ({
+                        value: String(c.id),
+                        label: c.name,
+                      }))}
+                      onValueChange={async (value) => {
+                        if (isHydratingRef.current) return;
 
-                {/* ADDRESS + MESSAGE */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <FloatingTextarea
-                    name="address"
-                    label="Address"
-                    isRequired
-                    control={form.control}
-                  />
+                        setStates([]);
+                        setCities([]);
+                        form.setValue("state_id", "");
+                        form.setValue("city_id", "");
 
-                  <FloatingTextarea
-                    name="message"
-                    label="Message"
-                    control={form.control}
-                  />
-                </div>
+                        setLoadingState(true);
+                        const stateList = await fetchStateList(Number(value));
+                        setStates(stateList);
+                        setLoadingState(false);
+                      }}
+                    />
 
-                {/* GST OPTIONAL */}
-                <div className="mt-4 flex items-center gap-2">
-                  <Checkbox
-                    checked={addGST}
-                    onCheckedChange={(val) => form.setValue("add_gst", Boolean(val))}
-                  />
-                  <label
-                    htmlFor="add_gst"
-                    className="text-sm font-bold cursor-pointer"
-                  >
-                    Add GST Details (Optional)
-                  </label>
-                </div>
-                {addGST && (
-                  <div className="pt-4">
-                    <h4 className="text-sm font-semibold mb-4">
-                      GST Information
-                    </h4>
+                    {/* STATE */}
+                    <FloatingRHFSelect
+                      name="state_id"
+                      label="State"
+                      control={form.control}
+                      isRequired
+                      isDisabled={isView || !form.getValues("country_id")}
+                      options={states.map(s => ({
+                        value: String(s.id),
+                        label: s.name,
+                      }))}
+                      onValueChange={async (value) => {
+                        if (isHydratingRef.current) return;
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FloatingField
-                        name="gst_company_name"
-                        label="Company Name"
-                        control={form.control}
-                      />
+                        setCities([]);
+                        form.setValue("city_id", "");
 
-                      <FloatingField
-                        name="gst_contact_no"
-                        label="Company Contact No."
-                        control={form.control}
-                      />
+                        setLoadingCity(true);
+                        const cityList = await fetchCityList(Number(value));
+                        setCities(cityList);
+                        setLoadingCity(false);
+                      }}
+                    />
 
-                      <FloatingField
-                        name="gstin"
-                        label="GSTIN"
-                        control={form.control}
-                      />
+                    <FloatingRHFSelect
+                      name="city_id"
+                      label="City"
+                      control={form.control}
+                      isRequired
+                      isDisabled={isView || !form.getValues("state_id")}
+                      options={cities.map(c => ({
+                        value: String(c.id),
+                        label: c.name,
+                      }))}
+                    />
+
+                    <FloatingField
+                      name="district"
+                      label="District"
+                      isRequired
+                      control={form.control}
+                    />
+
+                    <FloatingField
+                      name="pincode"
+                      label="Pincode"
+                      isRequired
+                      control={form.control}
+                    />
+                  </div>
+
+                  {/* ADDRESS + MESSAGE */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <FloatingTextarea
+                      name="address"
+                      label="Address"
+                      isRequired
+                      control={form.control}
+                    />
+
+                    <FloatingTextarea
+                      name="message"
+                      label="Message"
+                      control={form.control}
+                    />
+                  </div>
+
+                  {/* GST OPTIONAL */}
+                  <div className="mt-4 flex items-center gap-2">
+                    <Checkbox
+                      checked={addGST}
+                      onCheckedChange={(val) => form.setValue("add_gst", Boolean(val))}
+                    />
+                    <label
+                      htmlFor="add_gst"
+                      className="text-sm font-bold "
+                    >
+                      Add GST Details (Optional)
+                    </label>
+                  </div>
+                  {
+                    addGST
+                    &&
+                    (
+                      <div className="pt-4">
+                        <h4 className="text-sm font-semibold mb-4">
+                          GST Information
+                        </h4>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <FloatingField
+                            name="gst_company_name"
+                            label="Company Name"
+                            control={form.control}
+                          />
+
+                          <FloatingField
+                            name="gst_contact_no"
+                            label="Company Contact No."
+                            control={form.control}
+                          />
+
+                          <FloatingField
+                            name="gstin"
+                            label="GSTIN"
+                            control={form.control}
+                          />
+
+                          <FloatingRHFSelect
+                            name="gst_country_id"
+                            label="Country"
+                            control={form.control}
+                            isDisabled={isView}
+                            options={countryList.map(c => ({
+                              value: String(c.id),
+                              label: c.name,
+                            }))}
+                            onValueChange={async (value) => {
+                              if (isGstHydratingRef.current) return;
+
+                              setGstStates([]);
+                              setGstCities([]);
+                              form.setValue("gst_state_id", "");
+                              form.setValue("gst_city_id", "");
+
+                              setLoadingGstState(true);
+                              const stateList = await fetchStateList(Number(value));
+                              setGstStates(stateList);
+                              setLoadingGstState(false);
+                            }}
+                          />
+                          <FloatingRHFSelect
+                            name="gst_state_id"
+                            label="State"
+                            control={form.control}
+                            isDisabled={isView || !form.getValues("gst_country_id")}
+                            options={gstStates.map(s => ({
+                              value: String(s.id),
+                              label: s.name,
+                            }))}
+                            onValueChange={async (value) => {
+                              if (isGstHydratingRef.current) return;
+
+                              setGstCities([]);
+                              form.setValue("gst_city_id", "");
+
+                              setLoadingGstCity(true);
+                              const cityList = await fetchCityList(Number(value));
+                              setGstCities(cityList);
+                              setLoadingGstCity(false);
+                            }}
+                          />
+
+                          <FloatingRHFSelect
+                            name="gst_city_id"
+                            label="City"
+                            control={form.control}
+                            isDisabled={isView || !form.getValues("gst_state_id")}
+                            options={gstCities.map(c => ({
+                              value: String(c.id),
+                              label: c.name,
+                            }))}
+                          />
+                          <FloatingField
+                            name="gst_district"
+                            label="District"
+                            control={form.control}
+                          />
+
+                          <FloatingField
+                            name="gst_pincode"
+                            label="Pincode"
+                            control={form.control}
+                          />
+                        </div>
+
+                        <div className="mt-4">
+                          <FloatingTextarea
+                            name="gst_address"
+                            label="Company Address"
+                            control={form.control}
+                          />
+                        </div>
+                      </div>
+                    )}
+                </SectionCard>
+              </Card>
+
+              <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+
+
+                {/* Vehicle Information */}
+                <Card>
+                  <SectionCard title="Vehicle Information" className="pb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
                       <FloatingRHFSelect
-                        name="gst_country_id"
-                        label="Country"
+                        name="vehicle_make"
+                        label="Vehicle Make"
+                        isRequired
                         control={form.control}
                         options={[
-                          { value: "India", label: "India" },
+                          { value: "HYUNDAI", label: "Hyundai" },
+                          { value: "HONDA", label: "Honda" },
+                          { value: "TOYOTA", label: "Toyota" },
                         ]}
                       />
 
                       <FloatingRHFSelect
-                        name="gst_state_id"
-                        label="State"
+                        name="vehicle_model"
+                        label="Vehicle Model"
+                        isRequired
                         control={form.control}
-                        options={[]}
+                        options={[
+                          { value: "VERNA", label: "Verna" },
+                          { value: "CITY", label: "City" },
+                          { value: "INNOVA", label: "Innova" },
+                        ]}
+                      />
+
+                      <FloatingField
+                        name="vehicle_color"
+                        label="Vehicle Color"
+                        isRequired
+                        control={form.control}
                       />
 
                       <FloatingRHFSelect
-                        name="gst_city_id"
-                        label="City"
+                        name="make_year"
+                        label="Make Year"
+                        isRequired
                         control={form.control}
-                        options={[]}
+                        options={[
+                          { value: "2025", label: "2025" },
+                          { value: "2024", label: "2024" },
+                          { value: "2023", label: "2023" },
+                        ]}
                       />
 
                       <FloatingField
-                        name="gst_district"
-                        label="District"
+                        name="registration_no"
+                        label="Registration No"
+                        isRequired
                         control={form.control}
                       />
 
                       <FloatingField
-                        name="gst_pincode"
-                        label="Pincode"
+                        name="chassis_no"
+                        label="Chassis No"
+                        control={form.control}
+                      />
+
+                      <FloatingRHFSelect
+                        name="srs"
+                        label="SRS Condition"
+                        isRequired
+                        control={form.control}
+                        options={[
+                          { value: "brand_new", label: "Brand New" },
+                          { value: "minor_damage", label: "Minor Damage" },
+                          { value: "major_damage", label: "Major Damage" },
+                        ]}
+                      />
+
+                      <FloatingField
+                        name="service_amount"
+                        label="Service Amount"
                         control={form.control}
                       />
                     </div>
 
                     <div className="mt-4">
                       <FloatingTextarea
-                        name="gst_address"
-                        label="Company Address"
+                        name="vehicle_remark"
+                        label="Remark"
                         control={form.control}
                       />
                     </div>
-                  </div>
-                )}
-              </SectionCard>
 
-            )}
+                    {/* PAINT CONDITION */}
+                    <div className="mt-4">
+                      <p className="text-sm font-semibold mb-3">Vehicle Paint Condition</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <label className="flex items-center gap-2 text-sm">
+                          <Checkbox /> Repainted Vehicle
+                        </label>
+                        <label className="flex items-center gap-2 text-sm">
+                          <Checkbox /> Single Stage Paint
+                        </label>
+                        <label className="flex items-center gap-2 text-sm">
+                          <Checkbox /> Paint Thickness below 2 MIL
+                        </label>
+                        <label className="flex items-center gap-2 text-sm">
+                          <Checkbox /> Vehicle older than 5 years
+                        </label>
+                      </div>
+                    </div>
+                  </SectionCard>
+                </Card>
 
-            {/* STEP 2 */}
-            {step === 2 && (
-              <SectionCard title="Vehicle Information">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* Service Selection & Summary */}
+                <Card>
+                  <SectionCard title="Service Information" className="pb-4 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Vehicle Type */}
+                      <FloatingRHFSelect
+                        name="vehicle_type"
+                        label="Vehicle Type"
+                        isRequired
+                        control={form.control}
+                        options={[
+                          { label: "Bike", value: "bike" },
+                          { label: "Hatchback", value: "hatchback" },
+                          { label: "Sedan", value: "sedan" },
+                          { label: "SUV", value: "suv" },
+                        ]}
+                      />
 
-                  <FloatingRHFSelect
-                    name="vehicle_make"
-                    label="Vehicle Make"
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { value: "HYUNDAI", label: "Hyundai" },
-                      { value: "HONDA", label: "Honda" },
-                      { value: "TOYOTA", label: "Toyota" },
-                    ]}
-                  />
+                      {/* Service Date */}
+                      <FloatingDateField
+                        name="service_date"
+                        label="Service Date"
+                        isRequired
+                        control={form.control}
+                      />
+                      {/* Service Opted */}
+                      <FloatingRHFSelect
+                        name="service_opted"
+                        label="Service Opted"
+                        isRequired
+                        control={form.control}
+                        options={[
+                          { label: "Standard", value: "standard" },
+                          { label: "Premium", value: "premium" },
+                          { label: "Custom", value: "custom" },
+                        ]}
+                      />
+                      {/* Service Type (Multi) */}
 
-                  <FloatingRHFSelect
-                    name="vehicle_model"
-                    label="Vehicle Model"
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { value: "VERNA", label: "Verna" },
-                      { value: "CITY", label: "City" },
-                      { value: "INNOVA", label: "Innova" },
-                    ]}
-                  />
+                    </div>
+                    <div className="mt-4">
+                      <p className="mb-3 block text-sm font-medium text-[gray]">
+                        Service Type <span className="text-red-500">*</span>
+                      </p>
 
-                  <FloatingField
-                    name="vehicle_color"
-                    label="Vehicle Color"
-                    isRequired
-                    control={form.control}
-                  />
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {availableServices.map(service => {
+                          const isSelected = selectedServices.includes(service.id);
 
-                  <FloatingRHFSelect
-                    name="make_year"
-                    label="Make Year"
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { value: "2025", label: "2025" },
-                      { value: "2024", label: "2024" },
-                      { value: "2023", label: "2023" },
-                    ]}
-                  />
+                          return (
+                            <Card
+                              key={service.id}
+                              onClick={() => toggleService(service.id)}
+                              className={`
+            cursor-pointer transition-all border
+            ${isSelected
+                                  ? "border-primary bg-primary/5 shadow-sm"
+                                  : "hover:border-muted-foreground/30"}
+          `}
+                            >
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex items-start gap-2">
+                                    <Checkbox checked={isSelected} />
+                                    <div>
+                                      <p className="font-medium leading-tight">
+                                        {service.name}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        {service.description}
+                                      </p>
+                                    </div>
+                                  </div>
 
-                  <FloatingField
-                    name="registration_no"
-                    label="Registration No"
-                    isRequired
-                    control={form.control}
-                  />
+                                  <div className="text-right">
+                                    <p className="text-lg font-semibold text-green-600">
+                                      ₹{service.price}
+                                    </p>
+                                    <Badge variant="outline" className="mt-1">
+                                      {service.category}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
 
-                  <FloatingField
-                    name="chassis_no"
-                    label="Chassis No"
-                    control={form.control}
-                  />
+                      {/* Validation error */}
+                      <FormMessage className="pt-1 text-[0.75rem]">
+                        {form.formState.errors.service_type?.message}
+                      </FormMessage>
+                    </div>
 
-                  <FloatingRHFSelect
-                    name="srs"
-                    label="SRS Condition"
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { value: "brand_new", label: "Brand New" },
-                      { value: "minor_damage", label: "Minor Damage" },
-                      { value: "major_damage", label: "Major Damage" },
-                    ]}
-                  />
-
-                  <FloatingField
-                    name="service_amount"
-                    label="Service Amount"
-                    control={form.control}
-                  />
-                </div>
-
-                <div className="mt-4">
-                  <FloatingTextarea
-                    name="vehicle_remark"
-                    label="Remark"
-                    control={form.control}
-                  />
-                </div>
-
-                {/* PAINT CONDITION */}
-                <div className="mt-4">
-                  <p className="text-sm font-semibold mb-3">Vehicle Paint Condition</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <label className="flex items-center gap-2 text-sm">
-                      <Checkbox /> Repainted Vehicle
-                    </label>
-                    <label className="flex items-center gap-2 text-sm">
-                      <Checkbox /> Single Stage Paint
-                    </label>
-                    <label className="flex items-center gap-2 text-sm">
-                      <Checkbox /> Paint Thickness below 2 MIL
-                    </label>
-                    <label className="flex items-center gap-2 text-sm">
-                      <Checkbox /> Vehicle older than 5 years
-                    </label>
-                  </div>
-                </div>
-              </SectionCard>
-            )}
-
-
-            {/* STEP 3 */}
-            {step === 3 && (
-              <SectionCard title="Service Information">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Vehicle Type */}
-                  <FloatingRHFSelect
-                    name="vehicle_type"
-                    label="Vehicle Type"
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { label: "Bike", value: "bike" },
-                      { label: "Hatchback", value: "hatchback" },
-                      { label: "Sedan", value: "sedan" },
-                      { label: "SUV", value: "suv" },
-                    ]}
-                  />
-
-                  {/* Service Type (Multi) */}
-                  <FloatingRHFSelect
-                    name="service_type"
-                    label="Service Type"
-                    isMulti
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { label: "Exterior Detailing", value: "exterior_detailing" },
-                      { label: "Interior Detailing", value: "interior_detailing" },
-                      { label: "Exterior Protection", value: "exterior_protection" },
-                      { label: "PPF / Ceramic", value: "ppf_ceramic" },
-                    ]}
-                  />
-
-                  {/* Service Opted */}
-                  <FloatingRHFSelect
-                    name="service_opted"
-                    label="Service Opted"
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { label: "Standard", value: "standard" },
-                      { label: "Premium", value: "premium" },
-                      { label: "Custom", value: "custom" },
-                    ]}
-                  />
-                </div>
-
-                {/* Service Date */}
-                <FloatingDateField
-                  name="service_date"
-                  label="Service Date"
-                  isRequired
-                  control={form.control}
-                  className="max-w-xs mt-6"
-                />
-              </SectionCard>
-            )}
-
-            {/* FOOTER */}
-            <div className="border-t px-5 py-4 flex justify-end gap-3 mt-4">
-              <Button
-                variant="outline"
-                disabled={isLoading || isInfoLoading}
-                className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
-                onClick={() => navigate("/customers")}
-              >
-                {'Cancel'}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={step === 1}
-                onClick={() => setStep((s) => s - 1)}
-              >
-                Previous
-              </Button>
-              {step < 3 ? (
-                <Button className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]" type="button" onClick={() => setStep((s) => s + 1)}>
-                  Next
-                </Button>
-              ) : (
-                <Button type="submit"
-                  disabled={isLoading || isInfoLoading}
-                  className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
-                  {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
-                  {isLoading
-                    ? id ? "Updating..." : "Adding..."
-                    : id ? "Update " : "Add "}
-                </Button>
-              )}
-
-            </div>
-          </form>
-        </Form>
-      </div>
-    </div>
-  );
-}
-
-/* ============================
-   STEPPER
-============================ */
-function Stepper({ step }: { step: number }) {
-  const steps = [
-    { id: 1, label: "Customer Info", desc: "Basic details" },
-    { id: 2, label: "Vehicle Info", desc: "Vehicle details" },
-    { id: 3, label: "Service Info", desc: "Service selection" },
-  ];
-
-  return (
-    <div className="flex justify-center py-6 border-b">
-      <div className="relative w-full max-w-2xl">
-        {/* Connector line (perfectly aligned) */}
-        <div className="absolute top-[14px] left-[24px] right-[24px] h-[1.5px] bg-border" />
-
-        <div className="relative flex justify-between">
-          {steps.map((s) => {
-            const isActive = step === s.id;
-            const isDone = step > s.id;
-
-            return (
-              <div key={s.id} className="flex flex-col items-center">
-                {/* STEP DOT */}
-                <div
-                  className={`
-                    h-7 w-7 rounded-full flex items-center justify-center
-                    text-xs font-semibold border z-10
-                    ${isDone
-                      ? "bg-green-600 text-white border-green-600"
-                      : isActive
-                        ? "bg-primary text-white border-primary"
-                        : "bg-muted text-muted-foreground border-border"
-                    }
-                  `}
-                >
-                  {isDone ? "✓" : s.id}
-                </div>
-
-                {/* LABEL */}
-                <div className="mt-1 text-center">
-                  <p
-                    className={`text-xs font-medium ${isActive
-                      ? "text-primary"
-                      : isDone
-                        ? "text-foreground"
-                        : "text-muted-foreground"
-                      }`}
-                  >
-                    {s.label}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground hidden sm:block">
-                    {s.desc}
-                  </p>
-                </div>
+                  </SectionCard>
+                </Card>
               </div>
-            );
-          })}
+
+
+              <div className="  pb-4 flex justify-end gap-3 mt-4">
+                <Button
+                  variant="outline"
+                  disabled={isLoading || isInfoLoading}
+                  className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                  onClick={() => navigate("/job-cards")}
+                >
+                  {'Cancel'}
+                </Button>
+
+                {(
+                  <Button type="submit"
+                    disabled={isLoading || isInfoLoading}
+                    className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
+                    {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
+                    {isLoading
+                      ? id ? "Updating..." : "Adding..."
+                      : id ? "Update " : "Add "}
+                  </Button>
+                )}
+
+              </div>
+            </form>
+          </Form>
         </div>
       </div>
-    </div>
+    </>
   );
 }
