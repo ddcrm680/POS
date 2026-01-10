@@ -67,61 +67,72 @@ export default function JobCard() {
     }
   };
 const columns = [
-  /* ================= DATE / CREATED BY ================= */
+  /* ================= CREATED AT ================= */
   {
     key: "created_at",
     label: "Created On",
-      align: "center",
+    align: "center",
     width: "170px",
-    render: (value: string, row: any) => (
-     <Box className="flex flex-col justify-center items-center">
-                <span className="font-bold  ">
-                  {formatDate(value)}
-                </span>
-                <span className="text-sm font-medium  text-gray-700">
-                  {formatTime(value)}
-                </span></Box>
+    render: (value: string) => (
+      <Box className="flex flex-col items-center">
+        <span className="font-bold">{formatDate(value)}</span>
+        <span className="text-sm text-gray-700">
+          {formatTime(value)}
+        </span>
+      </Box>
     ),
   },
+
+  /* ================= JOB CARD NO ================= */
   {
-    key: "job_card_no",
+    key: "job_card_number",
     label: "JC No.",
-    width: "100px",
-    render: (value: string) => (
-      <span className="text-primary font-medium cursor-pointer">
+    width: "110px",
+    render: (value: string, row: any) => (
+      <span
+        className="text-primary font-medium cursor-pointer hover:underline"
+        onClick={() => navigate(`/jobCard/manage?id=${row.id}&mode=view`)}
+      >
         {value}
       </span>
     ),
   },
 
-
-  /* ================= NAME ================= */
+  /* ================= CUSTOMER ================= */
   {
-    key: "name",
-     label: (
-        <ColumnFilter
-          label= "Customer"
-          value={filters.consumer_id}
-          onChange={(val) => {
-            setFilters(f => ({ ...f, consumer_id: val }));
-            setPage(1);
-          }}
-          options={[{ label: 'All', value: '' }, ...jobCards].map(r => ({
-            label: r.label,
-            value: r.value,
-          }))}
-        />
-      ),
+    key: "consumer",
+    label: (
+      <ColumnFilter
+        label="Customer"
+        value={filters.consumer_id}
+        onChange={(val) => {
+          setFilters(f => ({ ...f, consumer_id: val }));
+          setPage(1);
+        }}
+        options={[
+          { label: "All", value: "" },
+          ...jobCards.map(j => ({
+            label: j.consumer?.name,
+            value: String(j.consumer?.id),
+          })),
+        ]}
+      />
+    ),
     width: "180px",
-    render: (value: string) => (
-      <span className="text-sm">
-        {value}
-      </span>
+    render: (_: any, row: any) => (
+      <div className="flex flex-col" >
+        <span  className="text-primary font-medium cursor-pointer hover:underline"
+       >
+          {row.consumer?.name ?? "-"}
+        </span>
+       
+      </div>
     ),
   },
-  /* ================= JOB CARD DATE ================= */
+
+  /* ================= SERVICE DATE ================= */
   {
-    key: "job_card_date",
+    key: "jobcard_date",
     label: "Service Date",
     width: "140px",
     render: (value: string) => (
@@ -130,123 +141,65 @@ const columns = [
       </span>
     ),
   },
-  /* ================= VEHICLE CATEGORY ================= */
-  {
-    key: "vehicle_category",
-    label: "Vehicle Category",
-    width: "150px",
-  },
 
-  /* ================= BRAND ================= */
-  // {
-  //   key: "brand",
-  //   label: "Brand",
-  //   width: "110px",
-  // },
-
-  /* ================= CAR MODEL ================= */
+  /* ================= VEHICLE TYPE ================= */
   {
-    key: "car_model",
-    label: "Car Model",
+    key: "vehicle_type",
+    label: "Vehicle Type",
     width: "120px",
   },
 
-  /* ================= SERVICE PLAN ================= */
-  // {
-  //   key: "service_plan",
-  //   label: "Service Plan",
-  //   width: "340px",
-  //   render: (value: string) => (
-  //     <span
-  //       className="text-sm text-gray-700"
-  //       title={value}
-  //     >
-  //       {value}
-  //     </span>
-  //   ),
-  // },
-
   /* ================= REG NO ================= */
   {
-    key: "registration_no",
+    key: "reg_no",
     label: "Reg No.",
-    width: "130px",
+    width: "140px",
   },
 
-  /* ================= JOB CARD NO ================= */
-
+  /* ================= STORE ================= */
+  {
+    key: "store",
+    label: "Store",
+    width: "150px",
+    render: (_: any, row: any) => (
+      <span className="text-sm">
+        {row.store?.name ?? "-"}
+      </span>
+    ),
+  },
 
   /* ================= STATUS ================= */
   {
     key: "status",
-      label: (
-        <ColumnFilter
-          label="Status"
-          value={filters.status}
-          onChange={(val) => {
-            setFilters(f => ({ ...f, status: val }));
-            setPage(1);
-          }}
-          options={jobCardStatusList}
-        />
-      ),
-    width: "90px",
+    label: (
+      <ColumnFilter
+        label="Status"
+        value={filters.status}
+        onChange={(val) => {
+          setFilters(f => ({ ...f, status: val }));
+          setPage(1);
+        }}
+        options={jobCardStatusList}
+      />
+    ),
+    width: "110px",
     render: (value: string) => (
-       <Badge
-          className={
-            `  px-3 py-1 text-xs font-medium  rounded-full ${
-            value === "open"
-              ? "bg-emerald-100 text-emerald-700"
-              : value === "cancel"
-              ? "bg-red-100 text-red-700"
-              : "bg-gray-100 text-gray-700"
-          }`
-          }
-        >
-          {jobCardStatusList.find((status)=>status.value==value)?.label ??""}
-        </Badge>
-     
+      <Badge
+        className={`px-3 py-1 text-xs font-medium rounded-full ${
+          value === "created"
+            ? "bg-blue-100 text-blue-700"
+            : value === "cancelled"
+            ? "bg-red-100 text-red-700"
+            : "bg-gray-100 text-gray-700"
+        }`}
+      >
+        {jobCardStatusList.find(s => s.value === value)?.label ?? value}
+      </Badge>
     ),
   },
 
-  /* ================= INVOICE NO ================= */
-{
-  key: "invoice_no",
-  label: "Invoice No.",
-  width: "150px",
-  render: (_: any, row: any) => {
-    // CASE 1: Invoice exists
-    if (row.invoice_no) {
-      return (
-        <span
-          className="text-primary font-medium cursor-pointer hover:underline"
-          onClick={() => navigate(`/invoice/manage?job_card_id=${row.id}`)}
-        >
-          {row.invoice_no}
-        </span>
-      );
-    }
-
-    // CASE 2: No invoice → show action
-    return (
-      <button
-        onClick={() =>
-          navigate(`/invoice/manage?job_card_id=${row.id}`)
-        }
-        className="
-          px-3 py-1 text-xs font-medium
-          rounded-md border border-primary
-          text-primary hover:bg-primary hover:text-white
-          transition
-        "
-      >
-        Create Invoice
-      </button>
-    );
-  },
-}
-
 ];
+
   const fetchJobCard = async (isLoaderHide = false) => {
     try {
       if (!isLoaderHide)

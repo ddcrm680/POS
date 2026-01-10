@@ -64,99 +64,66 @@ export default function Customer() {
       setIsLoading(false);
     }
   };
-const columns = useMemo(() => [
-  /* ================= CREATED ON ================= */
-  {
-    key: "created_at",
-    label: " Created On",
-    align: "center",
-    width: "140px",
-    render: (value: string, row: any) => (
-       <Box className="flex flex-col justify-center items-center">
-            <span className="font-bold  ">
-              {formatDate(value)}
-            </span>
-            <span className="text-sm font-medium  text-gray-700">
-              {formatTime(value)}
-            </span></Box>
-    ),
-  },
+  const columns = useMemo(() => [
+    /* ================= CREATED ON ================= */
+    {
+      key: "created_at",
+      label: " Created On",
+      align: "center",
+      width: "140px",
+      render: (value: string, row: any) => (
+        <Box className="flex flex-col justify-center items-center">
+          <span className="font-bold  ">
+            {formatDate(value)}
+          </span>
+          <span className="text-sm font-medium  text-gray-700">
+            {formatTime(value)}
+          </span></Box>
+      ),
+    },
 
-  /* ================= NAME ================= */
-  {
-    key: "name",
-    label: "Name",
-    width: "150px",
-  },
+    /* ================= NAME ================= */
+    {
+      key: "name",
+      label: "Name",
+      width: "150px",
+    },
 
-  /* ================= MOBILE ================= */
-  {
-    key: "phone",
-    label: "Mobile No.",
-    width: "150px",
-   
-  },
-  {
-    key: "email",
-    label: "Email",
-    width: "160px",
-   
-  },
+    /* ================= MOBILE ================= */
+    {
+      key: "phone",
+      label: "Mobile No.",
+      width: "150px",
 
-  /* ================= VEHICLE TYPE ================= */
-  {
-    key: "type",
-    label: " Type",
-    width: "160px",
-    render: (value: string) => (
-      <span className="text-sm text-gray-700">
-        {value || "-"}
-      </span>
-    ),
-  },
+    },
+    {
+      key: "email",
+      label: "Email",
+      width: "160px",
 
-  /* ================= INTERESTED IN ================= */
+    },
 
- 
+    /* ================= VEHICLE TYPE ================= */
+    {
+      key: "type",
+      label: " Type",
+      width: "160px",
+      render: (value: string) => (
+        <span className="text-sm text-gray-700">
+          {value || "-"}
+        </span>
+      ),
+    },
+
+    /* ================= INTERESTED IN ================= */
 
 
- 
-], []);
 
-  const CustomerStatusUpdateHandler = useCallback(async (u: any) => {
-    try {
-      const newStatus = u.is_active ? false : true;
 
-      setCustomers(prevcustomers => {
 
-        return prevcustomers.map(item =>
-          item.id === u.id
-            ? {
-              ...item,
-              is_active: newStatus,
-            }
-            : item
-        );
-      });
+  ], []);
 
-      // await UpdateCustomerStatus({ id: u.id, });
 
-      toast({
-        title: "Status Update",
-        description: "Customer status updated successfully",
-        variant: "success",
-      });
-    } catch (err: any) {
-      toast({
-        title: "Error",
-        description:
-          err?.response?.data?.message ||
-          err.message ||
-          "Failed to update customer status",
-        variant: "destructive",
-      });
-    }
-  }, []);
 
   const fetchCustomer = async (isLoaderHide = false) => {
     try {
@@ -170,11 +137,11 @@ const columns = useMemo(() => [
           status: filters.status
         });
 
-      const mappedTerritory = res
-      // setHasNext(res.meta.has_next)
-      // setTotal(res.meta.total)
+      const mappedTerritory = res.data
+      setHasNext(res.meta.has_next)
+      setTotal(res.meta.total)
       setCustomers(mappedTerritory);
-      // setLastPage(res.meta.last_page);
+      setLastPage(res.meta.last_page);
     } catch (e) {
       console.error(e);
 
@@ -237,31 +204,27 @@ const columns = useMemo(() => [
 
                   {(
                     <Box className="gap-3">
-                       <IconButton
-                      size="xs"
-                      mr={2}
-                      aria-label="View"
-                      onClick={() =>
-                       {}
-                      }
-                    >
-                      <EyeIcon />
-                    </IconButton>
+                      <IconButton
+                        size="xs"
+                        mr={2}
+                        aria-label="View"
+                        onClick={() => { }
+                        }
+                      >
+                        <EyeIcon />
+                      </IconButton>
+                      {<IconButton
+                        size="xs"
+                        mr={2}
+                        aria-label="Edit"
+                        onClick={() => {
+                          navigate(`/jobCard/manage?id=${row.id}&mode=edit`)
 
-                      {
-                        Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && !row.store &&
-                        <IconButton
-                          size="xs"
-                          mr={2}
-                          colorScheme="red"
-                          aria-label="Delete"
-                          onClick={() => {
-                            setIsCustomerDeleteModalOpenInfo({ open: true, info: row });
-                          }}
-                        >
-                          <Trash2 size={16} />
-                        </IconButton>}
-
+                        }
+                        }
+                      >
+                        <EditIcon />
+                      </IconButton>}
                     </Box>
                   )}
                 </>

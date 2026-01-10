@@ -647,7 +647,7 @@ export async function getConsumer({
     );
 
     if (response?.data?.success === true) {
-      return response.data.data; // customer object
+      return response.data; // customer object
     }
 
     return null;
