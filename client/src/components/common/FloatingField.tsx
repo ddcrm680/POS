@@ -49,39 +49,58 @@ export function FloatingField({
 
         return (
           <Box position="relative" w="full">
-            <Input
-              {...field}
-              {...inputProps}
-              type={inputType}
-              h="44px"
-              disabled={disabled}
-              pt="18px"
-                _disabled={{
-                bg: "gray.50",
-                cursor: "not-allowed",
-                opacity: 0.7,
-              }}
-                pr="18px"
-              pl="18px"
-              pb="8px"
-              border="1px solid"
-              borderColor={error ? "red.500" : "#e1e7ef"}
-              _focus={{ borderColor: error ? "red.500" : "blue.500" }}
-             onFocus={(e) => {
-                if (disabled) return
-                setFocused(true)
-                if (type === "date") setInputType("date")
-                inputProps.onFocus?.(e)
-              }}
-              onBlur={(e) => {
-                setFocused(false)
-                field.onBlur()
-                if (type === "date" && !field.value) {
-                  setInputType("text")
-                }
-                inputProps.onBlur?.(e)
-              }}
-            />
+        <Input
+  {...field}
+  {...inputProps}
+  type={inputType}
+  h="44px"
+  disabled={disabled}
+  pt="18px"
+  pr="18px"
+  pl="18px"
+  pb="8px"
+  border="1px solid"
+  borderColor={error ? "red.500" : "#e1e7ef"}
+  _focus={{ borderColor: error ? "red.500" : "blue.500" }}
+  _disabled={{
+    bg: "gray.50",
+    cursor: "not-allowed",
+    opacity: 0.7,
+  }}
+
+  /* 🔒 MOBILE NUMBER RULE */
+  inputMode={name === "search_mobile" ? "numeric" : inputProps.inputMode}
+  pattern={name === "search_mobile" ? "[0-9]*" : inputProps.pattern}
+  maxLength={name === "search_mobile" ? 10 : inputProps.maxLength}
+
+  onChange={(e) => {
+    let value = e.target.value
+
+    if (name === "search_mobile") {
+      value = value.replace(/\D/g, "").slice(0, 10)
+    }
+
+    field.onChange(value)
+    inputProps.onChange?.(e)
+  }}
+
+  onFocus={(e) => {
+    if (disabled) return
+    setFocused(true)
+    if (type === "date") setInputType("date")
+    inputProps.onFocus?.(e)
+  }}
+
+  onBlur={(e) => {
+    setFocused(false)
+    field.onBlur()
+    if (type === "date" && !field.value) {
+      setInputType("text")
+    }
+    inputProps.onBlur?.(e)
+  }}
+/>
+
 
             {/* Floating label */}
             <Text

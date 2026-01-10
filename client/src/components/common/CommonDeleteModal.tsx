@@ -16,7 +16,9 @@ export default function CommonDeleteModal({
   loadingText="Deleting...",
   maxWidth,
   onConfirm,
+  showCloseIcon=true,
   onCancel,
+  shouldNotCancelOnOverlayClick=false
 }: CommonDeleteModalProps) {
   useEffect(() => {
     const handleUnauthorized = () => {
@@ -32,9 +34,15 @@ export default function CommonDeleteModal({
   return (
     <CommonModal
       isOpen={isOpen}
-      onClose={onCancel}
+      onClose={()=>{
+
+        if(!shouldNotCancelOnOverlayClick){
+          onCancel();
+        }
+      }}
       maxWidth={maxWidth}
       width
+      showCloseIcon={showCloseIcon}
       title={title}
       isLoading={isLoading}
       primaryText={confirmText}

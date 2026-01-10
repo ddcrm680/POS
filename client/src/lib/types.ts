@@ -113,8 +113,10 @@ export interface CommonDeleteModalProps {
   isOpen: boolean;
   title?: string;
   width?: string
+  showCloseIcon?: boolean
   maxWidth?: string
   description?: string;
+  shouldNotCancelOnOverlayClick?: boolean
   confirmText?: string;
   loadingText?: string
   cancelText?: string;

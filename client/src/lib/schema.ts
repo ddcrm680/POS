@@ -768,47 +768,47 @@ export const TerritoryMasterSchema = z.object({
 
 export const NewJobCardSchema = z
   .object({
-    role: z.enum(["super-admin", "admin", "staff"]).optional(),
+    role: z.string().optional(),
 
     name: z.string().min(1, "Name required"),
-    mobile_no: z.string().min(10, "Mobile number required"),
+    phone: z.string().min(10, "Mobile number required"),
     email: z.string().email("Invalid email"),
-    customer_id: z.string().optional(),
+    consumer_id: z.string().optional(),
 
     service_type: z.array(z.string()).min(1, "Select at least one service type"),
     country_id: z.string().min(1, "Please select country"),
-    billing_type: z.enum(["individual", "company"]),
+    type: z.enum(["individual", "company"]),
     state_id: z.string().min(1, "Please select state"),
 
-    gst_country_id: z.string(),
-    gst_state_id: z.string(),
-    gst_contact_no:z.string(),
-gstin: z.string(),
+    company_country_id: z.string(),
+    company_state_id: z.string(),
+    company_contact_no: z.string(),
+    company_gstin: z.string(),
     address: z.string().min(1),
 
-    vehicle_make: z.string().min(1),
-    vehicle_model: z.string().min(1),
-    vehicle_color: z.string().min(1),
-    make_year: z.string().min(1),
-    registration_no: z.string().min(1),
+    vehicle_company_id: z.string().min(1),
+    vehicle_model_id: z.string().min(1),
+    color: z.string().min(1),
+    year: z.string().min(1),
+    reg_no: z.string().min(1),
 
-    chassis_no: z.string().optional(),
-    srs: z.string().min(1),
+    chasis_no: z.string().optional(),
+    vehicle_condition: z.string().min(1),
 
     store_id: z.string().optional(), // 🔑 optional, enforced below
 
-    vehicle_remark: z.string().optional(),
+    remarks: z.string().optional(),
 
-    repainted_vehicle: z.boolean().optional(),
+    isRepainted: z.boolean().optional(),
     search_mobile: z.string().min(10, "Mobile number required"),
 
-    single_stage_paint: z.boolean().optional(),
-    paint_thickness_below_2mil: z.boolean().optional(),
-    vehicle_older_than_5_years: z.boolean().optional(),
+    isSingleStagePaint: z.boolean().optional(),
+    isPaintThickness: z.boolean().optional(),
+    isVehicleOlder: z.boolean().optional(),
 
     vehicle_type: z.string().min(1),
-    service_opted: z.array(z.string()).min(1, "Select at least one service"),
-    service_date: z.string().min(1, "Service date required"),
+    service_ids: z.array(z.string()).min(1, "Select at least one service"),
+    jobcard_date: z.string().min(1, "Service date required"),
   })
   .superRefine((data, ctx) => {
     if (

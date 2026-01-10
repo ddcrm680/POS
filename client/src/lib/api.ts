@@ -933,6 +933,7 @@ export async function lookupCustomerByPhone(phone: string, store_id?: string) {
     const params = new URLSearchParams({
       phone: String(phone),
     });
+console.log(store_id,'store_idstore_id');
 
     if (store_id) params.append("store_id", String(store_id));
 
