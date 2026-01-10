@@ -168,7 +168,7 @@ export default function CustomerForm() {
       // 1️⃣ COUNTRY
       isHydratingRef.current = true;
       try {
-        const countryId = findIdByName(countryList, initialValues.country);
+        const countryId = findIdByName(countryList, initialValues.country.id);
 
         if (!countryId) return;
 
@@ -180,22 +180,12 @@ export default function CustomerForm() {
         setStates(stateList);
         setLoadingState(false);
 
-        const stateId = findIdByName(stateList, initialValues.state);
+        const stateId = findIdByName(stateList, initialValues.state.id);
 
         if (!stateId) return;
 
         form.setValue("state_id", String(stateId));
 
-        // 3️⃣ CITIES
-        setLoadingCity(true);
-        const cityList = await fetchCityList(stateId);
-        setCities(cityList);
-        setLoadingCity(false);
-
-        const cityId = findIdByName(cityList, initialValues.city);
-        if (!cityId) return;
-
-        // form.setValue("city_id", String(cityId));
 
       } finally {
         // ✅ hydration completed
@@ -239,10 +229,7 @@ export default function CustomerForm() {
   }, [mode, countryList]);
   const onSubmit = (data: CustomerFormValues) => {
   };
-  const [isJobCardSubmissionDeleteModalInfo, setIsJobCardSubmissionModalOpenInfo] = useState<{ open: boolean, info: any }>({
-    open: false,
-    info: {}
-  });
+ 
   useEffect(() => {
     if (!initialValues) return;
 
@@ -294,7 +281,7 @@ export default function CustomerForm() {
         // 1️⃣ COUNTRY
         isGstHydratingRef.current = true;
         try {
-          const countryId = findIdByName(countryList, '101');
+          const countryId = findIdByName(countryList, initialValues?.company_country?.id || '101');
 
           if (!countryId) return;
 
@@ -317,11 +304,11 @@ export default function CustomerForm() {
     }
     if (!initialValues || !countryList.length) return;
 
-    const hydrateGstLocation = async () => {
+    const hydrateGstLocation = async () => {  
       isGstHydratingRef.current = true;
 
       try {
-        const countryId = findIdByName(countryList, initialValues.gst_country);
+        const countryId = findIdByName(countryList, initialValues.company_country?.id);
         if (!countryId) return;
 
         form.setValue("company_country_id", String(countryId));
@@ -331,18 +318,10 @@ export default function CustomerForm() {
         setGstStates(stateList);
         setLoadingGstState(false);
 
-        const stateId = findIdByName(stateList, initialValues.gst_state);
+        const stateId = findIdByName(stateList, initialValues.company_state?.id);
         if (!stateId) return;
 
         form.setValue("company_state_id", String(stateId));
-
-        setLoadingGstCity(true);
-        const cityList = await fetchCityList(stateId);
-        setGstCities(cityList);
-        setLoadingGstCity(false);
-
-        const cityId = findIdByName(cityList, initialValues.gst_city);
-        if (!cityId) return;
 
         // form.setValue("gst_city_id", String(cityId));
       } finally {
@@ -387,6 +366,7 @@ export default function CustomerForm() {
         variant: "success",
       });
 
+      navigate("/customers")
     } catch (err: any) {
       const apiErrors = err?.response?.data?.errors;
 
@@ -653,7 +633,7 @@ export default function CustomerForm() {
                   variant="outline"
                   disabled={isLoading || isInfoLoading}
                   className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
-                  onClick={() => navigate("/job-cards")}
+                  onClick={() => navigate("/customers")}
                 >
                   {'Cancel'}
                 </Button>

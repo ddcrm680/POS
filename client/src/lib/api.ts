@@ -1066,11 +1066,11 @@ export async function jobCardCancel(data:any) {
     throw response;
   }
 }
-export async function getCustomerView(data:any) {
+export async function getCustomerView(id:any) {
   try {
-    const response: any = await api.post(
-      `/api/consumers/${data.id}/view`,
-      data
+    const response: any = await api.get(
+      `/api/consumers/${id}/view`,
+      
     );
 
     if (response?.data?.success === true) {
