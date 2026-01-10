@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getJobCard, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getJobCard, jobCardCancel, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, PrinterIcon, Trash2 } from "lucide-react";
+import { EditIcon, EyeIcon, PrinterIcon, Trash2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
@@ -29,7 +29,7 @@ export default function JobCard() {
   const [, navigate] = useLocation();
   const [filters, setFilters] = useState({
     status: "",
-    consumer_id:""
+    consumer_id: ""
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,8 +47,8 @@ export default function JobCard() {
     try {
       setIsLoading(true);
 
-      // await DeleteCustomer(isCustomerDeleteModalInfo?.info?.id);
-      // toast({ title: `Delete JobCard`, description: "JobCard deleted successfully", variant: "success", });
+      await jobCardCancel(isJobCardDeleteModalInfo?.info?.id);
+      toast({ title: `Delete Job Card`, description: "Job Card deleted successfully", variant: "success", });
 
       fetchJobCard(false)
 
@@ -58,7 +58,7 @@ export default function JobCard() {
         title: "Error",
         description:
           err?.response?.data?.message ||
-          err.message || `Failed to delete territory`,
+          err.message || `Failed to delete jobcard`,
         variant: "destructive",
       });
     } finally {
@@ -66,140 +66,139 @@ export default function JobCard() {
       setIsLoading(false);
     }
   };
-const columns = [
-  /* ================= CREATED AT ================= */
-  {
-    key: "created_at",
-    label: "Created On",
-    align: "center",
-    width: "170px",
-    render: (value: string) => (
-      <Box className="flex flex-col items-center">
-        <span className="font-bold">{formatDate(value)}</span>
-        <span className="text-sm text-gray-700">
-          {formatTime(value)}
+  const columns = [
+    /* ================= CREATED AT ================= */
+    {
+      key: "created_at",
+      label: "Created On",
+      align: "center",
+      width: "170px",
+      render: (value: string) => (
+        <Box className="flex flex-col items-center">
+          <span className="font-bold">{formatDate(value)}</span>
+          <span className="text-sm text-gray-700">
+            {formatTime(value)}
+          </span>
+        </Box>
+      ),
+    },
+
+    /* ================= JOB CARD NO ================= */
+    {
+      key: "job_card_number",
+      label: "JC No.",
+      width: "110px",
+      render: (value: string, row: any) => (
+        <span
+          className="text-primary font-medium cursor-pointer hover:underline"
+          onClick={() => navigate(`/jobCard/manage?id=${row.id}&mode=view`)}
+        >
+          {value}
         </span>
-      </Box>
-    ),
-  },
+      ),
+    },
 
-  /* ================= JOB CARD NO ================= */
-  {
-    key: "job_card_number",
-    label: "JC No.",
-    width: "110px",
-    render: (value: string, row: any) => (
-      <span
-        className="text-primary font-medium cursor-pointer hover:underline"
-        onClick={() => navigate(`/jobCard/manage?id=${row.id}&mode=view`)}
-      >
-        {value}
-      </span>
-    ),
-  },
+    /* ================= CUSTOMER ================= */
+    {
+      key: "consumer",
+      label: (
+        <ColumnFilter
+          label="Customer"
+          value={filters.consumer_id}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, consumer_id: val }));
+            setPage(1);
+          }}
+          options={[
+            { label: "All", value: "" },
+            ...jobCards.map(j => ({
+              label: j.consumer?.name,
+              value: String(j.consumer?.id),
+            })),
+          ]}
+        />
+      ),
+      width: "180px",
+      render: (_: any, row: any) => (
+        <div className="flex flex-col" >
+          <span className="text-primary font-medium cursor-pointer hover:underline" onClick={() => navigate(`/customers/manage?id=${row.id}&mode=view`)
+          }
+          >
+            {row.consumer?.name ?? "-"}
+          </span>
 
-  /* ================= CUSTOMER ================= */
-  {
-    key: "consumer",
-    label: (
-      <ColumnFilter
-        label="Customer"
-        value={filters.consumer_id}
-        onChange={(val) => {
-          setFilters(f => ({ ...f, consumer_id: val }));
-          setPage(1);
-        }}
-        options={[
-          { label: "All", value: "" },
-          ...jobCards.map(j => ({
-            label: j.consumer?.name,
-            value: String(j.consumer?.id),
-          })),
-        ]}
-      />
-    ),
-    width: "180px",
-    render: (_: any, row: any) => (
-      <div className="flex flex-col" >
-        <span  className="text-primary font-medium cursor-pointer hover:underline" onClick={()=>   navigate(`/customers/manage?id=${row.id}&mode=view`)
-                   }
-       >
-          {row.consumer?.name ?? "-"}
+        </div>
+      ),
+    },
+
+    /* ================= SERVICE DATE ================= */
+    {
+      key: "jobcard_date",
+      label: "Service Date",
+      width: "140px",
+      render: (value: string) => (
+        <span className="text-sm">
+          {formatDate(value)}
         </span>
-       
-      </div>
-    ),
-  },
+      ),
+    },
 
-  /* ================= SERVICE DATE ================= */
-  {
-    key: "jobcard_date",
-    label: "Service Date",
-    width: "140px",
-    render: (value: string) => (
-      <span className="text-sm">
-        {formatDate(value)}
-      </span>
-    ),
-  },
+    /* ================= VEHICLE TYPE ================= */
+    {
+      key: "vehicle_type",
+      label: "Vehicle Type",
+      width: "120px",
+    },
 
-  /* ================= VEHICLE TYPE ================= */
-  {
-    key: "vehicle_type",
-    label: "Vehicle Type",
-    width: "120px",
-  },
+    /* ================= REG NO ================= */
+    {
+      key: "reg_no",
+      label: "Reg No.",
+      width: "140px",
+    },
 
-  /* ================= REG NO ================= */
-  {
-    key: "reg_no",
-    label: "Reg No.",
-    width: "140px",
-  },
+    /* ================= STORE ================= */
+    {
+      key: "store",
+      label: "Store",
+      width: "150px",
+      render: (_: any, row: any) => (
+        <span className="text-sm">
+          {row.store?.name ?? "-"}
+        </span>
+      ),
+    },
 
-  /* ================= STORE ================= */
-  {
-    key: "store",
-    label: "Store",
-    width: "150px",
-    render: (_: any, row: any) => (
-      <span className="text-sm">
-        {row.store?.name ?? "-"}
-      </span>
-    ),
-  },
+    /* ================= STATUS ================= */
+    {
+      key: "status",
+      label: (
+        <ColumnFilter
+          label="Status"
+          value={filters.status}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, status: val }));
+            setPage(1);
+          }}
+          options={jobCardStatusList}
+        />
+      ),
+      width: "110px",
+      render: (value: string) => (
+        <Badge
+          className={`px-3 py-1 text-xs font-medium rounded-full ${value === "created"
+              ? "bg-blue-100 text-blue-700"
+              : value === "cancelled"
+                ? "bg-red-100 text-red-700"
+                : "bg-gray-100 text-gray-700"
+            }`}
+        >
+          {jobCardStatusList.find(s => s.value === value)?.label ?? value}
+        </Badge>
+      ),
+    },
 
-  /* ================= STATUS ================= */
-  {
-    key: "status",
-    label: (
-      <ColumnFilter
-        label="Status"
-        value={filters.status}
-        onChange={(val) => {
-          setFilters(f => ({ ...f, status: val }));
-          setPage(1);
-        }}
-        options={jobCardStatusList}
-      />
-    ),
-    width: "110px",
-    render: (value: string) => (
-      <Badge
-        className={`px-3 py-1 text-xs font-medium rounded-full ${
-          value === "created"
-            ? "bg-blue-100 text-blue-700"
-            : value === "cancelled"
-            ? "bg-red-100 text-red-700"
-            : "bg-gray-100 text-gray-700"
-        }`}
-      >
-        {jobCardStatusList.find(s => s.value === value)?.label ?? value}
-      </Badge>
-    ),
-  },
-
-];
+  ];
 
   const fetchJobCard = async (isLoaderHide = false) => {
     try {
@@ -211,7 +210,7 @@ const columns = [
           page,
           search,
           status: filters.status,
-          consumer:filters.consumer_id
+          consumer: filters.consumer_id
         });
 
       const mappedTerritory = res
@@ -236,7 +235,7 @@ const columns = [
     setPage(1)
     setFilters({
       status: "",
-      consumer_id:""
+      consumer_id: ""
     })
   }
   return (
@@ -245,8 +244,8 @@ const columns = [
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold">Job Card Management</h1>
-              <p className="text-muted-foreground">Manage service workflow and track vehicles</p>
-              </div>
+            <p className="text-muted-foreground">Manage service workflow and track vehicles</p>
+          </div>
         </div>
       </div>
       <Card className="w-full">
@@ -274,38 +273,37 @@ const columns = [
               setPage(1); // reset page on new search
               // }
             }}
-            setIsModalOpen={(value: boolean) => {    navigate(`/jobCard/manage`)
-}}
+            setIsModalOpen={(value: boolean) => {
+              navigate(`/jobCard/manage`)
+            }}
             actions={(row: any) => {
               return (
                 <>
 
                   {(
                     <Box className="gap-3">
-                           <IconButton
-                      size="xs"
-                      mr={2}
-                      aria-label="Print"
-                      onClick={() =>
-                       {}
-                      }
-                    >
-                      <PrinterIcon />
-                    </IconButton>
-                       <IconButton
-                      size="xs"
-                      mr={2}
-                      aria-label="View"
-                      onClick={() =>
-                       {
-                        
-                          navigate(`/customers/manage?id=${row.id}&mode=edit`)
-                       }
-                      }
-                    >
-                      <EyeIcon />
-                    </IconButton>
-                      {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
+                      <IconButton
+                        size="xs"
+                        mr={2}
+                        aria-label="Print"
+                        onClick={() => { }
+                        }
+                      >
+                        <PrinterIcon />
+                      </IconButton>
+                      <IconButton
+                        size="xs"
+                        mr={2}
+                        aria-label="View"
+                        onClick={() => {
+
+                          navigate(`/jobCard/manage?id=${row.id}&mode=view`)
+                        }
+                        }
+                      >
+                        <EyeIcon />
+                      </IconButton>
+                      {  row.status !== 'cancelled' &&<IconButton
                         size="xs"
                         mr={2}
                         aria-label="Edit"
@@ -319,17 +317,18 @@ const columns = [
                       </IconButton>}
 
                       {
-                        Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && !row.store &&
-                        <IconButton
+
+                        row.status !== 'cancelled' && <IconButton
                           size="xs"
                           mr={2}
+                          title="Cancel"
                           colorScheme="red"
-                          aria-label="Delete"
+                          aria-label="Cancel"
                           onClick={() => {
                             setIsJobCardDeleteModalOpenInfo({ open: true, info: row });
                           }}
                         >
-                          <Trash2 size={16} />
+                          <XCircle size={16} />
                         </IconButton>}
 
                     </Box>
@@ -343,10 +342,11 @@ const columns = [
             width="420px"
             maxWidth="420px"
             isOpen={isJobCardDeleteModalInfo.open}
-            title="Delete Job Card"
-            description={`Are you sure you want to delete this job card? This action cannot be undone.`}
-            confirmText="Delete"
-            cancelText="Cancel"
+            title="Cancel Job Card"
+            description={`Are you sure you want to cancel this job card? This action cannot be undone.`}
+            confirmText="Yes, Cancel"
+            cancelText="No"
+            loadingText="Cancelling..."
             isLoading={isLoading}
             onCancel={() =>
               setIsJobCardDeleteModalOpenInfo({ open: false, info: {} })

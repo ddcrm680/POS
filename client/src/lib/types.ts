@@ -707,6 +707,7 @@ export type CustomerFormValues = z.infer<typeof NewCustomerSchema>;
 export type FloatingDateFieldProps = {
   name: string;
   label: string;
+  isDisabled?: boolean;
   control: Control<any>;
   isRequired?: boolean;
   className?: string;

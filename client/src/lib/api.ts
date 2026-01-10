@@ -1048,11 +1048,10 @@ export async function getServiceOptionByTypeVehicle(data:any) {
     throw response;
   }
 }
-export async function jobCardCancel(data:any) {
+export async function jobCardCancel(id:any) {
   try {
     const response: any = await api.post(
-      `/api/job-cards/${data.id}/cancel`,
-      data
+      `/api/job-cards/${id}/cancel`,
     );
 
     if (response?.data?.success === true) {

@@ -7,6 +7,7 @@ export function FloatingDateField({
   name,
   label,
   control,
+  isDisabled = false,
   isRequired = false,
   className = "",
 }: FloatingDateFieldProps) {
@@ -33,9 +34,10 @@ export function FloatingDateField({
     <Controller
       name={name}
       control={control}
-      render={({ field, fieldState }) => {
+      render={({ field, fieldState ,formState }) => {
         const hasValue = !!dateValue?.startDate;
-
+  const disabled = isDisabled || formState.disabled;
+      
         return (
           <div className={`relative group ${className}`}>
             {/* FLOATING LABEL */}
@@ -61,6 +63,7 @@ export function FloatingDateField({
               asSingle
               useRange={false}
               value={dateValue}
+               disabled={disabled}
               onChange={(val) => {
                 setDateValue(val as DateValueType);
 
@@ -76,10 +79,11 @@ export function FloatingDateField({
               showShortcuts={false}
               popoverDirection="down"
               containerClassName="relative z-10"
-              inputClassName={`
+             inputClassName={`
                 w-full border rounded-md
                 pt-4 pb-2 px-3 text-sm
                 focus:ring-1 focus:ring-red-500
+                ${disabled ? "bg-gray-50 cursor-not-allowed" : ""}
                 ${fieldState.error ? "border-red-500" : ""}
               `}
             />

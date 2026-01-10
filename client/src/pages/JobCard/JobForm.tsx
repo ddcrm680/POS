@@ -52,26 +52,6 @@ import { NewJobCardSchema } from "@/lib/schema";
 import { useAuth } from "@/lib/auth";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 
-interface ServiceItem {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  category: string;
-  selected?: boolean;
-}
-
-// Available services for POS
-const availableServices: ServiceItem[] = [
-  { id: '1', name: 'Basic Exterior Wash', price: 500, description: 'Exterior wash and dry', category: 'Basic' },
-  { id: '2', name: 'Premium Interior Detailing', price: 1200, description: 'Complete interior cleaning and protection', category: 'Premium' },
-  { id: '3', name: 'Ceramic Coating Kit', price: 4500, description: '6-month ceramic protection', category: 'Protection' },
-  { id: '4', name: 'Paint Correction Service', price: 3000, description: 'Remove scratches and swirl marks', category: 'Correction' },
-  { id: '5', name: 'Full Car PPF Installation', price: 18000, description: 'Complete paint protection film', category: 'Protection' },
-  { id: '6', name: 'Engine Bay Cleaning', price: 800, description: 'Professional engine compartment cleaning', category: 'Detailing' }
-];
-
-
 export default function JobForm() {
   const [step, setStep] = useState(1);
   const [, navigate] = useLocation();
@@ -809,6 +789,7 @@ export default function JobForm() {
                         name="store_id"
                         label="Select Store"
                         control={form.control}
+                        isDisabled={isView}
                         isRequired
                         options={storeList.map((s: any) => ({
                           label: s.label,
@@ -826,6 +807,7 @@ export default function JobForm() {
                       <FloatingField
                         name="search_mobile"
                         label="Search Mobile Number"
+                        isDisabled={isView}
                         isRequired
                         control={form.control}
                       />
@@ -869,6 +851,7 @@ export default function JobForm() {
                       name="name"
                       label="Name"
                       isRequired
+                            isDisabled={isView}
                       control={form.control}
                     />
 
@@ -878,12 +861,13 @@ export default function JobForm() {
                       label="Mobile No"
                       isRequired
                       control={form.control}
-                      isDisabled={customerFound === true}
+                      isDisabled={customerFound === true || isView}
                     />
 
                     <FloatingField
                       name="email"
                       label="Email"
+                            isDisabled={isView}
                       isRequired
                       control={form.control}
                     />
@@ -896,6 +880,7 @@ export default function JobForm() {
                     <FloatingTextarea
                       name="address"
                       label="Address"
+                      isView={isView}
                       isRequired
                       control={form.control}
                     />
@@ -958,6 +943,7 @@ export default function JobForm() {
                         label="Billing Type"
                         control={form.control}
                         isRequired
+                        isDisabled={isView}
                         options={[
                           { label: "Company", value: "company" },
                           { label: "Individual", value: "individual" },
@@ -993,6 +979,7 @@ export default function JobForm() {
                           <FloatingField
                             name="company_contact_no"
                             label="Company Contact No."
+                                  isDisabled={isView}
                             control={form.control}
                           />
 
@@ -1000,6 +987,7 @@ export default function JobForm() {
                             name="company_gstin"
                             label="GSTIN"
                             control={form.control}
+                                  isDisabled={isView}
                           />
 
                           <FloatingRHFSelect
@@ -1064,6 +1052,7 @@ export default function JobForm() {
                       <FloatingRHFSelect
                         name="vehicle_company_id"
                         label="Vehicle Make"
+                        isDisabled={isView}
                         isRequired
                         control={form.control}
                         options={meta.vehicleCompanies}
@@ -1073,12 +1062,13 @@ export default function JobForm() {
                         label="Vehicle Model"
                         isRequired
                         control={form.control}
-                        isDisabled={!meta.vehicleModels.length}
+                        isDisabled={!meta.vehicleModels.length || isView}
                         options={meta.vehicleModels}
                       />
 
                       <FloatingField
                         name="color"
+                              isDisabled={isView}
                         label="Vehicle Color"
                         isRequired
                         control={form.control}
@@ -1087,12 +1077,14 @@ export default function JobForm() {
                       <FloatingRHFSelect
                         name="year"
                         label="Make Year"
+                        isDisabled={isView}
                         isRequired
                         control={form.control}
                         options={meta.years}
                       />
 
                       <FloatingField
+                            isDisabled={isView}
                         name="reg_no"
                         label="Registration No"
                         isRequired
@@ -1101,6 +1093,7 @@ export default function JobForm() {
 
                       <FloatingField
                         name="chasis_no"
+                              isDisabled={isView}
                         label="Chassis No"
                         control={form.control}
                       />
@@ -1108,6 +1101,7 @@ export default function JobForm() {
                         name="vehicle_condition"
                         label="SRS Condition"
                         isRequired
+                        isDisabled={isView}
                         control={form.control}
                         options={meta.srsCondition}
                       />
@@ -1124,8 +1118,9 @@ export default function JobForm() {
                           control={form.control}
                           name="isRepainted"
                           render={({ field }) => (
-                            <label className="flex items-center gap-2 text-sm cursor-pointer">
+                            <label className={`flex items-center gap-2 text-sm ${isView ? '':'cursor-pointer'}  `}>
                               <Checkbox
+                               disabled={isView}
                                 checked={field.value}
                                 onCheckedChange={(val) => field.onChange(Boolean(val))}
                               />
@@ -1137,8 +1132,9 @@ export default function JobForm() {
                           control={form.control}
                           name="isSingleStagePaint"
                           render={({ field }) => (
-                            <label className="flex items-center gap-2 text-sm cursor-pointer">
+                            <label className={`flex items-center gap-2 text-sm ${isView ? '':'cursor-pointer'}  `}>
                               <Checkbox
+                               disabled={isView}
                                 checked={field.value}
                                 onCheckedChange={(val) => field.onChange(Boolean(val))}
                               />
@@ -1151,8 +1147,9 @@ export default function JobForm() {
                           control={form.control}
                           name="isPaintThickness"
                           render={({ field }) => (
-                            <label className="flex items-center gap-2 text-sm cursor-pointer">
+                            <label className={`flex items-center gap-2 text-sm ${isView ? '':'cursor-pointer'}  `}>
                               <Checkbox
+                               disabled={isView}
                                 checked={field.value}
                                 onCheckedChange={(val) => field.onChange(Boolean(val))}
                               />
@@ -1165,8 +1162,9 @@ export default function JobForm() {
                           control={form.control}
                           name="isVehicleOlder"
                           render={({ field }) => (
-                            <label className="flex items-center gap-2 text-sm cursor-pointer">
+                            <label className={`flex items-center gap-2 text-sm ${isView ? '':'cursor-pointer'}  `}>
                               <Checkbox
+                               disabled={isView}
                                 checked={field.value}
                                 onCheckedChange={(val) => field.onChange(Boolean(val))}
                               />
@@ -1195,6 +1193,7 @@ export default function JobForm() {
                       {/* Vehicle Type */}
                       <FloatingRHFSelect
                         name="vehicle_type"
+                        isDisabled={isView}
                         label="Vehicle Type"
                         isRequired
                         control={form.control}
@@ -1206,6 +1205,7 @@ export default function JobForm() {
                         name="jobcard_date"
                         label="Service Date"
                         isRequired
+                        isDisabled={isView}
                         control={form.control}
                       />
                       {/* Service Type */}
@@ -1213,6 +1213,7 @@ export default function JobForm() {
                         name="service_type"
                         label="Service Type"
                         isMulti
+                        isDisabled={isView}
                         isRequired
                         control={form.control}
                         options={meta.serviceTypes}
@@ -1255,6 +1256,7 @@ export default function JobForm() {
                                   <div className="flex items-start gap-2">
                                     <Checkbox
                                       checked={isSelected}
+                                      disabled={isView}
                                       onCheckedChange={() => toggleService(service.id)}
                                       onClick={(e) => e.stopPropagation()} // 🔴 IMPORTANT
                                     />
@@ -1292,30 +1294,30 @@ export default function JobForm() {
                 </Card>
               </div>
 
-
-              <div className="  pb-4 flex justify-end gap-3 mt-4">
-                <Button
-                  variant="outline"
-                  disabled={isLoading || isInfoLoading}
-                  className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
-                  onClick={() => navigate("/job-cards")}
-                >
-                  {'Cancel'}
-                </Button>
-
-                {(
-                  <Button type="button"
+              {mode !== 'view' &&
+                <div className="  pb-4 flex justify-end gap-3 mt-4">
+                  <Button
+                    variant="outline"
                     disabled={isLoading || isInfoLoading}
-                    onClick={form.handleSubmit(handleJobCardSubmission,)}
-                    className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
-                    {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
-                    {isLoading
-                      ? id ? "Updating..." : "Adding..."
-                      : id ? "Update " : "Add "}
+                    className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                    onClick={() => navigate("/job-cards")}
+                  >
+                    {'Cancel'}
                   </Button>
-                )}
 
-              </div>
+                  {(
+                    <Button type="button"
+                      disabled={isLoading || isInfoLoading}
+                      onClick={form.handleSubmit(handleJobCardSubmission,)}
+                      className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
+                      {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
+                      {isLoading
+                        ? id ? "Updating..." : "Adding..."
+                        : id ? "Update " : "Add "}
+                    </Button>
+                  )}
+
+                </div>}
             </form>
           </Form>
         </div>
