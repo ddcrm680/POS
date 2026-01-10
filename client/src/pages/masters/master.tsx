@@ -62,9 +62,7 @@ text-xl font-semibold
 ">
                   Master Details
                 </h1>
-                <p className="text-muted-foreground">
-                   Control and manage all foundational business records
-                </p>
+             
               </div>
                 <TabsList
                   className={cn(
