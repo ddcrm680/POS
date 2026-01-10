@@ -667,8 +667,8 @@ export default function JobForm() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="">
 
-              <Card className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {isAdmin && <SectionCard title="Store Information" className="pb-4 pr-0">
+              <Card className="mb-6 grid grid-cols-1 md:grid-cols-2 md:gap-4">
+                {isAdmin && <SectionCard title="Store Information" className="pb-4 md:pr-0 ">
                   <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                     <FloatingRHFSelect
                       name="store_id"
@@ -682,7 +682,7 @@ export default function JobForm() {
                     />
                   </div>
                 </SectionCard>}
-                <SectionCard title="Customer Lookup" className="pb-4 pl-0">
+                <SectionCard title="Customer Lookup" className="pb-4 md:pl-0 pt-0 md:pt-4">
                   <div className="grid grid-cols-1 md:grid-cols-1 gap-1 items-end">
                     <FloatingField
                       name="search_mobile"
