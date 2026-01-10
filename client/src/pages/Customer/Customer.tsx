@@ -208,7 +208,10 @@ export default function Customer() {
                         size="xs"
                         mr={2}
                         aria-label="View"
-                        onClick={() => { }
+                        onClick={() => {
+                          navigate(`/customers/manage?id=${row.id}&mode=view`)
+
+                        }
                         }
                       >
                         <EyeIcon />
@@ -218,7 +221,7 @@ export default function Customer() {
                         mr={2}
                         aria-label="Edit"
                         onClick={() => {
-                          navigate(`/jobCard/manage?id=${row.id}&mode=edit`)
+                          navigate(`/customers/manage?id=${row.id}&mode=edit`)
 
                         }
                         }

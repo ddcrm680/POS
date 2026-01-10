@@ -822,6 +822,24 @@ export const NewJobCardSchema = z
       });
     }
   });
+  export const NewCustomerSchema = z
+  .object({
+
+    name: z.string().min(1, "Name required"),
+    phone: z.string().min(10, "Mobile number required"),
+    email: z.string().email("Invalid email"),
+    consumer_id: z.string().optional(),
+    country_id: z.string().min(1, "Please select country"),
+    type: z.enum(["individual", "company"]),
+    state_id: z.string().min(1, "Please select state"),
+    company_country_id: z.string(),
+    company_state_id: z.string(),
+    company_contact_no: z.string(),
+    company_gstin: z.string(),
+    address: z.string().min(1),
+    store_id: z.string().optional(), // 🔑 optional, enforced below
+  })
+ 
 export const invoicePaymentSchema = z
   .object({
     invoice_total: z.number(),

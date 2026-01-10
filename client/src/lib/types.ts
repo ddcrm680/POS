@@ -1,5 +1,5 @@
 import { Control, ControllerRenderProps, UseFormSetError } from "react-hook-form";
-import { CustomerSchema, InsertCustomerSchema, JobCardSchema, loginSchema, NewJobCardSchema, passwordSchema, posJobSchema, profileSchema, userSchema, VehicleSchema } from "./schema";
+import { CustomerSchema, InsertCustomerSchema, JobCardSchema, loginSchema, NewCustomerSchema, NewJobCardSchema, passwordSchema, posJobSchema, profileSchema, userSchema, VehicleSchema } from "./schema";
 import z from "zod";
 import { ReactNode } from "react";
 
@@ -702,6 +702,8 @@ export type Notification = {
   is_read: boolean;
 };
 export type JobCardFormValues = z.infer<typeof NewJobCardSchema>;
+
+export type CustomerFormValues = z.infer<typeof NewCustomerSchema>;
 export type FloatingDateFieldProps = {
   name: string;
   label: string;

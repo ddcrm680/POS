@@ -35,6 +35,7 @@ import Invoice from "./pages/Invoices/Invoice";
 import InvoiceForm from "./pages/Invoices/InvoiceForm";
 import Notification from "./pages/Notification/Noitification";
 import JobForm from "./pages/JobCard/JobForm";
+import CustomerForm from "./pages/Customer/CustomerForm";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -73,6 +74,7 @@ export function Router() {
       {/* <Route path="/test" component={() => <ProtectedRoute component={ManagerDashboard} />} /> */}
       <Route path="/manager" component={() => <ProtectedRoute component={ManagerDashboard} />} />
       <Route path="/customers" component={() => <ProtectedRoute component={Customer} />} />
+        <Route path="/customers/manage" component={() => <ProtectedRoute component={CustomerForm} />} />
       <Route path="/job-cards" component={() => <ProtectedRoute component={JobCard} />} />
       <Route path="/appointments" component={() => <ProtectedRoute component={AppointmentsPage} />} />
       <Route path="/facility-management" component={() => <ProtectedRoute component={FacilityManagement} />} />

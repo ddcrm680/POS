@@ -1066,6 +1066,24 @@ export async function jobCardCancel(data:any) {
     throw response;
   }
 }
+export async function getCustomerView(data:any) {
+  try {
+    const response: any = await api.post(
+      `/api/consumers/${data.id}/view`,
+      data
+    );
+
+    if (response?.data?.success === true) {
+      return response.data; // customer object
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to get customer view"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
 export async function consumerUpdate(data:any) {
   try {
     const response: any = await api.post(

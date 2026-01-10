@@ -121,7 +121,8 @@ const columns = [
     width: "180px",
     render: (_: any, row: any) => (
       <div className="flex flex-col" >
-        <span  className="text-primary font-medium cursor-pointer hover:underline"
+        <span  className="text-primary font-medium cursor-pointer hover:underline" onClick={()=>   navigate(`/customers/manage?id=${row.id}&mode=view`)
+                   }
        >
           {row.consumer?.name ?? "-"}
         </span>
@@ -296,7 +297,10 @@ const columns = [
                       mr={2}
                       aria-label="View"
                       onClick={() =>
-                       {}
+                       {
+                        
+                          navigate(`/customers/manage?id=${row.id}&mode=edit`)
+                       }
                       }
                     >
                       <EyeIcon />
