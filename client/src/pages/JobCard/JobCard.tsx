@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getJobCard, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
@@ -29,7 +29,7 @@ export default function JobCard() {
   const [, navigate] = useLocation();
   const [filters, setFilters] = useState({
     status: "",
-    customer:""
+    consumer_id:""
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -101,9 +101,9 @@ const columns = [
      label: (
         <ColumnFilter
           label= "Customer"
-          value={filters.customer}
+          value={filters.consumer_id}
           onChange={(val) => {
-            setFilters(f => ({ ...f, category_type: val }));
+            setFilters(f => ({ ...f, consumer_id: val }));
             setPage(1);
           }}
           options={[{ label: 'All', value: '' }, ...jobCards].map(r => ({
@@ -251,17 +251,16 @@ const columns = [
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      const res ={
-        data:jobCardMockData.map((item)=>({...item,label:item.name,value:item.name}))
-      }
-        // await fetchCustomerList({
-        //   per_page: perPage,
-        //   page,
-        //   search,
-        //   status: filters.status
-        // });
+      const res =
+        await getJobCard({
+          per_page: perPage,
+          page,
+          search,
+          status: filters.status,
+          consumer:filters.consumer_id
+        });
 
-      const mappedTerritory = res.data
+      const mappedTerritory = res
       // setHasNext(res.meta.has_next)
       // setTotal(res.meta.total)
       setJobCards(mappedTerritory);
@@ -283,7 +282,7 @@ const columns = [
     setPage(1)
     setFilters({
       status: "",
-      customer:""
+      consumer_id:""
     })
   }
   return (

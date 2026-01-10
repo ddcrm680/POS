@@ -1,8 +1,8 @@
-export function Loader({ isShowLoadingText = true, color = "" }: { isShowLoadingText?: boolean, color?: string }) {
+export function Loader({ isShowLoadingText = true, color = "",loaderSize=5 }: {loaderSize?:number, isShowLoadingText?: boolean, color?: string }) {
   return <div className="flex items-center justify-center gap-3 text-gray-500">
 
     <svg
-      className={`h-5 w-5 animate-spin text-[${color ?? ""}]`}
+      className={`h-${loaderSize} w-${loaderSize} animate-spin text-[${color ?? ""}]`}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

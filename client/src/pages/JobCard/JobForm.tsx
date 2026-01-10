@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { type Customer, type Vehicle, JobCard, JobCardFormValues } from "@/lib/types";
+import { type Customer, type Vehicle, JobServiceOption, JobCard, JobCardFormValues, option, ServiceCard } from "@/lib/types";
 import {
   User,
   Phone,
@@ -47,7 +47,7 @@ import { SectionCard } from "@/components/common/card";
 import { Loader } from "@/components/common/loader";
 import { FloatingDateField } from "@/components/common/FloatingDateField";
 import { findIdByName } from "@/lib/utils";
-import { consumerSave, consumerUpdate, fetchCityList, fetchStateList, fetchStoreCrispList, jobFormSubmission, lookupCustomerByPhone } from "@/lib/api";
+import { consumerSave, consumerUpdate, fetchCityList, fetchStateList, fetchStoreCrispList, getServiceOptionByTypeVehicle, jobCardMetaInfo, jobCardModelInfo, jobFormSubmission, lookupCustomerByPhone } from "@/lib/api";
 import { NewJobCardSchema } from "@/lib/schema";
 import { useAuth } from "@/lib/auth";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
@@ -143,6 +143,8 @@ export default function JobForm() {
   const { toast } = useToast();
   const { countries } = useAuth();
 
+  const [services, setServices] = useState<ServiceCard[]>([]);
+  const [loadingServices, setLoadingServices] = useState(false);
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [customerFound, setCustomerFound] = useState<boolean | null>(null);
   const disablePhone = customerFound === true;
@@ -156,9 +158,133 @@ export default function JobForm() {
   const [loadingGstState, setLoadingGstState] = useState(false);
   const [loadingGstCity, setLoadingGstCity] = useState(false);
 
+  const [meta, setMeta] = useState({
+    vehicleCompanies: [] as option[],
+    vehicleModels: [] as option[],
+
+    vehicleTypes: [] as option[],
+    serviceTypes: [] as option[],
+    years: [] as option[],
+    srsCondition: [] as option[],
+
+    loadingModels: false,
+  });
   const isGstHydratingRef = useRef(false);
   const { user, } = useAuth();
+  const toSelectOptions = <T extends { value: any; label: string }>(
+    list: T[] = []
+  ) =>
+    list.map(item => ({
+      label: item.label,
+      value: String(item.value), // 🔑 force string
+    }));
+  const vehicleType = form.watch("vehicle_type");
+  const serviceTypes = form.watch("service_type"); // multi select (string[])
+  useEffect(() => {
+    const loadMeta = async () => {
+      const data = await jobCardMetaInfo();
+      if (!data) return;
+      const value = {
 
+        vehicleCompanies: toSelectOptions(data.vehicleCompanies),
+        vehicleTypes: toSelectOptions(data.vehicleTypes),
+        serviceTypes: toSelectOptions(data.serviceTypes),
+        years: toSelectOptions(data.years),
+        srsCondition: toSelectOptions(data.srsCondition),
+      }
+      console.log(value, 'valuevaluevalue');
+
+      setMeta(prev => (({ ...prev, ...value })));
+    };
+
+    loadMeta();
+  }, []);
+  useEffect(() => {
+    if (!vehicleType || !serviceTypes?.length) {
+      setServices([]);
+      setSelectedServices([]);
+      form.setValue("service_opted", []);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadServices = async () => {
+      setLoadingServices(true);
+
+      try {
+        const payload = {
+          vehicle_type: vehicleType,
+          service_types: serviceTypes,
+        };
+
+        const data: JobServiceOption[] =
+          await getServiceOptionByTypeVehicle(payload);
+
+        if (cancelled) return;
+
+        const normalized: ServiceCard[] = data.map(item => ({
+          id: String(item.id),
+          label: item.service_name,
+          value: String(item.id),
+          price: Number(item.price),
+          description: item.description,
+        }));
+
+        setServices(normalized);
+        setSelectedServices([]);
+        form.setValue("service_opted", []);
+      } catch (e) {
+        console.error(e);
+        setServices([]);
+      } finally {
+        if (!cancelled) setLoadingServices(false);
+      }
+    };
+
+    loadServices();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [vehicleType, serviceTypes]);
+  const vehicleCompanyId = form.watch("vehicle_make");
+
+  useEffect(() => {
+    if (!vehicleCompanyId) {
+      setMeta(prev => ({ ...prev, vehicleModels: [] }));
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadModels = async () => {
+      setMeta(prev => ({ ...prev, loadingModels: true }));
+
+      try {
+        const models = await jobCardModelInfo(vehicleCompanyId);
+        if (cancelled) return;
+
+        setMeta(prev => ({
+          ...prev,
+          vehicleModels: toSelectOptions(models),
+          loadingModels: false,
+        }));
+
+        // reset model on company change
+        form.setValue("vehicle_model", "");
+      } catch {
+        if (!cancelled) {
+          setMeta(prev => ({ ...prev, loadingModels: false }));
+        }
+      }
+    };
+
+    loadModels();
+    return () => {
+      cancelled = true;
+    };
+  }, [vehicleCompanyId]);
   useEffect(() => {
     form.setValue('role', user?.role);
   }, [user])
@@ -431,10 +557,6 @@ export default function JobForm() {
 
     hydrateGstLocation();
   }, [initialValues, countryList]);
-  useEffect(() => {
-    console.log(form.formState.errors, form.getValues(), 'form.formState.errors');
-
-  })
 
   async function handleJobCardSubmission(values: JobCardFormValues) {
     setIsLoading(true);
@@ -547,23 +669,23 @@ export default function JobForm() {
         if (!customer) {
           // 🔸 New customer
           setCustomerFound(false);
-           form.setValue("customer_id", "");
-        form.setValue("mobile_no", "");
-        form.setValue("name",  "");
-        form.setValue("email",  "");
-        form.setValue("address",  "");
-        form.setValue("country_id", "");
-        form.setValue("state_id", "");
-        form.setValue(
-          "billing_type",
-         "individual"
-        );
+          form.setValue("customer_id", "");
+          form.setValue("mobile_no", "");
+          form.setValue("name", "");
+          form.setValue("email", "");
+          form.setValue("address", "");
+          form.setValue("country_id", "");
+          form.setValue("state_id", "");
+          form.setValue(
+            "billing_type",
+            "individual"
+          );
 
-          form.setValue("gstin",  "");
-        form.setValue("gst_contact_no",  "");
-        form.setValue("gst_country_id", "");
-        form.setValue("gst_state_id", "");
-   
+          form.setValue("gstin", "");
+          form.setValue("gst_contact_no", "");
+          form.setValue("gst_country_id", "");
+          form.setValue("gst_state_id", "");
+
           form.setValue("customer_id", undefined);
 
           // ⚠️ DO NOT touch user-typed fields
@@ -584,11 +706,11 @@ export default function JobForm() {
           customer.type === "company" ? "company" : "individual"
         );
 
-          form.setValue("gstin", customer.company_gstin || "");
+        form.setValue("gstin", customer.company_gstin || "");
         form.setValue("gst_contact_no", customer.company_contact_no || "");
         form.setValue("gst_country_id", String(customer.company_country_id));
         form.setValue("gst_state_id", String(customer.company_state_id));
-   
+
 
         toast({
           title: "Customer found",
@@ -608,10 +730,7 @@ export default function JobForm() {
       cancelled = true;
     };
   }, [searchMobile, store_id]);
-  useEffect(() => {
-    console.log(customerFound, 'customerFound');
 
-  }, [customerFound])
   const [storeList, setStoreList] = useState<
     { value: string; label: string; isDisabled?: boolean }[]
   >([]);
@@ -624,7 +743,6 @@ export default function JobForm() {
         label: store.name,
       }));
 
-      console.log(options, 'optionsoptions');
 
       setStoreList(options);
     } catch (e) {
@@ -636,10 +754,7 @@ export default function JobForm() {
       fetchStoreList();
     }
   }, [isAdmin]);
-  useEffect(() => {
-    console.log(form.getValues(), 'getValues');
 
-  })
   return (
     <>
       <div className="max-w-7xl  mx-auto px-4 py-4 space-y-4">
@@ -846,7 +961,7 @@ export default function JobForm() {
                         </h4>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        
+
 
                           <FloatingField
                             name="gst_contact_no"
@@ -919,29 +1034,20 @@ export default function JobForm() {
                 <Card>
                   <SectionCard title="Vehicle Information" className="pb-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-
                       <FloatingRHFSelect
                         name="vehicle_make"
                         label="Vehicle Make"
                         isRequired
                         control={form.control}
-                        options={[
-                          { value: "HYUNDAI", label: "Hyundai" },
-                          { value: "HONDA", label: "Honda" },
-                          { value: "TOYOTA", label: "Toyota" },
-                        ]}
+                        options={meta.vehicleCompanies}
                       />
-
                       <FloatingRHFSelect
                         name="vehicle_model"
                         label="Vehicle Model"
                         isRequired
                         control={form.control}
-                        options={[
-                          { value: "VERNA", label: "Verna" },
-                          { value: "CITY", label: "City" },
-                          { value: "INNOVA", label: "Innova" },
-                        ]}
+                        isDisabled={!meta.vehicleModels.length}
+                        options={meta.vehicleModels}
                       />
 
                       <FloatingField
@@ -956,11 +1062,7 @@ export default function JobForm() {
                         label="Make Year"
                         isRequired
                         control={form.control}
-                        options={[
-                          { value: "2025", label: "2025" },
-                          { value: "2024", label: "2024" },
-                          { value: "2023", label: "2023" },
-                        ]}
+                        options={meta.years}
                       />
 
                       <FloatingField
@@ -975,24 +1077,14 @@ export default function JobForm() {
                         label="Chassis No"
                         control={form.control}
                       />
-
                       <FloatingRHFSelect
                         name="srs"
                         label="SRS Condition"
                         isRequired
                         control={form.control}
-                        options={[
-                          { value: "brand_new", label: "Brand New" },
-                          { value: "minor_damage", label: "Minor Damage" },
-                          { value: "major_damage", label: "Major Damage" },
-                        ]}
+                        options={meta.srsCondition}
                       />
 
-                      {/* <FloatingField
-                        name="service_amount"
-                        label="Service Amount"
-                        control={form.control}
-                      /> */}
                     </div>
                     {/* PAINT CONDITION */}
                     <div className="mt-4">
@@ -1079,12 +1171,7 @@ export default function JobForm() {
                         label="Vehicle Type"
                         isRequired
                         control={form.control}
-                        options={[
-                          { label: "Bike", value: "bike" },
-                          { label: "Hatchback", value: "hatchback" },
-                          { label: "Sedan", value: "sedan" },
-                          { label: "SUV", value: "suv" },
-                        ]}
+                        options={meta.vehicleTypes}
                       />
 
                       {/* Service Date */}
@@ -1101,14 +1188,8 @@ export default function JobForm() {
                         isMulti
                         isRequired
                         control={form.control}
-                        options={[
-                          { label: "Exterior Detailing", value: "exterior_detailing" },
-                          { label: "Interior Detailing", value: "interior_detailing" },
-                          { label: "Exterior Protection", value: "exterior_protection" },
-                          { label: "PPF / Ceramic", value: "ppf_ceramic" },
-                        ]}
+                        options={meta.serviceTypes}
                       />
-
                       {/* Service Type (Multi) */}
 
                     </div>
@@ -1116,9 +1197,20 @@ export default function JobForm() {
                       <p className="mb-3 block text-sm font-medium text-[gray]">
                         Select Services <span className="text-red-500">*</span>
                       </p>
+                      {loadingServices && (
+                        <p className="text-sm text-muted-foreground text-center flex gap-2 items-center justify-center">
+                          <Loader loaderSize={4} isShowLoadingText={false} />
+                          Loading services…
+                        </p>
+                      )}
 
+                      {!loadingServices && services.length === 0 && (
+                        <p className="text-sm text-muted-foreground  text-center">
+                          No services available for selected vehicle & service type
+                        </p>
+                      )}
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {availableServices.map(service => {
+                        {services.map(service => {
                           const isSelected = selectedServices.includes(service.id);
 
                           return (
@@ -1142,7 +1234,7 @@ export default function JobForm() {
 
                                     <div>
                                       <p className="font-medium leading-tight">
-                                        {service.name}
+                                        {service.label}
                                       </p>
                                       <p className="text-xs text-muted-foreground mt-1">
                                         {service.description}
@@ -1154,9 +1246,7 @@ export default function JobForm() {
                                     <p className="text-lg font-semibold text-green-600">
                                       ₹{service.price}
                                     </p>
-                                    <Badge variant="outline" className="mt-1">
-                                      {service.category}
-                                    </Badge>
+
                                   </div>
                                 </div>
                               </CardContent>

@@ -9,6 +9,8 @@ export interface ServiceItem {
   price: number;
   description?: string;
   category?: string;
+  
+  selected?: boolean;
 }
 
 export interface KanbanCard {
@@ -704,4 +706,19 @@ export type FloatingDateFieldProps = {
   control: Control<any>;
   isRequired?: boolean;
   className?: string;
+};
+export interface option { value: string; label: string }
+export type JobServiceOption = {
+  id: number;
+  service_name: string;
+  price: string;
+  description: string;
+};
+
+export type ServiceCard = {
+  id: string;
+  label: string;
+  value: string;
+  price: number;
+  description: string;
 };

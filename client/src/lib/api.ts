@@ -659,6 +659,45 @@ export async function getConsumer({
     throw error;
   }
 }
+export async function getJobCard({
+  page,
+  search,
+  status,
+  consumer,
+  per_page
+}: {
+  per_page?: number;
+  page?: number;
+  search?: string;
+  consumer?:string
+  status?: string | number;
+}) {
+  try {
+    const params = new URLSearchParams();
+
+  if (page !== undefined) params.append("page", String(page));
+  if (per_page !== undefined) params.append("per_page", String(per_page));
+  if (search) params.append("search", search);
+  if (status) params.append("status", String(status));
+  if (consumer) params.append("consumer", String(consumer));
+
+    const response: any = await api.get(
+      `/api/job-cards?${params.toString()}`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    return null;
+  } catch (error: any) {
+    // 404 / not found → treat as new customer
+    if (error?.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
 export async function fetchOrganizationsList({
   page,
   search,
@@ -914,7 +953,46 @@ export async function lookupCustomerByPhone(phone: string, store_id?: string) {
     throw error;
   }
 }
+export async function jobCardMetaInfo() {
+  try {
+   
+    const response: any = await api.get(
+      `/api/utility/job-card-meta`,
+    );
 
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    return null;
+  } catch (error: any) {
+    // 404 / not found → treat as new customer
+    if (error?.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+export async function jobCardModelInfo(id:string) {
+  try {
+   
+    const response: any = await api.get(
+      `/api/utility/vehicle-companies/${id}/models`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    return null;
+  } catch (error: any) {
+    // 404 / not found → treat as new customer
+    if (error?.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
 export async function jobFormSubmission(data: any ) {
   try {
     const response: any = await api.post(
@@ -951,6 +1029,42 @@ export async function consumerSave(data:any) {
     throw response;
   }
 }
+export async function getServiceOptionByTypeVehicle(data:any) {
+  try {
+    const response: any = await api.post(
+      `/api/utility/services/by-vehicle-and-type`,
+      data
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to get service options"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function jobCardCancel(data:any) {
+  try {
+    const response: any = await api.post(
+      `/api/job-cards/${data.id}/cancel`,
+      data
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to cancel job card"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
 export async function consumerUpdate(data:any) {
   try {
     const response: any = await api.post(
@@ -963,6 +1077,23 @@ export async function consumerUpdate(data:any) {
     }
     throw new Error(
       response?.data?.message || "Failed to update consumer"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function getJobCardItem(data:any) {
+  try {
+    const response: any = await api.post(
+      `/api/job-cards/${data.id}`,
+      data
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+    throw new Error(
+      response?.data?.message || "Failed to get job card info"
     );
   } catch (response: any) {
     throw response;
