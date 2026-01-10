@@ -623,7 +623,42 @@ export async function fetchStoresList({
   }
   throw new Error("Failed to fetch store list");
 }
+export async function getConsumer({
+  page,
+  search,
+  status,
+  per_page
+}: {
+  per_page?: number;
+  page?: number;
+  search?: string;
+  status?: string | number;
+}) {
+  try {
+    const params = new URLSearchParams();
 
+  if (page !== undefined) params.append("page", String(page));
+  if (per_page !== undefined) params.append("per_page", String(per_page));
+  if (search) params.append("search", search);
+  if (status) params.append("status", String(status));
+
+    const response: any = await api.get(
+      `/api/consumers?${params.toString()}`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    return null;
+  } catch (error: any) {
+    // 404 / not found → treat as new customer
+    if (error?.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
 export async function fetchOrganizationsList({
   page,
   search,
@@ -849,6 +884,85 @@ export async function markAllNotificationsRead() {
 
     throw new Error(
       response?.data?.message || "Failed to mark all notifications as read"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function lookupCustomerByPhone(phone: string, store_id?: string) {
+  try {
+    const params = new URLSearchParams({
+      phone: String(phone),
+    });
+
+    if (store_id) params.append("store_id", String(store_id));
+
+    const response: any = await api.get(
+      `/api/consumers/lookup?${params.toString()}`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    return null;
+  } catch (error: any) {
+    // 404 / not found → treat as new customer
+    if (error?.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function jobFormSubmission(data: any ) {
+  try {
+    const response: any = await api.post(
+      `/api/job-cards${data.id ? `/${data.id}` : ''}/${data.id ? 'update' : 'save'}`,
+      data
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data;
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to submit job card"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function consumerSave(data:any) {
+  try {
+    const response: any = await api.post(
+      `/api/consumers/save`,
+      data
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to save consumer"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function consumerUpdate(data:any) {
+  try {
+    const response: any = await api.post(
+      `/api/consumers/${data.id}/update`,
+      data
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+    throw new Error(
+      response?.data?.message || "Failed to update consumer"
     );
   } catch (response: any) {
     throw response;

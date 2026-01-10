@@ -56,7 +56,7 @@ export function FloatingRHFSelect({
             : null
 
         return (
-          <Box position="relative" h={'44px'} w="full">
+          <Box position="relative"  w="full">
             {/* FLOATING LABEL */}
             <Text
               position="absolute"

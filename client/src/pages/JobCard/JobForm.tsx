@@ -47,7 +47,7 @@ import { SectionCard } from "@/components/common/card";
 import { Loader } from "@/components/common/loader";
 import { FloatingDateField } from "@/components/common/FloatingDateField";
 import { findIdByName } from "@/lib/utils";
-import { fetchCityList, fetchStateList } from "@/lib/api";
+import { consumerSave, consumerUpdate, fetchCityList, fetchStateList, fetchStoreCrispList, jobFormSubmission, lookupCustomerByPhone } from "@/lib/api";
 import { NewJobCardSchema } from "@/lib/schema";
 import { useAuth } from "@/lib/auth";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
@@ -113,6 +113,7 @@ export default function JobForm() {
 
       service_opted: [],
       // service_amount: "",
+      billing_type: "individual",
 
       vehicle_remark: "",
 
@@ -122,9 +123,13 @@ export default function JobForm() {
       vehicle_older_than_5_years: false,
       service_type: [],
       name: "",
+      gst_contact_no: "",
+      search_mobile: "",
+      gstin: "",
       mobile_no: "",
       email: "",
       country_id: "India",
+      store_id: "",
       // district: "",
       // city_id: "",
       state_id: "",
@@ -132,13 +137,15 @@ export default function JobForm() {
       address: "",
       // message: "",
 
-      add_gst: false,
     },
   });
 
   const { toast } = useToast();
-  const addGST = form.watch("add_gst");
   const { countries } = useAuth();
+
+  const [isLookingUp, setIsLookingUp] = useState(false);
+  const [customerFound, setCustomerFound] = useState<boolean | null>(null);
+  const disablePhone = customerFound === true;
   const [countryList, setCountryList] = useState<
     { id: number; name: string; slug?: string }[]
   >([]);
@@ -150,9 +157,13 @@ export default function JobForm() {
   const [loadingGstCity, setLoadingGstCity] = useState(false);
 
   const isGstHydratingRef = useRef(false);
+  const { user, } = useAuth();
 
   useEffect(() => {
-    if (!addGST || !countryList.length) return;
+    form.setValue('role', user?.role);
+  }, [user])
+  useEffect(() => {
+    if (!countryList.length) return;
 
     const india = countryList.find(c => c.name === "India");
     if (!india) return;
@@ -167,7 +178,7 @@ export default function JobForm() {
     setGstCities([]);
 
     isGstHydratingRef.current = false;
-  }, [addGST, countryList]);
+  }, [countryList]);
   const [loadingState, setLoadingState] = useState(false);
   const [loadingCity, setLoadingCity] = useState(false);
 
@@ -309,7 +320,7 @@ export default function JobForm() {
         state_id: initialValues.state_id
           ? String(initialValues.state_id)
           : "",
-
+        store_id: initialValues.store_id ?? "",
         // city_id: initialValues.city_id
         //   ? String(initialValues.city_id)
         //   : "",
@@ -348,10 +359,12 @@ export default function JobForm() {
 
         /* ===== GST ===== */
         service_type: initialValues.service_type ?? [],
-        add_gst: Boolean(initialValues.add_gst),
       });
     }
   }, [mode, initialValues, form]);
+
+  const isAdmin =
+    user?.role === "admin" || user?.role === "super-admin";
   useEffect(() => {
 
     if ((mode == "create" || !mode) &&
@@ -381,7 +394,7 @@ export default function JobForm() {
       };
       hydrateLocation()
     }
-    if (!initialValues || !addGST || !countryList.length) return;
+    if (!initialValues || !countryList.length) return;
 
     const hydrateGstLocation = async () => {
       isGstHydratingRef.current = true;
@@ -417,7 +430,7 @@ export default function JobForm() {
     };
 
     hydrateGstLocation();
-  }, [initialValues, addGST, countryList]);
+  }, [initialValues, countryList]);
   useEffect(() => {
     console.log(form.formState.errors, form.getValues(), 'form.formState.errors');
 
@@ -427,64 +440,206 @@ export default function JobForm() {
     setIsLoading(true);
 
     try {
-      if (mode === "edit") {
-        // await EditStore(value);
+      let customerId = values.customer_id;
 
-        toast({
-          title: "Edit Job Card",
-          description: "Job Card updated successfully",
-          variant: "success",
-        });
-
-        navigate("/job-cards")
-      } else {
-
-        //const res= await SaveStore(value);
-
-        toast({
-          title: "Add Job Card",
-          description: " Job Card added successfully",
-          variant: "success",
-        });
-        // ✅ ONLY open modal here
-        setIsJobCardSubmissionModalOpenInfo({
-          open: true,
-          info: id,
-        });
+      // 🔹 STEP 1: HANDLE CUSTOMER
+      const customerPayload = {
+        ...(customerId ? { id: customerId } : {}),
+        name: values.name,
+        phone: values.mobile_no,
+        email: values.email,
+        address: values.address,
+        type: values.billing_type,
+        ...(values.billing_type === "company" && {
+          country_id: values.country_id,
+          company_country_id: values.gst_country_id,
+          company_state_id: values.gst_state_id,
+          company_contact_no: values.gst_contact_no,
+          company_gstin: values.gstin,
+        }),
+        state_id: values.state_id,
+        store_id: values.store_id,
+      }
+      if (customerFound === true && customerId) {
+        // ✅ Existing customer → UPDATE
+        await consumerUpdate(customerPayload);
       }
 
+      if (customerFound === false) {
+        // ✅ New customer → SAVE
+        const res = await consumerSave(customerPayload);
 
+        customerId = res.data.id; // 🔑 IMPORTANT
+      }
+
+      if (!customerId) {
+        throw new Error("Customer could not be resolved");
+      }
+
+      // 🔹 STEP 2: SAVE JOB CARD
+      const jobCardPayload = {
+        ...(id ? { id } : {}),
+        store_id: values.store_id,
+        consumer_id: values.customer_id,
+        "vehicle_type": values.vehicle_type,
+        "service_ids": values.service_opted,
+        "vehicle_company_id": values.vehicle_make,
+        "vehicle_model_id": values.vehicle_model,
+        "color": values.vehicle_color,
+        "year": values.make_year,
+        "reg_no": values.registration_no,
+        jobcard_date: values.service_date,
+        "chasis_no": values.chassis_no,
+        "vehicle_condition": values.srs,
+        "remarks": values.vehicle_remark,
+        "isRepainted": values.repainted_vehicle,
+        "isSingleStagePaint": values.single_stage_paint,
+        "isPaintThickness": values.paint_thickness_below_2mil,
+        "isVehicleOlder": values.vehicle_older_than_5_years,
+
+      }
+      const jobRes = await jobFormSubmission(jobCardPayload);
+
+      toast({
+        title: "Job Card Created",
+        description: "Job card created successfully",
+        variant: "success",
+      });
+
+      // ✅ Open invoice modal
+      setIsJobCardSubmissionModalOpenInfo({
+        open: true,
+        info: jobRes.data.id,
+      });
     } catch (err: any) {
-      const apiErrors = err?.response?.data?.errors;
-
-
-      // 👇 THIS IS THE KEY PART
-      if (apiErrors && err?.response?.status === 422) {
-        // Object.entries(apiErrors).forEach(([field, messages]) => {
-        //   setError(field as keyof any, {
-        //     type: "server",
-        //     message: (messages as string[])[0],
-        //   });
-        // });
-        return;
-      }
-      if (err?.response?.status === 403) {
-        navigate("/master")
-      }
       toast({
         title: "Error",
         description:
           err?.response?.data?.message ||
           err.message ||
-          `Failed to ${mode === "create" ? "add" : "update"
-          } store`,
+          "Something went wrong",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   }
+  const searchMobile = form.watch("search_mobile");
+  const customerMobile = form.watch("mobile_no");
+  const store_id = form.watch("store_id");
+  useEffect(() => {
+    setCustomerFound(null);
+    form.setValue("customer_id", undefined);
+  }, [searchMobile]);
+  useEffect(() => {
+    if (!searchMobile || searchMobile.length !== 10 || !store_id) return;
 
+    let cancelled = false;
+
+    const lookup = async () => {
+      setIsLookingUp(true);
+      setCustomerFound(null);
+
+      try {
+        const customer = await lookupCustomerByPhone(searchMobile, store_id);
+        if (cancelled) return;
+
+        if (!customer) {
+          // 🔸 New customer
+          setCustomerFound(false);
+           form.setValue("customer_id", "");
+        form.setValue("mobile_no", "");
+        form.setValue("name",  "");
+        form.setValue("email",  "");
+        form.setValue("address",  "");
+        form.setValue("country_id", "");
+        form.setValue("state_id", "");
+        form.setValue(
+          "billing_type",
+         "individual"
+        );
+
+          form.setValue("gstin",  "");
+        form.setValue("gst_contact_no",  "");
+        form.setValue("gst_country_id", "");
+        form.setValue("gst_state_id", "");
+   
+          form.setValue("customer_id", undefined);
+
+          // ⚠️ DO NOT touch user-typed fields
+          return;
+        }
+
+        // 🔹 Existing customer
+        setCustomerFound(true);
+        form.setValue("customer_id", String(customer.id));
+        form.setValue("mobile_no", customer.mobile_no || searchMobile);
+        form.setValue("name", customer.name || "");
+        form.setValue("email", customer.email || "");
+        form.setValue("address", customer.address || "");
+        form.setValue("country_id", String(customer.country_id));
+        form.setValue("state_id", String(customer.state_id));
+        form.setValue(
+          "billing_type",
+          customer.type === "company" ? "company" : "individual"
+        );
+
+          form.setValue("gstin", customer.company_gstin || "");
+        form.setValue("gst_contact_no", customer.company_contact_no || "");
+        form.setValue("gst_country_id", String(customer.company_country_id));
+        form.setValue("gst_state_id", String(customer.company_state_id));
+   
+
+        toast({
+          title: "Customer found",
+          description: "Customer details auto-filled",
+          variant: "success",
+        });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (!cancelled) setIsLookingUp(false);
+      }
+    };
+
+    lookup();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [searchMobile, store_id]);
+  useEffect(() => {
+    console.log(customerFound, 'customerFound');
+
+  }, [customerFound])
+  const [storeList, setStoreList] = useState<
+    { value: string; label: string; isDisabled?: boolean }[]
+  >([]);
+  const fetchStoreList = async () => {
+    try {
+      const res = await fetchStoreCrispList();
+
+      let options = res.data.map((store: any) => ({
+        value: String(store.id),
+        label: store.name,
+      }));
+
+      console.log(options, 'optionsoptions');
+
+      setStoreList(options);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  useEffect(() => {
+    if (isAdmin) {
+      fetchStoreList();
+    }
+  }, [isAdmin]);
+  useEffect(() => {
+    console.log(form.getValues(), 'getValues');
+
+  })
   return (
     <>
       <div className="max-w-7xl  mx-auto px-4 py-4 space-y-4">
@@ -512,9 +667,60 @@ export default function JobForm() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="">
 
+              <Card className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {isAdmin && <SectionCard title="Store Information" className="pb-4 pr-0">
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                    <FloatingRHFSelect
+                      name="store_id"
+                      label="Select Store"
+                      control={form.control}
+                      isRequired
+                      options={storeList.map((s: any) => ({
+                        label: s.label,
+                        value: String(s.value),
+                      }))}
+                    />
+                  </div>
+                </SectionCard>}
+                <SectionCard title="Customer Lookup" className="pb-4 pl-0">
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-1 items-end">
+                    <FloatingField
+                      name="search_mobile"
+                      label="Search Mobile Number"
+                      isRequired
+                      control={form.control}
+                    />
+
+                    {(isLookingUp || customerFound !== null) && <div className="text-sm h-[38px] flex items-center">
+                      {isLookingUp && (
+                        <span className="text-muted-foreground flex items-center gap-2">
+                          <Loader2 className="animate-spin h-4 w-4" />
+                          Looking up customer…
+                        </span>
+                      )}
+
+                      {!isLookingUp && customerFound === true && (
+                        <span className="text-green-600 flex items-center gap-2">
+                          <CheckCircle size={16} />
+                          Existing customer found
+                        </span>
+                      )}
+
+                      {!isLookingUp && customerFound === false && (
+                        <span className="text-orange-500">
+                          New customer
+                        </span>
+                      )}
+                    </div>}
+                  </div>
+                </SectionCard>
+
+              </Card>
+
               {/* Customer Lookup Section */}
-              <Card className="mb-6">
-                <SectionCard title="Customer Information" className="pb-4">
+              {customerFound !== null && <Card className="mb-6">
+
+                <SectionCard title="Customer Information" className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>
                   {/* BASIC INFO */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FloatingField
@@ -530,6 +736,7 @@ export default function JobForm() {
                       label="Mobile No"
                       isRequired
                       control={form.control}
+                      isDisabled={customerFound === true}
                     />
 
                     <FloatingField
@@ -538,6 +745,21 @@ export default function JobForm() {
                       isRequired
                       control={form.control}
                     />
+
+
+
+                  </div>
+                  {/* ADDRESS + MESSAGE */}
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                    <FloatingTextarea
+                      name="address"
+                      label="Address"
+                      isRequired
+                      control={form.control}
+                    />
+
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                     {/* COUNTRY */}
                     <FloatingRHFSelect
@@ -588,83 +810,43 @@ export default function JobForm() {
                         setLoadingCity(false);
                       }}
                     />
-{/* 
-                    <FloatingRHFSelect
-                      name="city_id"
-                      label="City"
-                      control={form.control}
-                      isRequired
-                      isDisabled={isView || !form.getValues("state_id")}
-                      options={cities.map(c => ({
-                        value: String(c.id),
-                        label: c.name,
-                      }))}
-                    /> */}
+                    <div className="flex flex-col items-start">
+                      <FloatingRHFSelect
+                        name="billing_type"
+                        label="Billing Type"
+                        control={form.control}
+                        isRequired
+                        options={[
+                          { label: "Company", value: "company" },
+                          { label: "Individual", value: "individual" },
+                        ]}
+                        onValueChange={(value) => {
+                          if (typeof value !== "string") return;
+                          const billingType = value as "company" | "individual";
+                          form.setValue("billing_type", billingType);
+                        }}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Select <b>Company</b> if you need GST invoice
+                      </p>
+                    </div>
 
-                    {/* <FloatingField
-                      name="district"
-                      label="District"
-                      isRequired
-                      control={form.control}
-                    />
-
-                    <FloatingField
-                      name="pincode"
-                      label="Pincode"
-                      isRequired
-                      control={form.control}
-                    /> */}
                   </div>
 
-                  {/* ADDRESS + MESSAGE */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <FloatingTextarea
-                      name="address"
-                      label="Address"
-                      isRequired
-                      control={form.control}
-                    />
 
-                    {/* <FloatingTextarea
-                      name="message"
-                      label="Message"
-                      control={form.control}
-                    /> */}
-                  </div>
 
                   {/* GST OPTIONAL */}
 
-                  <div className="mt-4 flex items-center gap-2">
-                    <FormField
-                      control={form.control}
-                      name="add_gst"
-                      render={({ field }) => (
-                        <label className="flex items-center gap-2 font-bold text-sm cursor-pointer">
-                          <Checkbox
-                            checked={addGST}
-                            onCheckedChange={(val) => form.setValue("add_gst", Boolean(val))}
-                          />
-                          Add GST Details (Optional)
-                        </label>
-                      )}
-                    />
-
-                  </div>
                   {
-                    addGST
-                    &&
+                    form.watch("billing_type") === "company" &&
                     (
-                      <div className="pt-4">
+                      <div className="">
                         <h4 className="text-sm font-semibold mb-4">
                           GST Information
                         </h4>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <FloatingField
-                            name="gst_company_name"
-                            label="Company Name"
-                            control={form.control}
-                          />
+                        
 
                           <FloatingField
                             name="gst_contact_no"
@@ -723,41 +905,13 @@ export default function JobForm() {
                             }}
                           />
 
-                          {/* <FloatingRHFSelect
-                            name="gst_city_id"
-                            label="City"
-                            control={form.control}
-                            isDisabled={isView || !form.getValues("gst_state_id")}
-                            options={gstCities.map(c => ({
-                              value: String(c.id),
-                              label: c.name,
-                            }))}
-                          />
-                          <FloatingField
-                            name="gst_district"
-                            label="District"
-                            control={form.control}
-                          /> */}
-
-                          {/* <FloatingField
-                            name="gst_pincode"
-                            label="Pincode"
-                            control={form.control}
-                          /> */}
                         </div>
 
-                        {/* <div className="mt-4">
-                          <FloatingTextarea
-                            name="gst_address"
-                            label="Company Address"
-                            control={form.control}
-                          />
-                        </div> */}
                       </div>
                     )}
                 </SectionCard>
               </Card>
-
+              }
               <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
 
 
@@ -840,10 +994,10 @@ export default function JobForm() {
                         control={form.control}
                       /> */}
                     </div>
-  {/* PAINT CONDITION */}
+                    {/* PAINT CONDITION */}
                     <div className="mt-4">
-                          <p className="mb-3 block text-sm font-medium text-[gray]">
-                     Vehicle Paint Condition
+                      <p className="mb-3 block text-sm font-medium text-[gray]">
+                        Vehicle Paint Condition
                       </p>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -911,7 +1065,7 @@ export default function JobForm() {
                       />
                     </div>
 
-                  
+
                   </SectionCard>
                 </Card>
 
@@ -941,26 +1095,26 @@ export default function JobForm() {
                         control={form.control}
                       />
                       {/* Service Type */}
-                       <FloatingRHFSelect
-                    name="service_type"
-                    label="Service Type"
-                    isMulti
-                    isRequired
-                    control={form.control}
-                    options={[
-                      { label: "Exterior Detailing", value: "exterior_detailing" },
-                      { label: "Interior Detailing", value: "interior_detailing" },
-                      { label: "Exterior Protection", value: "exterior_protection" },
-                      { label: "PPF / Ceramic", value: "ppf_ceramic" },
-                    ]}
-                  />
+                      <FloatingRHFSelect
+                        name="service_type"
+                        label="Service Type"
+                        isMulti
+                        isRequired
+                        control={form.control}
+                        options={[
+                          { label: "Exterior Detailing", value: "exterior_detailing" },
+                          { label: "Interior Detailing", value: "interior_detailing" },
+                          { label: "Exterior Protection", value: "exterior_protection" },
+                          { label: "PPF / Ceramic", value: "ppf_ceramic" },
+                        ]}
+                      />
 
                       {/* Service Type (Multi) */}
 
                     </div>
                     <div className="mt-4">
                       <p className="mb-3 block text-sm font-medium text-[gray]">
-                       Select Services <span className="text-red-500">*</span>
+                        Select Services <span className="text-red-500">*</span>
                       </p>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -970,9 +1124,8 @@ export default function JobForm() {
                           return (
                             <Card
                               key={service.id}
-                              onClick={() => toggleService(service.id)}
                               className={`
-    cursor-pointer transition-all border
+    transition-all border
     ${isSelected
                                   ? "border-primary bg-primary/5 shadow-sm"
                                   : "hover:border-muted-foreground/30"}

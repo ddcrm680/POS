@@ -766,8 +766,10 @@ export const TerritoryMasterSchema = z.object({
 
 });
 
-export const NewJobCardSchema =
-  z.object({
+export const NewJobCardSchema = z
+  .object({
+    role: z.enum(["super-admin", "admin", "staff"]).optional(),
+
     name: z.string().min(1, "Name required"),
     mobile_no: z.string().min(10, "Mobile number required"),
     email: z.string().email("Invalid email"),
@@ -775,17 +777,15 @@ export const NewJobCardSchema =
 
     service_type: z.array(z.string()).min(1, "Select at least one service type"),
     country_id: z.string().min(1, "Please select country"),
+    billing_type: z.enum(["individual", "company"]),
     state_id: z.string().min(1, "Please select state"),
-    // city_id: z.string().min(1, "Please select city"),
+
     gst_country_id: z.string(),
     gst_state_id: z.string(),
-    // gst_city_id: z.string(),
-    // district: z.string().min(1),
-    // pincode: z.string().min(1),
+    gst_contact_no:z.string(),
+gstin: z.string(),
     address: z.string().min(1),
-    // message: z.string().optional(),
 
-    add_gst: z.boolean(),
     vehicle_make: z.string().min(1),
     vehicle_model: z.string().min(1),
     vehicle_color: z.string().min(1),
@@ -795,17 +795,33 @@ export const NewJobCardSchema =
     chassis_no: z.string().optional(),
     srs: z.string().min(1),
 
-    // service_amount: z.string().min(1, "Service amount is required"),
+    store_id: z.string().optional(), // 🔑 optional, enforced below
+
     vehicle_remark: z.string().optional(),
 
     repainted_vehicle: z.boolean().optional(),
+    search_mobile: z.string().min(10, "Mobile number required"),
+
     single_stage_paint: z.boolean().optional(),
     paint_thickness_below_2mil: z.boolean().optional(),
     vehicle_older_than_5_years: z.boolean().optional(),
+
     vehicle_type: z.string().min(1),
     service_opted: z.array(z.string()).min(1, "Select at least one service"),
     service_date: z.string().min(1, "Service date required"),
   })
+  .superRefine((data, ctx) => {
+    if (
+      ["admin", "super-admin"].includes(data.role ?? "") &&
+      !data.store_id
+    ) {
+      ctx.addIssue({
+        path: ["store_id"],
+        message: "Store is required",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });
 export const invoicePaymentSchema = z
   .object({
     invoice_total: z.number(),
@@ -835,6 +851,6 @@ export const invoicePaymentSchema = z
       });
     }
   });
-  export const invoiceSchema = z.object({
+export const invoiceSchema = z.object({
   billing_address: z.string().min(1, "Billing address is required"),
 });

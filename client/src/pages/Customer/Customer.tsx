@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getConsumer, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton, Switch } from "@chakra-ui/react";
@@ -91,16 +91,22 @@ const columns = useMemo(() => [
 
   /* ================= MOBILE ================= */
   {
-    key: "mobile_no",
+    key: "phone",
     label: "Mobile No.",
     width: "150px",
+   
+  },
+  {
+    key: "email",
+    label: "Email",
+    width: "160px",
    
   },
 
   /* ================= VEHICLE TYPE ================= */
   {
-    key: "vehicle_type",
-    label: "Vehicle Type",
+    key: "type",
+    label: " Type",
     width: "160px",
     render: (value: string) => (
       <span className="text-sm text-gray-700">
@@ -110,28 +116,8 @@ const columns = useMemo(() => [
   },
 
   /* ================= INTERESTED IN ================= */
-  {
-    key: "interested_in",
-    label: "Interested In",
-    width: "160px",
-    render: (value: string) => (
-      <span className="text-sm text-gray-700 capitalize">
-        {value || "-"}
-      </span>
-    ),
-  },
 
-  /* ================= SOURCE ================= */
-  {
-    key: "source",
-    label: "Source",
-    width: "150px",
-    render: (value: string) => (
-      <span className="text-sm text-gray-700">
-        {value || "-"}
-      </span>
-    ),
-  },
+ 
 
 
  
@@ -176,16 +162,15 @@ const columns = useMemo(() => [
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      const res ={
-        data:customerMockData}
-        // await fetchCustomerList({
-        //   per_page: perPage,
-        //   page,
-        //   search,
-        //   status: filters.status
-        // });
+      const res =
+        await getConsumer({
+          per_page: perPage,
+          page,
+          search,
+          status: filters.status
+        });
 
-      const mappedTerritory = res.data
+      const mappedTerritory = res
       // setHasNext(res.meta.has_next)
       // setTotal(res.meta.total)
       setCustomers(mappedTerritory);

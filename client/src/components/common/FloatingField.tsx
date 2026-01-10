@@ -24,6 +24,7 @@ export function FloatingField({
   name,
   label,
   control,
+  isDisabled=false,
   isView,
   isRequired = false,
   type = "text",
@@ -32,8 +33,10 @@ export function FloatingField({
   const [focused, setFocused] = useState(false)
   const [inputType, setInputType] = useState(type)
 
+  const disabled = isView || isDisabled
   return (
     <Controller
+    
       name={name}
       control={control}
       render={({ field, fieldState }) => {
@@ -51,15 +54,21 @@ export function FloatingField({
               {...inputProps}
               type={inputType}
               h="44px"
+              disabled={disabled}
               pt="18px"
+                _disabled={{
+                bg: "gray.50",
+                cursor: "not-allowed",
+                opacity: 0.7,
+              }}
                 pr="18px"
               pl="18px"
               pb="8px"
-              disabled={isView}
               border="1px solid"
               borderColor={error ? "red.500" : "#e1e7ef"}
               _focus={{ borderColor: error ? "red.500" : "blue.500" }}
-              onFocus={(e) => {
+             onFocus={(e) => {
+                if (disabled) return
                 setFocused(true)
                 if (type === "date") setInputType("date")
                 inputProps.onFocus?.(e)
@@ -81,7 +90,7 @@ export function FloatingField({
               color={error ? "red.500" : "gray.500"}
             >
               {label}
-              {isRequired && <RequiredMark show={!isView} />}
+              {isRequired && <RequiredMark show={!disabled} />}
             </Text>
 
             {error && (
