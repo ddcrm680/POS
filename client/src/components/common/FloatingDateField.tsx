@@ -57,6 +57,7 @@ export function FloatingDateField({
                 ${hasValue ? "-top-2 text-[#71717a]" : "top-3 text-muted-foreground"}
                 group-focus-within:-top-2
                 group-focus-within:text-[#71717a]
+                    ${fieldState.error ? " text-red-500" : ""}
               `}
             >
               {label}

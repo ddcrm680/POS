@@ -65,13 +65,16 @@ export default function JobForm() {
 
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  
   const toggleService = (serviceId: string) => {
     const newSelection = selectedServices.includes(serviceId)
       ? selectedServices.filter(id => Number(id) !== Number(serviceId))
       : [...selectedServices, serviceId];
 
     setSelectedServices(newSelection);
-    form.setValue('service_ids', newSelection);
+    form.setValue("service_ids", newSelection, {
+  shouldValidate: true,
+});
   };
 
   const form = useForm<JobCardFormUnion>({
@@ -597,12 +600,12 @@ export default function JobForm() {
       const jobRes = await jobFormSubmission(jobCardPayload);
 
       toast({
-        title: mode === "" ? "Job Card Created" : "Job Card Updated",
-        description: mode === "" ? "Job card created successfully" : "Job card updated successfully",
+        title: !mode? "Job Card Created" : "Job Card Updated",
+        description: !mode? "Job card created successfully" : "Job card updated successfully",
         variant: "success",
       });
       // ✅ Open invoice modal
-      if (mode !== "view" && mode !== "edit") {
+      if (!mode) {
         setIsJobCardSubmissionModalOpenInfo({
           open: true,
           info: jobRes.id,
@@ -705,13 +708,21 @@ export default function JobForm() {
         form.setValue("company_contact_no", customer.company_contact_no || "");
         form.setValue("company_country_id", String(customer.company_country_id));
         form.setValue("company_state_id", String(customer.company_state_id));
+        form.clearErrors([
+          "name",
+          "phone",
+          "email",
+          "address",
+          "country_id",
+          "state_id",
+          "type",
+          "company_gstin",
+          "company_contact_no",
+          "company_country_id",
+          "company_state_id",
+        ]);
 
 
-        toast({
-          title: "Customer found",
-          description: "Customer details auto-filled",
-          variant: "success",
-        });
       } catch (e) {
         console.error(e);
       } finally {
