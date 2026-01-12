@@ -65,7 +65,7 @@ export default function JobForm() {
 
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const toggleService = (serviceId: string) => {
     const newSelection = selectedServices.includes(serviceId)
       ? selectedServices.filter(id => Number(id) !== Number(serviceId))
@@ -73,8 +73,8 @@ export default function JobForm() {
 
     setSelectedServices(newSelection);
     form.setValue("service_ids", newSelection, {
-  shouldValidate: true,
-});
+      shouldValidate: true,
+    });
   };
 
   const form = useForm<JobCardFormUnion>({
@@ -600,8 +600,8 @@ export default function JobForm() {
       const jobRes = await jobFormSubmission(jobCardPayload);
 
       toast({
-        title: !mode? "Job Card Created" : "Job Card Updated",
-        description: !mode? "Job card created successfully" : "Job card updated successfully",
+        title: !mode ? "Job Card Created" : "Job Card Updated",
+        description: !mode ? "Job card created successfully" : "Job card updated successfully",
         variant: "success",
       });
       // ✅ Open invoice modal
@@ -650,7 +650,11 @@ export default function JobForm() {
   }, [searchMobile]);
 
   useEffect(() => {
-    if (!searchMobile || searchMobile.length !== 10 || !(store_id || user?.store_id)) return;
+    if (!searchMobile || searchMobile.length !== 10 || !(store_id || user?.store_id)) {
+      setIsLookingUp(false);
+
+      return;
+    }
 
     let cancelled = false;
 
