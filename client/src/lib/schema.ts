@@ -765,7 +765,35 @@ export const TerritoryMasterSchema = z.object({
     .min(1, "Please select at least one city"),
 
 });
+export const JobCardOnlySchema = z
+  .object({
 
+    consumer_id: z.string().optional(),
+    service_type: z.array(z.string()).min(1, "Select at least one service type"),
+    vehicle_company_id: z.string().min(1),
+    vehicle_model_id: z.string().min(1),
+    color: z.string().min(1),
+    year: z.string().min(1),
+    reg_no: z.string().min(1),
+
+    chasis_no: z.string().optional(),
+    vehicle_condition: z.string().min(1),
+
+    store_id: z.string().optional(), // 🔑 optional, enforced below
+
+    remarks: z.string().optional(),
+
+    isRepainted: z.boolean().optional(),
+
+    isSingleStagePaint: z.boolean().optional(),
+    isPaintThickness: z.boolean().optional(),
+    isVehicleOlder: z.boolean().optional(),
+
+    vehicle_type: z.string().min(1),
+    service_ids: z.array(z.string()).min(1, "Select at least one service"),
+    jobcard_date: z.string().min(1, "Service date required"),
+  })
+ 
 export const NewJobCardSchema = z
   .object({
     role: z.string().optional(),

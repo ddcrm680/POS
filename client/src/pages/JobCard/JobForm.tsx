@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { type Customer, type Vehicle, JobServiceOption, JobCard, JobCardFormValues, option, ServiceCard } from "@/lib/types";
+import { type Customer, type Vehicle, JobServiceOption, JobCard, JobCardFormValues, option, ServiceCard, JobCardFormUnion } from "@/lib/types";
 import {
   User,
   Phone,
@@ -48,7 +48,7 @@ import { Loader } from "@/components/common/loader";
 import { FloatingDateField } from "@/components/common/FloatingDateField";
 import { cn, findIdByName } from "@/lib/utils";
 import { consumerSave, consumerUpdate, fetchCityList, fetchStateList, fetchStoreCrispList, getJobCardItem, getServiceOptionByTypeVehicle, jobCardMetaInfo, jobCardModelInfo, jobFormSubmission, lookupCustomerByPhone } from "@/lib/api";
-import { NewJobCardSchema } from "@/lib/schema";
+import { JobCardOnlySchema, NewJobCardSchema } from "@/lib/schema";
 import { useAuth } from "@/lib/auth";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 
@@ -67,15 +67,15 @@ export default function JobForm() {
   const [isLoading, setIsLoading] = useState(false);
   const toggleService = (serviceId: string) => {
     const newSelection = selectedServices.includes(serviceId)
-      ? selectedServices.filter(id => id !== serviceId)
+      ? selectedServices.filter(id => Number(id) !== Number(serviceId))
       : [...selectedServices, serviceId];
 
     setSelectedServices(newSelection);
     form.setValue('service_ids', newSelection);
   };
 
-  const form = useForm<JobCardFormValues>({
-    resolver: zodResolver(NewJobCardSchema),
+  const form = useForm<JobCardFormUnion>({
+    resolver: zodResolver((mode !== "view" && mode !== 'edit') ? NewJobCardSchema : JobCardOnlySchema),
     defaultValues: {
       consumer_id: undefined,
 
@@ -180,52 +180,36 @@ export default function JobForm() {
   }, []);
   useEffect(() => {
     if (!vehicleType || !serviceTypes?.length) {
-      setServices([]);
-      setSelectedServices([]);
-      form.setValue("service_ids", []);
+      if (!isHydratingJobRef.current) {
+        setServices([]);
+        setSelectedServices([]);
+        form.setValue("service_ids", []);
+      }
       return;
     }
-
-    let cancelled = false;
 
     const loadServices = async () => {
       setLoadingServices(true);
 
-      try {
-        const payload = {
-          vehicle_type: vehicleType,
-          service_types: serviceTypes,
-        };
+      const data = await getServiceOptionByTypeVehicle({
+        vehicle_type: vehicleType,
+        service_types: serviceTypes,
+      });
 
-        const data: JobServiceOption[] =
-          await getServiceOptionByTypeVehicle(payload);
+      const normalized = data.map((item: any) => ({
+        id: String(item.id),
+        label: item.service_name,
+        value: String(item.id),
+        price: Number(item.price),
+        description: item.description,
+      }));
 
-        if (cancelled) return;
+      setServices(normalized);
 
-        const normalized: ServiceCard[] = data.map(item => ({
-          id: String(item.id),
-          label: item.service_name,
-          value: String(item.id),
-          price: Number(item.price),
-          description: item.description,
-        }));
-
-        setServices(normalized);
-        setSelectedServices([]);
-        form.setValue("service_ids", []);
-      } catch (e) {
-        console.error(e);
-        setServices([]);
-      } finally {
-        if (!cancelled) setLoadingServices(false);
-      }
+      setLoadingServices(false);
     };
 
     loadServices();
-
-    return () => {
-      cancelled = true;
-    };
   }, [vehicleType, serviceTypes]);
   const vehicleCompanyId = form.watch("vehicle_company_id");
 
@@ -360,7 +344,6 @@ export default function JobForm() {
         const cityId = findIdByName(cityList, initialValues.city);
         if (!cityId) return;
 
-        // form.setValue("city_id", String(cityId));
 
       } finally {
         // ✅ hydration completed
@@ -374,10 +357,10 @@ export default function JobForm() {
   const fetchJobFormInfo = async () => {
     try {
       setIsInfoLoading(true);
-       const res =
-         await getJobCardItem({id:id ?? ""});
+      const res =
+        await getJobCardItem({ id: id ?? "" });
 
-       setInitialValues(res)
+      setInitialValues(res)
     } catch (e) {
       console.error(e);
 
@@ -392,71 +375,77 @@ export default function JobForm() {
     }
   }, [id]);
   useEffect(() => {
-    console.log(initialValues,countryList,mode,'    ');
-    
-  if (!initialValues || !countryList.length) return;
-  if (mode !== "edit" && mode !== "view") return;
 
-  const hydrate = async () => {
-    /* ===== STORE ===== */
-    if (isAdmin) {
-      form.setValue("store_id", String(initialValues.store_id));
-    }
+    if (!initialValues || !countryList.length) return;
+    if (mode !== "edit" && mode !== "view") return;
 
-    /* ===== 🔥 TRIGGER CONSUMER LOOKUP ===== */
-    const phone = initialValues.consumer?.phone;
-    console.log(phone,'phonephonephone');
-    
-    if (phone) {
-      form.setValue("search_mobile", phone);
-    }
+    const hydrate = async () => {
+      /* ===== STORE ===== */
+      if (isAdmin) {
+        form.setValue("store_id", String(initialValues.job_card.store_id));
+      }
+      form.setValue("consumer_id", String(initialValues.job_card.consumer_id));
+      /* ===== JOB CARD ===== */
+      form.setValue(
+        "jobcard_date",
+        initialValues.job_card.jobcard_date
+          ? new Date(initialValues.job_card.jobcard_date)
+            .toISOString()
+            .split("T")[0]
+          : ""
+      );
 
-    /* ===== JOB CARD ===== */
-    form.setValue(
-      "jobcard_date",
-      initialValues.jobcard_date
-        ? new Date(initialValues.jobcard_date).toISOString().slice(0, 10)
-        : ""
-    );
 
-    form.setValue("vehicle_type", initialValues.vehicle_type);
-    form.setValue("vehicle_company_id", String(initialValues.vehicle_company_id));
-    form.setValue("color", initialValues.color ?? "");
-    form.setValue("year", String(initialValues.year ?? ""));
-    form.setValue("reg_no", initialValues.reg_no ?? "");
-    form.setValue("chasis_no", initialValues.chasis_no ?? "");
-    form.setValue("vehicle_condition", initialValues.vehicle_condition ?? "");
-    form.setValue("remarks", initialValues.remarks ?? "");
+      form.setValue("vehicle_type", initialValues.job_card.vehicle_type);
+      form.setValue("vehicle_company_id", String(initialValues.job_card.vehicle_company_id));
+      form.setValue("color", initialValues.job_card.color ?? "");
+      form.setValue("year", String(initialValues.job_card.year ?? ""));
+      form.setValue("reg_no", initialValues.job_card.reg_no ?? "");
+      form.setValue("chasis_no", initialValues.job_card.chasis_no ?? "");
+      form.setValue("vehicle_condition", initialValues.job_card.vehicle_condition ?? "");
+      form.setValue("remarks", initialValues.job_card.remarks ?? "");
 
-    /* ===== CHECKBOXES ===== */
-    form.setValue("isRepainted", Boolean(initialValues.isRepainted));
-    form.setValue("isSingleStagePaint", Boolean(initialValues.isSingleStagePaint));
-    form.setValue("isPaintThickness", Boolean(initialValues.isPaintThickness));
-    form.setValue("isVehicleOlder", Boolean(initialValues.isVehicleOlder));
+      /* ===== CHECKBOXES ===== */
+      form.setValue("isRepainted", Boolean(initialValues.job_card.isRepainted));
+      form.setValue("isSingleStagePaint", Boolean(initialValues.job_card.isSingleStagePaint));
+      form.setValue("isPaintThickness", Boolean(initialValues.job_card.isPaintThickness));
+      form.setValue("isVehicleOlder", Boolean(initialValues.job_card.isVehicleOlder));
 
-    /* ===== SERVICES ===== */
-    const serviceIds = (initialValues.service_ids || []).map(String);
-    form.setValue("service_ids", serviceIds);
-    setSelectedServices(serviceIds);
+      /* ===== SERVICES ===== */
+      const serviceTypeValues = (initialValues.opted_services || []).map(
+        (item: any) => String(item.category_type)
+      );
 
-    /* ===== VEHICLE MODELS ===== */
-    const models = await jobCardModelInfo(
-      String(initialValues.vehicle_company_id)
-    );
+      const serviceIds = (initialValues.job_card.service_ids || []).map(String);
 
-    setMeta(prev => ({
-      ...prev,
-      vehicleModels: toSelectOptions(models),
-    }));
 
-    form.setValue(
-      "vehicle_model_id",
-      String(initialValues.vehicle_model_id)
-    );
-  };
+      isHydratingJobRef.current = true;
 
-  hydrate();
-}, [initialValues, countryList, mode]);
+      form.setValue("service_type", serviceTypeValues);
+      form.setValue("service_ids", serviceIds);
+      setSelectedServices(serviceIds);
+
+      isHydratingJobRef.current = false;
+
+      /* ===== VEHICLE MODELS ===== */
+      const models = await jobCardModelInfo(
+        String(initialValues.job_card.vehicle_company_id)
+      );
+
+
+      setMeta(prev => ({
+        ...prev,
+        vehicleModels: toSelectOptions(models),
+      }));
+
+      form.setValue(
+        "vehicle_model_id",
+        String(initialValues.job_card.vehicle_model_id)
+      );
+    };
+
+    hydrate();
+  }, [initialValues, countryList, mode]);
 
   useEffect(() => {
     if (mode !== "create" || !countryList.length) return;
@@ -466,65 +455,12 @@ export default function JobForm() {
 
     form.setValue("country_id", String(india.id));
   }, [mode, countryList]);
-  const onSubmit = (data: JobCardFormValues) => {
+  const onSubmit = (data: JobCardFormUnion) => {
   };
   const [isJobCardSubmissionDeleteModalInfo, setIsJobCardSubmissionModalOpenInfo] = useState<{ open: boolean, info: any }>({
     open: false,
     info: {}
   });
-  // useEffect(() => {
-  //   if (!initialValues) return;
-
-  //   if (mode === "edit" || mode === "view") {
-  //     form.reset({
-  //       consumer_id: initialValues.consumer_id ?? undefined,
-
-  //       name: initialValues.name ?? "",
-  //       phone: initialValues.phone ?? "",
-  //       email: initialValues.email ?? "",
-
-  //       country_id: initialValues.country_id
-  //         ? String(initialValues.country_id)
-  //         : "India",
-
-  //       state_id: initialValues.state_id
-  //         ? String(initialValues.state_id)
-  //         : "",
-  //       store_id: initialValues.store_id ?? "",
-  //       address: initialValues.address ?? "",
-
-
-  //       jobcard_date: initialValues.jobcard_date
-  //         ? new Date(initialValues.jobcard_date).toISOString().slice(0, 10)
-  //         : "",
-
-  //       /* ===== VEHICLE ===== */
-  //       vehicle_type: initialValues.vehicle_type ?? "",
-  //       vehicle_company_id: initialValues.vehicle_company_id ?? "",
-  //       vehicle_model_id: initialValues.vehicle_model_id ?? "",
-  //       color: initialValues.color ?? "",
-
-  //       year: initialValues.year ?? "",
-  //       reg_no: initialValues.reg_no ?? "",
-  //       chasis_no: initialValues.chasis_no ?? "",
-  //       vehicle_condition: initialValues.vehicle_condition ?? "",
-
-  //       service_ids: initialValues.service_ids ?? [],
-  //       // service_amount: initialValues.service_amount ?? "",
-
-  //       remarks: initialValues.remarks ?? "",
-
-  //       /* ===== VEHICLE CONDITION ===== */
-  //       isRepainted: Boolean(initialValues.isRepainted),
-  //       isSingleStagePaint: Boolean(initialValues.isSingleStagePaint),
-  //       isPaintThickness: Boolean(initialValues.isPaintThickness),
-  //       isVehicleOlder: Boolean(initialValues.isVehicleOlder),
-
-  //       /* ===== GST ===== */
-  //       service_type: initialValues.service_type ?? [],
-  //     });
-  //   }
-  // }, [mode, initialValues, form]);
 
   const isAdmin =
     user?.role === "admin" || user?.role === "super-admin";
@@ -595,82 +531,93 @@ export default function JobForm() {
 
     hydrateGstLocation();
   }, [initialValues, countryList]);
-
-  async function handleJobCardSubmission(values: JobCardFormValues) {
+  function isFullJobCard(
+    values: JobCardFormUnion
+  ): values is JobCardFormValues {
+    return "phone" in values;
+  }
+  const isHydratingJobRef = useRef(false);
+  async function handleJobCardSubmission(values: JobCardFormUnion) {
     setIsLoading(true);
 
     try {
       let customerId = values.consumer_id;
 
-      // 🔹 STEP 1: HANDLE CUSTOMER
-      const customerPayload = {
-        ...(customerId ? { id: customerId } : {}),
-        name: values.name,
-        phone: values.phone,
-        email: values.email,
-        address: values.address,
-        type: values.type,
+      // ✅ ONLY when full form
+      if (isFullJobCard(values) && mode !== "view" && mode !== "edit") {
 
-        country_id: values.country_id,
-        ...(values.type === "company" && {
-          company_country_id: values.company_country_id,
-          company_state_id: values.company_state_id,
-          company_contact_no: values.company_contact_no,
-          company_gstin: values.company_gstin,
-        }),
-        state_id: values.state_id,
-        store_id: !isAdmin ? user?.store_id : values.store_id,
+        const customerPayload = {
+          ...(customerId ? { id: customerId } : {}),
+          name: values.name,
+          phone: values.phone,
+          email: values.email,
+          address: values.address,
+          type: values.type,
+
+          country_id: values.country_id,
+          state_id: values.state_id,
+          store_id: !isAdmin ? user?.store_id : values.store_id,
+
+          ...(values.type === "company" && {
+            company_country_id: values.company_country_id,
+            company_state_id: values.company_state_id,
+            company_contact_no: values.company_contact_no,
+            company_gstin: values.company_gstin,
+          }),
+        };
+
+        if (customerFound && customerId) {
+          await consumerUpdate(customerPayload);
+        } else {
+          const res = await consumerSave(customerPayload);
+          customerId = res.id;
+        }
+        if (!customerId) {
+          throw new Error("Customer could not be resolved");
+        }
       }
-      if (customerFound === true && customerId) {
-        // ✅ Existing customer → UPDATE
-        await consumerUpdate(customerPayload);
-      }
 
-      if (!customerFound) {
-        // ✅ New customer → SAVE
-        const res = await consumerSave(customerPayload);
-
-        customerId = res.id; // 🔑 IMPORTANT
-      }
-
-      if (!customerId) {
-        throw new Error("Customer could not be resolved");
-      }
-
-      // 🔹 STEP 2: SAVE JOB CARD
+      // ✅ job card fields are COMMON → safe
       const jobCardPayload = {
         ...(id ? { id } : {}),
         store_id: !isAdmin ? user?.store_id : values.store_id,
-        consumer_id: values.consumer_id ?? customerId,
-        "vehicle_type": values.vehicle_type,
-        "service_ids": values.service_ids.map(_id=> Number(_id)),
-        "vehicle_company_id": values.vehicle_company_id,
-        "vehicle_model_id": values.vehicle_model_id,
-        "color": values.color,
-        "year": values.year,
-        "reg_no": values.reg_no,
-        jobcard_date: values.jobcard_date,
-        "chasis_no": values.chasis_no,
-        "vehicle_condition": values.vehicle_condition,
-        "remarks": values.remarks,
-        "isRepainted": values.isRepainted,
-        "isSingleStagePaint": values.isSingleStagePaint,
-        "isPaintThickness": values.isPaintThickness,
-        "isVehicleOlder": values.isVehicleOlder,
+        consumer_id: customerId,
 
-      }
+        vehicle_type: values.vehicle_type,
+        service_ids: values.service_ids.map(Number),
+        vehicle_company_id: values.vehicle_company_id,
+        vehicle_model_id: values.vehicle_model_id,
+        color: values.color,
+        year: values.year,
+        reg_no: values.reg_no,
+        chasis_no: values.chasis_no,
+        vehicle_condition: values.vehicle_condition,
+        jobcard_date: values.jobcard_date,
+        remarks: values.remarks,
+
+        isRepainted: values.isRepainted,
+        isSingleStagePaint: values.isSingleStagePaint,
+        isPaintThickness: values.isPaintThickness,
+        isVehicleOlder: values.isVehicleOlder,
+      };
+
       const jobRes = await jobFormSubmission(jobCardPayload);
 
       toast({
-        title: "Job Card Created",
-        description: "Job card created successfully",
+        title: mode === "" ? "Job Card Created" : "Job Card Updated",
+        description: mode === "" ? "Job card created successfully" : "Job card updated successfully",
         variant: "success",
       });
       // ✅ Open invoice modal
-      setIsJobCardSubmissionModalOpenInfo({
-        open: true,
-        info: jobRes.id,
-      });
+      if (mode !== "view" && mode !== "edit") {
+        setIsJobCardSubmissionModalOpenInfo({
+          open: true,
+          info: jobRes.id,
+        });
+      }
+      else {
+        navigate("/job-cards")
+      }
     } catch (err: any) {
       const apiErrors = err?.response?.data?.errors;
 
@@ -697,6 +644,7 @@ export default function JobForm() {
       setIsLoading(false);
     }
   }
+
   const searchMobile = form.watch("search_mobile");
   const customerMobile = form.watch("phone");
   const store_id = form.watch("store_id");
@@ -704,9 +652,7 @@ export default function JobForm() {
     setCustomerFound(null);
     form.setValue("consumer_id", undefined);
   }, [searchMobile]);
-  useEffect(()=>{
-    
-  })
+
   useEffect(() => {
     if (!searchMobile || searchMobile.length !== 10 || !(store_id || user?.store_id)) return;
 
@@ -837,272 +783,273 @@ export default function JobForm() {
           {/* Main Job Creation Form */}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="">
-              <Card className="mb-6 p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(mode !== "view" && mode !== 'edit') && <>
+                <Card className="mb-6 p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                  {isAdmin && <div
-                    className={cn(
-                      "bg-white  rounded-xl p-0",
-                    )} >
-                    <h3 className={`text-sm font-semibold text-gray-700 mb-4`}>{"Store Information"}</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                      <FloatingRHFSelect
-                        name="store_id"
-                        label="Select Store"
-                        control={form.control}
-                        isDisabled={isView}
-                        isRequired
-                        options={storeList.map((s: any) => ({
-                          label: s.label,
-                          value: String(s.value),
-                        }))}
-                      />
+                    {isAdmin && <div
+                      className={cn(
+                        "bg-white  rounded-xl p-0",
+                      )} >
+                      <h3 className={`text-sm font-semibold text-gray-700 mb-4`}>{"Store Information"}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                        <FloatingRHFSelect
+                          name="store_id"
+                          label="Select Store"
+                          control={form.control}
+                          isDisabled={isView}
+                          isRequired
+                          options={storeList.map((s: any) => ({
+                            label: s.label,
+                            value: String(s.value),
+                          }))}
+                        />
+                      </div>
+                    </div>}
+                    <div
+                      className={cn(
+                        "bg-white  rounded-xl p-0",
+                      )} >
+                      <h3 className={`text-sm font-semibold text-gray-700 mb-4`}>{"Customer Lookup"}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-1 gap-1 items-end">
+                        <FloatingField
+                          name="search_mobile"
+                          label="Search Mobile Number"
+                          isDisabled={isView}
+                          isRequired
+                          control={form.control}
+                        />
+
+                        {(isLookingUp || customerFound !== null) && !isView && <div className="text-sm h-[38px] flex items-center">
+                          {isLookingUp && (
+                            <span className="text-muted-foreground flex items-center gap-2">
+                              <Loader2 className="animate-spin h-4 w-4" />
+                              Looking up customer…
+                            </span>
+                          )}
+
+                          {!isLookingUp && customerFound === true && (
+                            <span className="text-green-600 flex items-center gap-2">
+                              <CheckCircle size={16} />
+                              Existing customer found
+                            </span>
+                          )}
+
+                          {!isLookingUp && customerFound === false && (
+                            <span className="text-orange-500">
+                              New customer
+                            </span>
+                          )}
+                        </div>}
+                      </div>
                     </div>
-                  </div>}
-                  <div
-                    className={cn(
-                      "bg-white  rounded-xl p-0",
-                    )} >
-                    <h3 className={`text-sm font-semibold text-gray-700 mb-4`}>{"Customer Lookup"}</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-1 gap-1 items-end">
-                      <FloatingField
-                        name="search_mobile"
-                        label="Search Mobile Number"
-                        isDisabled={isView}
-                        isRequired
-                        control={form.control}
-                      />
-
-                      {(isLookingUp || customerFound !== null) && !isView &&  <div className="text-sm h-[38px] flex items-center">
-                        {isLookingUp && (
-                          <span className="text-muted-foreground flex items-center gap-2">
-                            <Loader2 className="animate-spin h-4 w-4" />
-                            Looking up customer…
-                          </span>
-                        )}
-
-                        {!isLookingUp && customerFound === true && (
-                          <span className="text-green-600 flex items-center gap-2">
-                            <CheckCircle size={16} />
-                            Existing customer found
-                          </span>
-                        )}
-
-                        {!isLookingUp && customerFound === false && (
-                          <span className="text-orange-500">
-                            New customer
-                          </span>
-                        )}
-                      </div>}
-                    </div>
-                  </div>
-                  {/* <SectionCard title="Customer Lookup" >
+                    {/* <SectionCard title="Customer Lookup" >
                   
                 </SectionCard> */}
-                </div>
-              </Card>
-
-              {/* Customer Lookup Section */}
-              {customerFound !== null && <Card className="mb-6">
-
-                <SectionCard title="Customer Information" className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>
-                  {/* BASIC INFO */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FloatingField
-                      name="name"
-                      label="Name"
-                      isRequired
-                            isDisabled={isView}
-                      control={form.control}
-                    />
-
-
-                    <FloatingField
-                      name="phone"
-                      label="Mobile No"
-                      isRequired
-                      control={form.control}
-                      isDisabled={customerFound === true || isView}
-                    />
-
-                    <FloatingField
-                      name="email"
-                      label="Email"
-                            isDisabled={isView}
-                      isRequired
-                      control={form.control}
-                    />
-
-
-
                   </div>
-                  {/* ADDRESS + MESSAGE */}
-                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                    <FloatingTextarea
-                      name="address"
-                      label="Address"
-                      isView={isView}
-                      isRequired
-                      control={form.control}
-                    />
+                </Card>
 
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Customer Lookup Section */}
+                {customerFound !== null && <Card className="mb-6">
 
-                    {/* COUNTRY */}
-                    <FloatingRHFSelect
-                      name="country_id"
-                      label="Country"
-                      control={form.control}
-                      isRequired
-                      isDisabled={isView}
-                      options={countryList.map(c => ({
-                        value: String(c.id),
-                        label: c.name,
-                      }))}
-                      onValueChange={async (value) => {
-                        if (isHydratingRef.current) return;
+                  <SectionCard title="Customer Information" className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>
+                    {/* BASIC INFO */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FloatingField
+                        name="name"
+                        label="Name"
+                        isRequired
+                        isDisabled={isView}
+                        control={form.control}
+                      />
 
-                        setStates([]);
-                        setCities([]);
-                        form.setValue("state_id", "");
-                        // form.setValue("city_id", "");
 
-                        setLoadingState(true);
-                        const stateList = await fetchStateList(Number(value));
-                        setStates(stateList);
-                        setLoadingState(false);
-                      }}
-                    />
+                      <FloatingField
+                        name="phone"
+                        label="Mobile No"
+                        isRequired
+                        control={form.control}
+                        isDisabled={customerFound === true || isView}
+                      />
 
-                    {/* STATE */}
-                    <FloatingRHFSelect
-                      name="state_id"
-                      label="State"
-                      control={form.control}
-                      isRequired
-                      isDisabled={isView || !form.getValues("country_id")}
-                      options={states.map(s => ({
-                        value: String(s.id),
-                        label: s.name,
-                      }))}
-                      onValueChange={async (value) => {
-                        if (isHydratingRef.current) return;
+                      <FloatingField
+                        name="email"
+                        label="Email"
+                        isDisabled={isView}
+                        isRequired
+                        control={form.control}
+                      />
 
-                        setCities([]);
-                        // form.setValue("city_id", "");
 
-                        setLoadingCity(true);
-                        const cityList = await fetchCityList(Number(value));
-                        setCities(cityList);
-                        setLoadingCity(false);
-                      }}
-                    />
-                    <div className="flex flex-col items-start">
+
+                    </div>
+                    {/* ADDRESS + MESSAGE */}
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                      <FloatingTextarea
+                        name="address"
+                        label="Address"
+                        isView={isView}
+                        isRequired
+                        control={form.control}
+                      />
+
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                      {/* COUNTRY */}
                       <FloatingRHFSelect
-                        name="type"
-                        label="Billing Type"
+                        name="country_id"
+                        label="Country"
                         control={form.control}
                         isRequired
                         isDisabled={isView}
-                        options={[
-                          { label: "Company", value: "company" },
-                          { label: "Individual", value: "individual" },
-                        ]}
-                        onValueChange={(value) => {
-                          if (typeof value !== "string") return;
-                          const billingType = value as "company" | "individual";
-                          form.setValue("type", billingType);
+                        options={countryList.map(c => ({
+                          value: String(c.id),
+                          label: c.name,
+                        }))}
+                        onValueChange={async (value) => {
+                          if (isHydratingRef.current) return;
+
+                          setStates([]);
+                          setCities([]);
+                          form.setValue("state_id", "");
+                          // form.setValue("city_id", "");
+
+                          setLoadingState(true);
+                          const stateList = await fetchStateList(Number(value));
+                          setStates(stateList);
+                          setLoadingState(false);
                         }}
                       />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Select <b>Company</b> if you need GST invoice
-                      </p>
+
+                      {/* STATE */}
+                      <FloatingRHFSelect
+                        name="state_id"
+                        label="State"
+                        control={form.control}
+                        isRequired
+                        isDisabled={isView || !form.getValues("country_id")}
+                        options={states.map(s => ({
+                          value: String(s.id),
+                          label: s.name,
+                        }))}
+                        onValueChange={async (value) => {
+                          if (isHydratingRef.current) return;
+
+                          setCities([]);
+                          // form.setValue("city_id", "");
+
+                          setLoadingCity(true);
+                          const cityList = await fetchCityList(Number(value));
+                          setCities(cityList);
+                          setLoadingCity(false);
+                        }}
+                      />
+                      <div className="flex flex-col items-start">
+                        <FloatingRHFSelect
+                          name="type"
+                          label="Billing Type"
+                          control={form.control}
+                          isRequired
+                          isDisabled={isView}
+                          options={[
+                            { label: "Company", value: "company" },
+                            { label: "Individual", value: "individual" },
+                          ]}
+                          onValueChange={(value) => {
+                            if (typeof value !== "string") return;
+                            const billingType = value as "company" | "individual";
+                            form.setValue("type", billingType);
+                          }}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Select <b>Company</b> if you need GST invoice
+                        </p>
+                      </div>
+
                     </div>
 
-                  </div>
 
 
+                    {/* GST OPTIONAL */}
 
-                  {/* GST OPTIONAL */}
+                    {
+                      form.watch("type") === "company" &&
+                      (
+                        <div className="">
+                          <h4 className="text-sm font-semibold mb-4">
+                            GST Information
+                          </h4>
 
-                  {
-                    form.watch("type") === "company" &&
-                    (
-                      <div className="">
-                        <h4 className="text-sm font-semibold mb-4">
-                          GST Information
-                        </h4>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
 
-                          <FloatingField
-                            name="company_contact_no"
-                            label="Company Contact No."
-                                  isDisabled={isView}
-                            control={form.control}
-                          />
+                            <FloatingField
+                              name="company_contact_no"
+                              label="Company Contact No."
+                              isDisabled={isView}
+                              control={form.control}
+                            />
 
-                          <FloatingField
-                            name="company_gstin"
-                            label="GSTIN"
-                            control={form.control}
-                                  isDisabled={isView}
-                          />
+                            <FloatingField
+                              name="company_gstin"
+                              label="GSTIN"
+                              control={form.control}
+                              isDisabled={isView}
+                            />
 
-                          <FloatingRHFSelect
-                            name="company_country_id"
-                            label="Country"
-                            control={form.control}
-                            isDisabled={isView}
-                            options={countryList.map(c => ({
-                              value: String(c.id),
-                              label: c.name,
-                            }))}
-                            onValueChange={async (value) => {
-                              if (isGstHydratingRef.current) return;
+                            <FloatingRHFSelect
+                              name="company_country_id"
+                              label="Country"
+                              control={form.control}
+                              isDisabled={isView}
+                              options={countryList.map(c => ({
+                                value: String(c.id),
+                                label: c.name,
+                              }))}
+                              onValueChange={async (value) => {
+                                if (isGstHydratingRef.current) return;
 
-                              setGstStates([]);
-                              setGstCities([]);
-                              form.setValue("company_state_id", "");
-                              // form.setValue("gst_city_id", "");
+                                setGstStates([]);
+                                setGstCities([]);
+                                form.setValue("company_state_id", "");
+                                // form.setValue("gst_city_id", "");
 
-                              setLoadingGstState(true);
-                              const stateList = await fetchStateList(Number(value));
-                              setGstStates(stateList);
-                              setLoadingGstState(false);
-                            }}
-                          />
-                          <FloatingRHFSelect
-                            name="company_state_id"
-                            label="State"
-                            control={form.control}
-                            isDisabled={isView || !form.getValues("company_country_id")}
-                            options={gstStates.map(s => ({
-                              value: String(s.id),
-                              label: s.name,
-                            }))}
-                            onValueChange={async (value) => {
-                              if (isGstHydratingRef.current) return;
+                                setLoadingGstState(true);
+                                const stateList = await fetchStateList(Number(value));
+                                setGstStates(stateList);
+                                setLoadingGstState(false);
+                              }}
+                            />
+                            <FloatingRHFSelect
+                              name="company_state_id"
+                              label="State"
+                              control={form.control}
+                              isDisabled={isView || !form.getValues("company_country_id")}
+                              options={gstStates.map(s => ({
+                                value: String(s.id),
+                                label: s.name,
+                              }))}
+                              onValueChange={async (value) => {
+                                if (isGstHydratingRef.current) return;
 
-                              setGstCities([]);
-                              // form.setValue("gst_city_id", "");
+                                setGstCities([]);
+                                // form.setValue("gst_city_id", "");
 
-                              setLoadingGstCity(true);
-                              const cityList = await fetchCityList(Number(value));
-                              setGstCities(cityList);
-                              setLoadingGstCity(false);
-                            }}
-                          />
+                                setLoadingGstCity(true);
+                                const cityList = await fetchCityList(Number(value));
+                                setGstCities(cityList);
+                                setLoadingGstCity(false);
+                              }}
+                            />
+
+                          </div>
 
                         </div>
-
-                      </div>
-                    )}
-                </SectionCard>
-              </Card>
-              }
+                      )}
+                  </SectionCard>
+                </Card>
+                }</>}
               <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
 
 
@@ -1129,7 +1076,7 @@ export default function JobForm() {
 
                       <FloatingField
                         name="color"
-                              isDisabled={isView}
+                        isDisabled={isView}
                         label="Vehicle Color"
                         isRequired
                         control={form.control}
@@ -1145,7 +1092,7 @@ export default function JobForm() {
                       />
 
                       <FloatingField
-                            isDisabled={isView}
+                        isDisabled={isView}
                         name="reg_no"
                         label="Registration No"
                         isRequired
@@ -1154,7 +1101,7 @@ export default function JobForm() {
 
                       <FloatingField
                         name="chasis_no"
-                              isDisabled={isView}
+                        isDisabled={isView}
                         label="Chassis No"
                         control={form.control}
                       />
@@ -1179,9 +1126,9 @@ export default function JobForm() {
                           control={form.control}
                           name="isRepainted"
                           render={({ field }) => (
-                            <label className={`flex items-center gap-2 text-sm ${isView ? '':'cursor-pointer'}  `}>
+                            <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
                               <Checkbox
-                               disabled={isView}
+                                disabled={isView}
                                 checked={field.value}
                                 onCheckedChange={(val) => field.onChange(Boolean(val))}
                               />
@@ -1193,9 +1140,9 @@ export default function JobForm() {
                           control={form.control}
                           name="isSingleStagePaint"
                           render={({ field }) => (
-                            <label className={`flex items-center gap-2 text-sm ${isView ? '':'cursor-pointer'}  `}>
+                            <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
                               <Checkbox
-                               disabled={isView}
+                                disabled={isView}
                                 checked={field.value}
                                 onCheckedChange={(val) => field.onChange(Boolean(val))}
                               />
@@ -1208,9 +1155,9 @@ export default function JobForm() {
                           control={form.control}
                           name="isPaintThickness"
                           render={({ field }) => (
-                            <label className={`flex items-center gap-2 text-sm ${isView ? '':'cursor-pointer'}  `}>
+                            <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
                               <Checkbox
-                               disabled={isView}
+                                disabled={isView}
                                 checked={field.value}
                                 onCheckedChange={(val) => field.onChange(Boolean(val))}
                               />
@@ -1223,9 +1170,9 @@ export default function JobForm() {
                           control={form.control}
                           name="isVehicleOlder"
                           render={({ field }) => (
-                            <label className={`flex items-center gap-2 text-sm ${isView ? '':'cursor-pointer'}  `}>
+                            <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
                               <Checkbox
-                               disabled={isView}
+                                disabled={isView}
                                 checked={field.value}
                                 onCheckedChange={(val) => field.onChange(Boolean(val))}
                               />
