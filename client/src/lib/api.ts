@@ -1116,3 +1116,137 @@ export async function getJobCardItem(data:any) {
     throw response;
   }
 }
+export async function getJobCardPrefillData(data:any) {
+  try {
+    const response: any = await api.get(
+      `/api/job-cards/${data.id}/invoice/prefill`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+    throw new Error(
+      response?.data?.message || "Failed to get job card invoice info"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function createInvoice(data:any) {
+  try {
+    const {id, ...rest} = data;
+    console.log(data,'datadata');
+    
+    const response: any = await api.post(
+      `/api/job-cards/${id}/invoice`,
+      rest
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; 
+    }
+    throw new Error(
+      response?.data?.message || "Failed to create invoice"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function updateInvoice(data:any) {
+  try {
+    const response: any = await api.post(
+      `/api/invoices/${data.id}/update`,
+      data
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; 
+    }
+    throw new Error(
+      response?.data?.message || "Failed to update invoice"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function getInvoiceInfo(id:any) {
+  try {
+    const response: any = await api.get(
+      `/api/invoices/${id}`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data;
+    }
+    throw new Error(
+      response?.data?.message || "Failed to get invoice info"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function cancelInvoice(data:any) {
+  try {
+    const response: any = await api.post(
+      `/api/invoices/${data.id}/cancel`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data;
+    }
+    throw new Error(
+      response?.data?.message || "Failed to cancel invoice"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+  export async function getInvoiceList({
+  page,
+  search,
+  status,
+  per_page
+}: {
+  per_page?: number;
+  page?: number;
+  search?: string;
+  status?: string 
+}) {
+  const params = new URLSearchParams();
+
+  if (page !== undefined) params.append("page", String(page));
+  if (per_page !== undefined) params.append("per_page", String(per_page));
+  if (search) params.append("search", search);
+  if (status) params.append("status", String(status));
+
+  try {
+    const response: any = await api.get(
+      `/api/invoices?${params.toString()}`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data;
+    }
+    throw new Error(
+      response?.data?.message || "Failed to get invoice list"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function getInvoiceInfoByJobCardPrefill(data:any) {
+  try {
+    const response: any = await api.get(
+      `/api/job-cards/${data.id}/invoice/prefill`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data;
+    }
+    throw new Error(
+      response?.data?.message || "Failed to get invoice info"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}

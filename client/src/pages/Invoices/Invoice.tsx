@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { InvoicePaymentFormValues, organizationFormType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, PrinterIcon, Trash2, Wallet, Wallet2 } from "lucide-react";
+import { EditIcon, EyeIcon, PrinterIcon, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
@@ -26,6 +26,9 @@ export default function Invoice() {
     const [perPage, setPerPage] = useState(10);
     const [total, setTotal] = useState(0);
     const [has_next, setHasNext] = useState(false)
+    const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: [] }>({
+        status: []
+    });
     const [, navigate] = useLocation();
     const [filters, setFilters] = useState({
         status: "",
@@ -50,8 +53,8 @@ export default function Invoice() {
         try {
             setIsLoading(true);
 
-            // await DeleteCustomer(isCustomerDeleteModalInfo?.info?.id);
-            // toast({ title: `Delete JobCard`, description: "JobCard deleted successfully", variant: "success", });
+            await cancelInvoice({ id: invoiceDeleteModalOpenInfo?.info?.id });
+            toast({ title: `Delete Invoice`, description: "Invoice deleted successfully", variant: "success", });
 
             fetchInvoices(false)
 
@@ -89,10 +92,10 @@ export default function Invoice() {
             key: "invoice_no",
             label: "Invoice No.",
             width: "130px",
-            render: (value: string,row:any) => (
-                <span className="text-primary font-medium cursor-pointer" onClick={()=>  navigate(`/invoice/manage?id=${row.id}&mode=view`)
-}>
-                    {value}
+            render: (value: string, row: any) => (
+                <span className="text-primary font-medium cursor-pointer" onClick={() => navigate(`/invoice/manage?id=${row.id}&mode=view`)
+                }>
+                    #{value}
                 </span>
             ),
         },
@@ -102,11 +105,12 @@ export default function Invoice() {
             key: "consumer",
             label: "Customer",
             width: "180px",
-            render: (value: string) => (
-                <span className="text-primary font-medium cursor-pointer" onClick={()=>{
-                    localStorage.setItem("sidebar_active_parent","customers")
-                    navigate("/customers")}}>
-                    {value}
+            render: (value: { name: string }) => (
+                <span className="text-primary font-medium cursor-pointer" onClick={() => {
+                    localStorage.setItem("sidebar_active_parent", "customers")
+                    navigate("/customers")
+                }}>
+                    {value?.name}
                 </span>
             ),
         },
@@ -115,11 +119,11 @@ export default function Invoice() {
 
         /* ================= AMOUNT ================= */
         {
-            key: "amount",
+            key: "grand_total",
             label: "Amount",
             width: "120px",
             render: (value: number) => (
-                <span>₹ {value.toLocaleString()}</span>
+                <span>₹ {value}</span>
             ),
         },
 
@@ -129,20 +133,30 @@ export default function Invoice() {
             label: "Balance Due",
             width: "130px",
             render: (value: number) => (
-                <span>₹ {value.toLocaleString()}</span>
+                <span>₹ {value ?? 0}</span>
             ),
         },
 
         /* ================= PAYMENT STATUS ================= */
         {
-            key: "payment_status",
-            label: "Payment",
+            key: "status",
+            label: (
+                <ColumnFilter
+                    label="Payment Status"
+                    value={filters.status}
+                    onChange={(val) => {
+                        setFilters(f => ({ ...f, status: val }));
+                        setPage(1);
+                    }}
+                    options={filterMetaInfo.status}
+                />
+            ),
             width: "120px",
             render: (value: string) => {
                 const styles: Record<string, string> = {
-                    Pending: "bg-yellow-100 text-yellow-700",
-                    Paid: "bg-emerald-100 text-emerald-700",
-                    Cancel: "bg-red-100 text-red-700",
+                    issued: "bg-yellow-100 text-yellow-700",
+                    paid: "bg-emerald-100 text-emerald-700",
+                    cancelled: "bg-red-100 text-red-700",
                     "Partially-Paid": "bg-blue-100 text-blue-700",
                 };
 
@@ -161,30 +175,34 @@ export default function Invoice() {
         try {
             if (!isLoaderHide)
                 setIsListLoading(true);
-            const res = {
-                data: invoiceMockData
-            }
-            // await fetchCustomerList({
-            //   per_page: perPage,
-            //   page,
-            //   search,
-            //   status: filters.status
-            // });
+            console.log( filters.status,' filters.status');
+            
+            const res =
+                await getInvoiceList({
+                    per_page: perPage,
+                    page,
+                    search,
+                    status: filters.status
+                });
 
-            const mappedTerritory = res.data
-            // setHasNext(res.meta.has_next)
-            // setTotal(res.meta.total)
-            setInvoices(mappedTerritory);
-            // setLastPage(res.meta.last_page);
+            const mappedData = res.data
+            setHasNext(res.meta.has_next)
+            setTotal(res.meta.total)
+            setInvoices(mappedData);
+            setLastPage(res.meta.last_page);
+            setFilterMetaInfo(res.meta.filters)
         } catch (e) {
-            console.error(e);
+            console.error('error coming', e);
 
         } finally {
             if (!isLoaderHide)
                 setIsListLoading(false);
         }
     };
+    useEffect(() => {
+        console.log(invoices, 'invoicesinvoices');
 
+    }, [invoices])
     useEffect(() => {
         fetchInvoices(false);
     }, [search, page, perPage, filters]);
@@ -287,6 +305,7 @@ export default function Invoice() {
                                             size="xs"
                                             mr={2}
                                             aria-label="Print"
+                                            disabled
                                             onClick={() => { }
                                             }
                                         >
@@ -297,9 +316,9 @@ export default function Invoice() {
                                                 mr={2}
                                                 aria-label="View"
                                                 onClick={() => {
-                                                        navigate(`/invoice/manage?id=${row.id}&mode=view`)
+                                                    navigate(`/invoice/manage?id=${row.id}&mode=view`)
 
-                                                 }
+                                                }
                                                 }
                                             >
                                                 <EyeIcon />
@@ -309,7 +328,7 @@ export default function Invoice() {
                                                 mr={2}
                                                 aria-label="Edit"
                                                 onClick={() => {
-                                                    navigate(`/invoice/manage?id=${row.id}&mode=edit`)
+                                                    navigate(`/invoice/manage?id=${row.id}&mode=create`)
 
                                                 }
                                                 }
@@ -317,8 +336,11 @@ export default function Invoice() {
                                                 <EditIcon />
                                             </IconButton>}
 
+
+
+
                                             {
-                                                Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && !row.store &&
+                                                Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id&&
                                                 <IconButton
                                                     size="xs"
                                                     mr={2}
@@ -330,6 +352,20 @@ export default function Invoice() {
                                                 >
                                                     <Wallet size={16} />
                                                 </IconButton>}
+                                            {
+
+                                                row.status !== 'cancelled' && <IconButton
+                                                    size="xs"
+                                                    mr={2}
+                                                    title="Cancel"
+                                                    colorScheme="red"
+                                                    aria-label="Cancel"
+                                                    onClick={() => {
+                                                        setIsInvoiceDeleteModalOpenInfo({ open: true, info: row });
+                                                    }}
+                                                >
+                                                    <XCircle size={16} />
+                                                </IconButton>}
 
                                         </Box>
                                     )}
@@ -339,8 +375,8 @@ export default function Invoice() {
 
                     />
                     <CommonModal
-                        width={ '50%'}
-                        maxWidth={ '50%'}
+                        width={'50%'}
+                        maxWidth={'50%'}
                         isOpen={invoicePaymentModalOpenInfo.open}
                         onClose={() => setIsInvoicePaymentModalOpenInfo({ open: false, info: {} })}
                         title={"Payments"}
@@ -373,10 +409,11 @@ export default function Invoice() {
                         width="420px"
                         maxWidth="420px"
                         isOpen={invoiceDeleteModalOpenInfo.open}
-                        title="Delete Invoice"
-                        description={`Are you sure you want to delete this invoice? This action cannot be undone.`}
-                        confirmText="Delete"
-                        cancelText="Cancel"
+                        title="Cancel Invoice"
+                        description={`Are you sure you want to cancel this invoice? This action cannot be undone.`}
+                        confirmText="Yes, Cancel"
+                        cancelText="No"
+                        loadingText="Cancelling..."
                         isLoading={isLoading}
                         onCancel={() =>
                             setIsInvoiceDeleteModalOpenInfo({ open: false, info: {} })

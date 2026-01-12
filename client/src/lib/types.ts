@@ -703,6 +703,7 @@ export type Notification = {
 };
 export type JobCardFormValues = z.infer<typeof NewJobCardSchema>;
 
+export type GstType = "igst" | "cgst_sgst";
 export type JobCardOnlyFormValues = z.infer<typeof JobCardOnlySchema>;
 export type JobCardFormUnion = JobCardFormValues | JobCardOnlyFormValues;
 

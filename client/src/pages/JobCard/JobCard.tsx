@@ -101,14 +101,15 @@ export default function JobCard() {
     /* ================= CUSTOMER ================= */
     {
       key: "consumer",
-      label:"Customer" ,
+      label: "Customer",
       width: "180px",
       render: (_: any, row: any) => (
         <div className="flex flex-col" >
-          <span className="text-primary font-medium cursor-pointer hover:underline" onClick={() =>{
-              localStorage.setItem("sidebar_active_parent","customers")
-                 
-            navigate(`/customers/manage?id=${row.id}&mode=view`)}
+          <span className="text-primary font-medium cursor-pointer hover:underline" onClick={() => {
+            localStorage.setItem("sidebar_active_parent", "customers")
+
+            navigate(`/customers/manage?id=${row.id}&mode=view`)
+          }
           }
           >
             {row.consumer?.name ?? "-"}
@@ -174,16 +175,51 @@ export default function JobCard() {
       render: (value: string) => (
         <Badge
           className={`px-3 py-1 text-xs font-medium rounded-full ${value === "created"
-              ? "bg-blue-100 text-blue-700"
-              : value === "cancelled"
-                ? "bg-red-100 text-red-700"
-                : "bg-gray-100 text-gray-700"
+            ? "bg-blue-100 text-blue-700"
+            : value === "cancelled"
+              ? "bg-red-100 text-red-700"
+              : "bg-gray-100 text-gray-700"
             }`}
         >
           {jobCardStatusList.find(s => s.value === value)?.label ?? value}
         </Badge>
       ),
     },
+    {
+      key: "id",
+      label: "Invoice No.",
+      width: "150px",
+      render: (_: any, row: any) => {
+        // CASE 1: Invoice exists
+        if (!row.id) {
+          return (
+            <span
+              className="text-primary font-medium cursor-pointer hover:underline"
+              // onClick={() => navigate(`/invoice/id=${row.id}&mode=view`)}
+            >
+              #{row.id}
+            </span>
+          );
+        }
+
+        // CASE 2: No invoice → show action
+        return (
+          <button
+            onClick={() => {
+              navigate(`/invoice/manage?jobCardId=${row.id}&mode=create`)
+            }}
+            className="
+          px-3 py-1 text-xs font-medium
+          rounded-md border border-primary
+          text-primary hover:bg-primary hover:text-white
+          transition
+        "
+          >
+            Create Invoice
+          </button>
+        );
+      },
+    }
 
   ];
 
@@ -291,7 +327,7 @@ export default function JobCard() {
                       >
                         <EyeIcon />
                       </IconButton>
-                      {  row.status !== 'cancelled' &&<IconButton
+                      {row.status !== 'cancelled' && <IconButton
                         size="xs"
                         mr={2}
                         aria-label="Edit"

@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { FloatingRHFSelectProps, GroupedOption, Option, SidebarProps, TabItem } from "./types";
+import { FloatingRHFSelectProps, GroupedOption, GstType, Option, SidebarProps, TabItem } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -270,4 +270,174 @@ export function getActiveChild(tab: any, location: string,id:string,sidebarConte
   return tab.children?.find((c: any) =>
     isChildActive(c.path, location,id,sidebarContext)
   );
+}
+export function mapInvoiceApiToViewModel(api: any) {
+  const job = api.job_card;
+  const consumer = api.consumer;
+
+  return {
+    customer: {
+      bill_to: consumer.name,
+      name: consumer.name,
+      phone: consumer.phone,
+      email: consumer.email,
+      address: consumer.address,
+      gst: consumer.company_gstin ?? "",
+      type:consumer.type || 'individual',
+    },
+
+    vehicle: {
+      type: job.vehicle_type,
+      make: String(job.vehicle_company_id), // replace with lookup if available
+      model: String(job.vehicle_model_id),  // replace with lookup if available
+      reg_no: job.reg_no,
+      make_year: String(job.year),
+      color: job.color,
+      chassisNo: job.chasis_no,
+      remark: job.remarks ?? "",
+    },
+
+    jobcard: {
+      jobcard_date: new Date(job.jobcard_date).toLocaleDateString("en-GB"),
+      edited_date: new Date(job.updated_at).toLocaleString(),
+    },
+
+    plans: api.items.map((s: any) => {
+      const price = Number(s.price);
+
+      return {
+        id: s.id,
+        plan_name: s.plan_name,
+        sac: "9997",
+        visits: 1,
+        price,
+        discount_percent: 0,
+        discount_amount: 0,
+        sub_amount: price,
+        igst_percent: 18,
+        igst_amount: +(price * 0.18).toFixed(2),
+        total_amount: +(price * 1.18).toFixed(2),
+      };
+    }),
+  };
+}
+export function mapInvoiceApiToPrefilledViewModel(api: any) {
+  const job = api.job_card;
+  const consumer = api.job_card.consumer;
+  const opted_services=api.opted_services || [];
+  const billing_prefill=api.billing_prefill || {};
+  return {
+    customer: {
+      bill_to: consumer.type==='individual' ? billing_prefill.individual.name : billing_prefill.company.name,
+      name: billing_prefill.individual.name,
+      phone: billing_prefill.individual.phone,
+      email: billing_prefill.individual.email,
+      address: billing_prefill.individual.address,
+      gst: billing_prefill.company.gstin     ?? "",
+      type:consumer.type || 'individual',
+      billingAddress: consumer.type==='individual' ? billing_prefill.individual.address : billing_prefill.company.address,
+    },
+
+    vehicle: {
+      type: job.vehicle_type,
+      make: String(job.vehicle_company_id), // replace with lookup if available
+      model: String(job.vehicle_model_id),  // replace with lookup if available
+      reg_no: job.reg_no,
+      make_year: String(job.year),
+      color: job.color,
+      chassisNo: job.chasis_no,
+      remark: job.remarks ?? "",
+    },
+
+    jobcard: {
+      jobcard_date: new Date(job.jobcard_date).toLocaleDateString("en-GB"),
+      edited_date: new Date(job.updated_at).toLocaleString(),
+    },
+
+    plans: api.opted_services,
+    billing_prefill:billing_prefill.individual,
+    store:job.store
+  };
+}
+ 
+export function getGstType(storeStateId:any, billingStateId:any) {
+  if (!storeStateId || !billingStateId) return null;
+  return storeStateId === billingStateId ? "cgst_sgst" : "igst";
+}
+ 
+export function calculateRow(item:any, gstType:any) {
+  const base = item.price * item.qty;
+ 
+  if (!gstType) {
+    return { base, cgst: 0, sgst: 0, igst: 0, total: base };
+  }
+ 
+  if (gstType === "cgst_sgst") {
+    const cgst = (base * (item.gst / 2)) / 100;
+    const sgst = cgst;
+    return { base, cgst, sgst, igst: 0, total: base + cgst + sgst };
+  }
+ 
+  const igst = (base * item.gst) / 100;
+  return { base, cgst: 0, sgst: 0, igst, total: base + igst };
+}
+ 
+export function calculateInvoiceTotals(items:any, gstType:any) {
+  return items.reduce(
+    (acc:any, item:any) => {
+      const r = calculateRow(item, gstType);
+      acc.subtotal += r.base;
+      acc.cgst += r.cgst;
+      acc.sgst += r.sgst;
+      acc.igst += r.igst;
+      acc.grandTotal += r.total;
+      return acc;
+    },
+    { subtotal: 0, cgst: 0, sgst: 0, igst: 0, grandTotal: 0 }
+  );
+}
+export function calculateInvoiceRow(plan: any, gstType: "igst" | "cgst_sgst" = "igst") {
+  const qty = Number(plan.qty || 1);
+  const price = Number(plan.price || 0);
+  const gstPercent = Number(plan.gst || 0);
+
+  // 1️⃣ Sub Amount
+  const subAmount = qty * price;
+
+  let cgstAmount = 0;
+  let sgstAmount = 0;
+  let igstAmount = 0;
+
+  if (gstType === "cgst_sgst") {
+    const halfGst = gstPercent / 2;
+    cgstAmount = (subAmount * halfGst) / 100;
+    sgstAmount = (subAmount * halfGst) / 100;
+  } else {
+    igstAmount = (subAmount * gstPercent) / 100;
+  }
+
+  const totalAmount = subAmount + cgstAmount + sgstAmount + igstAmount;
+
+  return {
+    ...plan,
+
+    qty,
+    unit_price: price,
+
+    discount_percent: 0,
+    discount_amount: 0,
+
+    sub_amount: Number(subAmount.toFixed(2)),
+
+    cgst_percent: gstType === "cgst_sgst" ? gstPercent / 2 : 0,
+    cgst_amount: Number(cgstAmount.toFixed(2)),
+
+    sgst_percent: gstType === "cgst_sgst" ? gstPercent / 2 : 0,
+    sgst_amount: Number(sgstAmount.toFixed(2)),
+
+    igst_percent: gstType === "igst" ? gstPercent : 0,
+    igst_amount: Number(igstAmount.toFixed(2)),
+
+    total_amount: Number(totalAmount.toFixed(2)),
+  };
 }

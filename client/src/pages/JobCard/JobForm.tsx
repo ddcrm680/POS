@@ -1349,7 +1349,7 @@ export default function JobForm() {
           shouldNotCancelOnOverlayClick={true}
           onCancel={() => navigate("/job-cards")}
           onConfirm={() =>
-            navigate(`/invoice/manage?job_card_id=${isJobCardSubmissionDeleteModalInfo.info}`)
+            navigate(`/invoice/manage?id=${isJobCardSubmissionDeleteModalInfo.info}&mode=create`)
           }
         />
       </div>

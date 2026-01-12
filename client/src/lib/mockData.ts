@@ -1112,3 +1112,69 @@ export const invoicePlanMockData = [
 ];
 
 
+
+export const invoiceViewMock = {
+  invoice_no: "CO/25-26/2",
+  status: "Open",
+  customer: {
+    bill_to: "Detailing Devils ss",
+    name: "Detailing Devils ss",
+    phone: "6647123413",
+    email: "admin@pos.com",
+    address: "124r35",
+    adhar: "",
+    panNo: "",
+    gst: ""
+  },
+  vehicle: {
+    type: "Luxury Mini SUV",
+    make: "HYUNDAI",
+    model: "CRETA",
+    reg_no: "wqdqwe12",
+    make_year: "2025",
+    color: "Red",
+    chassisNo: "",
+    remark: ""
+
+  },
+  jobcard: {
+    jobcard_date: "13-01-2026",
+    edited_date: "07-01-2026 11:01 AM",
+  },
+  plans: [
+    { id: 1, name: "Front Right Door Coating", amount: 3540 },
+    { id: 2, name: "Front Bumper Coating", amount: 2407 },
+  ],
+  images: [
+    { id: 1, label: "Vehicle Front", url: "https://placehold.co/300x200" },
+    { id: 2, label: "Vehicle Rear", url: "https://placehold.co/300x200" },
+  ],
+};
+export const availablePlansMock = [
+  {
+    id: 101,
+    plan_name: "Wheel Nano Armor",
+    sac: "9997",
+    visits: 1,
+    price: 3000,
+    discount_percent: 0,
+    discount_amount: 0,
+    sub_amount: 3000,
+    igst_percent: 18,
+    igst_amount: 540,
+    total_amount: 3540,
+  },
+  {
+    id: 102,
+    plan_name: "Full Body Coating",
+    sac: "9997",
+    visits: 1,
+    price: 15000,
+    discount_percent: 0,
+    discount_amount: 0,
+    sub_amount: 15000,
+    igst_percent: 18,
+    igst_amount: 2700,
+    total_amount: 17700,
+  },
+];
