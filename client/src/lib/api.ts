@@ -1102,9 +1102,8 @@ export async function consumerUpdate(data:any) {
 }
 export async function getJobCardItem(data:any) {
   try {
-    const response: any = await api.post(
+    const response: any = await api.get(
       `/api/job-cards/${data.id}`,
-      data
     );
 
     if (response?.data?.success === true) {

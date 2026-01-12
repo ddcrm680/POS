@@ -47,7 +47,7 @@ import { SectionCard } from "@/components/common/card";
 import { Loader } from "@/components/common/loader";
 import { FloatingDateField } from "@/components/common/FloatingDateField";
 import { cn, findIdByName } from "@/lib/utils";
-import { consumerSave, consumerUpdate, fetchCityList, fetchStateList, fetchStoreCrispList, getServiceOptionByTypeVehicle, jobCardMetaInfo, jobCardModelInfo, jobFormSubmission, lookupCustomerByPhone } from "@/lib/api";
+import { consumerSave, consumerUpdate, fetchCityList, fetchStateList, fetchStoreCrispList, getJobCardItem, getServiceOptionByTypeVehicle, jobCardMetaInfo, jobCardModelInfo, jobFormSubmission, lookupCustomerByPhone } from "@/lib/api";
 import { NewJobCardSchema } from "@/lib/schema";
 import { useAuth } from "@/lib/auth";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
@@ -374,11 +374,10 @@ export default function JobForm() {
   const fetchJobFormInfo = async () => {
     try {
       setIsInfoLoading(true);
-      //  const res =
-      //    await fetchStoreById(id ?? "");
+       const res =
+         await getJobCardItem({id:id ?? ""});
 
-      //  const updatedInfo = { ...res?.data, territory_id: res?.data?.territory?.id ?? "" }
-      //  setInitialValues(updatedInfo)
+       setInitialValues(res)
     } catch (e) {
       console.error(e);
 
@@ -393,6 +392,73 @@ export default function JobForm() {
     }
   }, [id]);
   useEffect(() => {
+    console.log(initialValues,countryList,mode,'    ');
+    
+  if (!initialValues || !countryList.length) return;
+  if (mode !== "edit" && mode !== "view") return;
+
+  const hydrate = async () => {
+    /* ===== STORE ===== */
+    if (isAdmin) {
+      form.setValue("store_id", String(initialValues.store_id));
+    }
+
+    /* ===== 🔥 TRIGGER CONSUMER LOOKUP ===== */
+    const phone = initialValues.consumer?.phone;
+    console.log(phone,'phonephonephone');
+    
+    if (phone) {
+      form.setValue("search_mobile", phone);
+    }
+
+    /* ===== JOB CARD ===== */
+    form.setValue(
+      "jobcard_date",
+      initialValues.jobcard_date
+        ? new Date(initialValues.jobcard_date).toISOString().slice(0, 10)
+        : ""
+    );
+
+    form.setValue("vehicle_type", initialValues.vehicle_type);
+    form.setValue("vehicle_company_id", String(initialValues.vehicle_company_id));
+    form.setValue("color", initialValues.color ?? "");
+    form.setValue("year", String(initialValues.year ?? ""));
+    form.setValue("reg_no", initialValues.reg_no ?? "");
+    form.setValue("chasis_no", initialValues.chasis_no ?? "");
+    form.setValue("vehicle_condition", initialValues.vehicle_condition ?? "");
+    form.setValue("remarks", initialValues.remarks ?? "");
+
+    /* ===== CHECKBOXES ===== */
+    form.setValue("isRepainted", Boolean(initialValues.isRepainted));
+    form.setValue("isSingleStagePaint", Boolean(initialValues.isSingleStagePaint));
+    form.setValue("isPaintThickness", Boolean(initialValues.isPaintThickness));
+    form.setValue("isVehicleOlder", Boolean(initialValues.isVehicleOlder));
+
+    /* ===== SERVICES ===== */
+    const serviceIds = (initialValues.service_ids || []).map(String);
+    form.setValue("service_ids", serviceIds);
+    setSelectedServices(serviceIds);
+
+    /* ===== VEHICLE MODELS ===== */
+    const models = await jobCardModelInfo(
+      String(initialValues.vehicle_company_id)
+    );
+
+    setMeta(prev => ({
+      ...prev,
+      vehicleModels: toSelectOptions(models),
+    }));
+
+    form.setValue(
+      "vehicle_model_id",
+      String(initialValues.vehicle_model_id)
+    );
+  };
+
+  hydrate();
+}, [initialValues, countryList, mode]);
+
+  useEffect(() => {
     if (mode !== "create" || !countryList.length) return;
 
     const india = countryList.find(c => c.name === "India");
@@ -406,67 +472,59 @@ export default function JobForm() {
     open: false,
     info: {}
   });
-  useEffect(() => {
-    if (!initialValues) return;
+  // useEffect(() => {
+  //   if (!initialValues) return;
 
-    if (mode === "edit" || mode === "view") {
-      form.reset({
-        /* ===== CUSTOMER ===== */
-        consumer_id: initialValues.consumer_id ?? undefined,
+  //   if (mode === "edit" || mode === "view") {
+  //     form.reset({
+  //       consumer_id: initialValues.consumer_id ?? undefined,
 
-        name: initialValues.name ?? "",
-        phone: initialValues.phone ?? "",
-        email: initialValues.email ?? "",
+  //       name: initialValues.name ?? "",
+  //       phone: initialValues.phone ?? "",
+  //       email: initialValues.email ?? "",
 
-        country_id: initialValues.country_id
-          ? String(initialValues.country_id)
-          : "India",
+  //       country_id: initialValues.country_id
+  //         ? String(initialValues.country_id)
+  //         : "India",
 
-        state_id: initialValues.state_id
-          ? String(initialValues.state_id)
-          : "",
-        store_id: initialValues.store_id ?? "",
-        // city_id: initialValues.city_id
-        //   ? String(initialValues.city_id)
-        //   : "",
-
-        // district: initialValues.district ?? "",
-        // pincode: initialValues.pincode ?? "",
-        address: initialValues.address ?? "",
-        // message: initialValues.message ?? "",
+  //       state_id: initialValues.state_id
+  //         ? String(initialValues.state_id)
+  //         : "",
+  //       store_id: initialValues.store_id ?? "",
+  //       address: initialValues.address ?? "",
 
 
-        jobcard_date: initialValues.jobcard_date
-          ? new Date(initialValues.jobcard_date).toISOString().slice(0, 10)
-          : "",
+  //       jobcard_date: initialValues.jobcard_date
+  //         ? new Date(initialValues.jobcard_date).toISOString().slice(0, 10)
+  //         : "",
 
-        /* ===== VEHICLE ===== */
-        vehicle_type: initialValues.vehicle_type ?? "",
-        vehicle_company_id: initialValues.vehicle_company_id ?? "",
-        vehicle_model_id: initialValues.vehicle_model_id ?? "",
-        color: initialValues.color ?? "",
+  //       /* ===== VEHICLE ===== */
+  //       vehicle_type: initialValues.vehicle_type ?? "",
+  //       vehicle_company_id: initialValues.vehicle_company_id ?? "",
+  //       vehicle_model_id: initialValues.vehicle_model_id ?? "",
+  //       color: initialValues.color ?? "",
 
-        year: initialValues.year ?? "",
-        reg_no: initialValues.reg_no ?? "",
-        chasis_no: initialValues.chasis_no ?? "",
-        vehicle_condition: initialValues.vehicle_condition ?? "",
+  //       year: initialValues.year ?? "",
+  //       reg_no: initialValues.reg_no ?? "",
+  //       chasis_no: initialValues.chasis_no ?? "",
+  //       vehicle_condition: initialValues.vehicle_condition ?? "",
 
-        service_ids: initialValues.service_ids ?? [],
-        // service_amount: initialValues.service_amount ?? "",
+  //       service_ids: initialValues.service_ids ?? [],
+  //       // service_amount: initialValues.service_amount ?? "",
 
-        remarks: initialValues.remarks ?? "",
+  //       remarks: initialValues.remarks ?? "",
 
-        /* ===== VEHICLE CONDITION ===== */
-        isRepainted: Boolean(initialValues.isRepainted),
-        isSingleStagePaint: Boolean(initialValues.isSingleStagePaint),
-        isPaintThickness: Boolean(initialValues.isPaintThickness),
-        isVehicleOlder: Boolean(initialValues.isVehicleOlder),
+  //       /* ===== VEHICLE CONDITION ===== */
+  //       isRepainted: Boolean(initialValues.isRepainted),
+  //       isSingleStagePaint: Boolean(initialValues.isSingleStagePaint),
+  //       isPaintThickness: Boolean(initialValues.isPaintThickness),
+  //       isVehicleOlder: Boolean(initialValues.isVehicleOlder),
 
-        /* ===== GST ===== */
-        service_type: initialValues.service_type ?? [],
-      });
-    }
-  }, [mode, initialValues, form]);
+  //       /* ===== GST ===== */
+  //       service_type: initialValues.service_type ?? [],
+  //     });
+  //   }
+  // }, [mode, initialValues, form]);
 
   const isAdmin =
     user?.role === "admin" || user?.role === "super-admin";
@@ -585,7 +643,7 @@ export default function JobForm() {
         store_id: !isAdmin ? user?.store_id : values.store_id,
         consumer_id: values.consumer_id ?? customerId,
         "vehicle_type": values.vehicle_type,
-        "service_ids": values.service_ids,
+        "service_ids": values.service_ids.map(_id=> Number(_id)),
         "vehicle_company_id": values.vehicle_company_id,
         "vehicle_model_id": values.vehicle_model_id,
         "color": values.color,
@@ -646,6 +704,9 @@ export default function JobForm() {
     setCustomerFound(null);
     form.setValue("consumer_id", undefined);
   }, [searchMobile]);
+  useEffect(()=>{
+    
+  })
   useEffect(() => {
     if (!searchMobile || searchMobile.length !== 10 || !(store_id || user?.store_id)) return;
 
@@ -812,7 +873,7 @@ export default function JobForm() {
                         control={form.control}
                       />
 
-                      {(isLookingUp || customerFound !== null) && <div className="text-sm h-[38px] flex items-center">
+                      {(isLookingUp || customerFound !== null) && !isView &&  <div className="text-sm h-[38px] flex items-center">
                         {isLookingUp && (
                           <span className="text-muted-foreground flex items-center gap-2">
                             <Loader2 className="animate-spin h-4 w-4" />
