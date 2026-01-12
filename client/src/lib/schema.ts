@@ -765,78 +765,187 @@ export const TerritoryMasterSchema = z.object({
     .min(1, "Please select at least one city"),
 
 });
-export const JobCardOnlySchema = z
-  .object({
+export const JobCardOnlySchema = z.object({
+  consumer_id: z.string().optional(),
 
-    consumer_id: z.string().optional(),
-    service_type: z.array(z.string()).min(1, "Select at least one service type"),
-    vehicle_company_id: z.string().min(1),
-    vehicle_model_id: z.string().min(1),
-    color: z.string().min(1),
-    year: z.string().min(1),
-    reg_no: z.string().min(1),
+  service_type: z
+    .array(z.string())
+    .min(1, "Please select at least one service type"),
 
-    chasis_no: z.string().optional(),
-    vehicle_condition: z.string().min(1),
+  vehicle_company_id: z
+    .string()
+    .min(1, "Please select vehicle make"),
 
-    store_id: z.string().optional(), // 🔑 optional, enforced below
+  vehicle_model_id: z
+    .string()
+    .min(1, "Please select vehicle model"),
 
-    remarks: z.string().optional(),
+  color: z
+    .string()
+    .min(1, "Vehicle color is required"),
 
-    isRepainted: z.boolean().optional(),
+  year: z
+    .string()
+    .min(1, "Vehicle manufacturing year is required"),
 
-    isSingleStagePaint: z.boolean().optional(),
-    isPaintThickness: z.boolean().optional(),
-    isVehicleOlder: z.boolean().optional(),
+  reg_no: z
+    .string()
+    .min(1, "Registration number is required"),
 
-    vehicle_type: z.string().min(1),
-    service_ids: z.array(z.string()).min(1, "Select at least one service"),
-    jobcard_date: z.string().min(1, "Service date required"),
-  })
+  chasis_no: z.string().optional(),
+
+  vehicle_condition: z
+    .string()
+    .min(1, "Please select vehicle condition"),
+
+  store_id: z.string().optional(),
+
+  remarks: z.string().optional(),
+
+  isRepainted: z.boolean().optional(),
+  isSingleStagePaint: z.boolean().optional(),
+  isPaintThickness: z.boolean().optional(),
+  isVehicleOlder: z.boolean().optional(),
+
+  vehicle_type: z
+    .string()
+    .min(1, "Please select vehicle type"),
+
+  service_ids: z
+    .array(z.string())
+    .min(1, "Please select at least one service"),
+
+  jobcard_date: z
+    .string()
+    .min(1, "Service date is required"),
+});
+// export const JobCardOnlySchema = z
+//   .object({
+
+//     consumer_id: z.string().optional(),
+//     service_type: z.array(z.string()).min(1, "Select at least one service type"),
+//     vehicle_company_id: z.string().min(1),
+//     vehicle_model_id: z.string().min(1),
+//     color: z.string().min(1),
+//     year: z.string().min(1),
+//     reg_no: z.string().min(1),
+
+//     chasis_no: z.string().optional(),
+//     vehicle_condition: z.string().min(1),
+
+//     store_id: z.string().optional(), // 🔑 optional, enforced below
+
+//     remarks: z.string().optional(),
+
+//     isRepainted: z.boolean().optional(),
+
+//     isSingleStagePaint: z.boolean().optional(),
+//     isPaintThickness: z.boolean().optional(),
+//     isVehicleOlder: z.boolean().optional(),
+
+//     vehicle_type: z.string().min(1),
+//     service_ids: z.array(z.string()).min(1, "Select at least one service"),
+//     jobcard_date: z.string().min(1, "Service date required"),
+//   })
  
 export const NewJobCardSchema = z
   .object({
     role: z.string().optional(),
 
-    name: z.string().min(1, "Name required"),
-    phone: z.string().min(10, "Mobile number required"),
-    email: z.string().email("Invalid email"),
+    name: z
+      .string()
+       .min(3, "Customer name must be at least 3 characters").
+    max(50, "Customer name must be at most 50 characters"),
+
+    phone: z
+      .string()
+      .regex(/^\d{10}$/, "Enter a valid 10-digit mobile number"),
+
+    email: z
+  .string()
+    .min(1, "Email is required")
+    .trim()
+    .email("Please enter a valid email address"),
     consumer_id: z.string().optional(),
 
-    service_type: z.array(z.string()).min(1, "Select at least one service type"),
-    country_id: z.string().min(1, "Please select country"),
-    type: z.enum(["individual", "company"]),
-    state_id: z.string().min(1, "Please select state"),
+    search_mobile: z
+      .string()
+      .regex(/^\d{10}$/, "Enter a valid 10-digit mobile number"),
 
-    company_country_id: z.string(),
-    company_state_id: z.string(),
-    company_contact_no: z.string(),
-    company_gstin: z.string(),
-    address: z.string().min(1),
+    service_type: z
+      .array(z.string())
+      .min(1, "Please select at least one service type"),
 
-    vehicle_company_id: z.string().min(1),
-    vehicle_model_id: z.string().min(1),
-    color: z.string().min(1),
-    year: z.string().min(1),
-    reg_no: z.string().min(1),
+    country_id: z
+      .string()
+      .min(1, "Please select country"),
+
+    state_id: z
+      .string()
+      .min(1, "Please select state"),
+
+    type: z.enum(["individual", "company"], {
+      errorMap: () => ({ message: "Please select billing type" }),
+    }),
+
+    address: z
+      .string()
+     .min(10, "Address must be at least 10 characters")
+      .max(300, "Address must not exceed 300 characters"),
+
+    /* ===== COMPANY FIELDS ===== */
+    company_country_id: z.string().optional(),
+    company_state_id: z.string().optional(),
+    company_contact_no: z.string().optional(),
+    company_gstin: z.string().optional(),
+
+    /* ===== VEHICLE ===== */
+    vehicle_company_id: z
+      .string()
+      .min(1, "Please select vehicle make"),
+
+    vehicle_model_id: z
+      .string()
+      .min(1, "Please select vehicle model"),
+
+    color: z
+      .string()
+      .min(1, "Vehicle color is required"),
+
+    year: z
+      .string()
+      .min(1, "Vehicle manufacturing year is required"),
+
+    reg_no: z
+      .string()
+      .min(1, "Registration number is required"),
 
     chasis_no: z.string().optional(),
-    vehicle_condition: z.string().min(1),
 
-    store_id: z.string().optional(), // 🔑 optional, enforced below
+    vehicle_condition: z
+      .string()
+      .min(1, "Please select vehicle condition"),
+
+    store_id: z.string().optional(),
 
     remarks: z.string().optional(),
 
     isRepainted: z.boolean().optional(),
-    search_mobile: z.string().min(10, "Mobile number required"),
-
     isSingleStagePaint: z.boolean().optional(),
     isPaintThickness: z.boolean().optional(),
     isVehicleOlder: z.boolean().optional(),
 
-    vehicle_type: z.string().min(1),
-    service_ids: z.array(z.string()).min(1, "Select at least one service"),
-    jobcard_date: z.string().min(1, "Service date required"),
+    vehicle_type: z
+      .string()
+      .min(1, "Please select vehicle type"),
+
+    service_ids: z
+      .array(z.string())
+      .min(1, "Please select at least one service"),
+
+    jobcard_date: z
+      .string()
+      .min(1, "Service date is required"),
   })
   .superRefine((data, ctx) => {
     if (
@@ -853,7 +962,8 @@ export const NewJobCardSchema = z
   export const NewCustomerSchema = z
   .object({
 
-    name: z.string().min(1, "Name required"),
+    name: z.string().min(3, "Name must be at least 3 characters").
+    max(50, "Name must be at most 50 characters"),
     phone: z.string().min(10, "Mobile number required"),
     email: z.string().email("Invalid email"),
     consumer_id: z.string().optional(),
@@ -864,7 +974,8 @@ export const NewJobCardSchema = z
     company_state_id: z.string(),
     company_contact_no: z.string(),
     company_gstin: z.string(),
-    address: z.string().min(1),
+    address: z.string().min(10, "Address must be at least 10 characters")
+      .max(300, "Address must not exceed 300 characters"),
     store_id: z.string().optional(), // 🔑 optional, enforced below
   })
  

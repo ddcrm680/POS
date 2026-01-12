@@ -121,7 +121,10 @@ export default function JobCard() {
       width: "180px",
       render: (_: any, row: any) => (
         <div className="flex flex-col" >
-          <span className="text-primary font-medium cursor-pointer hover:underline" onClick={() => navigate(`/customers/manage?id=${row.id}&mode=view`)
+          <span className="text-primary font-medium cursor-pointer hover:underline" onClick={() =>{
+              localStorage.setItem("sidebar_active_parent","customers")
+                 
+            navigate(`/customers/manage?id=${row.id}&mode=view`)}
           }
           >
             {row.consumer?.name ?? "-"}

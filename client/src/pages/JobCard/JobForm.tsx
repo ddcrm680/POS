@@ -447,14 +447,7 @@ export default function JobForm() {
     hydrate();
   }, [initialValues, countryList, mode]);
 
-  useEffect(() => {
-    if (mode !== "create" || !countryList.length) return;
 
-    const india = countryList.find(c => c.name === "India");
-    if (!india) return;
-
-    form.setValue("country_id", String(india.id));
-  }, [mode, countryList]);
   const onSubmit = (data: JobCardFormUnion) => {
   };
   const [isJobCardSubmissionDeleteModalInfo, setIsJobCardSubmissionModalOpenInfo] = useState<{ open: boolean, info: any }>({
@@ -676,7 +669,7 @@ export default function JobForm() {
           form.setValue("name", "");
           form.setValue("email", "");
           form.setValue("address", "");
-          form.setValue("country_id", "");
+          form.setValue("country_id", "101");
           form.setValue("state_id", "");
           form.setValue(
             "type",
@@ -685,7 +678,7 @@ export default function JobForm() {
 
           form.setValue("company_gstin", "");
           form.setValue("company_contact_no", "");
-          form.setValue("company_country_id", "");
+          form.setValue("company_country_id", "101");
           form.setValue("company_state_id", "");
 
           form.setValue("consumer_id", undefined);
