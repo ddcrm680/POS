@@ -101,23 +101,7 @@ export default function JobCard() {
     /* ================= CUSTOMER ================= */
     {
       key: "consumer",
-      label: (
-        <ColumnFilter
-          label="Customer"
-          value={filters.consumer_id}
-          onChange={(val) => {
-            setFilters(f => ({ ...f, consumer_id: val }));
-            setPage(1);
-          }}
-          options={[
-            { label: "All", value: "" },
-            ...jobCards.map(j => ({
-              label: j.consumer?.name,
-              value: String(j.consumer?.id),
-            })),
-          ]}
-        />
-      ),
+      label:"Customer" ,
       width: "180px",
       render: (_: any, row: any) => (
         <div className="flex flex-col" >
@@ -288,6 +272,7 @@ export default function JobCard() {
                       <IconButton
                         size="xs"
                         mr={2}
+                        disabled
                         aria-label="Print"
                         onClick={() => { }
                         }
