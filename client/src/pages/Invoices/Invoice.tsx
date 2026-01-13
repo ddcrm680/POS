@@ -330,7 +330,7 @@ export default function Invoice() {
                                                 mr={2}
                                                 aria-label="Edit"
                                                 onClick={() => {
-                                                    navigate(`/invoice/manage/update?id=${row.id}&mode=edit`)
+                                                    navigate(`/invoice/manage?id=${row.id}&mode=edit`)
 
                                                 }
                                                 }

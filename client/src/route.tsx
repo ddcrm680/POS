@@ -36,7 +36,6 @@ import InvoiceForm from "./pages/Invoices/InvoiceForm";
 import Notification from "./pages/Notification/Noitification";
 import JobForm from "./pages/JobCard/JobForm";
 import CustomerForm from "./pages/Customer/CustomerForm";
-import InvoiceEditForm from "./pages/Invoices/InvoiceEditForm";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -65,7 +64,6 @@ export function Router() {
       />} />
       <Route path="/invoice/manage" component={() => <ProtectedRoute component={InvoiceForm} />} />
  
-      <Route path="/invoice/manage/update" component={() => <ProtectedRoute component={InvoiceEditForm} />} />
  
       {/* <Route path="/master/stores" component={() => <ProtectedRoute component={Store} 
       />} /> */}
