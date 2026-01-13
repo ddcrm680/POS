@@ -47,7 +47,7 @@ import { Loader } from "@/components/common/loader";
 import { useToast } from "@/hooks/use-toast";
 
 
-export default function InvoiceForm() {
+export default function InvoiceEditForm() {
   const [plans, setPlans] = useState<any[]>([]);
   const [invoiceView, setInvoiceView] = useState<any | null>(null);
   const form = useForm({
@@ -224,19 +224,11 @@ export default function InvoiceForm() {
     const loadInvoice = async () => {
       setIsInfoLoading(true);
       try {
-        console.log(jobCardId, id, 'jobCardId');
-
-        const res = jobCardId
-          ? await getInvoiceInfoByJobCardPrefill({ id: jobCardId })
-          : await getInvoiceInfo(mode === "edit" ? `${id}/edit` : id);
-        if (mode == 'view')
-          setInvoiceNumber(res?.data?.invoice_number)
-        else if (mode === 'edit')
+        const res =  await getInvoiceInfo(`${id}/edit`);
+      
           setInvoiceNumber(res?.data?.invoice_data?.invoice_number)
         // 👇 normalize ONLY when jobCardId is NOT present
-        const normalizedData = jobCardId
-          ? res.data
-          : mode === "edit" ? res.data : normalizeInvoiceToCreateResponse(res.data);
+        const normalizedData = res.data
         console.log(normalizedData, 'normalizedData');
 
         setAvailablePlans(normalizedData?.availableServices ?? [])
@@ -363,7 +355,7 @@ export default function InvoiceForm() {
     try {
       const payload = {
         ...buildInvoicePayload(values),
-        url: mode !== "edit" && jobCardId ? `job-cards/${jobCardId}/invoice` : `invoices/${id}/update`
+        url: mode !== "edit" && jobCardId ? `job-cards/${id}/invoice` : `invoices/${id}/update`
       };
       console.log("FINAL PAYLOAD 👉", payload);
 
@@ -775,153 +767,250 @@ export default function InvoiceForm() {
 }
 
 // {
-//         "id": 6,
-//         "job_card_id": 22,
-//         "store_id": 4,
-//         "consumer_id": 7,
-//         "invoice_prefix": "CD",
-//         "invoice_series": "25-26",
-//         "invoice_no": 5,
-//         "invoice_date": "2026-01-12T18:30:00.000000Z",
-//         "billing_type": "company",
-//         "billing_name": "Rahul Sharma",
-//         "billing_phone": "9311841370",
-//         "billing_email": "accounts@abctech.com",
-//         "billing_address": "testing the flow",
-//         "billing_country_id": null,
-//         "billing_state_id": 22,
-//         "billing_gstin": "29ABCDE1234F1Z5",
-//         "gst_type": "igst",
-//         "subtotal": "4024.00",
-//         "cgst_total": "0.00",
-//         "sgst_total": "0.00",
-//         "igst_total": "881.56",
-//         "tax_total": "881.56",
-//         "grand_total": "4905.56",
-//         "status": "issued",
-//         "created_by": 1,
-//         "updated_by": null,
-//         "created_at": "2026-01-13T09:53:00.000000Z",
-//         "updated_at": "2026-01-13T09:53:00.000000Z",
-//         "invoice_number": "CD\/25-26\/000005",
-//         "consumer": {
-//             "id": 7,
+//     "success": true,
+//     "code": 200,
+//     "mode": "edit",
+//     "data": {
+//         "invoice_data": {
+//             "job_card_id": 24,
 //             "store_id": 4,
-//             "name": "ABC Technologies Pvt Ltd",
-//             "phone": "9123456789",
-//             "email": "accounts@abctech.com",
-//             "type": "company",
-//             "country_id": 101,
-//             "state_id": 4037,
-//             "address": "Whitefield, Bangalore",
-//             "company_country_id": 101,
-//             "company_state_id": 22,
-//             "company_contact_no": "08045678901",
-//             "company_gstin": "29ABCDE1234F1Z5",
-//             "is_active": true,
+//             "consumer_id": 7,
+//             "invoice_prefix": "CD",
+//             "invoice_series": "25-26",
+//             "invoice_no": 4,
+//             "invoice_date": "2026-01-12T18:30:00.000000Z",
+//             "billing_type": "individual",
+//             "billing_name": "ABC Technologies Pvt Ltd",
+//             "billing_phone": "9123456789",
+//             "billing_email": "accounts@abctech.com",
+//             "billing_address": "Whitefield, Bangalore",
+//             "billing_country_id": null,
+//             "billing_state_id": 4037,
+//             "billing_gstin": null,
+//             "gst_type": "igst",
+//             "subtotal": "4000.00",
+//             "cgst_total": "0.00",
+//             "sgst_total": "0.00",
+//             "igst_total": "880.00",
+//             "tax_total": "880.00",
+//             "grand_total": "4880.00",
+//             "status": "issued",
 //             "created_by": 1,
-//             "updated_by": 1,
-//             "created_at": "2026-01-09T09:15:21.000000Z",
-//             "updated_at": "2026-01-13T05:26:57.000000Z"
+//             "updated_by": null
 //         },
 //         "job_card": {
-//             "id": 22,
-//             "job_card_number": "100021",
+//             "id": 24,
+//             "job_card_number": "100023",
 //             "store_id": 4,
 //             "consumer_id": 7,
 //             "jobcard_date": "2026-01-08T18:30:00.000000Z",
-//             "vehicle_type": "Car",
+//             "vehicle_type": "Sedan",
 //             "service_ids": [
-//                 1,
-//                 3,
-//                 5
+//                 1
 //             ],
-//             "vehicle_company_id": 2,
-//             "vehicle_model_id": 8,
-//             "color": "White",
-//             "year": 2022,
-//             "reg_no": "MH12AB1234",
-//             "chasis_no": "CHS889977",
-//             "vehicle_condition": "fair-condition",
+//             "vehicle_company_id": 11,
+//             "vehicle_model_id": 29,
+//             "color": "black",
+//             "year": 2024,
+//             "reg_no": "wqdqwe12",
+//             "chasis_no": null,
+//             "vehicle_condition": "good-condition",
 //             "isRepainted": true,
 //             "isSingleStagePaint": false,
-//             "isPaintThickness": true,
+//             "isPaintThickness": false,
 //             "isVehicleOlder": false,
-//             "technician_id": 7,
-//             "remarks": "Customer wants quick delivery",
+//             "technician_id": null,
+//             "remarks": null,
 //             "status": "invoiced",
 //             "created_by": 1,
 //             "updated_by": null,
-//             "created_at": "2026-01-12T08:46:50.000000Z",
-//             "updated_at": "2026-01-13T09:53:00.000000Z"
+//             "created_at": "2026-01-13T05:26:57.000000Z",
+//             "updated_at": "2026-01-13T08:52:53.000000Z"
 //         },
-//         "items": [
+//         "opted_services": [
 //             {
-//                 "id": 21,
-//                 "job_card_invoice_id": 6,
-//                 "item_type": "service_plan",
-//                 "reference_id": 1,
-//                 "item_name": "Full Body Coating",
-//                 "description": null,
+//                 "id": 1,
+//                 "category_type": "Interior Care",
+//                 "category": null,
+//                 "vehicle_type": "Sedan",
+//                 "plan_name": "Full Body Coating",
+//                 "invoice_name": "Service plansa",
+//                 "number_of_visits": 1,
+//                 "price": "4000.00",
+//                 "gst": "22.00",
+//                 "is_tax_inclusive": false,
 //                 "sac": "12112",
+//                 "description": "Ceramic coating of bonnet of the car",
+//                 "warranty_period": 1,
+//                 "warranty_in": "months",
+//                 "raw_materials": [
+//                     "test1",
+//                     "test2"
+//                 ],
+//                 "status": true,
+//                 "created_by": 1,
+//                 "updated_by": 1,
+//                 "created_at": "2025-12-19T10:00:44.000000Z",
+//                 "updated_at": "2025-12-19T11:06:50.000000Z",
 //                 "qty": "1.00",
-//                 "unit_price": "4000.00",
-//                 "subtotal": "4000.00",
-//                 "cgst_percent": "0.00",
-//                 "cgst_amount": "0.00",
-//                 "sgst_percent": "0.00",
-//                 "sgst_amount": "0.00",
-//                 "igst_percent": "22.00",
-//                 "igst_amount": "880.00",
+//                 "tax": 0,
 //                 "total": "4880.00",
-//                 "created_at": "2026-01-13T09:53:00.000000Z",
-//                 "updated_at": "2026-01-13T09:53:00.000000Z"
-//             },
-//             {
-//                 "id": 22,
-//                 "job_card_invoice_id": 6,
-//                 "item_type": "service_plan",
-//                 "reference_id": 3,
-//                 "item_name": "Full Body Coating",
-//                 "description": null,
-//                 "sac": null,
-//                 "qty": "1.00",
-//                 "unit_price": "12.00",
-//                 "subtotal": "12.00",
-//                 "cgst_percent": "0.00",
-//                 "cgst_amount": "0.00",
-//                 "sgst_percent": "0.00",
-//                 "sgst_amount": "0.00",
-//                 "igst_percent": "12.00",
-//                 "igst_amount": "1.44",
-//                 "total": "13.44",
-//                 "created_at": "2026-01-13T09:53:00.000000Z",
-//                 "updated_at": "2026-01-13T09:53:00.000000Z"
-//             },
-//             {
-//                 "id": 23,
-//                 "job_card_invoice_id": 6,
-//                 "item_type": "service_plan",
-//                 "reference_id": 5,
-//                 "item_name": "Full Body Coating",
-//                 "description": null,
-//                 "sac": null,
-//                 "qty": "1.00",
-//                 "unit_price": "12.00",
-//                 "subtotal": "12.00",
-//                 "cgst_percent": "0.00",
-//                 "cgst_amount": "0.00",
-//                 "sgst_percent": "0.00",
-//                 "sgst_amount": "0.00",
-//                 "igst_percent": "1.00",
-//                 "igst_amount": "0.12",
-//                 "total": "12.12",
-//                 "created_at": "2026-01-13T09:53:00.000000Z",
-//                 "updated_at": "2026-01-13T09:53:00.000000Z"
+//                 "invoice_item_id": 20
 //             }
 //         ],
-//         "store": {
-//             "id": 4,
-//             "name": "test 44"
+//         "availableServices": [
+//             {
+//                 "id": 4,
+//                 "category_type": "Interior Care",
+//                 "category": null,
+//                 "vehicle_type": "Sedan",
+//                 "plan_name": "Bonnet Coating",
+//                 "invoice_name": "q3245t",
+//                 "number_of_visits": 1,
+//                 "price": "121.00",
+//                 "gst": "12.00",
+//                 "is_tax_inclusive": false,
+//                 "sac": null,
+//                 "description": null,
+//                 "warranty_period": 2,
+//                 "warranty_in": "years",
+//                 "raw_materials": [],
+//                 "status": true,
+//                 "created_by": 1,
+//                 "updated_by": null,
+//                 "created_at": "2025-12-19T11:38:51.000000Z",
+//                 "updated_at": "2025-12-19T11:38:51.000000Z"
+//             },
+//             {
+//                 "id": 1,
+//                 "category_type": "Interior Care",
+//                 "category": null,
+//                 "vehicle_type": "Sedan",
+//                 "plan_name": "Full Body Coating",
+//                 "invoice_name": "Service plansa",
+//                 "number_of_visits": 1,
+//                 "price": "4000.00",
+//                 "gst": "22.00",
+//                 "is_tax_inclusive": false,
+//                 "sac": "12112",
+//                 "description": "Ceramic coating of bonnet of the car",
+//                 "warranty_period": 1,
+//                 "warranty_in": "months",
+//                 "raw_materials": [
+//                     "test1",
+//                     "test2"
+//                 ],
+//                 "status": true,
+//                 "created_by": 1,
+//                 "updated_by": 1,
+//                 "created_at": "2025-12-19T10:00:44.000000Z",
+//                 "updated_at": "2025-12-19T11:06:50.000000Z"
+//             },
+//             {
+//                 "id": 3,
+//                 "category_type": "Interior Care",
+//                 "category": null,
+//                 "vehicle_type": "Sedan",
+//                 "plan_name": "Full Body Coating",
+//                 "invoice_name": "q3245t",
+//                 "number_of_visits": 1,
+//                 "price": "12.00",
+//                 "gst": "12.00",
+//                 "is_tax_inclusive": false,
+//                 "sac": null,
+//                 "description": "12",
+//                 "warranty_period": 2,
+//                 "warranty_in": "months",
+//                 "raw_materials": [],
+//                 "status": true,
+//                 "created_by": 1,
+//                 "updated_by": null,
+//                 "created_at": "2025-12-19T11:38:19.000000Z",
+//                 "updated_at": "2025-12-19T11:38:19.000000Z"
+//             },
+//             {
+//                 "id": 5,
+//                 "category_type": "Interior Care",
+//                 "category": null,
+//                 "vehicle_type": "Sedan",
+//                 "plan_name": "Full Body Coating",
+//                 "invoice_name": "121",
+//                 "number_of_visits": 1,
+//                 "price": "12.00",
+//                 "gst": "1.00",
+//                 "is_tax_inclusive": false,
+//                 "sac": null,
+//                 "description": null,
+//                 "warranty_period": 1,
+//                 "warranty_in": "months",
+//                 "raw_materials": [],
+//                 "status": true,
+//                 "created_by": 1,
+//                 "updated_by": null,
+//                 "created_at": "2025-12-19T11:39:13.000000Z",
+//                 "updated_at": "2025-12-19T11:39:13.000000Z"
+//             },
+//             {
+//                 "id": 9,
+//                 "category_type": "Interior Care",
+//                 "category": null,
+//                 "vehicle_type": "Sedan",
+//                 "plan_name": "Full Body Coating",
+//                 "invoice_name": "Service plan",
+//                 "number_of_visits": 2,
+//                 "price": "12.00",
+//                 "gst": "12.00",
+//                 "is_tax_inclusive": false,
+//                 "sac": null,
+//                 "description": null,
+//                 "warranty_period": 1,
+//                 "warranty_in": "months",
+//                 "raw_materials": [],
+//                 "status": true,
+//                 "created_by": 1,
+//                 "updated_by": 1,
+//                 "created_at": "2025-12-19T11:41:30.000000Z",
+//                 "updated_at": "2025-12-19T12:30:58.000000Z"
+//             },
+//             {
+//                 "id": 11,
+//                 "category_type": "Interior Care",
+//                 "category": null,
+//                 "vehicle_type": "Sedan",
+//                 "plan_name": "Full Body Coating",
+//                 "invoice_name": "Service planqw",
+//                 "number_of_visits": 1,
+//                 "price": "12.00",
+//                 "gst": "12.00",
+//                 "is_tax_inclusive": false,
+//                 "sac": null,
+//                 "description": null,
+//                 "warranty_period": 2,
+//                 "warranty_in": "months",
+//                 "raw_materials": [],
+//                 "status": true,
+//                 "created_by": 1,
+//                 "updated_by": 1,
+//                 "created_at": "2025-12-19T11:42:08.000000Z",
+//                 "updated_at": "2025-12-22T12:18:38.000000Z"
+//             }
+//         ],
+//         "billing_prefill": {
+//             "individual": {
+//                 "name": "ABC Technologies Pvt Ltd",
+//                 "phone": "9123456789",
+//                 "email": "accounts@abctech.com",
+//                 "address": "Whitefield, Bangalore",
+//                 "state_id": 4037
+//             },
+//             "company": {
+//                 "name": null,
+//                 "phone": "08045678901",
+//                 "email": "accounts@abctech.com",
+//                 "address": null,
+//                 "state_id": 22,
+//                 "gstin": "29ABCDE1234F1Z5"
+//             }
 //         }
 //     }
+// }

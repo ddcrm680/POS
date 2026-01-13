@@ -34,7 +34,7 @@ export function FloatingField({
   const [inputType, setInputType] = useState(type)
 
   const disabled = isView || isDisabled
-  const isMobileField = name === "search_mobile" || name === "phone" || name === "billing_phone";
+  const isMobileField = name === "search_mobile" || name === "phone" || name === "billing_phone" || name=="company_contact_no";
   return (
     <Controller
 

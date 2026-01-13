@@ -1134,11 +1134,11 @@ export async function getJobCardPrefillData(data:any) {
 }
 export async function createInvoice(data:any) {
   try {
-    const {id, ...rest} = data;
+    const {url, ...rest} = data;
     console.log(data,'datadata');
     
     const response: any = await api.post(
-      `/api/job-cards/${id}/invoice`,
+      `/api/${url}`,
       rest
     );
 

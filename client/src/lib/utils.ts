@@ -427,3 +427,58 @@ export function normalizeInvoiceToCreateResponse(api: any) {
     },
   };
 }
+export function normalizeInvoiceToEditResponse(api: any) {
+  if (!api) return api;
+
+  
+const job=api.job_card
+  // 🔹 INVOICE VIEW → CREATE PREFILL FORMAT
+  return {
+   customer: {
+      bill_to:"",
+      name:"",
+      phone: "",
+      email: "",
+      address: "",
+      gst: "",
+      type: "",
+      billingAddress: "",
+    },
+
+    vehicle: {
+      type: job.vehicle_type,
+      make: (job?.vmake?.name), // replace with lookup if available
+      model: (job?.vmodel?.name),  // replace with lookup if available
+      reg_no: job.reg_no,
+      make_year: String(job.year),
+      color: job.color,
+      chassisNo: job.chasis_no,
+      remark: job.remarks ?? "",
+    },
+
+    jobcard: {
+      jobcard_date: formatDate2(job.jobcard_date),
+      edited_date: new Date(job.updated_at).toLocaleString(),
+    },
+
+    plans: api.opted_services,
+    billing_prefill: {
+        name: api?.invoice_data?.billing_name,
+        phone: api?.invoice_data?.billing_phone ?? null,
+        email:api?.invoice_data?.billing_email,//
+        address: api?.invoice_data?.billing_address,//
+        state_id: api?.invoice_data?.billing_state_id ?? null,
+      },
+    billing_prefillCompany: {
+        name:  api?.invoice_data?.billing_name ,
+        phone: api?.invoice_data?.billing_phone ?? null,
+        email: api?.invoice_data?.billing_email,//
+        address: api?.invoice_data?.billing_address,//
+        state_id: api?.invoice_data?.billing_state_id ?? null,
+        gstin: api?.invoice_data?.billing_gstin ?? null,
+      },
+    store: job.store,
+
+  
+  };
+}
