@@ -229,11 +229,11 @@ export default function InvoiceEditForm() {
           setInvoiceNumber(res?.data?.invoice_data?.invoice_number)
         // 👇 normalize ONLY when jobCardId is NOT present
         const normalizedData = res.data
-        console.log(normalizedData, 'normalizedData');
-
+      
         setAvailablePlans(normalizedData?.availableServices ?? [])
         // 👇 existing mapper stays SAME
-        const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
+        const mapped = normalizeInvoiceToEditResponse(normalizedData);
+  console.log(mapped, 'normalizedData');
 
         setInvoiceView(mapped);
 

@@ -144,7 +144,7 @@ export default function Invoice() {
             key: "status",
             label: (
                 <ColumnFilter
-                    label="Payment Status"
+                    label="Status"
                     value={filters.status}
                     onChange={(val) => {
                         setFilters(f => ({ ...f, status: val }));
@@ -330,7 +330,7 @@ export default function Invoice() {
                                                 mr={2}
                                                 aria-label="Edit"
                                                 onClick={() => {
-                                                    navigate(`/invoice/manage?id=${row.id}&mode=edit`)
+                                                    navigate(`/invoice/manage/update?id=${row.id}&mode=edit`)
 
                                                 }
                                                 }

@@ -221,6 +221,7 @@ export default function JobForm() {
       setMeta(prev => ({ ...prev, vehicleModels: [] }));
       return;
     }
+    console.log(vehicleCompanyId, 'vehicleCompanyId');
 
     let cancelled = false;
 
@@ -431,15 +432,15 @@ export default function JobForm() {
       isHydratingJobRef.current = false;
 
       /* ===== VEHICLE MODELS ===== */
-      const models = await jobCardModelInfo(
-        String(initialValues.job_card.vehicle_company_id)
-      );
+      // const models = await jobCardModelInfo(
+      //   String(initialValues.job_card.vehicle_company_id)
+      // );
 
 
-      setMeta(prev => ({
-        ...prev,
-        vehicleModels: toSelectOptions(models),
-      }));
+      // setMeta(prev => ({
+      //   ...prev,
+      //   vehicleModels: toSelectOptions(models),
+      // }));
 
       form.setValue(
         "vehicle_model_id",

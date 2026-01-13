@@ -432,17 +432,18 @@ export function normalizeInvoiceToEditResponse(api: any) {
 
   
 const job=api.job_card
+console.log(api,'apiapi');
+
   // 🔹 INVOICE VIEW → CREATE PREFILL FORMAT
   return {
    customer: {
-      bill_to:"",
-      name:"",
-      phone: "",
-      email: "",
-      address: "",
-      gst: "",
-      type: "",
-      billingAddress: "",
+      bill_to:api.job_card.consumer.name,
+      name:api.job_card.consumer.name,
+      phone: api.job_card.consumer.phone,
+      email: api.job_card.consumer.email,
+      address: api.job_card.consumer.address,
+      gst: api.job_card.consumer.gst,
+      type: api.job_card.consumer.type,
     },
 
     vehicle: {
