@@ -31,10 +31,10 @@ export function formatTime(dateString: string) {
 
   return `${timePart}`;
 }
-export const findIdByName = (list: any[], name?: string) =>{
-console.log(name,'namenamename');
+export const findIdByName = (list: any[], name?: string) => {
+  console.log(name, 'namenamename');
 
-   return list.find(item => item.id === Number(name))?.id ?? "";
+  return list.find(item => item.id === Number(name))?.id ?? "";
 }
 export const findIdsByNames = (list: any[], names: string[]) => {
   return list
@@ -57,7 +57,7 @@ export function formatAndTruncate(
       isTruncated: false,
     };
   }
-  
+
 
   const fullText = value
     .map((item) =>
@@ -236,8 +236,8 @@ export function stripDiffMeta(meta: any) {
   const { before, after, ...rest } = meta;
   return Object.keys(rest).length ? rest : null;
 }
-export function isChildActive(path: string, location: string,id:string,sidebarContext?: string | null,) {
-  
+export function isChildActive(path: string, location: string, id: string, sidebarContext?: string | null,) {
+
   return ((location === path || location.startsWith(path + "/") || location.includes(path)) && sidebarContext == id);
 }
 
@@ -247,7 +247,7 @@ export function isParentActive(
   sidebarContext?: string | null
 ) {
   // 1️⃣ Context wins (explicit navigation intent)
-  
+
   if (sidebarContext && sidebarContext === tab.id) {
     return true;
   }
@@ -266,11 +266,17 @@ export function isParentActive(
 
   return false;
 }
-export function getActiveChild(tab: any, location: string,id:string,sidebarContext?: string | null) {
+export function getActiveChild(tab: any, location: string, id: string, sidebarContext?: string | null) {
   return tab.children?.find((c: any) =>
-    isChildActive(c.path, location,id,sidebarContext)
+    isChildActive(c.path, location, id, sidebarContext)
   );
 }
+export const formatDate2 = (date: string | Date) =>
+  new Date(date).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
 export function mapInvoiceApiToViewModel(api: any) {
   const job = api.job_card;
   const consumer = api.consumer;
@@ -283,13 +289,13 @@ export function mapInvoiceApiToViewModel(api: any) {
       email: consumer.email,
       address: consumer.address,
       gst: consumer.company_gstin ?? "",
-      type:consumer.type || 'individual',
+      type: consumer.type || 'individual',
     },
 
     vehicle: {
       type: job.vehicle_type,
-      make: String(job.vehicle_company_id), // replace with lookup if available
-      model: String(job.vehicle_model_id),  // replace with lookup if available
+      make: (job.vmake.name), // replace with lookup if available
+      model: (job.vmodel.name),  // replace with lookup if available
       reg_no: job.reg_no,
       make_year: String(job.year),
       color: job.color,
@@ -298,7 +304,7 @@ export function mapInvoiceApiToViewModel(api: any) {
     },
 
     jobcard: {
-      jobcard_date: new Date(job.jobcard_date).toLocaleDateString("en-GB"),
+      jobcard_date: new Date(job.jobcard_date).toLocaleDateString("en-GB",),
       edited_date: new Date(job.updated_at).toLocaleString(),
     },
 
@@ -324,24 +330,23 @@ export function mapInvoiceApiToViewModel(api: any) {
 export function mapInvoiceApiToPrefilledViewModel(api: any) {
   const job = api.job_card;
   const consumer = api.job_card.consumer;
-  const opted_services=api.opted_services || [];
-  const billing_prefill=api.billing_prefill || {};
+  const billing_prefill = api.billing_prefill || {};
   return {
     customer: {
-      bill_to: consumer.type==='individual' ? billing_prefill.individual.name : billing_prefill.company.name,
+      bill_to: consumer.type === 'individual' ? billing_prefill.individual.name : billing_prefill.company.name,
       name: billing_prefill.individual.name,
       phone: billing_prefill.individual.phone,
       email: billing_prefill.individual.email,
       address: billing_prefill.individual.address,
-      gst: billing_prefill.company.gstin     ?? "",
-      type:consumer.type || 'individual',
-      billingAddress: consumer.type==='individual' ? billing_prefill.individual.address : billing_prefill.company.address,
+      gst: billing_prefill.company.gstin ?? "",
+      type: consumer.type || 'individual',
+      billingAddress: consumer.type === 'individual' ? billing_prefill.individual.address : billing_prefill.company.address,
     },
 
     vehicle: {
       type: job.vehicle_type,
-      make: String(job.vehicle_company_id), // replace with lookup if available
-      model: String(job.vehicle_model_id),  // replace with lookup if available
+      make: (job?.vmake?.name), // replace with lookup if available
+      model: (job?.vmodel?.name),  // replace with lookup if available
       reg_no: job.reg_no,
       make_year: String(job.year),
       color: job.color,
@@ -350,52 +355,17 @@ export function mapInvoiceApiToPrefilledViewModel(api: any) {
     },
 
     jobcard: {
-      jobcard_date: new Date(job.jobcard_date).toLocaleDateString("en-GB"),
+      jobcard_date: formatDate2(job.jobcard_date),
       edited_date: new Date(job.updated_at).toLocaleString(),
     },
 
     plans: api.opted_services,
-    billing_prefill:billing_prefill.individual,
-    store:job.store
+    billing_prefill: billing_prefill.individual,
+    billing_prefillCompany: billing_prefill.company,
+    store: job.store
   };
 }
- 
-export function getGstType(storeStateId:any, billingStateId:any) {
-  if (!storeStateId || !billingStateId) return null;
-  return storeStateId === billingStateId ? "cgst_sgst" : "igst";
-}
- 
-export function calculateRow(item:any, gstType:any) {
-  const base = item.price * item.qty;
- 
-  if (!gstType) {
-    return { base, cgst: 0, sgst: 0, igst: 0, total: base };
-  }
- 
-  if (gstType === "cgst_sgst") {
-    const cgst = (base * (item.gst / 2)) / 100;
-    const sgst = cgst;
-    return { base, cgst, sgst, igst: 0, total: base + cgst + sgst };
-  }
- 
-  const igst = (base * item.gst) / 100;
-  return { base, cgst: 0, sgst: 0, igst, total: base + igst };
-}
- 
-export function calculateInvoiceTotals(items:any, gstType:any) {
-  return items.reduce(
-    (acc:any, item:any) => {
-      const r = calculateRow(item, gstType);
-      acc.subtotal += r.base;
-      acc.cgst += r.cgst;
-      acc.sgst += r.sgst;
-      acc.igst += r.igst;
-      acc.grandTotal += r.total;
-      return acc;
-    },
-    { subtotal: 0, cgst: 0, sgst: 0, igst: 0, grandTotal: 0 }
-  );
-}
+
 export function calculateInvoiceRow(plan: any, gstType: "igst" | "cgst_sgst" = "igst") {
   const qty = Number(plan.qty || 1);
   const price = Number(plan.price || 0);

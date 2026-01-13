@@ -847,25 +847,25 @@ export const JobCardOnlySchema = z.object({
 //     service_ids: z.array(z.string()).min(1, "Select at least one service"),
 //     jobcard_date: z.string().min(1, "Service date required"),
 //   })
- 
+
 export const NewJobCardSchema = z
   .object({
     role: z.string().optional(),
 
     name: z
       .string()
-       .min(3, "Customer name must be at least 3 characters").
-    max(50, "Customer name must be at most 50 characters"),
+      .min(3, "Customer name must be at least 3 characters").
+      max(50, "Customer name must be at most 50 characters"),
 
     phone: z
       .string()
       .regex(/^\d{10}$/, "Enter a valid 10-digit mobile number"),
 
     email: z
-  .string()
-    .min(1, "Email is required")
-    .trim()
-    .email("Please enter a valid email address"),
+      .string()
+      .min(1, "Email is required")
+      .trim()
+      .email("Please enter a valid email address"),
     consumer_id: z.string().optional(),
 
     search_mobile: z
@@ -890,7 +890,7 @@ export const NewJobCardSchema = z
 
     address: z
       .string()
-     .min(10, "Address must be at least 10 characters")
+      .min(10, "Address must be at least 10 characters")
       .max(300, "Address must not exceed 300 characters"),
 
     /* ===== COMPANY FIELDS ===== */
@@ -959,11 +959,11 @@ export const NewJobCardSchema = z
       });
     }
   });
-  export const NewCustomerSchema = z
+export const NewCustomerSchema = z
   .object({
 
     name: z.string().min(3, "Name must be at least 3 characters").
-    max(50, "Name must be at most 50 characters"),
+      max(50, "Name must be at most 50 characters"),
     phone: z.string().min(10, "Mobile number required"),
     email: z.string().email("Invalid email"),
     consumer_id: z.string().optional(),
@@ -978,7 +978,7 @@ export const NewJobCardSchema = z
       .max(300, "Address must not exceed 300 characters"),
     store_id: z.string().optional(), // 🔑 optional, enforced below
   })
- 
+
 export const invoicePaymentSchema = z
   .object({
     invoice_total: z.number(),
@@ -1008,6 +1008,57 @@ export const invoicePaymentSchema = z
       });
     }
   });
-export const invoiceSchema = z.object({
-  billing_address: z.string().min(1, "Billing address is required"),
-});
+  const GSTIN_REGEX =
+  /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/;
+export const invoiceSchema = z
+  .object({
+    billing_to: z.enum(["individual", "company"]),
+
+    billing_name: z
+      .string()
+      .min(3, "Name must be at least 3 characters")
+      .max(50, "Name must be at most 50 characters"),
+
+    billing_phone: z
+      .string()
+      .min(10, "Mobile number required"),
+
+    billing_email: z
+      .string()
+      .email("Invalid email"),
+
+    billing_gstin: z
+      .string()
+      .optional(),
+
+    billing_address: z
+      .string()
+      .min(10, "Billing address must be at least 10 characters")
+      .max(300, "Billing address must not exceed 300 characters"),
+
+    billing_state_id: z
+      .string()
+      .min(1, "Please select state"),
+  })
+  .superRefine((data, ctx) => {
+    if (data.billing_to !== "company") return;
+
+    // ❌ GSTIN missing
+    if (!data.billing_gstin || data.billing_gstin.trim() === "") {
+      ctx.addIssue({
+        path: ["billing_gstin"],
+        message: "Billing GSTIN is required",
+        code: z.ZodIssueCode.custom,
+      });
+      return;
+    }
+
+    // ❌ GSTIN invalid format
+    if (!GSTIN_REGEX.test(data.billing_gstin)) {
+      ctx.addIssue({
+        path: ["billing_gstin"],
+        message: "Invalid GSTIN format",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });

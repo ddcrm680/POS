@@ -28,7 +28,7 @@ import { unknown } from "zod";
 import { useAuth } from "@/lib/auth";
 import { createInvoice, fetchCityList, fetchStateList, getInvoiceInfo, getInvoiceInfoByJobCardPrefill, getJobCardItem } from "@/lib/api";
 import { Pencil, Trash2, X } from "lucide-react";
-import { calculateInvoiceRow, calculateInvoiceTotals, findIdByName, getGstType, mapInvoiceApiToPrefilledViewModel, mapInvoiceApiToViewModel } from "@/lib/utils";
+import { calculateInvoiceRow, mapInvoiceApiToPrefilledViewModel, mapInvoiceApiToViewModel } from "@/lib/utils";
 import { RequiredMark } from "@/components/common/RequiredMark";
 import { SectionCard } from "@/components/common/card";
 import { FloatingField } from "@/components/common/FloatingField";
@@ -50,7 +50,20 @@ import { useToast } from "@/hooks/use-toast";
 export default function InvoiceForm() {
   const [plans, setPlans] = useState<any[]>([]);
   const [invoiceView, setInvoiceView] = useState<any | null>(null);
+  const form = useForm({
+    resolver: zodResolver(invoiceSchema),
+    defaultValues: {
+      billing_to: "individual" as "individual" | "company",
 
+      billing_name: "",
+      billing_phone: "",
+      billing_email: "",
+
+      billing_address: "",
+      billing_state_id: "",
+    },
+  });
+  const billingTo = form.watch("billing_to");
   const [, navigate] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -65,19 +78,24 @@ export default function InvoiceForm() {
   }>({
     selectedPlanId: "", billingAddress: ""
   });
+  useEffect(() => {
+    if (!plans.length) return;
 
-  const [billingStateId, setBillingStateId] = useState(null);
-  const [extraDiscountPercent, setExtraDiscountPercent] = useState<string>("0");
+    const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
+
+    setPlans(prev =>
+      prev.map(plan => calculateInvoiceRow(plan, gstType))
+    );
+  }, [billingTo]);
   function buildInvoicePayload(values: any) {
     return {
-      billing_type: "individual",
+      billing_type: values.billing_to,
 
-      billing_name: invoiceView?.customer?.name ?? "",
-      billing_phone: invoiceView?.customer?.phone ?? "",
-      billing_email: invoiceView?.customer?.email ?? "",
-
+      billing_name: values.billing_name,
+      billing_phone: values.billing_phone,
+      billing_email: values.billing_email,
       billing_address: values.billing_address,
-      billing_state_id: billingStateId,
+      billing_state_id: Number(values.billing_state_id),
 
       items: plans.map(plan => ({
         service_plan_id: plan.id,
@@ -85,138 +103,82 @@ export default function InvoiceForm() {
       })),
     };
   }
-  const planColumns = useMemo(() => [
-    {
-      key: "plan_name",
-      label: "Plan Name",
-      width: "280px",
-    },
+  const planColumns = useMemo(() => {
+    const isCompany = billingTo === "company";
 
-    {
-      key: "sac",
-      label: "SAC",
-      width: "90px",
-      render: (v: string) => v ?? `-`,
-    },
-
-
-    {
-      key: "price",
-      label: "Price (₹)",
-      width: "120px",
-      render: (v: number) => `₹ ${v}`,
-    },
-
-    // {
-    //   key: "discount_percent",
-    //   label: "Dis.(%)",
-    //   render: (_: number, row: any) => (
-    //     <input
-    //       type="text"
-    //       inputMode="numeric"
-    //       pattern="[0-9]*"
-    //       value={row.discount_percent ?? ""}
-    //       onChange={(e) => {
-    //         let value = e.target.value.replace(/\D/g, "");
-
-    //         if (value === "") {
-    //           updatePlan(row.id, { discount_percent: "" });
-    //           return;
-    //         }
-
-    //         let num = Math.min(100, Math.max(0, Number(value)));
-
-    //         updatePlan(row.id, {
-    //           discount_percent: String(num),
-    //           discount_amount: "0", // 🔒 lock other input
-    //         });
-    //       }}
-    //       onBlur={() => {
-    //         if (!row.discount_percent) {
-    //           updatePlan(row.id, { discount_percent: "0" });
-    //         }
-    //       }}
-    //       className="w-16 border rounded px-1 py-0.5 text-xs text-right"
-    //     />
-    //   ),
-    // }
-    // , {
-    //   key: "discount_amount",
-    //   label: "Discount",
-    //   render: (_: number, row: any) => (
-    //     <input
-    //       type="text"
-    //       inputMode="numeric"
-    //       pattern="[0-9]*"
-    //       value={row.discount_amount ?? ""}
-    //       onChange={(e) => {
-    //         let value = e.target.value.replace(/\D/g, "");
-
-    //         updatePlan(row.id, {
-    //           discount_amount: value,
-    //           discount_percent: "0", // 🔒 lock percent
-    //         });
-    //       }}
-    //       onBlur={() => {
-    //         if (!row.discount_amount) {
-    //           updatePlan(row.id, { discount_amount: "0" });
-    //         }
-    //       }}
-    //       className="w-20 border rounded px-1 py-0.5 text-xs text-right"
-    //     />
-    //   ),
-    // },
-
-    {
-      key: "sub_amount",
-      label: "Sub Amount",
-      render: (v: number) => `₹ ${v ?? "-"}`
-    },
-
-    ...(billingStateId == invoiceView?.store.state_id ?
-      [{
-        key: "cgst_amount",
-        label: "CGST",
-        render: (_: any, row: any) => (
-          <span>
-            ₹ {row.cgst_amount}
-            <span className="text-green-600 text-xs">
-              ({row.cgst_amount}%)
-            </span>
-          </span>
-        )
+    return [
+      {
+        key: "plan_name",
+        label: "Plan Name",
+        width: "280px",
       },
       {
-        key: "sgst_amount",
-        label: "SGST",
-        render: (_: any, row: any) => (
-          <span>
-            ₹ {row.igst_amount}
-            <span className="text-green-600 text-xs">
-              ({row.sgst_amount}%)
-            </span>
-          </span>
-        )
-      }] : [{
-        key: "igst_amount",
-        label: "IGST",
-        render: (_: any, row: any) => (
-          <span>
-            ₹ {row.igst_amount}
-            <span className="text-green-600 text-xs pl-2">
-              ({row.igst_percent}%)
-            </span>
-          </span>
-        )
-      }]),
-    {
-      key: "total_amount",
-      label: "Amount",
-      render: (v: number) => `₹ ${v ?? "-"}`
-    }
+        key: "sac",
+        label: "SAC",
+        width: "90px",
+        render: (v: string) => v ?? "-",
+      },
+      {
+        key: "price",
+        label: "Price (₹)",
+        width: "120px",
+        render: (v: number) => `₹ ${v}`,
+      },
+      {
+        key: "sub_amount",
+        label: "Sub Amount",
+        render: (v: number) => `₹ ${v ?? "-"}`,
+      },
 
+      ...(isCompany
+        ? [
+          {
+            key: "cgst_amount",
+            label: "CGST",
+            render: (_: any, row: any) => (
+              <span>
+                ₹ {row.cgst_amount}
+                <span className="text-green-600 text-xs pl-2">
+                  ({row.cgst_percent}%)
+                </span>
+              </span>
+            ),
+          },
+          {
+            key: "sgst_amount",
+            label: "SGST",
+            render: (_: any, row: any) => (
+              <span>
+                ₹ {row.sgst_amount}
+                <span className="text-green-600 text-xs pl-2">
+                  ({row.sgst_percent}%)
+                </span>
+              </span>
+            ),
+          },
+        ]
+        : [
+          {
+            key: "igst_amount",
+            label: "IGST",
+            render: (_: any, row: any) => (
+              <span>
+                ₹ {row.igst_amount}
+                <span className="text-green-600 text-xs pl-2">
+                  ({row.igst_percent}%)
+                </span>
+              </span>
+            ),
+          },
+        ]),
 
-  ], []);
+      {
+        key: "total_amount",
+        label: "Amount",
+        render: (v: number) => `₹ ${v ?? "-"}`,
+      },
+    ];
+  }, [billingTo]);
   const costSummary = useMemo(() => {
     const totalItems = plans.reduce(
       (sum, p) => sum + Number(p.qty || 1),
@@ -253,6 +215,7 @@ export default function InvoiceForm() {
       grandTotal: Number((subTotal + cgstTotal + sgstTotal + igstTotal).toFixed(2)),
     };
   }, [plans]);
+
   useEffect(() => {
     // if (!id) return;
 
@@ -262,22 +225,58 @@ export default function InvoiceForm() {
         console.log(jobCardId, id, 'jobCardId');
 
         if (jobCardId) {
-          const res =
-            await getInvoiceInfoByJobCardPrefill({ id: jobCardId ?? "" });
+          const res = await getInvoiceInfoByJobCardPrefill({ id: jobCardId });
           const mapped = mapInvoiceApiToPrefilledViewModel(res.data);
-          console.log(mapped, 'mappedmapped');
 
           setInvoiceView(mapped);
-          const planCalculated = mapped.plans.map((item: any) =>
-            calculateInvoiceRow(item)
-          );
 
-          setPlans(planCalculated);
-          setBillingStateId(mapped.billing_prefill.state_id);
-          form.setValue(
-            "billing_address",
-            mapped.customer.billingAddress
+          const gstType = mapped.customer.type === "company" ? "cgst_sgst" : "igst";
+          const planCalculated = mapped.plans.map((item: any) =>
+            calculateInvoiceRow(item, gstType)
           );
+          setPlans(planCalculated);
+
+          // 🔑 billing state
+
+          const customer = mapped.billing_prefill;
+
+          const company = mapped.billing_prefillCompany;
+          console.log(customer, 'customercustomer');
+
+          // 🔑 decide billing_to
+          const billingTo =
+            mapped.customer.type === "company" ? "company" : "individual";
+
+          form.setValue("billing_to", billingTo);
+          console.log(billingTo, company, 'billingTo');
+
+          if (billingTo === "individual") {
+            console.log('came in indidivual billingTo');
+
+            // 🏢 COMPANY
+            form.setValue("billing_name", customer.name ?? "");
+            form.setValue(
+              "billing_phone",
+              customer.phone ?? customer.phone ?? ""
+            );
+            form.setValue("billing_email", customer.email ?? "");
+            form.setValue("billing_address", customer.address ?? "");
+            form.setValue(
+              "billing_state_id",
+              String(customer.state_id ?? "")
+            );
+          } else {
+            console.log(company, 'came in company billingTo');
+            // 👤 INDIVIDUAL
+            form.setValue("billing_name", company.name ?? "");
+            form.setValue("billing_phone", company.phone ?? "");
+            form.setValue("billing_email", company.email ?? "");
+            form.setValue("billing_address", company.address ?? "");
+            form.setValue(
+              "billing_state_id",
+              String(company.state_id ?? "")
+            );
+          }
         } else if (id) {
           const res = await getInvoiceInfo(id); // 🔥 your API
           const mapped = mapInvoiceApiToViewModel(res.data);
@@ -302,6 +301,47 @@ export default function InvoiceForm() {
 
     loadInvoice();
   }, [id]);
+  function removePlan(planId: number) {
+    setPlans(prev => prev.filter(p => p.id !== planId));
+  }
+  useEffect(() => {
+    if (!invoiceView?.billing_prefill) return;
+
+    const individual = invoiceView.billing_prefill;
+    const company = invoiceView.billing_prefillCompany;
+
+    const source =
+      billingTo === "company" ? company : individual;
+
+    if (!source) return;
+
+    const setIfExists = (name: any, value: any) => {
+      if (value !== null && value !== undefined && value !== "") {
+        form.setValue(name, value, { shouldDirty: true });
+        form.clearErrors(name); // ✅ clear only if value exists
+      }
+    };
+
+    setIfExists("billing_name", source.name);
+    setIfExists("billing_phone", source.phone);
+    setIfExists("billing_email", source.email);
+    setIfExists("billing_address", source.address);
+    setIfExists("billing_state_id", source.state_id ? String(source.state_id) : "");
+  }, [billingTo, invoiceView, form]);
+
+  const [states, setStates] = useState<any[]>([]);
+  const [loadingState, setLoadingState] = useState(false);
+
+  useEffect(() => {
+    const loadStates = async () => {
+      setLoadingState(true);
+      const stateList = await fetchStateList(101); // 🇮🇳 India
+      setStates(stateList);
+      setLoadingState(false);
+    };
+
+    loadStates();
+  }, []);
 
   useEffect(() => {
     if (!invoiceInfo.billingAddress && invoiceView && invoiceView?.customer.address) {
@@ -311,12 +351,6 @@ export default function InvoiceForm() {
       }));
     }
   }, [invoiceView?.customer?.address]);
-  const form = useForm({
-    resolver: zodResolver(invoiceSchema),
-    defaultValues: {
-      billing_address: invoiceView?.customer?.address ?? "",
-    },
-  });
 
   const { toast } = useToast();
   const mode = searchParams.get("mode");
@@ -349,6 +383,19 @@ export default function InvoiceForm() {
         navigate("/invoices");
       }
     } catch (err: any) {
+      const apiErrors = err?.response?.data?.errors;
+
+
+      // 👇 THIS IS THE KEY PART
+      if (apiErrors && err?.response?.status === 422) {
+        Object.entries(apiErrors).forEach(([field, messages]) => {
+          form.setError(field as any, {
+            type: "server",
+            message: (messages as string[])[0],
+          });
+        });
+        return;
+      }
       toast({
         title: "Error",
         description:
@@ -363,16 +410,12 @@ export default function InvoiceForm() {
     console.log(invoiceView, 'invoiceView');
 
   }, [invoiceView])
-
-  function updatePlan(planId: number, patch: Partial<any>) {
-    setPlans(prev =>
-      prev.map(p => {
-        if (p.id !== planId) return p;
-        const updated = { ...p, ...patch };
-        return calculateInvoiceRow(updated, 'igst');
-      })
-    );
+  const InfoIfExists = ({ value, ...props }: any) => {
+    if (value === null || value === undefined || value === "") return null
+    return <Info gap="gap-12" colon={false} justify="justify-between" {...props} value={value} />
   }
+
+
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-4">
       {/* Header */}
@@ -399,44 +442,54 @@ export default function InvoiceForm() {
 
       {/* Top Info */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-4">
+        {invoiceView?.customer && <Card className="p-4">
           <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
             Customer Detail
           </CardTitle>
           <div className="space-y-2">
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Name" value={invoiceView?.customer.name} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Phone" value={invoiceView?.customer.phone} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Email" value={invoiceView?.customer.email} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Address" value={invoiceView?.customer.address} />
-
+            <InfoIfExists
+              label="Name"
+              value={invoiceView?.customer?.name}
+            />
+            <InfoIfExists
+              label="Phone"
+              value={invoiceView?.customer?.phone}
+            />
+            <InfoIfExists
+              label="Email"
+              value={invoiceView?.customer?.email}
+            />
+            <InfoIfExists
+              label="Address"
+              value={invoiceView?.customer?.address}
+            />
           </div>
-        </Card>
+        </Card>}
 
-        <Card className="p-4">
+        {invoiceView?.vehicle && <Card className="p-4">
           <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
             Vehicle Info  </CardTitle>   <div className="space-y-2">
-
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Type" value={invoiceView?.vehicle.type} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Make" value={invoiceView?.vehicle.make} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Model" value={invoiceView?.vehicle.model} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Reg No" value={invoiceView?.vehicle.reg_no} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Year" value={invoiceView?.vehicle.make_year} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Color" value={invoiceView?.vehicle.color} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="  Chassis No" value={invoiceView?.vehicle.chassisNo} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Remark" value={invoiceView?.vehicle.remark} />
+            <InfoIfExists label="Type" value={invoiceView?.vehicle?.type} />
+            <InfoIfExists label="Make" value={invoiceView?.vehicle?.make} />
+            <InfoIfExists label="Model" value={invoiceView?.vehicle?.model} />
+            <InfoIfExists label="Reg No" value={invoiceView?.vehicle?.reg_no} />
+            <InfoIfExists label="Year" value={invoiceView?.vehicle?.make_year} />
+            <InfoIfExists label="Color" value={invoiceView?.vehicle?.color} />
+            <InfoIfExists label="Chassis No" value={invoiceView?.vehicle?.chassisNo} />
+            <InfoIfExists label="Remark" value={invoiceView?.vehicle?.remark} />
 
           </div>
         </Card>
-
-        <Card className="p-4">
+        }
+        {invoiceView?.jobcard && <Card className="p-4">
           <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
             Jobcard Info
           </CardTitle>
           <div className="space-y-2">
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Jobcard Date" value={invoiceView?.jobcard.jobcard_date} />
-            <Info gap="gap-12" colon={false} justify="justify-between" label="Edited Date" value={invoiceView?.jobcard.edited_date} />
+            <InfoIfExists label="Service Date" value={invoiceView?.jobcard.jobcard_date} />
+            <InfoIfExists label="Edited Date" value={invoiceView?.jobcard.edited_date} />
           </div>
-        </Card>
+        </Card>}
       </div>
 
       {/* Plans */}
@@ -445,7 +498,59 @@ export default function InvoiceForm() {
           PLAN INFO
         </CardTitle>
         <Form {...form}>
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+
+            <FloatingRHFSelect
+              name="billing_to"
+              label="Billing To"
+              control={form.control}
+              isRequired
+              options={[
+                { label: "Individual", value: "individual" },
+                { label: "Company", value: "company" },
+              ]}
+            />
+
+            <FloatingField
+              name="billing_name"
+              label="Name"
+              control={form.control}
+              isRequired
+            />
+
+            <FloatingField
+              name="billing_phone"
+              label="Phone"
+              control={form.control}
+              isRequired
+            />
+
+            <FloatingField
+              name="billing_email"
+              label="Email"
+              control={form.control}
+              isRequired
+            />
+
+            <FloatingRHFSelect
+              name="billing_state_id"
+              label="State"
+              control={form.control}
+              isRequired
+              options={states.map(s => ({
+                label: s.name,
+                value: String(s.id),
+              }))}
+            />
+            {form.getValues("billing_to") === 'company' && <FloatingField
+              name="billing_gstin"
+              label="GSTIN"
+              control={form.control}
+            // isDisabled={isView}
+            />}
+          </div>
+
+          <div className="mt-4">
             <FloatingTextarea
               name="billing_address"
               rows={2}
@@ -510,27 +615,20 @@ export default function InvoiceForm() {
           lastPage={1}
           hasNext={false}
           actions={(row: any) => {
+
             return (
-              <>
-
-                {(
-                  <Box className="gap-3">
-                    {
-                      <IconButton
-                        size="xs"
-                        mr={2}
-                        colorScheme="red"
-                        aria-label="Delete"
-                        onClick={() => {
-                          // setIsUserDeleteModalOpenInfo({ open: true, info: row });
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </IconButton>}
-
-                  </Box>
-                )}
-              </>
+              <Box className="gap-3">
+                <IconButton
+                  size="xs"
+                  mr={2}
+                  colorScheme="red"
+                  disabled={plans.length <= 1}
+                  aria-label="Delete"
+                  onClick={() => removePlan(row.id)}
+                >
+                  <Trash2 size={16} />
+                </IconButton>
+              </Box>
             );
           }}
         />
@@ -550,14 +648,14 @@ export default function InvoiceForm() {
 
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                Sub Total :
+                Sub Total Amount:
               </span>
               <span className="font-medium">
                 ₹ {costSummary.subTotal}
               </span>
             </div>
 
-            {billingStateId == invoiceView?.store.state_id ? (
+            {form.getValues("billing_to") === "company" ? (
               <>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
@@ -632,7 +730,7 @@ export default function InvoiceForm() {
             </div> */}
 
             <div className="flex justify-between font-semibold border-t pt-2">
-              <span>Grand Total :</span>
+              <span>Grand Total Amount:</span>
               <span>
                 ₹ {costSummary?.grandTotal}
               </span>
