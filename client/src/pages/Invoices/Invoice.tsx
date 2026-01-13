@@ -150,7 +150,7 @@ export default function Invoice() {
                         setFilters(f => ({ ...f, status: val }));
                         setPage(1);
                     }}
-                    options={filterMetaInfo.status}
+                    options={[{ label: 'All', value: '' },...filterMetaInfo.status]}
                 />
             ),
             width: "120px",

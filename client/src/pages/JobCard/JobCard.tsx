@@ -66,6 +66,9 @@ export default function JobCard() {
       setIsLoading(false);
     }
   };
+  const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: [] }>({
+    status: []
+  });
   const columns = [
     /* ================= CREATED AT ================= */
     {
@@ -168,7 +171,7 @@ export default function JobCard() {
             setFilters(f => ({ ...f, status: val }));
             setPage(1);
           }}
-          options={jobCardStatusList}
+          options={[{ label: 'All', value: '' },...filterMetaInfo.status]}
         />
       ),
       width: "110px",
@@ -191,13 +194,13 @@ export default function JobCard() {
       width: "150px",
       render: (value: any, row: any) => {
         // CASE 1: Invoice exists
-        console.log(value,'valuevalue');
-        
+        console.log(value, 'valuevalue');
+
         if (value) {
           return (
             <span
               className="text-[blue] font-medium cursor-pointer hover:underline"
-              onClick={() => navigate(`/invoice/manage?id=${row.invoice.id }&mode=view`)}
+              onClick={() => navigate(`/invoice/manage?id=${row.invoice.id}&mode=view`)}
             >
               #{value}
             </span>
@@ -208,7 +211,7 @@ export default function JobCard() {
         return (
           <button
             onClick={() => {
-              navigate(`/invoice/manage?jobCardId=${row.id }&mode=create`)
+              navigate(`/invoice/manage?jobCardId=${row.id}&mode=create`)
             }}
             className="
           px-3 py-1 text-xs font-medium
@@ -238,11 +241,13 @@ export default function JobCard() {
           consumer: filters.consumer_id
         });
 
-      const mappedTerritory = res.data.map((item:any)=>({...item,invoice_id: item?.invoice?.invoice_number ?? ""}))
+      const mappedTerritory = res.data.map((item: any) => ({ ...item, invoice_id: item?.invoice?.invoice_number ?? "" }))
       setHasNext(res.meta.has_next)
       setTotal(res.meta.total)
       setJobCards(mappedTerritory);
       setLastPage(res.meta.last_page);
+
+      setFilterMetaInfo(res.meta.filters)
     } catch (e) {
       console.error(e);
 
