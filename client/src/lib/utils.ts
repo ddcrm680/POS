@@ -376,8 +376,10 @@ export function normalizeInvoiceToCreateResponse(api: any) {
       ...api.job_card,
       consumer: api.consumer,
       store: api.store ?? api.job_card?.store ?? null,
-      vmake: null,
-      vmodel: null,
+      vmake:{ id: api.job_card?.vehicle_company_id ?? null,} ,
+      vmodel: {
+        id: api.job_card?.vehicle_make_id ?? null,
+      },
     },
 
     opted_services: (api.items || []).map((item: any) => ({
@@ -392,13 +394,8 @@ export function normalizeInvoiceToCreateResponse(api: any) {
       number_of_visits: Number(item.qty ?? 1),
       price: item.unit_price,
       gst:
-        item.igst_percent !== "0.00"
-          ? item.igst_percent
-          : String(
-              (Number(item.cgst_percent || 0) +
-                Number(item.sgst_percent || 0)) *
-                2
-            ),
+      item.igst_percent
+          ,
 
       is_tax_inclusive: false,
       sac: item.sac,
@@ -414,18 +411,18 @@ export function normalizeInvoiceToCreateResponse(api: any) {
     billing_prefill: {
       individual: {
         name: api.billing_name,
-        phone: api.billing_phone,
-        email: api.billing_email,
-        address: api.billing_address,
-        state_id: api.billing_state_id,
+        phone: api.billing_phone ?? null,
+        email:api.billing_email,//
+        address: api?.billing_address,//
+        state_id: api.billing_state_id ?? null,
       },
       company: {
-        name: api.consumer?.type === "company" ? api.billing_name : null,
-        phone: api.consumer?.company_contact_no ?? null,
-        email: api.billing_email,
-        address: null,
-        state_id: api.consumer?.company_state_id ?? null,
-        gstin: api.consumer?.company_gstin ?? null,
+        name:  api.billing_name ,
+        phone: api.billing_phone ?? null,
+        email: api.billing_email,//
+        address: api?.billing_address,//
+        state_id: api.billing_state_id ?? null,
+        gstin: api.billing_gstin ?? null,
       },
     },
   };

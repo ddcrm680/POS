@@ -74,9 +74,9 @@ export default function InvoiceForm() {
   const id = searchParams.get("id");
   const jobCardId = searchParams.get("jobCardId");
   const [invoiceInfo, setInvoiceInfo] = useState<{
-    selectedPlanId: string, billingAddress: string
+    selectedPlanId: string,
   }>({
-    selectedPlanId: "", billingAddress: ""
+    selectedPlanId: "",
   });
   useEffect(() => {
     if (!plans.length) return;
@@ -96,7 +96,7 @@ export default function InvoiceForm() {
       billing_email: values.billing_email,
       billing_address: values.billing_address,
       billing_state_id: Number(values.billing_state_id),
-      ...( billingTo === "company" && { billing_gstin: values.billing_gstin }),  
+      ...(billingTo === "company" && { billing_gstin: values.billing_gstin }),
 
       items: plans.map(plan => ({
         service_plan_id: plan.id,
@@ -216,7 +216,8 @@ export default function InvoiceForm() {
       grandTotal: Number((subTotal + cgstTotal + sgstTotal + igstTotal).toFixed(2)),
     };
   }, [plans]);
-const [availablePlans, setAvailablePlans] = useState<any[]>([]);
+  const [availablePlans, setAvailablePlans] = useState<any[]>([]);
+  const [invoiceNumber, setInvoiceNumber] = useState('');
   useEffect(() => {
     // if (!id) return;
 
@@ -227,13 +228,16 @@ const [availablePlans, setAvailablePlans] = useState<any[]>([]);
 
         const res = jobCardId
           ? await getInvoiceInfoByJobCardPrefill({ id: jobCardId })
-          : await getInvoiceInfo(id);
-
+          : await getInvoiceInfo(mode === "edit" ? `${id}/edit` : id);
+        if (mode == 'view')
+          setInvoiceNumber(res?.data?.invoice_number)
         // 👇 normalize ONLY when jobCardId is NOT present
         const normalizedData = jobCardId
-          ? res.data  
-          : normalizeInvoiceToCreateResponse(res.data);
-setAvailablePlans(normalizedData?.availableServices ?? [])
+          ? res.data
+          : mode === "edit" ? res.data : normalizeInvoiceToCreateResponse(res.data);
+        console.log(normalizedData, 'normalizedData');
+
+        setAvailablePlans(normalizedData?.availableServices ?? [])
         // 👇 existing mapper stays SAME
         const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
 
@@ -285,6 +289,7 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
             "billing_state_id",
             String(company.state_id ?? "")
           );
+          form.setValue("billing_gstin", company.gstin ?? "");
         }
 
 
@@ -340,15 +345,6 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
 
     loadStates();
   }, []);
-
-  useEffect(() => {
-    if (!invoiceInfo.billingAddress && invoiceView && invoiceView?.customer.address) {
-      setInvoiceInfo((prev) => ({
-        ...prev,
-        billingAddress: invoiceView?.customer.address,
-      }));
-    }
-  }, [invoiceView?.customer?.address]);
 
   const { toast } = useToast();
   const mode = searchParams.get("mode");
@@ -413,6 +409,7 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
     return <Info gap="gap-12" colon={false} justify="justify-between" {...props} value={value} />
   }
 
+  const isView = mode === "view";
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-4">
@@ -426,7 +423,7 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
           <ChevronLeft size={18} />
         </button>
 
-        <h1 className="text-lg font-semibold flex-1">Invoice {mode == 'create' ? `of Job Card #${jobCardId}` : `#${id}`}</h1>
+        <h1 className="text-lg font-semibold flex-1">Invoice {mode == 'create' ? `of Job Card #${jobCardId}` : `#${invoiceNumber}`}</h1>
         {invoiceView?.status && <Badge
           className={
             invoiceView?.status
@@ -502,6 +499,7 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
               name="billing_to"
               label="Billing To"
               control={form.control}
+              isDisabled={isView}
               isRequired
               options={[
                 { label: "Individual", value: "individual" },
@@ -512,6 +510,8 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
             <FloatingField
               name="billing_name"
               label="Name"
+
+              isDisabled={isView}
               control={form.control}
               isRequired
             />
@@ -519,12 +519,16 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
             <FloatingField
               name="billing_phone"
               label="Phone"
+
+              isDisabled={isView}
               control={form.control}
               isRequired
             />
 
             <FloatingField
               name="billing_email"
+
+              isDisabled={isView}
               label="Email"
               control={form.control}
               isRequired
@@ -534,6 +538,8 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
               name="billing_state_id"
               label="State"
               control={form.control}
+
+              isDisabled={isView}
               isRequired
               options={states.map(s => ({
                 label: s.name,
@@ -544,12 +550,14 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
               name="billing_gstin"
               label="GSTIN"
               control={form.control}
-            // isDisabled={isView}
+              isDisabled={isView}
             />}
           </div>
 
           <div className="mt-4">
             <FloatingTextarea
+
+              isView={isView}
               name="billing_address"
               rows={2}
               label="Billing Address"
@@ -558,7 +566,7 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
             />
           </div>
         </Form>
-        <div className="flex items-end gap-3 mt-3 ">
+        {mode !== 'view' && <div className="flex items-end gap-3 mt-3 ">
 
           <div className="w-72">
 
@@ -597,7 +605,7 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
           >
             Add Plan
           </Button>
-        </div>
+        </div>}
         <CommonTable
           columns={planColumns}
           data={plans}
@@ -620,7 +628,7 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
                   size="xs"
                   mr={2}
                   colorScheme="red"
-                  disabled={plans.length <= 1}
+                  disabled={plans.length <= 1 || isView}
                   aria-label="Delete"
                   onClick={() => removePlan(row.id)}
                 >
@@ -737,31 +745,183 @@ setAvailablePlans(normalizedData?.availableServices ?? [])
           </div>
         </div>
       </Card>
-
-      <div className="  pb-4 flex justify-end gap-3 mt-4">
-        <Button
-          variant="outline"
-          disabled={isLoading || isInfoLoading}
-          className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
-          onClick={() => navigate("/invoices")}
-        >
-          {'Cancel'}
-        </Button>
-
-        {(
-          <Button type="button"
+      {mode !== 'view' &&
+        <div className="  pb-4 flex justify-end gap-3 mt-4">
+          <Button
+            variant="outline"
             disabled={isLoading || isInfoLoading}
-            onClick={form.handleSubmit(handleInvoiceSubmission)}
-            className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
-            {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
-            {isLoading
-              ? id ? "Updating..." : "Adding..."
-              : id ? "Update " : "Add "}
+            className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+            onClick={() => navigate("/invoices")}
+          >
+            {'Cancel'}
           </Button>
-        )}
 
-      </div>
+          {(
+            <Button type="button"
+              disabled={isLoading || isInfoLoading}
+              onClick={form.handleSubmit(handleInvoiceSubmission)}
+              className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
+              {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
+              {isLoading
+                ? id ? "Updating..." : "Adding..."
+                : id ? "Update " : "Add "}
+            </Button>
+          )}
+
+        </div>}
 
     </div>
   );
 }
+
+// {
+//         "id": 6,
+//         "job_card_id": 22,
+//         "store_id": 4,
+//         "consumer_id": 7,
+//         "invoice_prefix": "CD",
+//         "invoice_series": "25-26",
+//         "invoice_no": 5,
+//         "invoice_date": "2026-01-12T18:30:00.000000Z",
+//         "billing_type": "company",
+//         "billing_name": "Rahul Sharma",
+//         "billing_phone": "9311841370",
+//         "billing_email": "accounts@abctech.com",
+//         "billing_address": "testing the flow",
+//         "billing_country_id": null,
+//         "billing_state_id": 22,
+//         "billing_gstin": "29ABCDE1234F1Z5",
+//         "gst_type": "igst",
+//         "subtotal": "4024.00",
+//         "cgst_total": "0.00",
+//         "sgst_total": "0.00",
+//         "igst_total": "881.56",
+//         "tax_total": "881.56",
+//         "grand_total": "4905.56",
+//         "status": "issued",
+//         "created_by": 1,
+//         "updated_by": null,
+//         "created_at": "2026-01-13T09:53:00.000000Z",
+//         "updated_at": "2026-01-13T09:53:00.000000Z",
+//         "invoice_number": "CD\/25-26\/000005",
+//         "consumer": {
+//             "id": 7,
+//             "store_id": 4,
+//             "name": "ABC Technologies Pvt Ltd",
+//             "phone": "9123456789",
+//             "email": "accounts@abctech.com",
+//             "type": "company",
+//             "country_id": 101,
+//             "state_id": 4037,
+//             "address": "Whitefield, Bangalore",
+//             "company_country_id": 101,
+//             "company_state_id": 22,
+//             "company_contact_no": "08045678901",
+//             "company_gstin": "29ABCDE1234F1Z5",
+//             "is_active": true,
+//             "created_by": 1,
+//             "updated_by": 1,
+//             "created_at": "2026-01-09T09:15:21.000000Z",
+//             "updated_at": "2026-01-13T05:26:57.000000Z"
+//         },
+//         "job_card": {
+//             "id": 22,
+//             "job_card_number": "100021",
+//             "store_id": 4,
+//             "consumer_id": 7,
+//             "jobcard_date": "2026-01-08T18:30:00.000000Z",
+//             "vehicle_type": "Car",
+//             "service_ids": [
+//                 1,
+//                 3,
+//                 5
+//             ],
+//             "vehicle_company_id": 2,
+//             "vehicle_model_id": 8,
+//             "color": "White",
+//             "year": 2022,
+//             "reg_no": "MH12AB1234",
+//             "chasis_no": "CHS889977",
+//             "vehicle_condition": "fair-condition",
+//             "isRepainted": true,
+//             "isSingleStagePaint": false,
+//             "isPaintThickness": true,
+//             "isVehicleOlder": false,
+//             "technician_id": 7,
+//             "remarks": "Customer wants quick delivery",
+//             "status": "invoiced",
+//             "created_by": 1,
+//             "updated_by": null,
+//             "created_at": "2026-01-12T08:46:50.000000Z",
+//             "updated_at": "2026-01-13T09:53:00.000000Z"
+//         },
+//         "items": [
+//             {
+//                 "id": 21,
+//                 "job_card_invoice_id": 6,
+//                 "item_type": "service_plan",
+//                 "reference_id": 1,
+//                 "item_name": "Full Body Coating",
+//                 "description": null,
+//                 "sac": "12112",
+//                 "qty": "1.00",
+//                 "unit_price": "4000.00",
+//                 "subtotal": "4000.00",
+//                 "cgst_percent": "0.00",
+//                 "cgst_amount": "0.00",
+//                 "sgst_percent": "0.00",
+//                 "sgst_amount": "0.00",
+//                 "igst_percent": "22.00",
+//                 "igst_amount": "880.00",
+//                 "total": "4880.00",
+//                 "created_at": "2026-01-13T09:53:00.000000Z",
+//                 "updated_at": "2026-01-13T09:53:00.000000Z"
+//             },
+//             {
+//                 "id": 22,
+//                 "job_card_invoice_id": 6,
+//                 "item_type": "service_plan",
+//                 "reference_id": 3,
+//                 "item_name": "Full Body Coating",
+//                 "description": null,
+//                 "sac": null,
+//                 "qty": "1.00",
+//                 "unit_price": "12.00",
+//                 "subtotal": "12.00",
+//                 "cgst_percent": "0.00",
+//                 "cgst_amount": "0.00",
+//                 "sgst_percent": "0.00",
+//                 "sgst_amount": "0.00",
+//                 "igst_percent": "12.00",
+//                 "igst_amount": "1.44",
+//                 "total": "13.44",
+//                 "created_at": "2026-01-13T09:53:00.000000Z",
+//                 "updated_at": "2026-01-13T09:53:00.000000Z"
+//             },
+//             {
+//                 "id": 23,
+//                 "job_card_invoice_id": 6,
+//                 "item_type": "service_plan",
+//                 "reference_id": 5,
+//                 "item_name": "Full Body Coating",
+//                 "description": null,
+//                 "sac": null,
+//                 "qty": "1.00",
+//                 "unit_price": "12.00",
+//                 "subtotal": "12.00",
+//                 "cgst_percent": "0.00",
+//                 "cgst_amount": "0.00",
+//                 "sgst_percent": "0.00",
+//                 "sgst_amount": "0.00",
+//                 "igst_percent": "1.00",
+//                 "igst_amount": "0.12",
+//                 "total": "12.12",
+//                 "created_at": "2026-01-13T09:53:00.000000Z",
+//                 "updated_at": "2026-01-13T09:53:00.000000Z"
+//             }
+//         ],
+//         "store": {
+//             "id": 4,
+//             "name": "test 44"
+//         }
+//     }
