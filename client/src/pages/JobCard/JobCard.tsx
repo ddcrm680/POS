@@ -90,7 +90,7 @@ export default function JobCard() {
       width: "110px",
       render: (value: string, row: any) => (
         <span
-          className="text-primary font-medium cursor-pointer hover:underline"
+          className="text-[blue] font-medium cursor-pointer hover:underline"
           onClick={() => navigate(`/jobCard/manage?id=${row.id}&mode=view`)}
         >
           {value}
@@ -105,10 +105,10 @@ export default function JobCard() {
       width: "180px",
       render: (_: any, row: any) => (
         <div className="flex flex-col" >
-          <span className="text-primary font-medium cursor-pointer hover:underline" onClick={() => {
+          <span className="text-[blue] font-medium cursor-pointer hover:underline" onClick={() => {
             localStorage.setItem("sidebar_active_parent", "customers")
 
-            navigate(`/customers/manage?id=${row.id}&mode=view`)
+            navigate(`/customers/manage?id=${row.consumer_id}&mode=view`)
           }
           }
           >
@@ -186,18 +186,20 @@ export default function JobCard() {
       ),
     },
     {
-      key: "id",
+      key: "invoice_id",
       label: "Invoice No.",
       width: "150px",
-      render: (_: any, row: any) => {
+      render: (value: any, row: any) => {
         // CASE 1: Invoice exists
-        if (!row.id) {
+        console.log(value,'valuevalue');
+        
+        if (value) {
           return (
             <span
-              className="text-primary font-medium cursor-pointer hover:underline"
-              // onClick={() => navigate(`/invoice/id=${row.id}&mode=view`)}
+              className="text-[blue] font-medium cursor-pointer hover:underline"
+              onClick={() => navigate(`/invoice/manage?id=${row.invoice.id }&mode=view`)}
             >
-              #{row.id}
+              #{value}
             </span>
           );
         }
@@ -206,7 +208,7 @@ export default function JobCard() {
         return (
           <button
             onClick={() => {
-              navigate(`/invoice/manage?jobCardId=${row.id}&mode=create`)
+              navigate(`/invoice/manage?jobCardId=${row.id }&mode=create`)
             }}
             className="
           px-3 py-1 text-xs font-medium
@@ -236,11 +238,11 @@ export default function JobCard() {
           consumer: filters.consumer_id
         });
 
-      const mappedTerritory = res
-      // setHasNext(res.meta.has_next)
-      // setTotal(res.meta.total)
+      const mappedTerritory = res.data.map((item:any)=>({...item,invoice_id: item?.invoice?.invoice_number ?? ""}))
+      setHasNext(res.meta.has_next)
+      setTotal(res.meta.total)
       setJobCards(mappedTerritory);
-      // setLastPage(res.meta.last_page);
+      setLastPage(res.meta.last_page);
     } catch (e) {
       console.error(e);
 

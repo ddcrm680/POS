@@ -686,7 +686,7 @@ export async function getJobCard({
     );
 
     if (response?.data?.success === true) {
-      return response.data.data; // customer object
+      return response.data; // customer object
     }
 
     return null;

@@ -89,11 +89,11 @@ export default function Invoice() {
             ),
         },
         {
-            key: "invoice_no",
+            key: "invoice_number",
             label: "Invoice No.",
             width: "130px",
             render: (value: string, row: any) => (
-                <span className="text-primary font-medium cursor-pointer" onClick={() => navigate(`/invoice/manage?id=${row.id}&mode=view`)
+                <span className="text-[blue] font-medium cursor-pointer" onClick={() => navigate(`/invoice/manage?id=${row.id}&mode=view`)
                 }>
                     #{value}
                 </span>
@@ -105,11 +105,13 @@ export default function Invoice() {
             key: "consumer",
             label: "Customer",
             width: "180px",
-            render: (value: { name: string }) => (
-                <span className="text-primary font-medium cursor-pointer" onClick={() => {
-                    localStorage.setItem("sidebar_active_parent", "customers")
-                    navigate("/customers")
-                }}>
+            render: (value: { name: string },row:any) => (
+                <span className="text-[blue] font-medium cursor-pointer"  onClick={() => {
+            localStorage.setItem("sidebar_active_parent", "customers")
+
+            navigate(`/customers/manage?id=${row.consumer_id}&mode=view`)
+          }
+          }>
                     {value?.name}
                 </span>
             ),
@@ -328,7 +330,7 @@ export default function Invoice() {
                                                 mr={2}
                                                 aria-label="Edit"
                                                 onClick={() => {
-                                                    navigate(`/invoice/manage?id=${row.id}&mode=create`)
+                                                    navigate(`/invoice/manage?id=${row.id}&mode=edit`)
 
                                                 }
                                                 }

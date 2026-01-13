@@ -28,7 +28,7 @@ import { unknown } from "zod";
 import { useAuth } from "@/lib/auth";
 import { createInvoice, fetchCityList, fetchStateList, getInvoiceInfo, getInvoiceInfoByJobCardPrefill, getJobCardItem } from "@/lib/api";
 import { Pencil, Trash2, X } from "lucide-react";
-import { calculateInvoiceRow, mapInvoiceApiToPrefilledViewModel, mapInvoiceApiToViewModel } from "@/lib/utils";
+import { calculateInvoiceRow, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, } from "@/lib/utils";
 import { RequiredMark } from "@/components/common/RequiredMark";
 import { SectionCard } from "@/components/common/card";
 import { FloatingField } from "@/components/common/FloatingField";
@@ -96,6 +96,7 @@ export default function InvoiceForm() {
       billing_email: values.billing_email,
       billing_address: values.billing_address,
       billing_state_id: Number(values.billing_state_id),
+      ...( billingTo === "company" && { billing_gstin: values.billing_gstin }),  
 
       items: plans.map(plan => ({
         service_plan_id: plan.id,
@@ -215,7 +216,7 @@ export default function InvoiceForm() {
       grandTotal: Number((subTotal + cgstTotal + sgstTotal + igstTotal).toFixed(2)),
     };
   }, [plans]);
-
+const [availablePlans, setAvailablePlans] = useState<any[]>([]);
   useEffect(() => {
     // if (!id) return;
 
@@ -224,68 +225,65 @@ export default function InvoiceForm() {
       try {
         console.log(jobCardId, id, 'jobCardId');
 
-        if (jobCardId) {
-          const res = await getInvoiceInfoByJobCardPrefill({ id: jobCardId });
-          const mapped = mapInvoiceApiToPrefilledViewModel(res.data);
+        const res = jobCardId
+          ? await getInvoiceInfoByJobCardPrefill({ id: jobCardId })
+          : await getInvoiceInfo(id);
 
-          setInvoiceView(mapped);
+        // 👇 normalize ONLY when jobCardId is NOT present
+        const normalizedData = jobCardId
+          ? res.data  
+          : normalizeInvoiceToCreateResponse(res.data);
+setAvailablePlans(normalizedData?.availableServices ?? [])
+        // 👇 existing mapper stays SAME
+        const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
 
-          const gstType = mapped.customer.type === "company" ? "cgst_sgst" : "igst";
-          const planCalculated = mapped.plans.map((item: any) =>
-            calculateInvoiceRow(item, gstType)
-          );
-          setPlans(planCalculated);
+        setInvoiceView(mapped);
 
-          // 🔑 billing state
+        const gstType = mapped.customer.type === "company" ? "cgst_sgst" : "igst";
+        const planCalculated = mapped.plans.map((item: any) =>
+          calculateInvoiceRow(item, gstType)
+        );
+        setPlans(planCalculated);
 
-          const customer = mapped.billing_prefill;
+        // 🔑 billing state
 
-          const company = mapped.billing_prefillCompany;
-          console.log(customer, 'customercustomer');
+        const customer = mapped.billing_prefill;
 
-          // 🔑 decide billing_to
-          const billingTo =
-            mapped.customer.type === "company" ? "company" : "individual";
+        const company = mapped.billing_prefillCompany;
+        console.log(customer, 'customercustomer');
 
-          form.setValue("billing_to", billingTo);
-          console.log(billingTo, company, 'billingTo');
+        // 🔑 decide billing_to
+        const billingTo =
+          mapped.customer.type === "company" ? "company" : "individual";
 
-          if (billingTo === "individual") {
-            console.log('came in indidivual billingTo');
+        form.setValue("billing_to", billingTo);
+        console.log(billingTo, company, 'billingTo');
 
-            // 🏢 COMPANY
-            form.setValue("billing_name", customer.name ?? "");
-            form.setValue(
-              "billing_phone",
-              customer.phone ?? customer.phone ?? ""
-            );
-            form.setValue("billing_email", customer.email ?? "");
-            form.setValue("billing_address", customer.address ?? "");
-            form.setValue(
-              "billing_state_id",
-              String(customer.state_id ?? "")
-            );
-          } else {
-            console.log(company, 'came in company billingTo');
-            // 👤 INDIVIDUAL
-            form.setValue("billing_name", company.name ?? "");
-            form.setValue("billing_phone", company.phone ?? "");
-            form.setValue("billing_email", company.email ?? "");
-            form.setValue("billing_address", company.address ?? "");
-            form.setValue(
-              "billing_state_id",
-              String(company.state_id ?? "")
-            );
-          }
-        } else if (id) {
-          const res = await getInvoiceInfo(id); // 🔥 your API
-          const mapped = mapInvoiceApiToViewModel(res.data);
+        if (billingTo === "individual") {
+          console.log('came in indidivual billingTo');
 
-          setInvoiceView(mapped);
-          setPlans(mapped.plans);
+          // 🏢 COMPANY
+          form.setValue("billing_name", customer.name ?? "");
           form.setValue(
-            "billing_address",
-            mapped.customer.address ?? ""
+            "billing_phone",
+            customer.phone ?? customer.phone ?? ""
+          );
+          form.setValue("billing_email", customer.email ?? "");
+          form.setValue("billing_address", customer.address ?? "");
+          form.setValue(
+            "billing_state_id",
+            String(customer.state_id ?? "")
+          );
+        } else {
+          console.log(company, 'came in company billingTo');
+          // 👤 INDIVIDUAL
+          form.setValue("billing_name", company.name ?? "");
+          form.setValue("billing_phone", company.phone ?? "");
+          form.setValue("billing_email", company.email ?? "");
+          form.setValue("billing_address", company.address ?? "");
+          form.setValue(
+            "billing_state_id",
+            String(company.state_id ?? "")
           );
         }
 
@@ -428,7 +426,7 @@ export default function InvoiceForm() {
           <ChevronLeft size={18} />
         </button>
 
-        <h1 className="text-lg font-semibold flex-1">Invoice {mode == 'create' ? `of Job Card #${jobCardId}` : `#${invoiceView?.invoice_no}`}</h1>
+        <h1 className="text-lg font-semibold flex-1">Invoice {mode == 'create' ? `of Job Card #${jobCardId}` : `#${id}`}</h1>
         {invoiceView?.status && <Badge
           className={
             invoiceView?.status
@@ -571,7 +569,7 @@ export default function InvoiceForm() {
               className="w-full border rounded-md px-3 py-2 text-sm"
             >
               <option value="">Select Plan</option>
-              {availablePlansMock.map((plan) => (
+              {availablePlans.map((plan) => (
                 <option key={plan.id} value={plan.id}>
                   {plan.plan_name}
                 </option>
@@ -584,7 +582,7 @@ export default function InvoiceForm() {
             onClick={() => {
               if (!invoiceInfo.selectedPlanId) return;
 
-              const plan = availablePlansMock.find(
+              const plan = availablePlans.find(
                 (p) => String(p.id) === invoiceInfo.selectedPlanId
               );
 

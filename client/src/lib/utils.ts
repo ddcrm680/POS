@@ -277,56 +277,7 @@ export const formatDate2 = (date: string | Date) =>
     month: "long",
     year: "numeric",
   })
-export function mapInvoiceApiToViewModel(api: any) {
-  const job = api.job_card;
-  const consumer = api.consumer;
 
-  return {
-    customer: {
-      bill_to: consumer.name,
-      name: consumer.name,
-      phone: consumer.phone,
-      email: consumer.email,
-      address: consumer.address,
-      gst: consumer.company_gstin ?? "",
-      type: consumer.type || 'individual',
-    },
-
-    vehicle: {
-      type: job.vehicle_type,
-      make: (job.vmake.name), // replace with lookup if available
-      model: (job.vmodel.name),  // replace with lookup if available
-      reg_no: job.reg_no,
-      make_year: String(job.year),
-      color: job.color,
-      chassisNo: job.chasis_no,
-      remark: job.remarks ?? "",
-    },
-
-    jobcard: {
-      jobcard_date: new Date(job.jobcard_date).toLocaleDateString("en-GB",),
-      edited_date: new Date(job.updated_at).toLocaleString(),
-    },
-
-    plans: api.items.map((s: any) => {
-      const price = Number(s.price);
-
-      return {
-        id: s.id,
-        plan_name: s.plan_name,
-        sac: "9997",
-        visits: 1,
-        price,
-        discount_percent: 0,
-        discount_amount: 0,
-        sub_amount: price,
-        igst_percent: 18,
-        igst_amount: +(price * 0.18).toFixed(2),
-        total_amount: +(price * 1.18).toFixed(2),
-      };
-    }),
-  };
-}
 export function mapInvoiceApiToPrefilledViewModel(api: any) {
   const job = api.job_card;
   const consumer = api.job_card.consumer;
@@ -362,7 +313,7 @@ export function mapInvoiceApiToPrefilledViewModel(api: any) {
     plans: api.opted_services,
     billing_prefill: billing_prefill.individual,
     billing_prefillCompany: billing_prefill.company,
-    store: job.store
+    store: job.store,
   };
 }
 
@@ -409,5 +360,73 @@ export function calculateInvoiceRow(plan: any, gstType: "igst" | "cgst_sgst" = "
     igst_amount: Number(igstAmount.toFixed(2)),
 
     total_amount: Number(totalAmount.toFixed(2)),
+  };
+}
+export function normalizeInvoiceToCreateResponse(api: any) {
+  if (!api) return api;
+
+  // 🔹 If already create-prefill response → return as-is
+  if (api.job_card && api.opted_services && api.billing_prefill) {
+    return api;
+  }
+
+  // 🔹 INVOICE VIEW → CREATE PREFILL FORMAT
+  return {
+    job_card: {
+      ...api.job_card,
+      consumer: api.consumer,
+      store: api.store ?? api.job_card?.store ?? null,
+      vmake: null,
+      vmodel: null,
+    },
+
+    opted_services: (api.items || []).map((item: any) => ({
+      id: item.reference_id,
+      category_type: null,
+      category: null,
+      vehicle_type: api.job_card?.vehicle_type ?? null,
+
+      plan_name: item.item_name,
+      invoice_name: item.item_name,
+
+      number_of_visits: Number(item.qty ?? 1),
+      price: item.unit_price,
+      gst:
+        item.igst_percent !== "0.00"
+          ? item.igst_percent
+          : String(
+              (Number(item.cgst_percent || 0) +
+                Number(item.sgst_percent || 0)) *
+                2
+            ),
+
+      is_tax_inclusive: false,
+      sac: item.sac,
+      description: item.description,
+      warranty_period: null,
+      warranty_in: null,
+      raw_materials: [],
+      status: true,
+    })),
+
+    availableServices: [],
+
+    billing_prefill: {
+      individual: {
+        name: api.billing_name,
+        phone: api.billing_phone,
+        email: api.billing_email,
+        address: api.billing_address,
+        state_id: api.billing_state_id,
+      },
+      company: {
+        name: api.consumer?.type === "company" ? api.billing_name : null,
+        phone: api.consumer?.company_contact_no ?? null,
+        email: api.billing_email,
+        address: null,
+        state_id: api.consumer?.company_state_id ?? null,
+        gstin: api.consumer?.company_gstin ?? null,
+      },
+    },
   };
 }
