@@ -215,49 +215,49 @@ export default function JobForm() {
     loadServices();
   }, [vehicleType, serviceTypes]);
   const vehicleCompanyId = form.watch("vehicle_company_id");
-const hasInitializedModelsRef = useRef(false);
-useEffect(() => {
-  if (!vehicleCompanyId) {
-    setMeta(prev => ({ ...prev, vehicleModels: [] }));
-    return;
-  }
-
-  // 🚫 Skip ONLY hydration-triggered change
-  if (hasInitializedModelsRef.current) {
-    hasInitializedModelsRef.current = false;
-    return;
-  }
-
-  let cancelled = false;
-
-  const loadModels = async () => {
-    setMeta(prev => ({ ...prev, loadingModels: true }));
-
-    try {
-      const models = await jobCardModelInfo(vehicleCompanyId);
-      if (cancelled) return;
-
-      setMeta(prev => ({
-        ...prev,
-        vehicleModels: toSelectOptions(models),
-        loadingModels: false,
-      }));
-
-      // reset model ONLY when user changes make
-      form.setValue("vehicle_model_id", "");
-    } catch {
-      if (!cancelled) {
-        setMeta(prev => ({ ...prev, loadingModels: false }));
-      }
+  const hasInitializedModelsRef = useRef(false);
+  useEffect(() => {
+    if (!vehicleCompanyId) {
+      setMeta(prev => ({ ...prev, vehicleModels: [] }));
+      return;
     }
-  };
 
-  loadModels();
+    // 🚫 Skip ONLY hydration-triggered change
+    if (hasInitializedModelsRef.current) {
+      hasInitializedModelsRef.current = false;
+      return;
+    }
 
-  return () => {
-    cancelled = true;
-  };
-}, [vehicleCompanyId]);
+    let cancelled = false;
+
+    const loadModels = async () => {
+      setMeta(prev => ({ ...prev, loadingModels: true }));
+
+      try {
+        const models = await jobCardModelInfo(vehicleCompanyId);
+        if (cancelled) return;
+
+        setMeta(prev => ({
+          ...prev,
+          vehicleModels: toSelectOptions(models),
+          loadingModels: false,
+        }));
+
+        // reset model ONLY when user changes make
+        form.setValue("vehicle_model_id", "");
+      } catch {
+        if (!cancelled) {
+          setMeta(prev => ({ ...prev, loadingModels: false }));
+        }
+      }
+    };
+
+    loadModels();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [vehicleCompanyId]);
   useEffect(() => {
     form.setValue('role', user?.role);
   }, [user])
@@ -407,7 +407,7 @@ useEffect(() => {
 
 
       form.setValue("vehicle_type", initialValues.job_card.vehicle_type);
-      hasInitializedModelsRef .current = true;
+      hasInitializedModelsRef.current = true;
       form.setValue("vehicle_company_id", String(initialValues.job_card.vehicle_company_id));
       form.setValue("color", initialValues.job_card.color ?? "");
       form.setValue("year", String(initialValues.job_card.year ?? ""));
@@ -779,11 +779,12 @@ useEffect(() => {
         {/* HEADER */}
         <div className="flex items-center gap-3">
           <button
-             onClick={() => {
- localStorage.removeItem('sidebar_active_parent')
+            onClick={() => {
+              localStorage.removeItem('sidebar_active_parent')
               window.history.back()
             }}
-            className="text-muted-foreground hover:text-foreground"
+             disabled={isLoading || isInfoLoading}
+            className="text-muted-foreground hover:text-foreground "
           >
             <ChevronLeft size={18} />
           </button>
@@ -802,525 +803,530 @@ useEffect(() => {
           {/* Main Job Creation Form */}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="">
-              {(mode !== "view" && mode !== 'edit') && <>
-                <Card className="mb-6 p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {
+                isInfoLoading && id ?
+                  <Card className="mb-6"><div className="min-h-[150px] flex justify-center items-center">
+                    <div className="p-4 text-sm "><Loader /></div>
+                  </div></Card> : <>
+                    {(mode !== "view" && mode !== 'edit') && <>
+                      <Card className="mb-6 p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                    {isAdmin && <div
-                      className={cn(
-                        "bg-white  rounded-xl p-0",
-                      )} >
-                      <h3 className={`text-sm font-semibold text-gray-700 mb-4`}>{"Store Information"}</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                        <FloatingRHFSelect
-                          name="store_id"
-                          label="Select Store"
-                          control={form.control}
-                          isDisabled={isView}
-                          isRequired
-                          options={storeList.map((s: any) => ({
-                            label: s.label,
-                            value: String(s.value),
-                          }))}
-                        />
-                      </div>
-                    </div>}
-                    <div
-                      className={cn(
-                        "bg-white  rounded-xl p-0",
-                      )} >
-                      <h3 className={`text-sm font-semibold text-gray-700 mb-4`}>{"Customer Lookup"}</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-1 gap-1 items-end">
-                        <FloatingField
-                          name="search_mobile"
-                          label="Search Mobile Number"
-                          isDisabled={isView}
-                          isRequired
-                          control={form.control}
-                        />
+                          {isAdmin && <div
+                            className={cn(
+                              "bg-white  rounded-xl p-0",
+                            )} >
+                            <h3 className={`text-sm font-semibold text-gray-700 mb-4`}>{"Store Information"}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                              <FloatingRHFSelect
+                                name="store_id"
+                                label="Select Store"
+                                control={form.control}
+                                isDisabled={isView}
+                                isRequired
+                                options={storeList.map((s: any) => ({
+                                  label: s.label,
+                                  value: String(s.value),
+                                }))}
+                              />
+                            </div>
+                          </div>}
+                          <div
+                            className={cn(
+                              "bg-white  rounded-xl p-0",
+                            )} >
+                            <h3 className={`text-sm font-semibold text-gray-700 mb-4`}>{"Customer Lookup"}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-1 items-end">
+                              <FloatingField
+                                name="search_mobile"
+                                label="Search Mobile Number"
+                                isDisabled={isView}
+                                isRequired
+                                control={form.control}
+                              />
 
-                        {(isLookingUp || customerFound !== null) && !isView && <div className="text-sm h-[38px] flex items-center">
-                          {isLookingUp && (
-                            <span className="text-muted-foreground flex items-center gap-2">
-                              <Loader2 className="animate-spin h-4 w-4" />
-                              Looking up customer…
-                            </span>
-                          )}
+                              {(isLookingUp || customerFound !== null) && !isView && <div className="text-sm h-[38px] flex items-center">
+                                {isLookingUp && (
+                                  <span className="text-muted-foreground flex items-center gap-2">
+                                    <Loader2 className="animate-spin h-4 w-4" />
+                                    Looking up customer…
+                                  </span>
+                                )}
 
-                          {!isLookingUp && customerFound === true && (
-                            <span className="text-green-600 flex items-center gap-2">
-                              <CheckCircle size={16} />
-                              Existing customer found
-                            </span>
-                          )}
+                                {!isLookingUp && customerFound === true && (
+                                  <span className="text-green-600 flex items-center gap-2">
+                                    <CheckCircle size={16} />
+                                    Existing customer found
+                                  </span>
+                                )}
 
-                          {!isLookingUp && customerFound === false && (
-                            <span className="text-orange-500">
-                              New customer
-                            </span>
-                          )}
-                        </div>}
-                      </div>
-                    </div>
-                    {/* <SectionCard title="Customer Lookup" >
+                                {!isLookingUp && customerFound === false && (
+                                  <span className="text-orange-500">
+                                    New customer
+                                  </span>
+                                )}
+                              </div>}
+                            </div>
+                          </div>
+                          {/* <SectionCard title="Customer Lookup" >
                   
                 </SectionCard> */}
-                  </div>
-                </Card>
+                        </div>
+                      </Card>
 
-                {/* Customer Lookup Section */}
-                {customerFound !== null && <Card className="mb-6">
+                      {/* Customer Lookup Section */}
+                      {customerFound !== null && <Card className="mb-6">
 
-                  <SectionCard title="Customer Information" className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>
-                    {/* BASIC INFO */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FloatingField
-                        name="name"
-                        label="Name"
-                        isRequired
-                        isDisabled={isView}
-                        control={form.control}
-                      />
-
-
-                      <FloatingField
-                        name="phone"
-                        label="Mobile No"
-                        isRequired
-                        control={form.control}
-                        isDisabled={customerFound === true || isView}
-                      />
-
-                      <FloatingField
-                        name="email"
-                        label="Email"
-                        isDisabled={isView}
-                        isRequired
-                        control={form.control}
-                      />
+                        <SectionCard title="Customer Information" className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>
+                          {/* BASIC INFO */}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <FloatingField
+                              name="name"
+                              label="Name"
+                              isRequired
+                              isDisabled={isView}
+                              control={form.control}
+                            />
 
 
+                            <FloatingField
+                              name="phone"
+                              label="Mobile No"
+                              isRequired
+                              control={form.control}
+                              isDisabled={customerFound === true || isView}
+                            />
 
-                    </div>
-                    {/* ADDRESS + MESSAGE */}
-                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                      <FloatingTextarea
-                        name="address"
-                        label="Address"
-                        isView={isView}
-                        isRequired
-                        control={form.control}
-                      />
-
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                      {/* COUNTRY */}
-                      <FloatingRHFSelect
-                        name="country_id"
-                        label="Country"
-                        control={form.control}
-                        isRequired
-                        isDisabled={isView}
-                        options={countryList.map(c => ({
-                          value: String(c.id),
-                          label: c.name,
-                        }))}
-                        onValueChange={async (value) => {
-                          if (isHydratingRef.current) return;
-
-                          setStates([]);
-                          setCities([]);
-                          form.setValue("state_id", "");
-                          // form.setValue("city_id", "");
-
-                          setLoadingState(true);
-                          const stateList = await fetchStateList(Number(value));
-                          setStates(stateList);
-                          setLoadingState(false);
-                        }}
-                      />
-
-                      {/* STATE */}
-                      <FloatingRHFSelect
-                        name="state_id"
-                        label="State"
-                        control={form.control}
-                        isRequired
-                        isDisabled={isView || !form.getValues("country_id")}
-                        options={states.map(s => ({
-                          value: String(s.id),
-                          label: s.name,
-                        }))}
-                        onValueChange={async (value) => {
-                          if (isHydratingRef.current) return;
-
-                          setCities([]);
-                          // form.setValue("city_id", "");
-
-                          setLoadingCity(true);
-                          const cityList = await fetchCityList(Number(value));
-                          setCities(cityList);
-                          setLoadingCity(false);
-                        }}
-                      />
-                      <div className="flex flex-col items-start">
-                        <FloatingRHFSelect
-                          name="type"
-                          label="Billing Type"
-                          control={form.control}
-                          isRequired
-                          isDisabled={isView}
-                          options={[
-                            { label: "Company", value: "company" },
-                            { label: "Individual", value: "individual" },
-                          ]}
-                          onValueChange={(value) => {
-                            if (typeof value !== "string") return;
-                            const billingType = value as "company" | "individual";
-                            form.setValue("type", billingType);
-                          }}
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Select <b>Company</b> if you need GST invoice
-                        </p>
-                      </div>
-
-                    </div>
+                            <FloatingField
+                              name="email"
+                              label="Email"
+                              isDisabled={isView}
+                              isRequired
+                              control={form.control}
+                            />
 
 
 
-                    {/* GST OPTIONAL */}
+                          </div>
+                          {/* ADDRESS + MESSAGE */}
+                          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                            <FloatingTextarea
+                              name="address"
+                              label="Address"
+                              isView={isView}
+                              isRequired
+                              control={form.control}
+                            />
 
-                    {
-                      form.watch("type") === "company" &&
-                      (
-                        <div className="">
-                          <h4 className="text-sm font-semibold mb-4">
-                            GST Information
-                          </h4>
-
+                          </div>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-
-                            <FloatingField
-                              name="company_contact_no"
-                              label="Company Contact No."
-                              isDisabled={isView}
-                              control={form.control}
-                            />
-
-                            <FloatingField
-                              name="company_gstin"
-                              label="GSTIN"
-                              control={form.control}
-                              isDisabled={isView}
-                            />
-
+                            {/* COUNTRY */}
                             <FloatingRHFSelect
-                              name="company_country_id"
+                              name="country_id"
                               label="Country"
                               control={form.control}
+                              isRequired
                               isDisabled={isView}
                               options={countryList.map(c => ({
                                 value: String(c.id),
                                 label: c.name,
                               }))}
                               onValueChange={async (value) => {
-                                if (isGstHydratingRef.current) return;
+                                if (isHydratingRef.current) return;
 
-                                setGstStates([]);
-                                setGstCities([]);
-                                form.setValue("company_state_id", "");
-                                // form.setValue("gst_city_id", "");
+                                setStates([]);
+                                setCities([]);
+                                form.setValue("state_id", "");
+                                // form.setValue("city_id", "");
 
-                                setLoadingGstState(true);
+                                setLoadingState(true);
                                 const stateList = await fetchStateList(Number(value));
-                                setGstStates(stateList);
-                                setLoadingGstState(false);
+                                setStates(stateList);
+                                setLoadingState(false);
                               }}
                             />
+
+                            {/* STATE */}
                             <FloatingRHFSelect
-                              name="company_state_id"
+                              name="state_id"
                               label="State"
                               control={form.control}
-                              isDisabled={isView || !form.getValues("company_country_id")}
-                              options={gstStates.map(s => ({
+                              isRequired
+                              isDisabled={isView || !form.getValues("country_id")}
+                              options={states.map(s => ({
                                 value: String(s.id),
                                 label: s.name,
                               }))}
                               onValueChange={async (value) => {
-                                if (isGstHydratingRef.current) return;
+                                if (isHydratingRef.current) return;
 
-                                setGstCities([]);
-                                // form.setValue("gst_city_id", "");
+                                setCities([]);
+                                // form.setValue("city_id", "");
 
-                                setLoadingGstCity(true);
+                                setLoadingCity(true);
                                 const cityList = await fetchCityList(Number(value));
-                                setGstCities(cityList);
-                                setLoadingGstCity(false);
+                                setCities(cityList);
+                                setLoadingCity(false);
                               }}
                             />
+                            <div className="flex flex-col items-start">
+                              <FloatingRHFSelect
+                                name="type"
+                                label="Billing Type"
+                                control={form.control}
+                                isRequired
+                                isDisabled={isView}
+                                options={[
+                                  { label: "Company", value: "company" },
+                                  { label: "Individual", value: "individual" },
+                                ]}
+                                onValueChange={(value) => {
+                                  if (typeof value !== "string") return;
+                                  const billingType = value as "company" | "individual";
+                                  form.setValue("type", billingType);
+                                }}
+                              />
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Select <b>Company</b> if you need GST invoice
+                              </p>
+                            </div>
 
                           </div>
 
-                        </div>
-                      )}
-                  </SectionCard>
-                </Card>
-                }</>}
-              <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
 
 
-                {/* Vehicle Information */}
-                <Card>
-                  <SectionCard title="Vehicle Information" className="pb-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <FloatingRHFSelect
-                        name="vehicle_company_id"
-                        label="Vehicle Make"
-                        isDisabled={isView}
-                        isRequired
-                        control={form.control}
-                        options={meta.vehicleCompanies}
-                      />
-                      <FloatingRHFSelect
-                        name="vehicle_model_id"
-                        label="Vehicle Model"
-                        isRequired
-                        control={form.control}
-                        isDisabled={!meta.vehicleModels.length || isView}
-                        options={meta.vehicleModels}
-                      />
+                          {/* GST OPTIONAL */}
 
-                      <FloatingField
-                        name="color"
-                        isDisabled={isView}
-                        label="Vehicle Color"
-                        isRequired
-                        control={form.control}
-                      />
+                          {
+                            form.watch("type") === "company" &&
+                            (
+                              <div className="">
+                                <h4 className="text-sm font-semibold mb-4">
+                                  GST Information
+                                </h4>
 
-                      <FloatingRHFSelect
-                        name="year"
-                        label="Make Year"
-                        isDisabled={isView}
-                        isRequired
-                        control={form.control}
-                        options={meta.years}
-                      />
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-                      <FloatingField
-                        isDisabled={isView}
-                        name="reg_no"
-                        label="Registration No"
-                        isRequired
-                        control={form.control}
-                      />
 
-                      <FloatingField
-                        name="chasis_no"
-                        isDisabled={isView}
-                        label="Chassis No"
-                        control={form.control}
-                      />
-                      <FloatingRHFSelect
-                        name="vehicle_condition"
-                        label="SRS Condition"
-                        isRequired
-                        isDisabled={isView}
-                        control={form.control}
-                        options={meta.srsCondition}
-                      />
+                                  <FloatingField
+                                    name="company_contact_no"
+                                    label="Company Contact No."
+                                    isDisabled={isView}
+                                    control={form.control}
+                                  />
 
-                    </div>
-                    {/* PAINT CONDITION */}
-                    <div className="mt-4">
-                      <p className="mb-3 block text-sm font-medium text-[gray]">
-                        Vehicle Paint Condition
-                      </p>
+                                  <FloatingField
+                                    name="company_gstin"
+                                    label="GSTIN"
+                                    control={form.control}
+                                    isDisabled={isView}
+                                  />
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="isRepainted"
-                          render={({ field }) => (
-                            <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
-                              <Checkbox
-                                disabled={isView}
-                                checked={field.value}
-                                onCheckedChange={(val) => field.onChange(Boolean(val))}
+                                  <FloatingRHFSelect
+                                    name="company_country_id"
+                                    label="Country"
+                                    control={form.control}
+                                    isDisabled={isView}
+                                    options={countryList.map(c => ({
+                                      value: String(c.id),
+                                      label: c.name,
+                                    }))}
+                                    onValueChange={async (value) => {
+                                      if (isGstHydratingRef.current) return;
+
+                                      setGstStates([]);
+                                      setGstCities([]);
+                                      form.setValue("company_state_id", "");
+                                      // form.setValue("gst_city_id", "");
+
+                                      setLoadingGstState(true);
+                                      const stateList = await fetchStateList(Number(value));
+                                      setGstStates(stateList);
+                                      setLoadingGstState(false);
+                                    }}
+                                  />
+                                  <FloatingRHFSelect
+                                    name="company_state_id"
+                                    label="State"
+                                    control={form.control}
+                                    isDisabled={isView || !form.getValues("company_country_id")}
+                                    options={gstStates.map(s => ({
+                                      value: String(s.id),
+                                      label: s.name,
+                                    }))}
+                                    onValueChange={async (value) => {
+                                      if (isGstHydratingRef.current) return;
+
+                                      setGstCities([]);
+                                      // form.setValue("gst_city_id", "");
+
+                                      setLoadingGstCity(true);
+                                      const cityList = await fetchCityList(Number(value));
+                                      setGstCities(cityList);
+                                      setLoadingGstCity(false);
+                                    }}
+                                  />
+
+                                </div>
+
+                              </div>
+                            )}
+                        </SectionCard>
+                      </Card>
+                      }</>}
+                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+
+
+                      {/* Vehicle Information */}
+                      <Card>
+                        <SectionCard title="Vehicle Information" className="pb-4">
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <FloatingRHFSelect
+                              name="vehicle_company_id"
+                              label="Vehicle Make"
+                              isDisabled={isView}
+                              isRequired
+                              control={form.control}
+                              options={meta.vehicleCompanies}
+                            />
+                            <FloatingRHFSelect
+                              name="vehicle_model_id"
+                              label="Vehicle Model"
+                              isRequired
+                              control={form.control}
+                              isDisabled={!meta.vehicleModels.length || isView}
+                              options={meta.vehicleModels}
+                            />
+
+                            <FloatingField
+                              name="color"
+                              isDisabled={isView}
+                              label="Vehicle Color"
+                              isRequired
+                              control={form.control}
+                            />
+
+                            <FloatingRHFSelect
+                              name="year"
+                              label="Make Year"
+                              isDisabled={isView}
+                              isRequired
+                              control={form.control}
+                              options={meta.years}
+                            />
+
+                            <FloatingField
+                              isDisabled={isView}
+                              name="reg_no"
+                              label="Registration No"
+                              isRequired
+                              control={form.control}
+                            />
+
+                            <FloatingField
+                              name="chasis_no"
+                              isDisabled={isView}
+                              label="Chassis No"
+                              control={form.control}
+                            />
+                            <FloatingRHFSelect
+                              name="vehicle_condition"
+                              label="SRS Condition"
+                              isRequired
+                              isDisabled={isView}
+                              control={form.control}
+                              options={meta.srsCondition}
+                            />
+
+                          </div>
+                          {/* PAINT CONDITION */}
+                          <div className="mt-4">
+                            <p className="mb-3 block text-sm font-medium text-[gray]">
+                              Vehicle Paint Condition
+                            </p>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              <FormField
+                                control={form.control}
+                                name="isRepainted"
+                                render={({ field }) => (
+                                  <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
+                                    <Checkbox
+                                      disabled={isView}
+                                      checked={field.value}
+                                      onCheckedChange={(val) => field.onChange(Boolean(val))}
+                                    />
+                                    Repainted Vehicle
+                                  </label>
+                                )}
                               />
-                              Repainted Vehicle
-                            </label>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="isSingleStagePaint"
-                          render={({ field }) => (
-                            <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
-                              <Checkbox
-                                disabled={isView}
-                                checked={field.value}
-                                onCheckedChange={(val) => field.onChange(Boolean(val))}
+                              <FormField
+                                control={form.control}
+                                name="isSingleStagePaint"
+                                render={({ field }) => (
+                                  <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
+                                    <Checkbox
+                                      disabled={isView}
+                                      checked={field.value}
+                                      onCheckedChange={(val) => field.onChange(Boolean(val))}
+                                    />
+                                    Single Stage Paint
+                                  </label>
+                                )}
                               />
-                              Single Stage Paint
-                            </label>
-                          )}
-                        />
 
-                        <FormField
-                          control={form.control}
-                          name="isPaintThickness"
-                          render={({ field }) => (
-                            <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
-                              <Checkbox
-                                disabled={isView}
-                                checked={field.value}
-                                onCheckedChange={(val) => field.onChange(Boolean(val))}
+                              <FormField
+                                control={form.control}
+                                name="isPaintThickness"
+                                render={({ field }) => (
+                                  <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
+                                    <Checkbox
+                                      disabled={isView}
+                                      checked={field.value}
+                                      onCheckedChange={(val) => field.onChange(Boolean(val))}
+                                    />
+                                    Paint Thickness below 2 MIL
+                                  </label>
+                                )}
                               />
-                              Paint Thickness below 2 MIL
-                            </label>
-                          )}
-                        />
 
-                        <FormField
-                          control={form.control}
-                          name="isVehicleOlder"
-                          render={({ field }) => (
-                            <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
-                              <Checkbox
-                                disabled={isView}
-                                checked={field.value}
-                                onCheckedChange={(val) => field.onChange(Boolean(val))}
+                              <FormField
+                                control={form.control}
+                                name="isVehicleOlder"
+                                render={({ field }) => (
+                                  <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
+                                    <Checkbox
+                                      disabled={isView}
+                                      checked={field.value}
+                                      onCheckedChange={(val) => field.onChange(Boolean(val))}
+                                    />
+                                    Vehicle older than 5 years
+                                  </label>
+                                )}
                               />
-                              Vehicle older than 5 years
-                            </label>
-                          )}
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <FloatingTextarea
-                        name="remarks"
-                        label="Remark"
-                        control={form.control}
-                      />
-                    </div>
+                            </div>
+                          </div>
+                          <div className="mt-4">
+                            <FloatingTextarea
+                              name="remarks"
+                              label="Remark"
+                              control={form.control}
+                            />
+                          </div>
 
 
-                  </SectionCard>
-                </Card>
+                        </SectionCard>
+                      </Card>
 
-                {/* Service Selection & Summary */}
-                <Card>
-                  <SectionCard title="Service Information" className="pb-4 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* Vehicle Type */}
-                      <FloatingRHFSelect
-                        name="vehicle_type"
-                        isDisabled={isView}
-                        label="Vehicle Type"
-                        isRequired
-                        control={form.control}
-                        options={meta.vehicleTypes}
-                      />
+                      {/* Service Selection & Summary */}
+                      <Card>
+                        <SectionCard title="Service Information" className="pb-4 space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Vehicle Type */}
+                            <FloatingRHFSelect
+                              name="vehicle_type"
+                              isDisabled={isView}
+                              label="Vehicle Type"
+                              isRequired
+                              control={form.control}
+                              options={meta.vehicleTypes}
+                            />
 
-                      {/* Service Date */}
-                      <FloatingDateField
-                        name="jobcard_date"
-                        label="Service Date"
-                        isRequired
-                        isDisabled={isView}
-                        control={form.control}
-                      />
-                      {/* Service Type */}
-                      <FloatingRHFSelect
-                        name="service_type"
-                        label="Service Type"
-                        isMulti
-                        isDisabled={isView}
-                        isRequired
-                        control={form.control}
-                        options={meta.serviceTypes}
-                      />
-                      {/* Service Type (Multi) */}
+                            {/* Service Date */}
+                            <FloatingDateField
+                              name="jobcard_date"
+                              label="Service Date"
+                              isRequired
+                              isDisabled={isView}
+                              control={form.control}
+                            />
+                            {/* Service Type */}
+                            <FloatingRHFSelect
+                              name="service_type"
+                              label="Service Type"
+                              isMulti
+                              isDisabled={isView}
+                              isRequired
+                              control={form.control}
+                              options={meta.serviceTypes}
+                            />
+                            {/* Service Type (Multi) */}
 
-                    </div>
-                    <div className="mt-4">
-                      <p className="mb-3 block text-sm font-medium text-[gray]">
-                        Select Services <span className="text-red-500">*</span>
-                      </p>
-                      {loadingServices && (
-                        <p className="text-sm text-muted-foreground text-center flex gap-2 items-center justify-center">
-                          <Loader loaderSize={4} isShowLoadingText={false} />
-                          Loading services…
-                        </p>
-                      )}
+                          </div>
+                          <div className="mt-4">
+                            <p className="mb-3 block text-sm font-medium text-[gray]">
+                              Select Services <span className="text-red-500">*</span>
+                            </p>
+                            {loadingServices && (
+                              <p className="text-sm text-muted-foreground text-center flex gap-2 items-center justify-center">
+                                <Loader loaderSize={4} isShowLoadingText={false} />
+                                Loading services…
+                              </p>
+                            )}
 
-                      {!loadingServices && services.length === 0 && (
-                        <p className="text-sm text-muted-foreground  text-center">
-                          No services available for selected vehicle & service type
-                        </p>
-                      )}
-                      {!loadingServices && services.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {services.map(service => {
-                          const isSelected = selectedServices.includes(service.id);
+                            {!loadingServices && services.length === 0 && (
+                              <p className="text-sm text-muted-foreground  text-center">
+                                No services available for selected vehicle & service type
+                              </p>
+                            )}
+                            {!loadingServices && services.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {services.map(service => {
+                                const isSelected = selectedServices.includes(service.id);
 
-                          return (
-                            <Card
-                              key={service.id}
-                              className={`
+                                return (
+                                  <Card
+                                    key={service.id}
+                                    className={`
     transition-all border
     ${isSelected
-                                  ? "border-primary bg-primary/5 shadow-sm"
-                                  : "hover:border-muted-foreground/30"}
+                                        ? "border-primary bg-primary/5 shadow-sm"
+                                        : "hover:border-muted-foreground/30"}
   `}
-                            >
-                              <CardContent className="p-4">
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="flex items-start gap-2">
-                                    <Checkbox
-                                      checked={isSelected}
-                                      disabled={isView}
-                                      onCheckedChange={() => toggleService(service.id)}
-                                      onClick={(e) => e.stopPropagation()} // 🔴 IMPORTANT
-                                    />
+                                  >
+                                    <CardContent className="p-4">
+                                      <div className="flex items-start justify-between gap-3">
+                                        <div className="flex items-start gap-2">
+                                          <Checkbox
+                                            checked={isSelected}
+                                            disabled={isView}
+                                            onCheckedChange={() => toggleService(service.id)}
+                                            onClick={(e) => e.stopPropagation()} // 🔴 IMPORTANT
+                                          />
 
-                                    <div>
-                                      <p className="font-medium leading-tight">
-                                        {service.label}
-                                      </p>
-                                      <p className="text-xs text-muted-foreground mt-1">
-                                        {service.description}
-                                      </p>
-                                    </div>
-                                  </div>
+                                          <div>
+                                            <p className="font-medium leading-tight">
+                                              {service.label}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                              {service.description}
+                                            </p>
+                                          </div>
+                                        </div>
 
-                                  <div className="text-right">
-                                    <p className="text-lg font-semibold text-green-600">
-                                      ₹{service.price}
-                                    </p>
+                                        <div className="text-right">
+                                          <p className="text-lg font-semibold text-green-600">
+                                            ₹{service.price}
+                                          </p>
 
-                                  </div>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          );
-                        })}
-                      </div>}
+                                        </div>
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                );
+                              })}
+                            </div>}
 
-                      {/* Validation error */}
-                      <FormMessage className="pt-1 text-[0.75rem]">
-                        {form.formState.errors.service_ids?.message}
-                      </FormMessage>
+                            {/* Validation error */}
+                            <FormMessage className="pt-1 text-[0.75rem]">
+                              {form.formState.errors.service_ids?.message}
+                            </FormMessage>
+                          </div>
+
+                        </SectionCard>
+                      </Card>
                     </div>
-
-                  </SectionCard>
-                </Card>
-              </div>
-
+                  </>}
               {mode !== 'view' &&
                 <div className="  pb-4 flex justify-end gap-3 mt-4">
                   <Button

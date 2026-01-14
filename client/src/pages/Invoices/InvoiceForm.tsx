@@ -1,51 +1,31 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import building from '@/lib/images/building.webp'
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as Dialog from "@radix-ui/react-dialog";
 import { IconButton } from "@chakra-ui/react";
 
 import { Form } from "@/components/ui/form";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Box } from "@chakra-ui/react";
-import { Constant } from "@/lib/constant";
-import { availablePlansMock, invoicePlanMockData, invoiceViewMock, warrantyType } from "@/lib/mockData";
-import { InvoicePaymentFormProp, InvoicePaymentFormValues, organizationFormType, serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
-import {  invoiceSchema, organizationSchema, servicePlanSchema, userSchema } from "@/lib/schema";
-import RHFSelect from "@/components/RHFSelect";
-import { Textarea } from "@/components/ui/textarea";
-import { unknown } from "zod";
-import { useAuth } from "@/lib/auth";
-import { createInvoice, fetchCityList, fetchStateList, getInvoiceInfo, getInvoiceInfoByJobCardPrefill, getInvoicePayments, getJobCardItem, getPaymentsList } from "@/lib/api";
-import { Pencil, Trash2, X } from "lucide-react";
+import { invoiceSchema } from "@/lib/schema";
+import { createInvoice, fetchStateList, getInvoiceInfo, getInvoiceInfoByJobCardPrefill, getInvoicePayments } from "@/lib/api";
+import { Trash2 } from "lucide-react";
 import { calculateInvoiceRow, formatDate, formatTime, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, normalizeInvoiceToEditResponse, } from "@/lib/utils";
-import { RequiredMark } from "@/components/common/RequiredMark";
-import { SectionCard } from "@/components/common/card";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
 
 // export default function InvoicePaymentForm
 // (
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, FileText } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import CommonTable from "@/components/common/CommonTable";
 import { Info } from "@/components/common/viewInfo";
 import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
 import { useToast } from "@/hooks/use-toast";
-import PaymentsPage from "../Payments/payments";
 
 
 export default function InvoiceForm() {
@@ -531,11 +511,11 @@ export default function InvoiceForm() {
       width: "180px",
 
     },
- {
+    {
       key: "payment_mode",
       label: "Mode",
       width: "120px",
-     
+
     },
     /* ================= PAYMENT STATUS ================= */
     {
@@ -543,7 +523,7 @@ export default function InvoiceForm() {
       label: "Status",
       width: "120px",
       render: (value: string) => {
- const styles: Record<string, string> = {
+        const styles: Record<string, string> = {
           issued: "bg-yellow-100 text-yellow-700",
           recieved: "bg-emerald-100 text-emerald-700",
           cancelled: "bg-red-100 text-red-700",
@@ -552,9 +532,9 @@ export default function InvoiceForm() {
         return (
           <span
             className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[value]}`}
-         
+
           >
-            {value.charAt(0).toUpperCase()+value.slice(1)}
+            {value.charAt(0).toUpperCase() + value.slice(1)}
           </span>
         );
       },
@@ -573,7 +553,7 @@ export default function InvoiceForm() {
 
       const res =
         await getInvoicePayments(id ?? "");
-console.log(res.data,'res.data');
+      console.log(res.data, 'res.data');
 
       const mappedData = res.data?.payments.map((item: any) => ({
         ...item,
@@ -611,10 +591,10 @@ console.log(res.data,'res.data');
       {/* Header */}
       <div className="flex items-center gap-2">
         <button
-           onClick={() => {
- localStorage.removeItem('sidebar_active_parent')
-              window.history.back()
-            }}
+          onClick={() => {
+            localStorage.removeItem('sidebar_active_parent')
+            window.history.back()
+          }}
           // disabled={loading}
           className="text-muted-foreground hover:text-foreground"
         >
@@ -632,316 +612,325 @@ console.log(res.data,'res.data');
           {invoiceView?.status ?? "-"}
         </Badge>}
       </div>
+      {
+        isInfoLoading && id ?
+          <Card className="mb-6"><div className="min-h-[150px] flex justify-center items-center">
+            <div className="p-4 text-sm "><Loader /></div>
+          </div></Card> : <>
+            {/* Top Info */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {invoiceView?.customer && <Card className="p-4">
+                <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+                  Customer Detail
+                </CardTitle>
+                <div className="space-y-2">
+                  <InfoIfExists
+                    label="Name"
+                    value={invoiceView?.customer?.name}
+                  />
+                  <InfoIfExists
+                    label="Phone"
+                    value={invoiceView?.customer?.phone}
+                  />
+                  <InfoIfExists
+                    label="Email"
+                    value={invoiceView?.customer?.email}
+                  />
+                  <InfoIfExists
+                    label="Address"
+                    value={invoiceView?.customer?.address}
+                  />
+                </div>
+              </Card>}
 
-      {/* Top Info */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {invoiceView?.customer && <Card className="p-4">
-          <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
-            Customer Detail
-          </CardTitle>
-          <div className="space-y-2">
-            <InfoIfExists
-              label="Name"
-              value={invoiceView?.customer?.name}
-            />
-            <InfoIfExists
-              label="Phone"
-              value={invoiceView?.customer?.phone}
-            />
-            <InfoIfExists
-              label="Email"
-              value={invoiceView?.customer?.email}
-            />
-            <InfoIfExists
-              label="Address"
-              value={invoiceView?.customer?.address}
-            />
-          </div>
-        </Card>}
+              {invoiceView?.vehicle && <Card className="p-4">
+                <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+                  Vehicle Info  </CardTitle>   <div className="space-y-2">
+                  <InfoIfExists label="Type" value={invoiceView?.vehicle?.type} />
+                  <InfoIfExists label="Make" value={invoiceView?.vehicle?.make} />
+                  <InfoIfExists label="Model" value={invoiceView?.vehicle?.model} />
+                  <InfoIfExists label="Reg No" value={invoiceView?.vehicle?.reg_no} />
+                  <InfoIfExists label="Year" value={invoiceView?.vehicle?.make_year} />
+                  <InfoIfExists label="Color" value={invoiceView?.vehicle?.color} />
+                  <InfoIfExists label="Chassis No" value={invoiceView?.vehicle?.chassisNo} />
+                  <InfoIfExists label="Remark" value={invoiceView?.vehicle?.remark} />
 
-        {invoiceView?.vehicle && <Card className="p-4">
-          <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
-            Vehicle Info  </CardTitle>   <div className="space-y-2">
-            <InfoIfExists label="Type" value={invoiceView?.vehicle?.type} />
-            <InfoIfExists label="Make" value={invoiceView?.vehicle?.make} />
-            <InfoIfExists label="Model" value={invoiceView?.vehicle?.model} />
-            <InfoIfExists label="Reg No" value={invoiceView?.vehicle?.reg_no} />
-            <InfoIfExists label="Year" value={invoiceView?.vehicle?.make_year} />
-            <InfoIfExists label="Color" value={invoiceView?.vehicle?.color} />
-            <InfoIfExists label="Chassis No" value={invoiceView?.vehicle?.chassisNo} />
-            <InfoIfExists label="Remark" value={invoiceView?.vehicle?.remark} />
+                </div>
+              </Card>
+              }
+              {invoiceView?.jobcard && <Card className="p-4">
+                <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+                  Jobcard Info
+                </CardTitle>
+                <div className="space-y-2">
+                  <InfoIfExists label="Service Date" value={invoiceView?.jobcard.jobcard_date} />
+                  <InfoIfExists label="Edited Date" value={invoiceView?.jobcard.edited_date} />
+                </div>
+              </Card>}
+            </div>
 
-          </div>
-        </Card>
-        }
-        {invoiceView?.jobcard && <Card className="p-4">
-          <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
-            Jobcard Info
-          </CardTitle>
-          <div className="space-y-2">
-            <InfoIfExists label="Service Date" value={invoiceView?.jobcard.jobcard_date} />
-            <InfoIfExists label="Edited Date" value={invoiceView?.jobcard.edited_date} />
-          </div>
-        </Card>}
-      </div>
+            {/* Plans */}
+            <Card className="p-4 lg:col-span-3">
+              <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
+                PLAN INFO
+              </CardTitle>
+              <Form {...form}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
 
-      {/* Plans */}
-      <Card className="p-4 lg:col-span-3">
-        <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
-          PLAN INFO
-        </CardTitle>
-        <Form {...form}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                  <FloatingRHFSelect
+                    name="billing_to"
+                    label="Billing To"
+                    control={form.control}
+                    isDisabled={isView}
+                    isRequired
+                    options={[
+                      { label: "Individual", value: "individual" },
+                      { label: "Company", value: "company" },
+                    ]}
+                  />
 
-            <FloatingRHFSelect
-              name="billing_to"
-              label="Billing To"
-              control={form.control}
-              isDisabled={isView}
-              isRequired
-              options={[
-                { label: "Individual", value: "individual" },
-                { label: "Company", value: "company" },
-              ]}
-            />
+                  <FloatingField
+                    name="billing_name"
+                    label="Name"
 
-            <FloatingField
-              name="billing_name"
-              label="Name"
+                    isDisabled={isView}
+                    control={form.control}
+                    isRequired
+                  />
 
-              isDisabled={isView}
-              control={form.control}
-              isRequired
-            />
+                  <FloatingField
+                    name="billing_phone"
+                    label="Phone"
 
-            <FloatingField
-              name="billing_phone"
-              label="Phone"
+                    isDisabled={isView}
+                    control={form.control}
+                    isRequired
+                  />
 
-              isDisabled={isView}
-              control={form.control}
-              isRequired
-            />
+                  <FloatingField
+                    name="billing_email"
 
-            <FloatingField
-              name="billing_email"
+                    isDisabled={isView}
+                    label="Email"
+                    control={form.control}
+                    isRequired
+                  />
 
-              isDisabled={isView}
-              label="Email"
-              control={form.control}
-              isRequired
-            />
+                  <FloatingRHFSelect
+                    name="billing_state_id"
+                    label="State"
+                    control={form.control}
 
-            <FloatingRHFSelect
-              name="billing_state_id"
-              label="State"
-              control={form.control}
+                    isDisabled={isView}
+                    isRequired
+                    options={states.map(s => ({
+                      label: s.name,
+                      value: String(s.id),
+                    }))}
+                  />
+                  {form.getValues("billing_to") === 'company' && <FloatingField
+                    name="billing_gstin"
+                    label="GSTIN"
+                    control={form.control}
+                    isDisabled={isView}
+                  />}
+                </div>
 
-              isDisabled={isView}
-              isRequired
-              options={states.map(s => ({
-                label: s.name,
-                value: String(s.id),
-              }))}
-            />
-            {form.getValues("billing_to") === 'company' && <FloatingField
-              name="billing_gstin"
-              label="GSTIN"
-              control={form.control}
-              isDisabled={isView}
-            />}
-          </div>
+                <div className="mt-4">
+                  <FloatingTextarea
 
-          <div className="mt-4">
-            <FloatingTextarea
+                    isView={isView}
+                    name="billing_address"
+                    rows={2}
+                    label="Billing Address"
+                    control={form.control}
+                    isRequired
+                  />
+                </div>
+              </Form>
+              {mode !== 'view' && <div className="flex items-end gap-3 mt-3 ">
 
-              isView={isView}
-              name="billing_address"
-              rows={2}
-              label="Billing Address"
-              control={form.control}
-              isRequired
-            />
-          </div>
-        </Form>
-        {mode !== 'view' && <div className="flex items-end gap-3 mt-3 ">
+                <div className="w-72">
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      const selectedId = e.target.value;
+                      if (!selectedId) return;
 
-          <div className="w-72">
-            <select
-              value=""
-              onChange={(e) => {
-                const selectedId = e.target.value;
-                if (!selectedId) return;
+                      const plan = availablePlans.find(
+                        (p) => String(p.id) === selectedId
+                      );
+                      if (!plan) return;
 
-                const plan = availablePlans.find(
-                  (p) => String(p.id) === selectedId
-                );
-                if (!plan) return;
+                      const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
 
-                const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
+                      setPlans(prev => {
+                        const existing = prev.find(p => p.id === plan.id);
 
-                setPlans(prev => {
-                  const existing = prev.find(p => p.id === plan.id);
+                        // ✅ If already exists → increment qty
+                        if (existing) {
+                          return prev.map(p =>
+                            p.id === plan.id
+                              ? calculateInvoiceRow(
+                                { ...p, qty: Number(p.qty || 1) + 1 },
+                                gstType
+                              )
+                              : p
+                          );
+                        }
 
-                  // ✅ If already exists → increment qty
-                  if (existing) {
-                    return prev.map(p =>
-                      p.id === plan.id
-                        ? calculateInvoiceRow(
-                          { ...p, qty: Number(p.qty || 1) + 1 },
-                          gstType
-                        )
-                        : p
-                    );
-                  }
+                        // ✅ First time add → qty = 1
+                        return [
+                          ...prev,
+                          calculateInvoiceRow({ ...plan, qty: 1 }, gstType),
+                        ];
+                      });
 
-                  // ✅ First time add → qty = 1
-                  return [
-                    ...prev,
-                    calculateInvoiceRow({ ...plan, qty: 1 }, gstType),
-                  ];
-                });
-
-                // reset dropdown back
-                e.target.value = "";
-              }}
-              className="w-full border rounded-md px-3 py-2 text-sm"
-            >
-              <option value="">Add Service Plan</option>
-              {availablePlans.map((plan) => (
-                <option key={plan.id} value={plan.id}>
-                  {plan.plan_name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-
-        </div>}
-        <CommonTable
-          columns={planColumns}
-          data={plans}
-          searchable={false}
-          isAdd={false}
-          isLoading={false}
-          total={plans.length}
-          tabDisplayName="Plans"
-          page={1}
-          isTotal={false}
-          setPage={() => { }}
-          lastPage={1}
-          hasNext={false}
-          actions={
-            isView
-              ? undefined
-              : (row: any) => (
-                <Box className="gap-3">
-                  <IconButton
-                    size="xs"
-                    mr={2}
-                    colorScheme="red"
-                    disabled={plans.length <= 1}
-                    aria-label="Delete"
-                    onClick={() => removePlan(row.id)}
+                      // reset dropdown back
+                      e.target.value = "";
+                    }}
+                    className="w-full border rounded-md px-3 py-2 text-sm"
                   >
-                    <Trash2 size={16} />
-                  </IconButton>
-                </Box>
-              )
-          }
-        />
-
-        {/* TOTALS */}
-        <div className="flex md:justify-end ">
-          <div className="w-[300px] text-sm space-y-2">
-
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                Total Items :
-              </span>
-              <span className="font-medium">
-                {costSummary.totalItems}
-              </span>
-            </div>
-
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                Sub Total Amount:
-              </span>
-              <span className="font-medium">
-                ₹ {costSummary.subTotal}
-              </span>
-            </div>
-
-            {form.getValues("billing_to") === "company" ? (
-              <>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    CGST Amount :
-                  </span>
-                  <span className="font-medium">
-                    ₹ {costSummary.cgstTotal ?? "-"}
-                  </span>
+                    <option value="">Add Service Plan</option>
+                    {availablePlans.map((plan) => (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.plan_name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    SGST Amount :
-                  </span>
-                  <span className="font-medium">
-                    ₹ {costSummary.sgstTotal ?? "-"}
-                  </span>
+
+
+              </div>}
+              <CommonTable
+                columns={planColumns}
+                data={plans}
+                searchable={false}
+                isAdd={false}
+                isLoading={false}
+                total={plans.length}
+                tabDisplayName="Plans"
+                page={1}
+                isTotal={false}
+                setPage={() => { }}
+                lastPage={1}
+                hasNext={false}
+                actions={
+                  isView
+                    ? undefined
+                    : (row: any) => (
+                      <Box className="gap-3">
+                        <IconButton
+                          size="xs"
+                          mr={2}
+                          colorScheme="red"
+                          disabled={plans.length <= 1}
+                          aria-label="Delete"
+                          onClick={() => removePlan(row.id)}
+                        >
+                          <Trash2 size={16} />
+                        </IconButton>
+                      </Box>
+                    )
+                }
+              />
+
+              {/* TOTALS */}
+              <div className="flex md:justify-end ">
+                <div className="w-[300px] text-sm space-y-2">
+
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Total Items :
+                    </span>
+                    <span className="font-medium">
+                      {costSummary.totalItems}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Sub Total Amount:
+                    </span>
+                    <span className="font-medium">
+                      ₹ {costSummary.subTotal}
+                    </span>
+                  </div>
+
+                  {form.getValues("billing_to") === "company" ? (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          CGST Amount :
+                        </span>
+                        <span className="font-medium">
+                          ₹ {costSummary.cgstTotal ?? "-"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          SGST Amount :
+                        </span>
+                        <span className="font-medium">
+                          ₹ {costSummary.sgstTotal ?? "-"}
+                        </span>
+                      </div>
+                    </>
+                  ) : <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      IGST Amount :
+                    </span>
+                    <span className="font-medium">
+                      ₹ {costSummary.igstTotal ?? "-"}
+                    </span>
+                  </div>}
+                  <div className="flex justify-between font-semibold border-t pt-2">
+                    <span>Grand Total Amount:</span>
+                    <span>
+                      ₹ {costSummary?.grandTotal}
+                    </span>
+                  </div>
+
                 </div>
-              </>
-            ) : <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                IGST Amount :
-              </span>
-              <span className="font-medium">
-                ₹ {costSummary.igstTotal ?? "-"}
-              </span>
-            </div>}
-            <div className="flex justify-between font-semibold border-t pt-2">
-              <span>Grand Total Amount:</span>
-              <span>
-                ₹ {costSummary?.grandTotal}
-              </span>
-            </div>
+              </div>
+            </Card>
+            {/* Payments info */}
+            {mode == 'view' && <Card className="p-4 lg:col-span-3">
+              <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
+                PAYMENTS INFO
+              </CardTitle>
+              <CommonTable
+                columns={paymentColumn}
+                isClear={false}
+                data={payments}
+                isAdd={false}
+                isTotal={false}
+                searchable={false}
+                perPage={perPage}
+                setPerPage={setPerPage}
+                resetFilter={resetFilter}
+                isLoading={isListLoading}
+                total={total}
+                hasNext={has_next}
+                tabType=""
+                tabDisplayName="Payments"
+                page={page}
+                setPage={setPage}
+                lastPage={lastPage}
+                searchValue={search}
+                onSearch={(value: string) => {
+                  // if (value) {
+                  setSearch(value);
+                  setPage(1); // reset page on new search
+                  // }
+                }}
 
-          </div>
-        </div>
-      </Card>
-      {/* Payments info */}
-      {mode == 'view' && <Card className="p-4 lg:col-span-3">
-        <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
-          PAYMENTS INFO
-        </CardTitle>
-        <CommonTable
-          columns={paymentColumn}
-          isClear={false}
-          data={payments}
-          isAdd={false}
-          searchable={false}
-          perPage={perPage}
-          setPerPage={setPerPage}
-          resetFilter={resetFilter}
-          isLoading={isListLoading}
-          total={total}
-          hasNext={has_next}
-          tabType=""
-          tabDisplayName="Payments"
-          page={page}
-          setPage={setPage}
-          lastPage={lastPage}
-          searchValue={search}
-          onSearch={(value: string) => {
-            // if (value) {
-            setSearch(value);
-            setPage(1); // reset page on new search
-            // }
-          }}
+              />
+            </Card>}
+          </>
+      }
 
-        />
-      </Card>}
+
       {mode !== 'view' &&
         <div className="  pb-4 flex justify-end gap-3 mt-4">
           <Button

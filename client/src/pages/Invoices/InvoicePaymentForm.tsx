@@ -34,6 +34,7 @@ import { SectionCard } from "@/components/common/card";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
+import { Loader } from "@/components/common/loader";
 
 export default function InvoicePaymentForm({
     mode,
@@ -71,7 +72,7 @@ export default function InvoicePaymentForm({
             remarks: "",
         },
     });
-    const [isListLoading, setIsDataLoading] = useState(true);
+    const [isDataLoading, setIsDataLoading] = useState(true);
     const fetchPayments = async (isLoaderHide = false) => {
         try {
             if (!isLoaderHide)
@@ -128,7 +129,11 @@ export default function InvoicePaymentForm({
                     onSubmit(values, form.setError)
                 )}
             >
-                <div className="pb-4  max-h-[60vh] overflow-y-auto">
+                {
+                    isDataLoading ?
+                    <div className="min-h-[150px] flex justify-center items-center">
+                                <div className="p-4 text-sm "><Loader /></div>
+                              </div>:      <div className="pb-4  max-h-[60vh] overflow-y-auto">
                     <SectionCard title="Invoice Summary" className="mt-0">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <FloatingField
@@ -197,7 +202,7 @@ export default function InvoicePaymentForm({
                                                     {...field}
                                                     className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
                                                 >
-                                                    <option value="" disabled>Select mode</option>
+                                                    <option value="" disabled>Select </option>
 
                                                     {paymentMode.map((item: any) => (
                                                         <option key={item.value ?? item.id} value={item.value}>
@@ -224,13 +229,15 @@ export default function InvoicePaymentForm({
                     </SectionCard>
                 </div>
 
+                }
+          
                 {/* ================= ACTIONS ================= */}
                 {mode !== 'view' &&
                     <div className="">
                         <div className="flex justify-end gap-3 pb-4 pr-4  border-t pt-[24px]">
                             <Button
                                 variant="outline"
-                                disabled={isLoading}
+                                disabled={isLoading || isDataLoading}
                                 className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
                                 onClick={onClose}
                             >
@@ -238,7 +245,7 @@ export default function InvoicePaymentForm({
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={isLoading}
+                                disabled={isLoading || isDataLoading}
                                 className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
                             >
                                 {isLoading && <svg
