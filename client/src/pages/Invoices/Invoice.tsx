@@ -159,7 +159,7 @@ export default function Invoice() {
                     issued: "bg-yellow-100 text-yellow-700",
                     paid: "bg-emerald-100 text-emerald-700",
                     cancelled: "bg-red-100 text-red-700",
-                    "Partially-Paid": "bg-blue-100 text-blue-700",
+                    "partially_paid": "bg-blue-100 text-blue-700",
                 };
 
                 return (

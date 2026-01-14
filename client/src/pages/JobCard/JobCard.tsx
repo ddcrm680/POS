@@ -177,12 +177,20 @@ export default function JobCard() {
       width: "110px",
       render: (value: string) => (
         <Badge
-          className={`px-3 py-1 text-xs font-medium rounded-full ${value === "created"
-            ? "bg-blue-100 text-blue-700"
-            : value === "cancelled"
-              ? "bg-red-100 text-red-700"
-              : "bg-gray-100 text-gray-700"
-            }`}
+         className={`px-3 py-1 text-xs font-medium rounded-full
+  ${
+    value === "created"
+      ? "bg-blue-100 text-blue-700"
+      : value === "completed"
+      ? "bg-green-100 text-green-700"
+      : value === "invoiced"
+      ? "bg-purple-100 text-purple-700"
+      : value === "cancelled"
+      ? "bg-red-100 text-red-700"
+      : "bg-gray-100 text-gray-700"
+  }
+`}
+
         >
             {filterMetaInfo.status.find((item:any) => item.value === value)?.label}
         
@@ -194,9 +202,6 @@ export default function JobCard() {
       label: "Invoice No.",
       width: "150px",
       render: (value: any, row: any) => {
-        // CASE 1: Invoice exists
-        console.log(value, 'valuevalue');
-
         if (value) {
           return (
             <span
