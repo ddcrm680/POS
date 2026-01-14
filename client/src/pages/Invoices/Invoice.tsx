@@ -95,7 +95,7 @@ export default function Invoice() {
             render: (value: string, row: any) => (
                 <span className="text-[blue] font-medium cursor-pointer" onClick={() => navigate(`/invoice/manage?id=${row.id}&mode=view`)
                 }>
-                    #{value}
+                    {value}
                 </span>
             ),
         },

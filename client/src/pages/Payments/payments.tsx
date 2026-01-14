@@ -111,7 +111,7 @@ export default function PaymentsPage() {
       render: (value: string, row: any) => (
         <span className="text-[blue] font-medium cursor-pointer" onClick={() => navigate(`/invoice/manage?id=${row?.invoice?.id}&mode=view`)
         }>
-          #{value}
+          {value}
         </span>
       ),
     },
