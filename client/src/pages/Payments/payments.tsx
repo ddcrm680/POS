@@ -318,7 +318,7 @@ export default function PaymentsPage() {
                 <>
 
                   {(
-                    <Box className="gap-3">    
+                    <Box className="gap-0">    
                       {
 
                         row.status !== 'cancelled' ? <IconButton

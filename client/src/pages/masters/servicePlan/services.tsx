@@ -423,7 +423,7 @@ export default function Services() {
               <>
 
                 {(
-                  <Box className="gap-3">
+                  <Box className="gap-0">
                     <IconButton
                       size="xs"
                       mr={2}

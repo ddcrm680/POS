@@ -304,9 +304,9 @@ export default function Invoice() {
                                 <>
 
                                     {(
-                                        <Box className="gap-3">     <IconButton
+                                        <Box className="gap-0">     <IconButton
                                             size="xs"
-                                            mr={2}
+                                            // mr={2}
                                             aria-label="Print"
                                             disabled
                                             onClick={() => { }
@@ -316,7 +316,7 @@ export default function Invoice() {
                                         </IconButton>
                                             <IconButton
                                                 size="xs"
-                                                mr={2}
+                                                // mr={2}
                                                 aria-label="View"
                                                 onClick={() => {
                                                     navigate(`/invoice/manage?id=${row.id}&mode=view`)
@@ -329,7 +329,7 @@ export default function Invoice() {
                                             {
                                                 row.status == 'issued' && <IconButton
                                                 size="xs"
-                                                mr={2}
+                                                // mr={2}
                                                 aria-label="Edit"
                                                 onClick={() => {
                                                     navigate(`/invoice/manage?id=${row.id}&mode=edit`)
@@ -348,7 +348,7 @@ export default function Invoice() {
                                               (row?.status === "partially_paid"||  row.status == 'issued') && 
                                                 <IconButton
                                                     size="xs"
-                                                    mr={2}
+                                                    // mr={2}
                                                     colorScheme="red"
                                                     aria-label="Delete"
                                                     onClick={() => {
@@ -361,7 +361,7 @@ export default function Invoice() {
 
                                                 row.status == 'issued' && <IconButton
                                                     size="xs"
-                                                    mr={2}
+                                                    // mr={2}
                                                     title="Cancel"
                                                     colorScheme="red"
                                                     aria-label="Cancel"
