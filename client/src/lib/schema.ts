@@ -979,26 +979,46 @@ export const NewCustomerSchema = z
     store_id: z.string().optional(), // 🔑 optional, enforced below
   })
 
-export const invoicePaymentSchema = z
-  .object({
-    grand_total: z.string(),
-    paid_amount: z.string(),
-    total_due: z.string(),
+export const createInvoicePaymentSchema = (
+  paymentModes: Array<{ value: string; requires_txn_id: boolean }>
+) =>
+  z
+    .object({
+      grand_total: z.string(),
+      paid_amount: z.string(),
+      total_due: z.string(),
 
-    received_amount: z
-      .string({ invalid_type_error: "Enter amount" })
-      .min(1, "Amount must be greater than 0"),
+      received_amount: z
+        .string({ invalid_type_error: "Enter amount" })
+        .min(1, "Amount must be greater than 0"),
 
-    txn_id: z
-      .string()
-      .max(100, "Tax Id must not exceed 100 characters")
-      .optional(),
-    payment_mode: z.string().min(1, "Select payment mode"),
-    payment_date: z.string().min(1, "Select payment date"),
+      payment_mode: z.string().min(1, "Select payment mode"),
 
-    remarks: z.string().max(255, "Remarks must not exceed 255 characters").optional(),
-  })
+      txn_id: z
+        .string()
+        .max(100, "Transaction Id must not exceed 100 characters")
+        .optional(),
 
+      payment_date: z.string().min(1, "Select payment date"),
+
+      remarks: z
+        .string()
+        .max(255, "Remarks must not exceed 255 characters")
+        .optional(),
+    })
+    .superRefine((data, ctx) => {
+      const mode = paymentModes.find(
+        m => m.value === data.payment_mode
+      );
+
+      if (mode?.requires_txn_id && !data.txn_id?.trim()) {
+        ctx.addIssue({
+          path: ["txn_id"],
+          code: z.ZodIssueCode.custom,
+          message: "Transaction Id is required for selected payment mode",
+        });
+      }
+    });
 const GSTIN_REGEX =
   /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/;
 export const invoiceSchema = z

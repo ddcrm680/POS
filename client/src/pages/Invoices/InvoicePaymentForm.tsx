@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import building from '@/lib/images/building.webp'
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,8 +20,8 @@ import { Input } from "@/components/ui/input";
 import { Box } from "@chakra-ui/react";
 import { Constant } from "@/lib/constant";
 import { warrantyType } from "@/lib/mockData";
-import { InvoicePaymentFormProp, InvoicePaymentFormValues, organizationFormType, serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
-import { invoicePaymentSchema, organizationSchema, servicePlanSchema, userSchema } from "@/lib/schema";
+import { InvoicePaymentFormProp, InvoicePaymentFormValues, InvoicePaymentValues, organizationFormType, serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
+import { createInvoicePaymentSchema, organizationSchema, servicePlanSchema, userSchema } from "@/lib/schema";
 import RHFSelect from "@/components/RHFSelect";
 import { Textarea } from "@/components/ui/textarea";
 import { unknown } from "zod";
@@ -44,8 +44,19 @@ export default function InvoicePaymentForm({
     onSubmit,
 }: InvoicePaymentFormProp) {
 
-    const form = useForm<InvoicePaymentFormValues>({
-        resolver: zodResolver(invoicePaymentSchema),
+    const [paymentMode, setPaymentMode] = useState<{
+        label: string,
+        value: string,
+        requires_txn_id: boolean
+    }[]>([])
+
+    const schema = useMemo(
+        () => createInvoicePaymentSchema(paymentMode),
+        [paymentMode]
+    );
+
+    const form = useForm<InvoicePaymentValues>({
+        resolver: zodResolver(schema),
         defaultValues: {
             grand_total: "",
             paid_amount: "",
@@ -60,8 +71,6 @@ export default function InvoicePaymentForm({
             remarks: "",
         },
     });
-    const [paymentMode, setPaymentMode] = useState([])
-
     const [isListLoading, setIsDataLoading] = useState(true);
     const fetchPayments = async (isLoaderHide = false) => {
         try {
@@ -95,7 +104,22 @@ export default function InvoicePaymentForm({
         if (initialValues)
             fetchPayments(false);
     }, [initialValues]);
+    const paymentModeValue = form.watch("payment_mode");
 
+    const requiresTxn =
+        paymentMode.find((m: any) => m.value === paymentModeValue)
+            ?.requires_txn_id ?? false;
+
+    useEffect(() => {
+  if (!paymentModeValue) return;
+
+  if (requiresTxn) {
+    // 🔥 force validation when it becomes required
+    form.trigger("txn_id");
+  } else {
+    form.clearErrors("txn_id");
+  }
+}, [paymentModeValue, requiresTxn]);
     return (
         <Form {...form}>
             <form
@@ -142,7 +166,7 @@ export default function InvoicePaymentForm({
                             <FloatingField
                                 name="txn_id"
                                 label="Transaction Id"
-                                isRequired
+                                isRequired={requiresTxn}
                                 type="text"
                                 control={form.control}
                             />
@@ -163,27 +187,27 @@ export default function InvoicePaymentForm({
                                 name="payment_mode"
                                 disabled={mode === "view"}
                                 render={({ field }) => (
-                                    <FormItem className="flex justify-between items-center">
-                                        <FormLabel  className="text-muted-foreground">
-                                            Payment Mode <RequiredMark show /> 
+                                    <FormItem className="flex justify-between items-center gap-4">
+                                        <FormLabel className="text-muted-foreground">
+                                            Payment Mode <RequiredMark show={true} />
                                         </FormLabel>
-<div className="flex flex-col items-start gap-2">
-                                        <FormControl>
-                                            <select
-                                                {...field}
-                                                className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
-                                            >
-                                                <option value="" disabled>Select mode</option>
+                                        <div className="flex-1 flex-col items-start gap-2">
+                                            <FormControl>
+                                                <select
+                                                    {...field}
+                                                    className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
+                                                >
+                                                    <option value="" disabled>Select mode</option>
 
-                                                {paymentMode.map((item: any) => (
-                                                    <option key={item.value ?? item.id} value={item.value}>
-                                                        {item.label}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </FormControl>
+                                                    {paymentMode.map((item: any) => (
+                                                        <option key={item.value ?? item.id} value={item.value}>
+                                                            {item.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </FormControl>
 
-                                        <FormMessage />
+                                            <FormMessage />
                                         </div>
                                     </FormItem>
                                 )}

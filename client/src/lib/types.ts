@@ -1,5 +1,5 @@
 import { Control, ControllerRenderProps, UseFormSetError } from "react-hook-form";
-import { CustomerSchema, InsertCustomerSchema, JobCardOnlySchema, JobCardSchema, loginSchema, NewCustomerSchema, NewJobCardSchema, passwordSchema, posJobSchema, profileSchema, userSchema, VehicleSchema } from "./schema";
+import { createInvoicePaymentSchema, CustomerSchema, InsertCustomerSchema, JobCardOnlySchema, JobCardSchema, loginSchema, NewCustomerSchema, NewJobCardSchema, passwordSchema, posJobSchema, profileSchema, userSchema, VehicleSchema } from "./schema";
 import z from "zod";
 import { ReactNode } from "react";
 
@@ -331,6 +331,10 @@ export interface organizationMetaInfoType {
 export type InvoicePaymentFormValues = {
   grand_total: string;
   paid_amount: string;
+  paymentModeList?:{value:String
+    label:string
+    requires_txn_id:boolean
+  }[]
   total_due: string;
   received_amount: string;
   txn_id?: string;
@@ -696,7 +700,9 @@ export type Notification = {
   is_read: boolean;
 };
 export type JobCardFormValues = z.infer<typeof NewJobCardSchema>;
-
+export type InvoicePaymentValues = z.infer<
+  ReturnType<typeof createInvoicePaymentSchema>
+>;
 export type GstType = "igst" | "cgst_sgst";
 export type JobCardOnlyFormValues = z.infer<typeof JobCardOnlySchema>;
 export type JobCardFormUnion = JobCardFormValues | JobCardOnlyFormValues;
@@ -728,7 +734,7 @@ export type ServiceCard = {
 export type SaveInvoicePaymentPayload = {
   payment_date: string;     // yyyy-mm-dd
   payment_mode: string;     // cash | upi | card | bank_transfer etc
-  received_amount: string;
+  amount: string;
   txn_id?: string | null;
   remarks?: string;
 };
