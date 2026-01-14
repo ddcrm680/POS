@@ -981,34 +981,25 @@ export const NewCustomerSchema = z
 
 export const invoicePaymentSchema = z
   .object({
-    grand_total: z.number(),
-    paid_amount: z.number(),
-    total_due: z.number(),
+    grand_total: z.string(),
+    paid_amount: z.string(),
+    total_due: z.string(),
 
     received_amount: z
-      .number({ invalid_type_error: "Enter amount" })
+      .string({ invalid_type_error: "Enter amount" })
       .min(1, "Amount must be greater than 0"),
 
-    txn_id: z.string(),
-
+    txn_id: z
+      .string()
+      .max(100, "Tax Id must not exceed 100 characters")
+      .optional(),
     payment_mode: z.string().min(1, "Select payment mode"),
     payment_date: z.string().min(1, "Select payment date"),
 
-    tax_deducted: z.enum(["no", "yes"]),
-    withholding_tax: z.number().optional(),
-
-    remarks: z.string().optional(),
+    remarks: z.string().max(255, "Remarks must not exceed 255 characters").optional(),
   })
-  .superRefine((data, ctx) => {
-    if (data.tax_deducted === "yes" && !data.withholding_tax) {
-      ctx.addIssue({
-        path: ["withholding_tax"],
-        message: "Withholding tax is required",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-  });
-  const GSTIN_REGEX =
+
+const GSTIN_REGEX =
   /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/;
 export const invoiceSchema = z
   .object({

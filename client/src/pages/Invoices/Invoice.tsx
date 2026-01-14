@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { InvoicePaymentFormValues, organizationFormType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Box, IconButton, Switch } from "@chakra-ui/react";
@@ -26,7 +26,7 @@ export default function Invoice() {
     const [perPage, setPerPage] = useState(10);
     const [total, setTotal] = useState(0);
     const [has_next, setHasNext] = useState(false)
-    const [filterMetaInfo, setFilterMetaInfo] = useState<{ status:{ value: string, label: string }[] }>({
+    const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: { value: string, label: string }[] }>({
         status: []
     });
     const [, navigate] = useLocation();
@@ -105,13 +105,13 @@ export default function Invoice() {
             key: "consumer",
             label: "Customer",
             width: "180px",
-            render: (value: { name: string },row:any) => (
-                <span className="text-[blue] font-medium cursor-pointer"  onClick={() => {
-            localStorage.setItem("sidebar_active_parent", "customers")
+            render: (value: { name: string }, row: any) => (
+                <span className="text-[blue] font-medium cursor-pointer" onClick={() => {
+                    localStorage.setItem("sidebar_active_parent", "customers")
 
-            navigate(`/customers/manage?id=${row.consumer_id}&mode=view`)
-          }
-          }>
+                    navigate(`/customers/manage?id=${row.consumer_id}&mode=view`)
+                }
+                }>
                     {value?.name}
                 </span>
             ),
@@ -150,7 +150,7 @@ export default function Invoice() {
                         setFilters(f => ({ ...f, status: val }));
                         setPage(1);
                     }}
-                    options={[{ label: 'All', value: '' },...filterMetaInfo.status]}
+                    options={[{ label: 'All', value: '' }, ...filterMetaInfo.status]}
                 />
             ),
             width: "120px",
@@ -166,7 +166,7 @@ export default function Invoice() {
                     <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[value]}`}
                     >
-                        {filterMetaInfo.status.find((item:any) => item.value === value)?.label}
+                        {filterMetaInfo.status.find((item: any) => item.value === value)?.label}
                     </span>
                 );
             },
@@ -177,8 +177,8 @@ export default function Invoice() {
         try {
             if (!isLoaderHide)
                 setIsListLoading(true);
-            console.log( filters.status,' filters.status');
-            
+            console.log(filters.status, ' filters.status');
+
             const res =
                 await getInvoiceList({
                     per_page: perPage,
@@ -215,20 +215,21 @@ export default function Invoice() {
             status: ""
         })
     }
-    const OrganizationCommonHandler = async (
+    const InvoiceCommonHandler = async (
         value: InvoicePaymentFormValues,
         setError: UseFormSetError<InvoicePaymentFormValues>
     ) => {
         try {
             setIsLoading(true);
+            const payload = {
+                "payment_date": value.payment_date,
+                "payment_mode": value.payment_mode,
+                "amount": value.received_amount,
+                "txn_id": value.txn_id,
+                "remarks": value.remarks
+            }
 
-            //   const formData = buildOrganizationFormData(
-            //     value,
-            //     isOrganizationModalOpenInfo.info.id
-            //   );
-
-            //   await EditOrganization(formData);
-
+            await saveInvoicePayment(invoicePaymentModalOpenInfo.info.id, payload);
             toast({
                 title: "Payment Info",
                 description: "Payment Info updated successfully",
@@ -342,7 +343,7 @@ export default function Invoice() {
 
 
                                             {
-                                                Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id&&
+                                                Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id &&
                                                 <IconButton
                                                     size="xs"
                                                     mr={2}
@@ -401,7 +402,7 @@ export default function Invoice() {
                                 }
                                 roles={roles}
                                 onSubmit={(values, setError) => {
-                                    OrganizationCommonHandler(values, setError);
+                                    InvoiceCommonHandler(values, setError);
                                 }}
                             />
 

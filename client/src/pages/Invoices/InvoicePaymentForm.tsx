@@ -47,11 +47,11 @@ export default function InvoicePaymentForm({
     const form = useForm<InvoicePaymentFormValues>({
         resolver: zodResolver(invoicePaymentSchema),
         defaultValues: {
-            grand_total: 0,
-            paid_amount: 0,
-            total_due: 0,
+            grand_total: "",
+            paid_amount: "",
+            total_due: "",
 
-            received_amount: 0,
+            received_amount: "",
             txn_id: '',
 
             payment_mode: "",
@@ -60,41 +60,41 @@ export default function InvoicePaymentForm({
             remarks: "",
         },
     });
-    
-  const [payments, setPayments] = useState<Array<any>>([]);
-      const [isListLoading, setIsDataLoading] = useState(true);
-  const fetchPayments = async (isLoaderHide = false) => {
-    try {
-      if (!isLoaderHide)
-        setIsDataLoading(true);
+    const [paymentMode, setPaymentMode] = useState([])
 
-      const res =
-        await getInvoicePayments(initialValues ?? "");
-console.log(res.data,'res.data');
+    const [isListLoading, setIsDataLoading] = useState(true);
+    const fetchPayments = async (isLoaderHide = false) => {
+        try {
+            if (!isLoaderHide)
+                setIsDataLoading(true);
 
-      const mappedData = res.data
-      console.log(mappedData, 'mappedData');
-      
-        form.setValue("paid_amount", mappedData.paid_amount);
-        
-        form.setValue("paid_amount", mappedData.total_due);
-        
-        form.setValue("paid_amount", mappedData.paid_amount);
-        
-        form.setValue("paid_amount", mappedData.paid_amount);
-      setPayments(mappedData);
-    } catch (e) {
-      console.error( e);
+            const res =
+                await getInvoicePayments(initialValues ?? "");
+            console.log(res.data, 'res.data');
 
-    } finally {
-      if (!isLoaderHide)
-        setIsDataLoading(false);
-    }
-  };
+            const mappedData = res.data
+            setPaymentMode(res.payment_modes)
+            console.log(mappedData, 'mappedData');
 
-  useEffect(() => {
-    fetchPayments(false);
-  }, [initialValues]);
+            form.setValue("grand_total", mappedData.grand_total);
+
+            form.setValue("total_due", mappedData.total_due);
+
+            form.setValue("paid_amount", mappedData.paid_amount);
+
+        } catch (e) {
+            console.error(e);
+
+        } finally {
+            if (!isLoaderHide)
+                setIsDataLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (initialValues)
+            fetchPayments(false);
+    }, [initialValues]);
 
     return (
         <Form {...form}>
@@ -133,17 +133,17 @@ console.log(res.data,'res.data');
                             <FloatingField
                                 name="received_amount"
                                 label="Received Amount"
-                                type="number"
+                                type="text"
                                 isRequired
                                 control={form.control}
+                                maxAmount={form.getValues('total_due')}
                             />
 
                             <FloatingField
                                 name="txn_id"
-                                label="Tax Id"
+                                label="Transaction Id"
                                 isRequired
                                 type="text"
-                                isView
                                 control={form.control}
                             />
 
@@ -157,23 +157,41 @@ console.log(res.data,'res.data');
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                            <FloatingRHFSelect
-                                name="payment_mode"
-                                label="Payment Mode"
-                                isRequired
+
+                            <FormField
                                 control={form.control}
-                                options={[
-                                    { label: "Cash", value: "cash" },
-                                    { label: "UPI", value: "upi" },
-                                    { label: "Card", value: "card" },
-                                    { label: "Bank Transfer", value: "bank" },
-                                ]}
+                                name="payment_mode"
+                                disabled={mode === "view"}
+                                render={({ field }) => (
+                                    <FormItem className="flex justify-between items-center">
+                                        <FormLabel  className="text-muted-foreground">
+                                            Payment Mode <RequiredMark show /> 
+                                        </FormLabel>
+<div className="flex flex-col items-start gap-2">
+                                        <FormControl>
+                                            <select
+                                                {...field}
+                                                className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
+                                            >
+                                                <option value="" disabled>Select mode</option>
+
+                                                {paymentMode.map((item: any) => (
+                                                    <option key={item.value ?? item.id} value={item.value}>
+                                                        {item.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </FormControl>
+
+                                        <FormMessage />
+                                        </div>
+                                    </FormItem>
+                                )}
                             />
-                       
                         </div>
                     </SectionCard>
 
-                    <SectionCard title="Additional Note"className="mt-0">
+                    <SectionCard title="Additional Note" className="mt-0">
                         <FloatingTextarea
                             name="remarks"
                             label="Payment Note"

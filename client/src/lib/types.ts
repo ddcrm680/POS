@@ -329,19 +329,13 @@ export interface organizationMetaInfoType {
 
 }
 export type InvoicePaymentFormValues = {
-  grand_total: number;
-  paid_amount: number;
-  total_due: number;
-
-  received_amount: number;
-  txn_id: string;
-
+  grand_total: string;
+  paid_amount: string;
+  total_due: string;
+  received_amount: string;
+  txn_id?: string;
   payment_mode: string;
   payment_date: string;
-
-  tax_deducted: "no" | "yes";
-  withholding_tax?: number;
-
   remarks?: string;
 };
 
@@ -734,7 +728,7 @@ export type ServiceCard = {
 export type SaveInvoicePaymentPayload = {
   payment_date: string;     // yyyy-mm-dd
   payment_mode: string;     // cash | upi | card | bank_transfer etc
-  amount: number;
+  received_amount: string;
   txn_id?: string | null;
   remarks?: string;
 };

@@ -15,6 +15,7 @@ type FloatingFieldProps = {
   label: string
   control: Control<any>
   isView?: boolean
+  maxAmount?: string
   isRequired?: boolean
   isDisabled?: boolean
   type?: string
@@ -27,6 +28,7 @@ export function FloatingField({
   isDisabled = false,
   isView,
   isRequired = false,
+  maxAmount,
   type = "text",
   ...inputProps
 }: FloatingFieldProps) {
@@ -34,7 +36,7 @@ export function FloatingField({
   const [inputType, setInputType] = useState(type)
 
   const disabled = isView || isDisabled
-  const isMobileField = name === "search_mobile" || name === "phone" || name === "billing_phone" || name=="company_contact_no";
+  const isMobileField = name === "search_mobile" || name === "phone" || name === "billing_phone" || name == "company_contact_no";
   return (
     <Controller
 
@@ -76,12 +78,48 @@ export function FloatingField({
               onChange={(e) => {
                 let value = e.target.value;
 
+                // ❌ prevent leading spaces
+                value = value.replace(/^\s+/, "");
+
                 if (isMobileField) {
                   value = value.replace(/\D/g, ""); // numbers only
                   value = value.replace(/^0+/, ""); // no leading zero
                   value = value.slice(0, 10);       // max 10 digits
                 }
+                // 💰 RECEIVED AMOUNT RULES
+                if (name === "received_amount") {
+                  // Allow digits + dot only
+                  value = value.replace(/[^0-9.]/g, "");
 
+                  // Prevent multiple dots
+                  const parts = value.split(".");
+                  if (parts.length > 2) return;
+
+                  // Limit decimals to 2 digits
+                  if (parts[1]?.length > 2) {
+                    value = `${parts[0]}.${parts[1].slice(0, 2)}`;
+                  }
+
+                  // Prevent leading zeros like 000, 00.50
+                  if (/^0{2,}/.test(value)) {
+                    value = value.replace(/^0+/, "0");
+                  }
+
+                  // Convert to number safely
+                  const numericValue = Number(value);
+
+                  // Clamp to due amount
+                  if (
+                    maxAmount !== undefined &&
+                    !Number.isNaN(numericValue) &&
+                    numericValue > Number(maxAmount)
+                  ) {
+                    value = String(maxAmount);
+                  }
+
+                  field.onChange(value);
+                  return;
+                }
                 field.onChange(value);
               }}
 

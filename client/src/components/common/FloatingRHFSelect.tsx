@@ -128,12 +128,12 @@ export function FloatingRHFSelect({
 
                 menuPortal: (base) => ({
                   ...base,
-                  zIndex: 9999, // 🔥 ABOVE ALL FLOATING LABELS
+                  zIndex: 999999, // 🔥 ABOVE ALL FLOATING LABELS
                 }),
 
                 menu: (base) => ({
                   ...base,
-                  zIndex: 9999,
+                  zIndex: 999999,
                 }),
 
                 placeholder: () => ({

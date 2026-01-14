@@ -203,7 +203,7 @@ export default function JobCard() {
               className="text-[blue] font-medium cursor-pointer hover:underline"
               onClick={() => navigate(`/invoice/manage?id=${row.invoice.id}&mode=view`)}
             >
-              #{value}
+              {value}
             </span>
           );
         }
