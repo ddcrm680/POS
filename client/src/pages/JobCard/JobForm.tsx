@@ -222,9 +222,9 @@ useEffect(() => {
     return;
   }
 
-  // 🚫 Skip FIRST RUN (initial hydration)
-  if (!hasInitializedModelsRef.current) {
-    hasInitializedModelsRef.current = true;
+  // 🚫 Skip ONLY hydration-triggered change
+  if (hasInitializedModelsRef.current) {
+    hasInitializedModelsRef.current = false;
     return;
   }
 
@@ -407,6 +407,7 @@ useEffect(() => {
 
 
       form.setValue("vehicle_type", initialValues.job_card.vehicle_type);
+      hasInitializedModelsRef .current = true;
       form.setValue("vehicle_company_id", String(initialValues.job_card.vehicle_company_id));
       form.setValue("color", initialValues.job_card.color ?? "");
       form.setValue("year", String(initialValues.job_card.year ?? ""));
