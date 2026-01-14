@@ -29,45 +29,48 @@ export function FloatingPasswordField({
           focused || (field.value && String(field.value).length > 0);
 
         return (
-          <Box position="relative" w="full">
-            <Input
-              {...field}
-              type={show ? "text" : "password"}
-              h="44px"
-              pt="18px"
-              pr="42px"   // space for eye icon
-              pl="18px"
-              pb="8px"
-              border="1px solid"
-              borderColor={error ? "red.500" : "#e1e7ef"}
-              _focus={{ borderColor: error ? "red.500" : "blue.500" }}
-              onFocus={() => setFocused(true)}
-              onBlur={(e) => {
-                setFocused(false);
-                field.onBlur();
-              }}
-            />
+          <Box w="full">
+            <Box position="relative">
+              <Input
+                {...field}
+                type={show ? "text" : "password"}
+                h="44px"
+                pt="18px"
+                pr="42px"
+                pl="18px"
+                pb="8px"
+                border="1px solid"
+                borderColor={error ? "red.500" : "#e1e7ef"}
+                _focus={{ borderColor: error ? "red.500" : "blue.500" }}
+                onFocus={() => setFocused(true)}
+                onBlur={(e) => {
+                  setFocused(false);
+                  field.onBlur();
+                }}
+              />
 
-            {/* Eye toggle */}
-            <button
-              type="button"
-              onClick={() => setShow((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-              tabIndex={-1}
-            >
-              {show ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
+              {/* 👁 Eye toggle – now stable */}
+              <button
+                type="button"
+                onClick={() => setShow((s) => !s)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                tabIndex={-1}
+              >
+                {show ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
 
-            {/* Floating label */}
-            <Text
-              css={floatingLabelStyle}
-              data-float={shouldFloat || undefined}
-              color={error ? "red.500" : "gray.500"}
-            >
-              {label}
-              {isRequired && <RequiredMark show={isRequired} />}
-            </Text>
+              {/* Floating label */}
+              <Text
+                css={floatingLabelStyle}
+                data-float={shouldFloat || undefined}
+                color={error ? "red.500" : "gray.500"}
+              >
+                {label}
+                {isRequired && <RequiredMark show />}
+              </Text>
+            </Box>
 
+            {/* ❌ Error text is OUTSIDE the positioning context */}
             {error && (
               <Text mt="1" fontSize="xs" color="red.500">
                 {error.message}
