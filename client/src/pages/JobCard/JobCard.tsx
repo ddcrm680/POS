@@ -208,7 +208,9 @@ export default function JobCard() {
           return (
             <span
               className="text-[blue] font-medium cursor-pointer hover:underline"
-              onClick={() => navigate(`/invoice/manage?id=${row.invoice.id}&mode=view`)}
+              onClick={() =>{
+                 localStorage.removeItem('sidebar_active_parent')
+                navigate(`/invoices/manage?id=${row.invoice.id}&mode=view`)}}
             >
               {value}
             </span>
@@ -219,7 +221,8 @@ export default function JobCard() {
         return (
           <button
             onClick={() => {
-              navigate(`/invoice/manage?jobCardId=${row.id}&mode=create`)
+               localStorage.removeItem('sidebar_active_parent')
+              navigate(`/invoices/manage?jobCardId=${row.id}&mode=create`)
             }}
             className="
           px-3 py-1 text-xs font-medium

@@ -400,7 +400,10 @@ export default function CustomerForm() {
         {/* HEADER */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => window.history.back()}
+            onClick={() => {
+ localStorage.removeItem('sidebar_active_parent')
+              window.history.back()
+            }}
             className="text-muted-foreground hover:text-foreground"
           >
             <ChevronLeft size={18} />

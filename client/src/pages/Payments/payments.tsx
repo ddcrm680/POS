@@ -10,7 +10,7 @@ import { useLocation } from "wouter";
 import { cancelInvoice, cancelPayment, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, getPaymentsList, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { InvoicePaymentFormValues, organizationFormType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
-import { Box, IconButton, Switch } from "@chakra-ui/react";
+import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
 import { EditIcon, EyeIcon, PrinterIcon, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
@@ -109,7 +109,9 @@ export default function PaymentsPage() {
       label: "Invoice No.",
       width: "130px",
       render: (value: string, row: any) => (
-        <span className="text-[blue] font-medium cursor-pointer" onClick={() => navigate(`/invoice/manage?id=${row?.invoice?.id}&mode=view`)
+        <span className="text-[blue] font-medium cursor-pointer" onClick={() =>{
+           localStorage.removeItem('sidebar_active_parent')
+          navigate(`/invoices/manage?id=${row?.invoice?.id}&mode=view`)}
         }>
           {value}
         </span>
@@ -177,11 +179,14 @@ export default function PaymentsPage() {
         };
 
         return (
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[value]}`}
-          >
-            {filterMetaInfo.status.find((item: any) => item.value === value)?.label}
-          </span>
+           <Badge
+                                  className={`px-3 py-1 text-xs font-medium rounded-full  ${styles[value]}
+                              `}
+                              >
+                                  {filterMetaInfo.status.find((item: any) => item.value === value)?.label}
+          
+                              </Badge>
+        
         );
       },
     },

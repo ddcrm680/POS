@@ -161,7 +161,10 @@ export default function StoreView() {
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <button
-          onClick={() => window.history.back()}
+           onClick={() => {
+ localStorage.removeItem('sidebar_active_parent')
+              window.history.back()
+            }}
           disabled={loading}
           className="text-muted-foreground hover:text-foreground"
         >

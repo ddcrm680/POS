@@ -611,7 +611,10 @@ console.log(res.data,'res.data');
       {/* Header */}
       <div className="flex items-center gap-2">
         <button
-          onClick={() => window.history.back()}
+           onClick={() => {
+ localStorage.removeItem('sidebar_active_parent')
+              window.history.back()
+            }}
           // disabled={loading}
           className="text-muted-foreground hover:text-foreground"
         >

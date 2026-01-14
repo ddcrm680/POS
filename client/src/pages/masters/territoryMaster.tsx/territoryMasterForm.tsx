@@ -305,7 +305,10 @@ export default function TerritoryMasterForm() {
       {/* ---------- HEADER ---------- */}
       <div className="flex items-center gap-2">
         <button
-          onClick={() => window.history.back()}
+           onClick={() => {
+ localStorage.removeItem('sidebar_active_parent')
+              window.history.back()
+            }}
              disabled={isLoading}
           className="text-muted-foreground hover:text-foreground"
         >

@@ -10,7 +10,7 @@ import { useLocation } from "wouter";
 import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { InvoicePaymentFormValues, organizationFormType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
-import { Box, IconButton, Switch } from "@chakra-ui/react";
+import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
 import { EditIcon, EyeIcon, PrinterIcon, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
@@ -93,7 +93,7 @@ export default function Invoice() {
             label: "Invoice No.",
             width: "130px",
             render: (value: string, row: any) => (
-                <span className="text-[blue] font-medium cursor-pointer" onClick={() => navigate(`/invoice/manage?id=${row.id}&mode=view`)
+                <span className="text-[blue] font-medium cursor-pointer" onClick={() => navigate(`/invoices/manage?id=${row.id}&mode=view`)
                 }>
                     {value}
                 </span>
@@ -154,6 +154,7 @@ export default function Invoice() {
                 />
             ),
             width: "120px",
+
             render: (value: string) => {
                 const styles: Record<string, string> = {
                     issued: "bg-yellow-100 text-yellow-700",
@@ -163,11 +164,14 @@ export default function Invoice() {
                 };
 
                 return (
-                    <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[value]}`}
+                    <Badge
+                        className={`px-3 py-1 text-xs font-medium rounded-full  ${styles[value]}
+                    `}
                     >
                         {filterMetaInfo.status.find((item: any) => item.value === value)?.label}
-                    </span>
+
+                    </Badge>
+
                 );
             },
         },
@@ -319,7 +323,7 @@ export default function Invoice() {
                                                 // mr={2}
                                                 aria-label="View"
                                                 onClick={() => {
-                                                    navigate(`/invoice/manage?id=${row.id}&mode=view`)
+                                                    navigate(`/invoices/manage?id=${row.id}&mode=view`)
 
                                                 }
                                                 }
@@ -328,24 +332,24 @@ export default function Invoice() {
                                             </IconButton>
                                             {
                                                 row.status == 'issued' && <IconButton
-                                                size="xs"
-                                                // mr={2}
-                                                aria-label="Edit"
-                                                onClick={() => {
-                                                    navigate(`/invoice/manage?id=${row.id}&mode=edit`)
+                                                    size="xs"
+                                                    // mr={2}
+                                                    aria-label="Edit"
+                                                    onClick={() => {
+                                                        navigate(`/invoices/manage?id=${row.id}&mode=edit`)
 
-                                                }
-                                                }
-                                            >
-                                                <EditIcon />
-                                            </IconButton>}
+                                                    }
+                                                    }
+                                                >
+                                                    <EditIcon />
+                                                </IconButton>}
 
 
 
 
                                             {
-                                              
-                                              (row?.status === "partially_paid"||  row.status == 'issued') && 
+
+                                                (row?.status === "partially_paid" || row.status == 'issued') &&
                                                 <IconButton
                                                     size="xs"
                                                     // mr={2}

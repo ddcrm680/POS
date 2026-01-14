@@ -199,6 +199,7 @@ export default function Customer() {
               // }
             }}
                setIsModalOpen={(value: boolean) => {
+                localStorage.removeItem('sidebar_active_parent')
               navigate(`/job-cards/manage`)
             }}
             actions={(row: any) => {

@@ -94,7 +94,10 @@ export default function Password() {
                 variant="outline"
                 className='hover:bg-[#E3EDF6] hover:text-[#000]'
                 disabled={isLoading}
-                onClick={() => window.history.back()}
+                 onClick={() => {
+ localStorage.removeItem('sidebar_active_parent')
+              window.history.back()
+            }}
                 data-testid="button-back"
               >
                 ← Back

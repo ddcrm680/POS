@@ -65,7 +65,7 @@ export function Router() {
       />} />
        <Route path="/invoices" component={() => <ProtectedRoute component={Invoice} 
       />} />
-      <Route path="/invoice/manage" component={() => <ProtectedRoute component={InvoiceForm} />} />
+      <Route path="/invoices/manage" component={() => <ProtectedRoute component={InvoiceForm} />} />
  
  
       {/* <Route path="/master/stores" component={() => <ProtectedRoute component={Store} 
