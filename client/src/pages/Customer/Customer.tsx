@@ -179,7 +179,7 @@ export default function Customer() {
             columns={columns}
             isClear={false}
             data={customers}
-            isAdd={false}
+            isAdd={true}
             perPage={perPage}
             setPerPage={setPerPage}
             resetFilter={resetFilter}
@@ -197,6 +197,9 @@ export default function Customer() {
               setSearch(value);
               setPage(1); // reset page on new search
               // }
+            }}
+               setIsModalOpen={(value: boolean) => {
+              navigate(`/job-cards/manage`)
             }}
             actions={(row: any) => {
               return (

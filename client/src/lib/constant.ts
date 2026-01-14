@@ -197,7 +197,7 @@ export const defaultBottomTabs: TabItem[] = [
 ];
 
 export const quickActions = [
-  { id: "new-job", label: "New Job", emoji: "📋", color: "bg-primary hover:bg-primary/90" },
+  { id: "new-job", label: "New Job Card", emoji: "📋", color: "bg-primary hover:bg-primary/90" },
   { id: "customer-lookup", label: "Find Customer", emoji: "👤", color: "bg-blue-600 hover:bg-blue-700" },
   { id: "inventory-check", label: "Stock Check", emoji: "📦", color: "bg-orange-600 hover:bg-orange-700" },
 ];

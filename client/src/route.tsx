@@ -71,7 +71,7 @@ export function Router() {
       {/* <Route path="/master/stores" component={() => <ProtectedRoute component={Store} 
       />} /> */}
        <Route path="/master/territory/manage" component={() => <ProtectedRoute component={TerritoryMasterForm} />} />
-     <Route path="/jobCard/manage" component={() => <ProtectedRoute component={JobForm} />} />
+     <Route path="/job-cards/manage" component={() => <ProtectedRoute component={JobForm} />} />
   
       <Route path="/master/stores/manage" component={() => <ProtectedRoute component={StoreFormHandler} />} />
       

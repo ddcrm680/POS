@@ -85,7 +85,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
 
     switch (actionId) {
       case "new-job":
-        window.location.href = "/pos-job-creation";
+        window.location.href = "/job-cards/manage";
         break;
       case "customer-lookup":
         window.location.href = "/customers";

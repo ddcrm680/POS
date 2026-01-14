@@ -94,7 +94,7 @@ export default function JobCard() {
       render: (value: string, row: any) => (
         <span
           className="text-[blue] font-medium cursor-pointer hover:underline"
-          onClick={() => navigate(`/jobCard/manage?id=${row.id}&mode=view`)}
+          onClick={() => navigate(`/job-cards/manage?id=${row.id}&mode=view`)}
         >
           {value}
         </span>
@@ -310,7 +310,7 @@ export default function JobCard() {
               // }
             }}
             setIsModalOpen={(value: boolean) => {
-              navigate(`/jobCard/manage`)
+              navigate(`/job-cards/manage`)
             }}
             actions={(row: any) => {
               return (
@@ -334,7 +334,7 @@ export default function JobCard() {
                         aria-label="View"
                         onClick={() => {
 
-                          navigate(`/jobCard/manage?id=${row.id}&mode=view`)
+                          navigate(`/job-cards/manage?id=${row.id}&mode=view`)
                         }
                         }
                       >
@@ -345,7 +345,7 @@ export default function JobCard() {
                         mr={2}
                         aria-label="Edit"
                         onClick={() => {
-                          navigate(`/jobCard/manage?id=${row.id}&mode=edit`)
+                          navigate(`/job-cards/manage?id=${row.id}&mode=edit`)
 
                         }
                         }
