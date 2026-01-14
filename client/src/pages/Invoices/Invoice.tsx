@@ -26,7 +26,7 @@ export default function Invoice() {
     const [perPage, setPerPage] = useState(10);
     const [total, setTotal] = useState(0);
     const [has_next, setHasNext] = useState(false)
-    const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: [] }>({
+    const [filterMetaInfo, setFilterMetaInfo] = useState<{ status:{ value: string, label: string }[] }>({
         status: []
     });
     const [, navigate] = useLocation();
@@ -166,7 +166,7 @@ export default function Invoice() {
                     <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[value]}`}
                     >
-                        {value}
+                        {filterMetaInfo.status.find((item:any) => item.value === value)?.label}
                     </span>
                 );
             },

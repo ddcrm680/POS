@@ -66,7 +66,7 @@ export default function JobCard() {
       setIsLoading(false);
     }
   };
-  const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: [] }>({
+  const [filterMetaInfo, setFilterMetaInfo] = useState<{ status:{ value: string, label: string }[] }>({
     status: []
   });
   const columns = [
@@ -184,7 +184,8 @@ export default function JobCard() {
               : "bg-gray-100 text-gray-700"
             }`}
         >
-          {jobCardStatusList.find(s => s.value === value)?.label ?? value}
+            {filterMetaInfo.status.find((item:any) => item.value === value)?.label}
+        
         </Badge>
       ),
     },
