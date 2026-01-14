@@ -105,14 +105,10 @@ export default function Customer() {
 
     /* ================= VEHICLE TYPE ================= */
     {
-      key: "type",
-      label: " Type",
+      key: "address",
+      label: " Address",
       width: "160px",
-      render: (value: string) => (
-        <span className="text-sm text-gray-700">
-          {value || "-"}
-        </span>
-      ),
+     
     },
 
     /* ================= INTERESTED IN ================= */
