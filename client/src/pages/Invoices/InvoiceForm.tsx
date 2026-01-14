@@ -690,23 +690,24 @@ export default function InvoiceForm() {
           setPage={() => { }}
           lastPage={1}
           hasNext={false}
-          actions={(row: any) => {
-
-            return (
-              <Box className="gap-3">
-                <IconButton
-                  size="xs"
-                  mr={2}
-                  colorScheme="red"
-                  disabled={plans.length <= 1 || isView}
-                  aria-label="Delete"
-                  onClick={() => removePlan(row.id)}
-                >
-                  <Trash2 size={16} />
-                </IconButton>
-              </Box>
-            );
-          }}
+         actions={
+  isView
+    ? undefined
+    : (row: any) => (
+        <Box className="gap-3">
+          <IconButton
+            size="xs"
+            mr={2}
+            colorScheme="red"
+            disabled={plans.length <= 1}
+            aria-label="Delete"
+            onClick={() => removePlan(row.id)}
+          >
+            <Trash2 size={16} />
+          </IconButton>
+        </Box>
+      )
+}
         />
 
         {/* TOTALS */}
