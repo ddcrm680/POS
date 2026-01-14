@@ -102,26 +102,33 @@ export default function JobCard() {
     },
 
     /* ================= CUSTOMER ================= */
-    {
-      key: "consumer",
-      label: "Customer",
-      width: "180px",
-      render: (_: any, row: any) => (
-        <div className="flex flex-col" >
-          <span className="text-[blue] font-medium cursor-pointer hover:underline" onClick={() => {
-            localStorage.setItem("sidebar_active_parent", "customers")
+{
+  key: "consumer",
+  label: "Customer",
+  width: "180px",
+  render: (_: any, row: any) => (
+    <div className="flex flex-col leading-tight">
+      {/* Customer Name */}
+      <span
+        className="text-blue-600 font-medium cursor-pointer hover:underline"
+        onClick={() => {
+          localStorage.setItem("sidebar_active_parent", "customers");
+          navigate(`/customers/manage?id=${row.consumer_id}&mode=view`);
+        }}
+      >
+        {row.consumer?.name ?? "-"}
+      </span>
 
-            navigate(`/customers/manage?id=${row.consumer_id}&mode=view`)
-          }
-          }
-          >
-            {row.consumer?.name ?? "-"}
-          </span>
-
-        </div>
-      ),
-    },
-
+      {/* Phone Number */}
+      {row.consumer?.phone && (
+        <span className="text-xs text-muted-foreground mt-0.5">
+          {row.consumer.phone}
+        </span>
+      )}
+    </div>
+  ),
+}
+,
     /* ================= SERVICE DATE ================= */
     {
       key: "jobcard_date",

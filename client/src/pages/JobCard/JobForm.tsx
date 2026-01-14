@@ -783,7 +783,7 @@ export default function JobForm() {
               localStorage.removeItem('sidebar_active_parent')
               window.history.back()
             }}
-             disabled={isLoading || isInfoLoading}
+            disabled={isLoading || isInfoLoading}
             className="text-muted-foreground hover:text-foreground "
           >
             <ChevronLeft size={18} />
@@ -973,7 +973,7 @@ export default function JobForm() {
                             <div className="flex flex-col items-start">
                               <FloatingRHFSelect
                                 name="type"
-                                label="Billing Type"
+                                label="Bill To"
                                 control={form.control}
                                 isRequired
                                 isDisabled={isView}
@@ -1232,16 +1232,7 @@ export default function JobForm() {
                               control={form.control}
                               options={meta.vehicleTypes}
                             />
-
-                            {/* Service Date */}
-                            <FloatingDateField
-                              name="jobcard_date"
-                              label="Service Date"
-                              isRequired
-                              isDisabled={isView}
-                              control={form.control}
-                            />
-                            {/* Service Type */}
+ {/* Service Type */}
                             <FloatingRHFSelect
                               name="service_type"
                               label="Service Type"
@@ -1251,6 +1242,15 @@ export default function JobForm() {
                               control={form.control}
                               options={meta.serviceTypes}
                             />
+                            {/* Service Date */}
+                            <FloatingDateField
+                              name="jobcard_date"
+                              label="Service Date"
+                              isRequired
+                              isDisabled={isView}
+                              control={form.control}
+                            />
+                           
                             {/* Service Type (Multi) */}
 
                           </div>
@@ -1264,12 +1264,21 @@ export default function JobForm() {
                                 Loading services…
                               </p>
                             )}
+                            {!form.getValues("vehicle_type") &&
+                              form.getValues("service_ids").length === 0 && (
+                                <p className="text-sm text-muted-foreground text-center">
+                                  Select a vehicle and service type to view available services
+                                </p>
+                              )}
 
-                            {!loadingServices && services.length === 0 && (
-                              <p className="text-sm text-muted-foreground  text-center">
-                                No services available for selected vehicle & service type
-                              </p>
-                            )}
+                            {!loadingServices &&
+                              services.length === 0 &&
+                              form.getValues("vehicle_type") &&
+                              form.getValues("service_ids").length > 0 && (
+                                <p className="text-sm text-muted-foreground text-center">
+                                  No services found for the selected vehicle and service type
+                                </p>
+                              )}
                             {!loadingServices && services.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                               {services.map(service => {
                                 const isSelected = selectedServices.includes(service.id);
