@@ -443,7 +443,7 @@ console.log(api,'apiapi');
       email: api.job_card.consumer.email,
       address: api.job_card.consumer.address,
       gst: api.job_card.consumer.gst,
-      type: api.job_card.consumer.type,
+      type: api.invoice_data.billing_type,
     },
 
     vehicle: {

@@ -123,11 +123,59 @@ export default function InvoiceForm() {
         key: "qty",
         label: "QTY",
         width: "90px",
-        render: (v: string, row: any) => {
-          console.log(v, row, 'rowrow');
+        render: (_: any, row: any) => (
+          <input
+            type="text"
+            inputMode="numeric"      // 📱 mobile numeric keypad
+            pattern="[0-9]*"
+            disabled={isView}
+            className="w-16 border text-center rounded px-1 py-0.5 text-xs "
+            value={row.qty}
+            onChange={(e) => {
+              let value = e.target.value.replace(/\D/g, "");
 
-          return v ?? row.qty ?? "-"
-        },
+              // allow empty while typing
+              if (value === "") {
+                setPlans(prev =>
+                  prev.map(p =>
+                    p.id === row.id
+                      ? { ...p, qty: "" }
+                      : p
+                  )
+                );
+                return;
+              }
+              let qty = Number(value);
+
+              // 🔒 enforce limits: 1 → 1000
+              if (qty < 1) qty = 1;
+              if (qty > 1000) qty = 1000;
+
+              const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
+
+              setPlans(prev =>
+                prev.map(p =>
+                  p.id === row.id
+                    ? calculateInvoiceRow({ ...p, qty }, gstType)
+                    : p
+                )
+              );
+            }}
+            onBlur={() => {
+              // normalize on blur
+              if (!row.qty || Number(row.qty) < 1) {
+                const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
+                setPlans(prev =>
+                  prev.map(p =>
+                    p.id === row.id
+                      ? calculateInvoiceRow({ ...p, qty: 1 }, gstType)
+                      : p
+                  )
+                );
+              }
+            }}
+          />
+        ),
       },
       {
         key: "price",
@@ -577,14 +625,47 @@ export default function InvoiceForm() {
         {mode !== 'view' && <div className="flex items-end gap-3 mt-3 ">
 
           <div className="w-72">
-
-
             <select
-              value={invoiceInfo.selectedPlanId}
-              onChange={(e) => setInvoiceInfo((prev) => ({ ...prev, selectedPlanId: e.target.value }))}
+              value=""
+              onChange={(e) => {
+                const selectedId = e.target.value;
+                if (!selectedId) return;
+
+                const plan = availablePlans.find(
+                  (p) => String(p.id) === selectedId
+                );
+                if (!plan) return;
+
+                const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
+
+                setPlans(prev => {
+                  const existing = prev.find(p => p.id === plan.id);
+
+                  // ✅ If already exists → increment qty
+                  if (existing) {
+                    return prev.map(p =>
+                      p.id === plan.id
+                        ? calculateInvoiceRow(
+                          { ...p, qty: Number(p.qty || 1) + 1 },
+                          gstType
+                        )
+                        : p
+                    );
+                  }
+
+                  // ✅ First time add → qty = 1
+                  return [
+                    ...prev,
+                    calculateInvoiceRow({ ...plan, qty: 1 }, gstType),
+                  ];
+                });
+
+                // reset dropdown back
+                e.target.value = "";
+              }}
               className="w-full border rounded-md px-3 py-2 text-sm"
             >
-              <option value="">Select Plan</option>
+              <option value="">Add Service Plan</option>
               {availablePlans.map((plan) => (
                 <option key={plan.id} value={plan.id}>
                   {plan.plan_name}
@@ -593,48 +674,7 @@ export default function InvoiceForm() {
             </select>
           </div>
 
-          <Button
-            size="sm"
-            onClick={() => {
-              if (!invoiceInfo.selectedPlanId) return;
 
-              const plan = availablePlans.find(
-                (p) => String(p.id) === invoiceInfo.selectedPlanId
-              );
-              if (!plan) return;
-
-              const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
-
-              setPlans(prev => {
-                const existing = prev.find(p => p.id === plan.id);
-
-                // ✅ IF PLAN ALREADY EXISTS → INCREMENT QTY
-                if (existing) {
-                  return prev.map(p =>
-                    p.id === plan.id
-                      ? calculateInvoiceRow(
-                        { ...p, qty: Number(p.qty || 1) + 1 },
-                        gstType
-                      )
-                      : p
-                  );
-                }
-
-                // ✅ FIRST TIME ADD → QTY = 1
-                return [
-                  ...prev,
-                  calculateInvoiceRow(
-                    { ...plan, qty: 1 },
-                    gstType
-                  ),
-                ];
-              });
-
-              setInvoiceInfo({ selectedPlanId: "" });
-            }}
-          >
-            Add Plan
-          </Button>
         </div>}
         <CommonTable
           columns={planColumns}
