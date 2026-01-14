@@ -21,7 +21,7 @@ import { Box } from "@chakra-ui/react";
 import { Constant } from "@/lib/constant";
 import { availablePlansMock, invoicePlanMockData, invoiceViewMock, warrantyType } from "@/lib/mockData";
 import { InvoicePaymentFormProp, InvoicePaymentFormValues, organizationFormType, serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
-import { invoicePaymentSchema, invoiceSchema, organizationSchema, servicePlanSchema, userSchema } from "@/lib/schema";
+import {  invoiceSchema, organizationSchema, servicePlanSchema, userSchema } from "@/lib/schema";
 import RHFSelect from "@/components/RHFSelect";
 import { Textarea } from "@/components/ui/textarea";
 import { unknown } from "zod";
@@ -849,7 +849,7 @@ console.log(res.data,'res.data');
         />
 
         {/* TOTALS */}
-        <div className="flex justify-end ">
+        <div className="flex md:justify-end ">
           <div className="w-[300px] text-sm space-y-2">
 
             <div className="flex justify-between">

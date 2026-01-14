@@ -171,7 +171,7 @@ export default function PaymentsPage() {
       render: (value: string) => {
         const styles: Record<string, string> = {
           issued: "bg-yellow-100 text-yellow-700",
-          recieved: "bg-emerald-100 text-emerald-700",
+          received : "bg-emerald-100 text-emerald-700",
           cancelled: "bg-red-100 text-red-700",
           "Partially-Paid": "bg-blue-100 text-blue-700",
         };
@@ -342,9 +342,9 @@ export default function PaymentsPage() {
 
           />
           <CommonModal
-            width={'50%'}
-            maxWidth={'50%'}
-            isOpen={invoicePaymentModalOpenInfo.open}
+            width={'80%'}
+            maxWidth={'80%'}
+             isOpen={invoicePaymentModalOpenInfo.open}
             onClose={() => setIsInvoicePaymentModalOpenInfo({ open: false, info: {} })}
             title={"Payments"}
             isLoading={isLoading}

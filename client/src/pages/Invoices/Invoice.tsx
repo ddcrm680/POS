@@ -326,7 +326,8 @@ export default function Invoice() {
                                             >
                                                 <EyeIcon />
                                             </IconButton>
-                                            {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
+                                            {
+                                                row.status == 'issued' && <IconButton
                                                 size="xs"
                                                 mr={2}
                                                 aria-label="Edit"
@@ -343,7 +344,8 @@ export default function Invoice() {
 
 
                                             {
-                                                Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id &&
+                                              
+                                              (row?.status === "partially_paid"||  row.status == 'issued') && 
                                                 <IconButton
                                                     size="xs"
                                                     mr={2}
@@ -357,7 +359,7 @@ export default function Invoice() {
                                                 </IconButton>}
                                             {
 
-                                                row.status !== 'cancelled' && <IconButton
+                                                row.status == 'issued' && <IconButton
                                                     size="xs"
                                                     mr={2}
                                                     title="Cancel"
