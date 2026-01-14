@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
-import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, serviceFormType, storeFormType, TerritoryFormRequestValues, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
+import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, SaveInvoicePaymentPayload, serviceFormType, storeFormType, TerritoryFormRequestValues, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
 import { DateRangeType, DateValueType } from "react-tailwindcss-datepicker";
 import { setServiceDown } from "./systemStatus";
 import { mockNotifications } from "./mockData";
@@ -422,6 +422,45 @@ export async function fetchUnassignedStoreList() {
     return response.data;
   }
   throw new Error(response.data?.message || "Failed to fetch unassigned store list");
+}
+export async function getPaymentsList({
+  page,
+  search,
+  mode,
+  per_page,
+    status,
+}: {
+  per_page: number;
+  page: number;
+  search: string;
+  mode?: string | number;
+  
+  status?: string | number;
+}) {
+  try {
+     const params = new URLSearchParams({
+    page: String(page),
+    search,
+    per_page: String(per_page)
+  });
+
+  if (mode) params.append("mode", String(mode));
+  if (status !== "") params.append("status", String(status));
+
+    const response: any = await api.get(
+      `/api/payments?${params.toString()}`
+    );
+
+    if (response?.data?.success === true) {
+      return response.data;
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to fetch payments list"
+    );
+  } catch (response: any) {
+    throw response;
+  }
 }
 export async function fetchUserList({
   page,
@@ -1245,6 +1284,62 @@ export async function getInvoiceInfoByJobCardPrefill(data:any) {
     }
     throw new Error(
       response?.data?.message || "Failed to get invoice info"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function getInvoicePayments(invoiceId: number | string) {
+  try {
+    const response: any = await api.get(
+      `/api/invoices/${invoiceId}/payments`
+    );
+
+    if (response?.data?.success === true) {
+      return response.data;
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to fetch invoice payments"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function saveInvoicePayment(
+  invoiceId: number | string,
+  payload: SaveInvoicePaymentPayload
+) {
+  try {
+    const response: any = await api.post(
+      `/api/invoices/${invoiceId}/save/payments`,
+      payload
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data;
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to save invoice payment"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+
+export async function cancelPayment(paymentId: number | string) {
+  try {
+    const response: any = await api.post(
+      `/api/payments/${paymentId}/cancel`
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data;
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to cancel payment"
     );
   } catch (response: any) {
     throw response;

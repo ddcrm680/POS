@@ -131,7 +131,7 @@ export default function Invoice() {
 
         /* ================= BALANCE DUE ================= */
         {
-            key: "balance_due",
+            key: "total_due",
             label: "Balance Due",
             width: "130px",
             render: (value: number) => (
@@ -392,7 +392,7 @@ export default function Invoice() {
                                 id="invoice-form"
                                 // organizationMetaInfo={}
                                 initialValues={
-                                    invoicePaymentModalOpenInfo.info
+                                    invoicePaymentModalOpenInfo.info.id
                                 }
                                 isLoading={isLoading}
                                 mode={"edit"}

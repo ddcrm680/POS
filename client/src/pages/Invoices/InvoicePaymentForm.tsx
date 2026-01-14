@@ -26,7 +26,7 @@ import RHFSelect from "@/components/RHFSelect";
 import { Textarea } from "@/components/ui/textarea";
 import { unknown } from "zod";
 import { useAuth } from "@/lib/auth";
-import { fetchCityList, fetchStateList } from "@/lib/api";
+import { fetchCityList, fetchStateList, getInvoicePayments } from "@/lib/api";
 import { Pencil, Trash2, X } from "lucide-react";
 import { findIdByName } from "@/lib/utils";
 import { RequiredMark } from "@/components/common/RequiredMark";
@@ -43,43 +43,59 @@ export default function InvoicePaymentForm({
     isLoading = false,
     onSubmit,
 }: InvoicePaymentFormProp) {
-    const { countries, user } = useAuth();
-    const [existingOrgImage, setExistingOrgImage] = useState<string | null>(null);
 
     const form = useForm<InvoicePaymentFormValues>({
         resolver: zodResolver(invoicePaymentSchema),
         defaultValues: {
-            invoice_total: initialValues?.invoice_total ?? 0,
-            already_received: initialValues?.already_received ?? 0,
-            due_amount: initialValues?.due_amount ?? 0,
+            grand_total: 0,
+            paid_amount: 0,
+            total_due: 0,
 
             received_amount: 0,
-            net_amount: 0,
+            txn_id: '',
 
             payment_mode: "",
             payment_date: "",
 
-            tax_deducted: "no",
-            withholding_tax: undefined,
-
-            note: "",
+            remarks: "",
         },
     });
-    const receivedAmount = form.watch("received_amount");
-    const withholdingTax = form.watch("withholding_tax") ?? 0;
-    const taxDeducted = form.watch("tax_deducted");
+    
+  const [payments, setPayments] = useState<Array<any>>([]);
+      const [isListLoading, setIsDataLoading] = useState(true);
+  const fetchPayments = async (isLoaderHide = false) => {
+    try {
+      if (!isLoaderHide)
+        setIsDataLoading(true);
 
-    useEffect(() => {
-        const net =
-            taxDeducted === "yes"
-                ? Math.max(receivedAmount - withholdingTax, 0)
-                : receivedAmount;
+      const res =
+        await getInvoicePayments(initialValues ?? "");
+console.log(res.data,'res.data');
 
-        form.setValue("net_amount", net);
-    }, [receivedAmount, withholdingTax, taxDeducted]);
+      const mappedData = res.data
+      console.log(mappedData, 'mappedData');
+      
+        form.setValue("paid_amount", mappedData.paid_amount);
+        
+        form.setValue("paid_amount", mappedData.total_due);
+        
+        form.setValue("paid_amount", mappedData.paid_amount);
+        
+        form.setValue("paid_amount", mappedData.paid_amount);
+      setPayments(mappedData);
+    } catch (e) {
+      console.error( e);
 
-    const isView = mode === "view";
-    const isCreate = mode === "create";
+    } finally {
+      if (!isLoaderHide)
+        setIsDataLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPayments(false);
+  }, [initialValues]);
+
     return (
         <Form {...form}>
             <form
@@ -92,19 +108,19 @@ export default function InvoicePaymentForm({
                     <SectionCard title="Invoice Summary" className="mt-0">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <FloatingField
-                                name="invoice_total"
+                                name="grand_total"
                                 label="Invoice Total"
                                 control={form.control}
                                 isView
                             />
                             <FloatingField
-                                name="already_received"
+                                name="paid_amount"
                                 label="Already Received"
                                 control={form.control}
                                 isView
                             />
                             <FloatingField
-                                name="due_amount"
+                                name="total_due"
                                 label="Due Amount"
                                 control={form.control}
                                 isView
@@ -123,9 +139,10 @@ export default function InvoicePaymentForm({
                             />
 
                             <FloatingField
-                                name="net_amount"
-                                label="Net Amount"
-                                type="number"
+                                name="txn_id"
+                                label="Tax Id"
+                                isRequired
+                                type="text"
                                 isView
                                 control={form.control}
                             />
@@ -152,48 +169,13 @@ export default function InvoicePaymentForm({
                                     { label: "Bank Transfer", value: "bank" },
                                 ]}
                             />
-
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-medium">
-                                    Tax Deducted?
-                                </label>
-                                <div className="flex gap-4 text-sm">
-                                    <label className="flex items-center gap-2">
-                                        <input
-                                            type="radio"
-                                            value="no"
-                                            checked={taxDeducted === "no"}
-                                            onChange={() => form.setValue("tax_deducted", "no")}
-                                        />
-                                        No
-                                    </label>
-                                    <label className="flex items-center gap-2">
-                                        <input
-                                            type="radio"
-                                            value="yes"
-                                            checked={taxDeducted === "yes"}
-                                            onChange={() => form.setValue("tax_deducted", "yes")}
-                                        />
-                                        Yes (TDS)
-                                    </label>
-                                </div>
-                            </div>
-
-                            {taxDeducted === "yes" && (
-                                <FloatingField
-                                    name="withholding_tax"
-                                    label="Withholding Tax"
-                                    type="number"
-                                    isRequired
-                                    control={form.control}
-                                />
-                            )}
+                       
                         </div>
                     </SectionCard>
 
                     <SectionCard title="Additional Note"className="mt-0">
                         <FloatingTextarea
-                            name="note"
+                            name="remarks"
                             label="Payment Note"
                             control={form.control}
                         />

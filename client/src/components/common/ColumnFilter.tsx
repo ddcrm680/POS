@@ -14,6 +14,8 @@ export function ColumnFilter({
     value: any;
     onChange: (val: any) => void;
 }) {
+    console.log(value,'valuevalue');
+    
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
 

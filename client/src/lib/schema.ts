@@ -981,15 +981,15 @@ export const NewCustomerSchema = z
 
 export const invoicePaymentSchema = z
   .object({
-    invoice_total: z.number(),
-    already_received: z.number(),
-    due_amount: z.number(),
+    grand_total: z.number(),
+    paid_amount: z.number(),
+    total_due: z.number(),
 
     received_amount: z
       .number({ invalid_type_error: "Enter amount" })
       .min(1, "Amount must be greater than 0"),
 
-    net_amount: z.number(),
+    txn_id: z.string(),
 
     payment_mode: z.string().min(1, "Select payment mode"),
     payment_date: z.string().min(1, "Select payment date"),
@@ -997,7 +997,7 @@ export const invoicePaymentSchema = z
     tax_deducted: z.enum(["no", "yes"]),
     withholding_tax: z.number().optional(),
 
-    note: z.string().optional(),
+    remarks: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.tax_deducted === "yes" && !data.withholding_tax) {

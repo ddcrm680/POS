@@ -329,12 +329,12 @@ export interface organizationMetaInfoType {
 
 }
 export type InvoicePaymentFormValues = {
-  invoice_total: number;
-  already_received: number;
-  due_amount: number;
+  grand_total: number;
+  paid_amount: number;
+  total_due: number;
 
   received_amount: number;
-  net_amount: number;
+  txn_id: string;
 
   payment_mode: string;
   payment_date: string;
@@ -342,7 +342,7 @@ export type InvoicePaymentFormValues = {
   tax_deducted: "no" | "yes";
   withholding_tax?: number;
 
-  note?: string;
+  remarks?: string;
 };
 
 export interface InvoicePaymentFormProp {
@@ -351,7 +351,7 @@ export interface InvoicePaymentFormProp {
   organizationMetaInfo?: organizationMetaInfoType
   id?: string;
 
-  initialValues?: Partial<InvoicePaymentFormValues>;
+  initialValues?:string;
   isLoading?: boolean;
   onClose: () => void;
 
@@ -730,4 +730,11 @@ export type ServiceCard = {
   value: string;
   price: number;
   description: string;
+};
+export type SaveInvoicePaymentPayload = {
+  payment_date: string;     // yyyy-mm-dd
+  payment_mode: string;     // cash | upi | card | bank_transfer etc
+  amount: number;
+  txn_id?: string | null;
+  remarks?: string;
 };

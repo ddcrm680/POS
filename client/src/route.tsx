@@ -6,7 +6,7 @@ import Workflow from "@/pages/workflow";
 import Inventory from "@/pages/inventory";
 import Facility from "@/pages/facility";
 import Expenses from "@/pages/expenses";
-import Payments from "@/pages/payments";
+import Payments from "@/pages/Payments/payments";
 import Reports from "@/pages/reports";
 import POSJobCreation from "@/pages/pos-job-creation";
 import CustomerProfile from "@/pages/customer-profile";
@@ -36,6 +36,7 @@ import InvoiceForm from "./pages/Invoices/InvoiceForm";
 import Notification from "./pages/Notification/Noitification";
 import JobForm from "./pages/JobCard/JobForm";
 import CustomerForm from "./pages/Customer/CustomerForm";
+import PaymentsPage from "@/pages/Payments/payments";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -57,6 +58,8 @@ export function Router() {
       <Route path="/master" component={() => <ProtectedRoute component={Master} 
       />} />
         <Route path="/stores" component={() => <ProtectedRoute component={StoreList} 
+      />} />
+        <Route path="/payments" component={() => <ProtectedRoute component={PaymentsPage} 
       />} />
             <Route path="/notifications" component={() => <ProtectedRoute component={Notification} 
       />} />

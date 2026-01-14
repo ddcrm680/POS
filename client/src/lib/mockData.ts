@@ -849,10 +849,10 @@ export const invoiceMockData = [
     invoice_no: "CO/25-26/2",
 
     amount: 2006,
-    invoice_total: 2006,
-    already_received: 0,
+    grand_total: 2006,
+    paid_amount: 0,
     balance_due: 2006,
-    due_amount: 2006,
+    total_due: 2006,
 
     received_amount: 0,
     net_amount: 0,
@@ -873,10 +873,10 @@ export const invoiceMockData = [
     invoice_no: "CO/25-26/1",
 
     amount: 11275,
-    invoice_total: 11275,
-    already_received: 0,
+    grand_total: 11275,
+    paid_amount: 0,
     balance_due: 11275,
-    due_amount: 11275,
+    total_due: 11275,
 
     received_amount: 0,
     net_amount: 0,
@@ -897,10 +897,10 @@ export const invoiceMockData = [
     invoice_no: "CO/24-25/9",
 
     amount: 1770,
-    invoice_total: 1770,
-    already_received: 0,
+    grand_total: 1770,
+    paid_amount: 0,
     balance_due: 1770,
-    due_amount: 1770,
+    total_due: 1770,
 
     received_amount: 0,
     net_amount: 0,
@@ -921,10 +921,10 @@ export const invoiceMockData = [
     invoice_no: "CO/24-25/8",
 
     amount: 32450,
-    invoice_total: 32450,
-    already_received: 32450,
+    grand_total: 32450,
+    paid_amount: 32450,
     balance_due: 0,
-    due_amount: 0,
+    total_due: 0,
 
     received_amount: 0,
     net_amount: 32450,
@@ -945,10 +945,10 @@ export const invoiceMockData = [
     invoice_no: "CO/24-25/7",
 
     amount: 118000,
-    invoice_total: 118000,
-    already_received: 0,
+    grand_total: 118000,
+    paid_amount: 0,
     balance_due: 118000,
-    due_amount: 118000,
+    total_due: 118000,
 
     received_amount: 0,
     net_amount: 0,
@@ -969,10 +969,10 @@ export const invoiceMockData = [
     invoice_no: "CO/24-25/6",
 
     amount: 112100,
-    invoice_total: 112100,
-    already_received: 0,
+    grand_total: 112100,
+    paid_amount: 0,
     balance_due: 112100,
-    due_amount: 112100,
+    total_due: 112100,
 
     received_amount: 0,
     net_amount: 0,
@@ -993,10 +993,10 @@ export const invoiceMockData = [
     invoice_no: "CO/24-25/5",
 
     amount: 1770,
-    invoice_total: 1770,
-    already_received: 1770,
+    grand_total: 1770,
+    paid_amount: 1770,
     balance_due: 0,
-    due_amount: 0,
+    total_due: 0,
 
     received_amount: 0,
     net_amount: 1770,
@@ -1017,10 +1017,10 @@ export const invoiceMockData = [
     invoice_no: "CO/24-25/4",
 
     amount: 127440,
-    invoice_total: 127440,
-    already_received: 127440,
+    grand_total: 127440,
+    paid_amount: 127440,
     balance_due: 0,
-    due_amount: 0,
+    total_due: 0,
 
     received_amount: 0,
     net_amount: 127440,
@@ -1041,10 +1041,10 @@ export const invoiceMockData = [
     invoice_no: "CO/24-25/3",
 
     amount: 17700,
-    invoice_total: 17700,
-    already_received: 17700,
+    grand_total: 17700,
+    paid_amount: 17700,
     balance_due: 0,
-    due_amount: 0,
+    total_due: 0,
 
     received_amount: 0,
     net_amount: 17700,
@@ -1065,10 +1065,10 @@ export const invoiceMockData = [
     invoice_no: "CO/24-25/2",
 
     amount: 2950,
-    invoice_total: 2950,
-    already_received: 1100,
+    grand_total: 2950,
+    paid_amount: 1100,
     balance_due: 1850,
-    due_amount: 1850,
+    total_due: 1850,
 
     received_amount: 0,
     net_amount: 1100,

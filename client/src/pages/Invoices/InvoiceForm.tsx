@@ -26,9 +26,9 @@ import RHFSelect from "@/components/RHFSelect";
 import { Textarea } from "@/components/ui/textarea";
 import { unknown } from "zod";
 import { useAuth } from "@/lib/auth";
-import { createInvoice, fetchCityList, fetchStateList, getInvoiceInfo, getInvoiceInfoByJobCardPrefill, getJobCardItem } from "@/lib/api";
+import { createInvoice, fetchCityList, fetchStateList, getInvoiceInfo, getInvoiceInfoByJobCardPrefill, getInvoicePayments, getJobCardItem, getPaymentsList } from "@/lib/api";
 import { Pencil, Trash2, X } from "lucide-react";
-import { calculateInvoiceRow, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, normalizeInvoiceToEditResponse, } from "@/lib/utils";
+import { calculateInvoiceRow, formatDate, formatTime, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, normalizeInvoiceToEditResponse, } from "@/lib/utils";
 import { RequiredMark } from "@/components/common/RequiredMark";
 import { SectionCard } from "@/components/common/card";
 import { FloatingField } from "@/components/common/FloatingField";
@@ -45,6 +45,7 @@ import { Info } from "@/components/common/viewInfo";
 import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
 import { useToast } from "@/hooks/use-toast";
+import PaymentsPage from "../Payments/payments";
 
 
 export default function InvoiceForm() {
@@ -63,6 +64,20 @@ export default function InvoiceForm() {
       billing_state_id: "",
     },
   });
+  const [perPage, setPerPage] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [has_next, setHasNext] = useState(false)
+  const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: { value: string, label: string }[] }>({
+    status: []
+  });
+  const [filters, setFilters] = useState({
+    status: "",
+    mode: ""
+  });
+
+  const [lastPage, setLastPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const billingTo = form.watch("billing_to");
   const [, navigate] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
@@ -72,6 +87,7 @@ export default function InvoiceForm() {
 
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
+
   const jobCardId = searchParams.get("jobCardId");
   const [invoiceInfo, setInvoiceInfo] = useState<{
     selectedPlanId: string,
@@ -466,7 +482,130 @@ export default function InvoiceForm() {
   }
 
   const isView = mode === "view";
+  const paymentColumn = [
+    /* ================= CREATED DATE ================= */
+    {
+      key: "created_at",
+      label: "Created Date",
+      align: "center",
+      width: "120px",
+      render: (value: string) => (
+        <Box className="flex flex-col">
+          <span className="font-medium">{formatDate(value)}</span>
+          <span className="text-xs text-muted-foreground">
+            {formatTime(value)}
+          </span>
+        </Box>
+      ),
+    },
+    {
+      key: "payment_date",
+      label: "Payment Date",
+      align: "center",
+      width: "120px",
+      render: (value: string) => (
+        <Box className="flex flex-col">
+          <span className="font-medium">{formatDate(value)}</span>
+          <span className="text-xs text-muted-foreground">
+            {formatTime(value)}
+          </span>
+        </Box>
+      ),
+    },
 
+    /* ================= CONSUMER ================= */
+    {
+      key: "amount",
+      label: "Recieved amount",
+      width: "180px",
+      render: (value: number) => (
+        <span>₹ {value ?? 0}</span>
+      ),
+    },
+
+
+    /* ================= BALANCE DUE ================= */
+    {
+      key: "remarks",
+      label: "Notes",
+      width: "180px",
+
+    },
+ {
+      key: "payment_mode",
+      label: "Mode",
+      width: "120px",
+     
+    },
+    /* ================= PAYMENT STATUS ================= */
+    {
+      key: "status",
+      label: "Status",
+      width: "120px",
+      render: (value: string) => {
+ const styles: Record<string, string> = {
+          issued: "bg-yellow-100 text-yellow-700",
+          recieved: "bg-emerald-100 text-emerald-700",
+          cancelled: "bg-red-100 text-red-700",
+          "Partially-Paid": "bg-blue-100 text-blue-700",
+        };
+        return (
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[value]}`}
+         
+          >
+            {value.charAt(0).toUpperCase()+value.slice(1)}
+          </span>
+        );
+      },
+    },
+
+  ];
+
+  const [isListLoading, setIsListLoading] = useState(true);
+
+  const [payments, setPayments] = useState<Array<any>>([]);
+  const fetchPayments = async (isLoaderHide = false) => {
+    try {
+      if (!isLoaderHide)
+        setIsListLoading(true);
+      console.log(filters.status, ' filters.status');
+
+      const res =
+        await getInvoicePayments(id ?? "");
+console.log(res.data,'res.data');
+
+      const mappedData = res.data?.payments.map((item: any) => ({
+        ...item,
+        invoice_number: item.invoice?.invoice_number
+      }))
+
+      // setHasNext(res.meta.has_next)
+      // setTotal(res.meta.total)
+      setPayments(mappedData);
+      // setLastPage(res.meta.last_page);
+      // setFilterMetaInfo(res.meta.filters)
+    } catch (e) {
+      console.error('error coming', e);
+
+    } finally {
+      if (!isLoaderHide)
+        setIsListLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (mode === "view")
+      fetchPayments(false);
+  }, []);
+  function resetFilter() {
+    setSearch('')
+    setPage(1)
+    setFilters({
+      status: "",
+      mode: ""
+    })
+  }
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-4">
       {/* Header */}
@@ -681,7 +820,6 @@ export default function InvoiceForm() {
           data={plans}
           searchable={false}
           isAdd={false}
-          perPage={10}
           isLoading={false}
           total={plans.length}
           tabDisplayName="Plans"
@@ -690,24 +828,24 @@ export default function InvoiceForm() {
           setPage={() => { }}
           lastPage={1}
           hasNext={false}
-         actions={
-  isView
-    ? undefined
-    : (row: any) => (
-        <Box className="gap-3">
-          <IconButton
-            size="xs"
-            mr={2}
-            colorScheme="red"
-            disabled={plans.length <= 1}
-            aria-label="Delete"
-            onClick={() => removePlan(row.id)}
-          >
-            <Trash2 size={16} />
-          </IconButton>
-        </Box>
-      )
-}
+          actions={
+            isView
+              ? undefined
+              : (row: any) => (
+                <Box className="gap-3">
+                  <IconButton
+                    size="xs"
+                    mr={2}
+                    colorScheme="red"
+                    disabled={plans.length <= 1}
+                    aria-label="Delete"
+                    onClick={() => removePlan(row.id)}
+                  >
+                    <Trash2 size={16} />
+                  </IconButton>
+                </Box>
+              )
+          }
         />
 
         {/* TOTALS */}
@@ -769,6 +907,38 @@ export default function InvoiceForm() {
           </div>
         </div>
       </Card>
+      {/* Payments info */}
+      {mode == 'view' && <Card className="p-4 lg:col-span-3">
+        <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
+          PAYMENTS INFO
+        </CardTitle>
+        <CommonTable
+          columns={paymentColumn}
+          isClear={false}
+          data={payments}
+          isAdd={false}
+          searchable={false}
+          perPage={perPage}
+          setPerPage={setPerPage}
+          resetFilter={resetFilter}
+          isLoading={isListLoading}
+          total={total}
+          hasNext={has_next}
+          tabType=""
+          tabDisplayName="Payments"
+          page={page}
+          setPage={setPage}
+          lastPage={lastPage}
+          searchValue={search}
+          onSearch={(value: string) => {
+            // if (value) {
+            setSearch(value);
+            setPage(1); // reset page on new search
+            // }
+          }}
+
+        />
+      </Card>}
       {mode !== 'view' &&
         <div className="  pb-4 flex justify-end gap-3 mt-4">
           <Button

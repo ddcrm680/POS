@@ -23,7 +23,8 @@ import {
   FileText,
   MapPinned,
   Key,
-  BarChart3
+  BarChart3,
+  Wallet
 } from "lucide-react";
 
 export const Constant = {
@@ -135,9 +136,14 @@ export const nonAdminTabs: nonAdminTabsItem[] = [
   { path: "/appointments", icon: Calendar, label: "Appointments" },
   { path: "/facility-management", icon: Building, label: "Facility" },
   { path: "/employee-management", icon: UserCheck, label: "Team" },
-  { path: "/job-cards", icon: ClipboardList, label: "Jobs", badge: 3 },
+
+
   { path: "/customers", icon: Users, label: "Customers" },
-  { path: "/payments", icon: CreditCard, label: "Payments" },
+  { path: "/job-cards", icon: ClipboardList, label: "Job Card" },
+
+  { path: "/invoices", icon: FileText, label: "Invoices" },
+
+  { path: "/payments", icon: Wallet, label: "Payments" },
   { path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
 ];
 export const bottomTabs: TabItem[] = [
@@ -161,14 +167,15 @@ export const bottomTabs: TabItem[] = [
     label: "Master",
 
   },
-  
+
   { id: "customers", path: "/customers", icon: Users, label: "Customers" },
   { id: "jobs", path: "/job-cards", icon: ClipboardList, label: "Job Card" },
-  
-  { id: "invoices", path: "/invoices", icon: FileText , label: "Invoices" },
-   { id: "appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
- 
-  { id: "payments", path: "/payments", icon: CreditCard, label: "Payments" },
+
+  { id: "invoices", path: "/invoices", icon: FileText, label: "Invoices" },
+
+  { id: "payments", path: "/payments", icon: Wallet, label: "Payments" },
+  { id: "appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
+
   { id: "inventory", path: "/inventory", icon: Package, label: "Inventory" },
 
   {
@@ -242,9 +249,9 @@ export const storeFormKeys = {
   { label: "PAN number", fieldName: "pan_no" }
   ]
 }
-export const jobCardStatusList=[
-            { label: 'All', value: '' },
-            { label: "Open", value: 'open' },
-            { label: "Cancel", value: 'cancel' },
-            { label: "Partially Paid", value: 'partially-paid' },
-          ]
+export const jobCardStatusList = [
+  { label: 'All', value: '' },
+  { label: "Open", value: 'open' },
+  { label: "Cancel", value: 'cancel' },
+  { label: "Partially Paid", value: 'partially-paid' },
+]
