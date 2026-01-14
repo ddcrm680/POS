@@ -119,13 +119,13 @@ export default function InvoiceForm() {
         width: "90px",
         render: (v: string) => v ?? "-",
       },
-       {
+      {
         key: "qty",
         label: "QTY",
         width: "90px",
-        render: (v: string,row:any) =>{
-          console.log(v, row,'rowrow');
-          
+        render: (v: string, row: any) => {
+          console.log(v, row, 'rowrow');
+
           return v ?? row.qty ?? "-"
         },
       },
@@ -245,11 +245,11 @@ export default function InvoiceForm() {
           setInvoiceNumber(res?.data?.invoice_data?.invoice_number)
         // 👇 normalize ONLY when jobCardId is NOT present
         const normalizedData = jobCardId
-          ? res.data  : normalizeInvoiceToCreateResponse(res.data);
+          ? res.data : normalizeInvoiceToCreateResponse(res.data);
 
         setAvailablePlans(normalizedData?.availableServices ?? [])
         // 👇 existing mapper stays SAME
-        const mapped =mode==="edit" ? normalizeInvoiceToEditResponse(normalizedData): mapInvoiceApiToPrefilledViewModel(normalizedData);
+        const mapped = mode === "edit" ? normalizeInvoiceToEditResponse(normalizedData) : mapInvoiceApiToPrefilledViewModel(normalizedData);
 
         setInvoiceView(mapped);
 
@@ -601,14 +601,36 @@ export default function InvoiceForm() {
               const plan = availablePlans.find(
                 (p) => String(p.id) === invoiceInfo.selectedPlanId
               );
-
               if (!plan) return;
 
-              // ❌ prevent duplicate
-              if (plans.some((p: any) => p.id === plan.id)) return;
+              const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
 
-              setPlans((prev: any) => ([...prev, plan]));
-              setInvoiceInfo((prev) => ({ ...prev, selectedPlanId: "" }));
+              setPlans(prev => {
+                const existing = prev.find(p => p.id === plan.id);
+
+                // ✅ IF PLAN ALREADY EXISTS → INCREMENT QTY
+                if (existing) {
+                  return prev.map(p =>
+                    p.id === plan.id
+                      ? calculateInvoiceRow(
+                        { ...p, qty: Number(p.qty || 1) + 1 },
+                        gstType
+                      )
+                      : p
+                  );
+                }
+
+                // ✅ FIRST TIME ADD → QTY = 1
+                return [
+                  ...prev,
+                  calculateInvoiceRow(
+                    { ...plan, qty: 1 },
+                    gstType
+                  ),
+                ];
+              });
+
+              setInvoiceInfo({ selectedPlanId: "" });
             }}
           >
             Add Plan
