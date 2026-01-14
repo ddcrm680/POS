@@ -215,43 +215,49 @@ export default function JobForm() {
     loadServices();
   }, [vehicleType, serviceTypes]);
   const vehicleCompanyId = form.watch("vehicle_company_id");
+const hasInitializedModelsRef = useRef(false);
+useEffect(() => {
+  if (!vehicleCompanyId) {
+    setMeta(prev => ({ ...prev, vehicleModels: [] }));
+    return;
+  }
 
-  useEffect(() => {
-    if (!vehicleCompanyId) {
-      setMeta(prev => ({ ...prev, vehicleModels: [] }));
-      return;
-    }
-    console.log(vehicleCompanyId, 'vehicleCompanyId');
+  // 🚫 Skip FIRST RUN (initial hydration)
+  if (!hasInitializedModelsRef.current) {
+    hasInitializedModelsRef.current = true;
+    return;
+  }
 
-    let cancelled = false;
+  let cancelled = false;
 
-    const loadModels = async () => {
-      setMeta(prev => ({ ...prev, loadingModels: true }));
+  const loadModels = async () => {
+    setMeta(prev => ({ ...prev, loadingModels: true }));
 
-      try {
-        const models = await jobCardModelInfo(vehicleCompanyId);
-        if (cancelled) return;
+    try {
+      const models = await jobCardModelInfo(vehicleCompanyId);
+      if (cancelled) return;
 
-        setMeta(prev => ({
-          ...prev,
-          vehicleModels: toSelectOptions(models),
-          loadingModels: false,
-        }));
+      setMeta(prev => ({
+        ...prev,
+        vehicleModels: toSelectOptions(models),
+        loadingModels: false,
+      }));
 
-        // reset model on company change
-        form.setValue("vehicle_model_id", "");
-      } catch {
-        if (!cancelled) {
-          setMeta(prev => ({ ...prev, loadingModels: false }));
-        }
+      // reset model ONLY when user changes make
+      form.setValue("vehicle_model_id", "");
+    } catch {
+      if (!cancelled) {
+        setMeta(prev => ({ ...prev, loadingModels: false }));
       }
-    };
+    }
+  };
 
-    loadModels();
-    return () => {
-      cancelled = true;
-    };
-  }, [vehicleCompanyId]);
+  loadModels();
+
+  return () => {
+    cancelled = true;
+  };
+}, [vehicleCompanyId]);
   useEffect(() => {
     form.setValue('role', user?.role);
   }, [user])
@@ -432,15 +438,15 @@ export default function JobForm() {
       isHydratingJobRef.current = false;
 
       /* ===== VEHICLE MODELS ===== */
-      // const models = await jobCardModelInfo(
-      //   String(initialValues.job_card.vehicle_company_id)
-      // );
+      const models = await jobCardModelInfo(
+        String(initialValues.job_card.vehicle_company_id)
+      );
 
 
-      // setMeta(prev => ({
-      //   ...prev,
-      //   vehicleModels: toSelectOptions(models),
-      // }));
+      setMeta(prev => ({
+        ...prev,
+        vehicleModels: toSelectOptions(models),
+      }));
 
       form.setValue(
         "vehicle_model_id",
