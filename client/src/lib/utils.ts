@@ -327,7 +327,7 @@ export function calculateInvoiceRow(
 
   const rawPercent = plan.discount_percent ?? "";
   const rawAmount = plan.discount_amount ?? "";
-
+  
   let percentNum = rawPercent || 0;
   let amountNum = (rawAmount || 0);
 
@@ -342,7 +342,7 @@ export function calculateInvoiceRow(
       amountNum = plan.price
     }
     percentNum = baseSubTotal
-      ? ((amountNum / baseSubTotal) * 100) > 100 ? 100 : ((amountNum / baseSubTotal) * 100).toFixed(2)
+      ? ((amountNum / baseSubTotal) * 100) > 100 ? 100 : ((amountNum / baseSubTotal) * 100).toFixed(4)
       : 0;
   }
 
