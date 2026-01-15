@@ -43,42 +43,50 @@ export default function InvoiceView() {
 
     const [extraDiscountPercent, setExtraDiscountPercent] = useState('')
 
-    const costSummary = useMemo(() => {
-        const totalItems = plans.reduce(
-            (sum, p) => sum + Number(p.qty || 1),
-            0
-        );
+   const costSummary = useMemo(() => {
+  const subTotal = plans.reduce(
+    (sum, p) => sum + Number(p.sub_amount || 0),
+    0
+  );
+    const totalItems = plans.reduce(
+      (sum, p) => sum + Number(p.qty || 1),
+      0
+    );
+  const discountTotal = plans.reduce(
+    (sum, p) => sum + Number(p.discount_amount || 0),
+    0
+  );
 
-        const subTotal = plans.reduce(
-            (sum, p) => sum + Number(p.sub_amount || 0),
-            0
-        );
+  const cgstTotal = plans.reduce(
+    (sum, p) => sum + Number(p.cgst_amount || 0),
+    0
+  );
 
-        const cgstTotal = plans.reduce(
-            (sum, p) => sum + Number(p.cgst_amount || 0),
-            0
-        );
+  const sgstTotal = plans.reduce(
+    (sum, p) => sum + Number(p.sgst_amount || 0),
+    0
+  );
 
-        const sgstTotal = plans.reduce(
-            (sum, p) => sum + Number(p.sgst_amount || 0),
-            0
-        );
+  const igstTotal = plans.reduce(
+    (sum, p) => sum + Number(p.igst_amount || 0),
+    0
+  );
 
-        const igstTotal = plans.reduce(
-            (sum, p) => sum + Number(p.igst_amount || 0),
-            0
-        );
+  const grandTotal =
+    subTotal + cgstTotal + sgstTotal + igstTotal;
 
-        return {
-            totalItems,
-            extraDiscount: 0,
-            subTotal: Number(subTotal.toFixed(2)),
-            cgstTotal: Number(cgstTotal.toFixed(2)),
-            sgstTotal: Number(sgstTotal.toFixed(2)),
-            igstTotal: Number(igstTotal.toFixed(2)),
-            grandTotal: Number((subTotal + cgstTotal + sgstTotal + igstTotal).toFixed(2)),
-        };
-    }, [plans]);
+  return {
+    subTotal: +subTotal.toFixed(2),
+    discountTotal: +discountTotal.toFixed(2),
+    cgstTotal: +cgstTotal.toFixed(2),
+    sgstTotal: +sgstTotal.toFixed(2),
+    igstTotal: +igstTotal.toFixed(2),
+    totalItems,
+    grandTotal: +grandTotal.toFixed(2),
+     
+  };
+}, [plans]);
+
     useEffect(() => {
         console.log(invoiceView, 'invoiceView');
 
@@ -216,7 +224,6 @@ export default function InvoiceView() {
         ];
     }, [invoiceView]);
 
-    const [availablePlans, setAvailablePlans] = useState<any[]>([]);
     const [invoiceNumber, setInvoiceNumber] = useState('');
     useEffect(() => {
         // if (!id) return;
@@ -229,10 +236,9 @@ export default function InvoiceView() {
                 const res = await getInvoiceInfo(id);
                 setInvoiceNumber(res?.data?.invoice_number)
                 // 👇 normalize ONLY when jobCardId is NOT present
-                const normalizedData = jobCardId
-                    ? res.data : normalizeInvoiceToCreateResponse(res.data);
+                const normalizedData = normalizeInvoiceToCreateResponse(res.data);
+console.log(normalizedData,'normalizedData');
 
-                setAvailablePlans(normalizedData?.availableServices ?? [])
                 // 👇 existing mapper stays SAME
                 const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
                 const stateList = await fetchStateList(101);
@@ -245,6 +251,8 @@ export default function InvoiceView() {
                 const planCalculated = mapped.plans.map((item: any) =>
                     calculateInvoiceRow(item, gstType)
                 );
+                console.log(planCalculated,'planCalculated');
+                
                 setPlans(planCalculated);
 
             } catch (e) {
@@ -576,7 +584,7 @@ export default function InvoiceView() {
                                             ₹ {costSummary.igstTotal ?? "-"}
                                         </span>
                                     </div>}
-                                    <div className="flex justify-between items-center">
+                                    {/* <div className="flex justify-between items-center">
                                         <span className="text-muted-foreground">
                                             Extra Discount (%):
                                         </span>
@@ -594,7 +602,7 @@ export default function InvoiceView() {
                                                     ?? "-"}
                                             </span>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="flex justify-between font-semibold border-t pt-2">
                                         <span>Grand Total Amount:</span>
                                         <span>

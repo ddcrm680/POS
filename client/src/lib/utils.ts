@@ -316,52 +316,85 @@ export function mapInvoiceApiToPrefilledViewModel(api: any) {
     store: job.store,
   };
 }
+export function calculateInvoiceRow(
+  plan: any,
+  gstType: "igst" | "cgst_sgst" = "igst"
+) {
+  console.log(plan, 'planplanplan');
 
-export function calculateInvoiceRow(plan: any, gstType: "igst" | "cgst_sgst" = "igst") {
   const qty = Number(plan.qty || 1);
   const price = Number(plan.price || 0);
   const gstPercent = Number(plan.gst || 0);
 
-  // 1️⃣ Sub Amount
-  const subAmount = qty * price;
+  // 1️⃣ Base amount
+  const baseSubTotal = qty * price;
 
-  let cgstAmount = 0;
-  let sgstAmount = 0;
-  let igstAmount = 0;
+  // 2️⃣ Discount handling
+  let discountPercent = Number(plan.discount_percent || 0);
+  let discountAmount = Number(plan.discount_amount || 0);
 
-  if (gstType === "cgst_sgst") {
-    const halfGst = gstPercent / 2;
-    cgstAmount = (subAmount * halfGst) / 100;
-    sgstAmount = (subAmount * halfGst) / 100;
-  } else {
-    igstAmount = (subAmount * gstPercent) / 100;
+  if (plan._discountSource === "percent") {
+    discountAmount = (baseSubTotal * discountPercent) / 100;
+  } else if (plan._discountSource === "amount") {
+    discountPercent = baseSubTotal
+      ? (discountAmount / baseSubTotal) * 100
+      : 0;
   }
 
-  const totalAmount = subAmount + cgstAmount + sgstAmount + igstAmount;
+  // Clamp
+  discountPercent = Math.min(Math.max(discountPercent, 0), 100);
+  discountAmount = Math.min(Math.max(discountAmount, 0), baseSubTotal);
+
+  // 3️⃣ Discounted subtotal
+  const discountedSubTotal = baseSubTotal - discountAmount;
+
+  // 4️⃣ GST calculation
+  let cgst = 0,
+    sgst = 0,
+    igst = 0;
+
+  let cgstPercent = 0;
+  let sgstPercent = 0;
+  let igstPercent = 0;
+
+  if (gstType === "cgst_sgst") {
+    cgstPercent = gstPercent / 2;
+    sgstPercent = gstPercent / 2;
+
+    cgst = (discountedSubTotal * cgstPercent) / 100;
+    sgst = (discountedSubTotal * sgstPercent) / 100;
+  } else {
+    igstPercent = gstPercent;
+    igst = (discountedSubTotal * igstPercent) / 100;
+  }
+
+  // 5️⃣ Final total
+  const total = discountedSubTotal + cgst + sgst + igst;
 
   return {
     ...plan,
 
     qty,
-    unit_price: price,
 
-    discount_percent: 0,
-    discount_amount: 0,
+    // amounts
+    sub_amount: +discountedSubTotal.toFixed(2),
+    discount_percent: +discountPercent.toFixed(2),
+    discount_amount: +discountAmount.toFixed(2),
 
-    sub_amount: Number(subAmount.toFixed(2)),
+    // GST
+    cgst_percent: +cgstPercent.toFixed(2),
+    sgst_percent: +sgstPercent.toFixed(2),
+    igst_percent: +igstPercent.toFixed(2),
 
-    cgst_percent: gstType === "cgst_sgst" ? gstPercent / 2 : 0,
-    cgst_amount: Number(cgstAmount.toFixed(2)),
+    cgst_amount: +cgst.toFixed(2),
+    sgst_amount: +sgst.toFixed(2),
+    igst_amount: +igst.toFixed(2),
 
-    sgst_percent: gstType === "cgst_sgst" ? gstPercent / 2 : 0,
-    sgst_amount: Number(sgstAmount.toFixed(2)),
-
-    igst_percent: gstType === "igst" ? gstPercent : 0,
-    igst_amount: Number(igstAmount.toFixed(2)),
-
-    total_amount: Number(totalAmount.toFixed(2)),
+    total_amount: +total.toFixed(2),
   };
 }
+
+
 export function normalizeInvoiceToCreateResponse(api: any) {
   if (!api) return api;
 
@@ -376,7 +409,7 @@ export function normalizeInvoiceToCreateResponse(api: any) {
       ...api.job_card,
       consumer: api.consumer,
       store: api.store ?? api.job_card?.store ?? null,
-      vmake:{ id: api.job_card?.vehicle_company_id ?? null,} ,
+      vmake: { id: api.job_card?.vehicle_company_id ?? null, },
       vmodel: {
         id: api.job_card?.vehicle_make_id ?? null,
       },
@@ -394,9 +427,10 @@ export function normalizeInvoiceToCreateResponse(api: any) {
       number_of_visits: Number(item.qty ?? 1),
       price: item.unit_price,
       gst:
-      item.igst_percent
-          ,
-
+        item.igst_percent
+      ,
+      discount_percent: item?.discount_percent,
+      discount_amount: item?.discount_amount,
       is_tax_inclusive: false,
       sac: item.sac,
       description: item.description,
@@ -412,12 +446,12 @@ export function normalizeInvoiceToCreateResponse(api: any) {
       individual: {
         name: api.billing_name,
         phone: api.billing_phone ?? null,
-        email:api.billing_email,//
+        email: api.billing_email,//
         address: api?.billing_address,//
         state_id: api.billing_state_id ?? null,
       },
       company: {
-        name:  api.billing_name ,
+        name: api.billing_name,
         phone: api.billing_phone ?? null,
         email: api.billing_email,//
         address: api?.billing_address,//
@@ -430,15 +464,15 @@ export function normalizeInvoiceToCreateResponse(api: any) {
 export function normalizeInvoiceToEditResponse(api: any) {
   if (!api) return api;
 
-  
-const job=api.job_card
-console.log(api,'apiapi');
+
+  const job = api.job_card
+  console.log(api, 'apiapi');
 
   // 🔹 INVOICE VIEW → CREATE PREFILL FORMAT
   return {
-   customer: {
-      bill_to:api.job_card.consumer.name,
-      name:api.job_card.consumer.name,
+    customer: {
+      bill_to: api.job_card.consumer.name,
+      name: api.job_card.consumer.name,
       phone: api.job_card.consumer.phone,
       email: api.job_card.consumer.email,
       address: api.job_card.consumer.address,
@@ -464,22 +498,22 @@ console.log(api,'apiapi');
 
     plans: api.opted_services,
     billing_prefill: {
-        name: api?.invoice_data?.billing_name,
-        phone: api?.invoice_data?.billing_phone ?? null,
-        email:api?.invoice_data?.billing_email,//
-        address: api?.invoice_data?.billing_address,//
-        state_id: api?.invoice_data?.billing_state_id ?? null,
-      },
+      name: api?.invoice_data?.billing_name,
+      phone: api?.invoice_data?.billing_phone ?? null,
+      email: api?.invoice_data?.billing_email,//
+      address: api?.invoice_data?.billing_address,//
+      state_id: api?.invoice_data?.billing_state_id ?? null,
+    },
     billing_prefillCompany: {
-        name:  api?.invoice_data?.billing_name ,
-        phone: api?.invoice_data?.billing_phone ?? null,
-        email: api?.invoice_data?.billing_email,//
-        address: api?.invoice_data?.billing_address,//
-        state_id: api?.invoice_data?.billing_state_id ?? null,
-        gstin: api?.invoice_data?.billing_gstin ?? null,
-      },
+      name: api?.invoice_data?.billing_name,
+      phone: api?.invoice_data?.billing_phone ?? null,
+      email: api?.invoice_data?.billing_email,//
+      address: api?.invoice_data?.billing_address,//
+      state_id: api?.invoice_data?.billing_state_id ?? null,
+      gstin: api?.invoice_data?.billing_gstin ?? null,
+    },
     store: job.store,
 
-  
+
   };
 }

@@ -54,7 +54,58 @@ export default function InvoiceForm() {
     status: "",
     mode: ""
   });
+  
+  // const [extraDiscountPercent, setExtraDiscountPercent] = useState('')
 
+const costSummary = useMemo(() => {
+  const subTotal = plans.reduce(
+    (sum, p) => sum + Number(p.sub_amount || 0),
+    0
+  );
+    const totalItems = plans.reduce(
+      (sum, p) => sum + Number(p.qty || 1),
+      0
+    );
+  const discountTotal = plans.reduce(
+    (sum, p) => sum + Number(p.discount_amount || 0),
+    0
+  );
+
+  const cgstTotal = plans.reduce(
+    (sum, p) => sum + Number(p.cgst_amount || 0),
+    0
+  );
+
+  const sgstTotal = plans.reduce(
+    (sum, p) => sum + Number(p.sgst_amount || 0),
+    0
+  );
+
+  const igstTotal = plans.reduce(
+    (sum, p) => sum + Number(p.igst_amount || 0),
+    0
+  );
+
+  const grandTotal =
+    subTotal + cgstTotal + sgstTotal + igstTotal;
+
+  return {
+    subTotal: +subTotal.toFixed(2),
+    discountTotal: +discountTotal.toFixed(2),
+    cgstTotal: +cgstTotal.toFixed(2),
+    sgstTotal: +sgstTotal.toFixed(2),
+    igstTotal: +igstTotal.toFixed(2),
+    totalItems,
+    grandTotal: +grandTotal.toFixed(2),
+     
+  };
+}, [plans]);
+
+    //  const extraDiscountAmount =
+    //   (costSummary.grandTotal * Number(extraDiscountPercent || 0)) / 100;
+
+    const finalGrandTotal =
+      costSummary.grandTotal ;
   const [lastPage, setLastPage] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -97,6 +148,8 @@ export default function InvoiceForm() {
       items: plans.map(plan => ({
         service_plan_id: plan.id,
         qty: Number(plan.qty || 1),
+        discount_percent:plan.discount_percent,
+        discount_amount:plan.discount_amount
       })),
     };
   }
@@ -179,6 +232,111 @@ export default function InvoiceForm() {
         width: "120px",
         render: (v: number) => `₹ ${v}`,
       },
+
+      {
+        key: "discount_percent",
+        label: "Dis.(%)",
+        width: "90px",
+        render: (_: any, row: any) => (
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={row.discount_percent}
+            onChange={(e) => {
+              let value = e.target.value.replace(/\D/g, "");
+
+              if (value === "") {
+                setPlans(prev =>
+                  prev.map(p =>
+                    p.id === row.id ? { ...p, discount_percent: "" } : p
+                  )
+                );
+                return;
+              }
+
+              if (/^0{2,}/.test(value)) return; // ❌ block 000
+
+              let percent = Math.min(Number(value), 100);
+
+              setPlans(prev =>
+                prev.map(p =>
+                  p.id === row.id
+                    ? calculateInvoiceRow(
+                      { ...p, discount_percent: percent, _discountSource: "percent" },
+                      billingTo === "company" ? "cgst_sgst" : "igst"
+                    )
+                    : p
+                )
+              );
+            }}
+            onBlur={() => {
+              if (!row.discount_percent) {
+                setPlans(prev =>
+                  prev.map(p =>
+                    p.id === row.id
+                      ? calculateInvoiceRow({ ...p, discount_percent: 0 }, billingTo === "company" ? "cgst_sgst" : "igst")
+                      : p
+                  )
+                );
+              }
+            }}
+            className="w-16 border rounded px-1 py-0.5 text-xs text-center"
+          />
+        ),
+      },
+      {
+        key: "discount_amount",
+        label: "	Discount",
+        width: "90px",
+        render: (_: any, row: any) => (
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={row.discount_amount}
+            onChange={(e) => {
+              let value = e.target.value.replace(/\D/g, "");
+
+              if (value === "") {
+                setPlans(prev =>
+                  prev.map(p =>
+                    p.id === row.id ? { ...p, discount_amount: "" } : p
+                  )
+                );
+                return;
+              }
+
+              if (/^0{2,}/.test(value)) return;
+
+              let amount = Math.min(Number(value), row.sub_amount);
+
+              setPlans(prev =>
+                prev.map(p =>
+                  p.id === row.id
+                    ? calculateInvoiceRow(
+                      { ...p, discount_amount: amount, _discountSource: "amount" },
+                      billingTo === "company" ? "cgst_sgst" : "igst"
+                    )
+                    : p
+                )
+              );
+            }}
+            onBlur={() => {
+              if (!row.discount_amount) {
+                setPlans(prev =>
+                  prev.map(p =>
+                    p.id === row.id
+                      ? calculateInvoiceRow({ ...p, discount_amount: 0 }, billingTo === "company" ? "cgst_sgst" : "igst")
+                      : p
+                  )
+                );
+              }
+            }}
+            className="w-16 border rounded px-1 py-0.5 text-xs text-center"
+          />
+        ),
+      },
       {
         key: "sub_amount",
         label: "Sub Amount",
@@ -216,14 +374,15 @@ export default function InvoiceForm() {
           {
             key: "igst_amount",
             label: "IGST",
-            render: (_: any, row: any) => (
+            render: (_: any, row: any) =>{
+              return (
               <span>
                 ₹ {row.igst_amount}
                 <span className="text-green-600 text-xs pl-2">
                   ({row.igst_percent}%)
                 </span>
               </span>
-            ),
+            )}
           },
         ]),
 
@@ -234,42 +393,7 @@ export default function InvoiceForm() {
       },
     ];
   }, [billingTo]);
-  const costSummary = useMemo(() => {
-    const totalItems = plans.reduce(
-      (sum, p) => sum + Number(p.qty || 1),
-      0
-    );
 
-    const subTotal = plans.reduce(
-      (sum, p) => sum + Number(p.sub_amount || 0),
-      0
-    );
-
-    const cgstTotal = plans.reduce(
-      (sum, p) => sum + Number(p.cgst_amount || 0),
-      0
-    );
-
-    const sgstTotal = plans.reduce(
-      (sum, p) => sum + Number(p.sgst_amount || 0),
-      0
-    );
-
-    const igstTotal = plans.reduce(
-      (sum, p) => sum + Number(p.igst_amount || 0),
-      0
-    );
-
-    return {
-      totalItems,
-      extraDiscount: 0,
-      subTotal: Number(subTotal.toFixed(2)),
-      cgstTotal: Number(cgstTotal.toFixed(2)),
-      sgstTotal: Number(sgstTotal.toFixed(2)),
-      igstTotal: Number(igstTotal.toFixed(2)),
-      grandTotal: Number((subTotal + cgstTotal + sgstTotal + igstTotal).toFixed(2)),
-    };
-  }, [plans]);
   const [availablePlans, setAvailablePlans] = useState<any[]>([]);
   const [invoiceNumber, setInvoiceNumber] = useState('');
   useEffect(() => {
@@ -884,6 +1008,36 @@ export default function InvoiceForm() {
                       ₹ {costSummary.igstTotal ?? "-"}
                     </span>
                   </div>}
+                  {/* <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">
+                      Extra Discount (%):
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={extraDiscountPercent}
+                        onChange={(e) => {
+                          let v = e.target.value.replace(/\D/g, "");
+                          if (/^0{2,}/.test(v)) return;
+                          setExtraDiscountPercent(
+                            v === "" ? "" : String(Math.min(Number(v), 100))
+                          );
+                        }}
+                        onBlur={() => {
+                          if (extraDiscountPercent === "") setExtraDiscountPercent("0");
+                        }}
+                        className="w-16 border rounded px-2 py-1 text-xs text-right"
+                      />
+                      <span className="text-muted-foreground">
+                        ₹ {
+                          costSummary?.extraDiscount
+                          ?? "-"}
+                      </span>
+                    </div>
+                  </div> */}
                   <div className="flex justify-between font-semibold border-t pt-2">
                     <span>Grand Total Amount:</span>
                     <span>

@@ -101,18 +101,31 @@ export default function Invoice() {
         },
 
         /* ================= CONSUMER ================= */
-        {
+        { 
             key: "consumer",
             label: "Customer",
             width: "180px",
-            render: (value: { name: string }, row: any) => (
-                <span className="text-[blue] font-medium cursor-pointer" onClick={() => {
-                    localStorage.setItem("sidebar_active_parent", "customers")
- navigate(`/customers/view?id=${row.consumer_id}`)
-                }
-                }>
-                    {value?.name}
-                </span>
+            render: (value: { name: string ,phone:string}, row: any) => (
+
+                <div className="flex flex-col leading-tight">
+      {/* Customer Name */}
+      <span
+        className="text-blue-600 font-medium cursor-pointer hover:underline"
+        onClick={() => {
+          localStorage.setItem("sidebar_active_parent", "customers");
+           navigate(`/customers/view?id=${row.consumer_id}`)
+        }}
+      >
+        {value?.name ?? "-"}
+      </span>
+
+      {/* Phone Number */}
+      {value?.phone && (
+        <span className="text-xs text-muted-foreground mt-0.5">
+          {value.phone}
+        </span>
+      )}
+    </div>
             ),
         },
 

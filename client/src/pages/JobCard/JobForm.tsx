@@ -716,10 +716,10 @@ export default function JobForm() {
           customer.type === "company" ? "company" : "individual"
         );
 
-        form.setValue("company_gstin", customer.company_gstin || "");
-        form.setValue("company_contact_no", customer.company_contact_no || "");
-        form.setValue("company_country_id", String(customer.company_country_id));
-        form.setValue("company_state_id", String(customer.company_state_id));
+        form.setValue("company_gstin", customer.company_gstin ?? "");
+        form.setValue("company_contact_no", customer.company_contact_no ?? "");
+        form.setValue("company_country_id", customer.company_country_id ? String(customer.company_country_id ): String(101));
+        form.setValue("company_state_id",customer.company_state_id ? String(customer.company_state_id) : "");
         form.clearErrors([
           "name",
           "phone",
