@@ -94,7 +94,7 @@ export default function JobCard() {
       render: (value: string, row: any) => (
         <span
           className="text-[blue] font-medium cursor-pointer hover:underline"
-          onClick={() => navigate(`/job-cards/manage?id=${row.id}&mode=view`)}
+          onClick={() => navigate(`/job-cards/view?id=${row.id}`)}
         >
           {value}
         </span>
@@ -113,7 +113,7 @@ export default function JobCard() {
         className="text-blue-600 font-medium cursor-pointer hover:underline"
         onClick={() => {
           localStorage.setItem("sidebar_active_parent", "customers");
-          navigate(`/customers/manage?id=${row.consumer_id}&mode=view`);
+           navigate(`/customers/view?id=${row.consumer_id}`)
         }}
       >
         {row.consumer?.name ?? "-"}
@@ -346,8 +346,7 @@ export default function JobCard() {
                         mr={2}
                         aria-label="View"
                         onClick={() => {
-
-                          navigate(`/job-cards/manage?id=${row.id}&mode=view`)
+ navigate(`/job-cards/view?id=${row.id}`)
                         }
                         }
                       >

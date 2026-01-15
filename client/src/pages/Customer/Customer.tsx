@@ -209,7 +209,7 @@ export default function Customer() {
                         mr={2}
                         aria-label="View"
                         onClick={() => {
-                          navigate(`/customers/manage?id=${row.id}&mode=view`)
+                          navigate(`/customers/view?id=${row.id}`)
 
                         }
                         }
