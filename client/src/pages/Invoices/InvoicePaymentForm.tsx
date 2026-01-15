@@ -32,7 +32,7 @@ import { findIdByName } from "@/lib/utils";
 import { RequiredMark } from "@/components/common/RequiredMark";
 import { SectionCard } from "@/components/common/card";
 import { FloatingField } from "@/components/common/FloatingField";
-import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
+import { FloatingRHFModalSelect } from "@/components/common/FloatingRHFModalSelect"
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
 import { Loader } from "@/components/common/loader";
 
@@ -186,37 +186,15 @@ export default function InvoicePaymentForm({
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-
-                            <FormField
-                                control={form.control}
-                                name="payment_mode"
-                                disabled={mode === "view"}
-                                render={({ field }) => (
-                                    <FormItem className="flex justify-between items-center gap-4">
-                                        <FormLabel className="text-muted-foreground">
-                                            Payment Mode <RequiredMark show={true} />
-                                        </FormLabel>
-                                        <div className="flex-1 flex-col items-start gap-2">
-                                            <FormControl>
-                                                <select
-                                                    {...field}
-                                                    className="w-full h-10 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-ring"
-                                                >
-                                                    <option value="" disabled>Select </option>
-
-                                                    {paymentMode.map((item: any) => (
-                                                        <option key={item.value ?? item.id} value={item.value}>
-                                                            {item.label}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </FormControl>
-
-                                            <FormMessage />
-                                        </div>
-                                    </FormItem>
-                                )}
+                            <FloatingRHFModalSelect
+                              name="payment_mode"
+                              label="Payment Mode"
+                              control={form.control}
+                              isRequired
+                              isDisabled={mode === "view"}
+                              options={paymentMode}
                             />
+
                         </div>
                     </SectionCard>
 
