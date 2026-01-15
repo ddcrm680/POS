@@ -977,6 +977,14 @@ export default function InvoiceForm() {
                       ₹ {costSummary.subTotal}
                     </span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Total Discount Amount:
+                    </span>
+                    <span className="font-medium">
+                      ₹ {costSummary.discountTotal}
+                    </span>
+                  </div>
 
                   {form.getValues("billing_to") === "company" ? (
                     <>

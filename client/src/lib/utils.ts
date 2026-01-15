@@ -333,7 +333,6 @@ export function calculateInvoiceRow(
 
   if (plan._discountSource === "percent") {
 
-    amountNum = (baseSubTotal * percentNum) / 100;
     amountNum = ((baseSubTotal * percentNum) / 100) > plan.price ? plan.price : ((baseSubTotal * percentNum) / 100).toFixed(2)
 
   } else if
@@ -343,7 +342,7 @@ export function calculateInvoiceRow(
       amountNum = plan.price
     }
     percentNum = baseSubTotal
-      ? (amountNum / baseSubTotal) * 100 > 100 ? 100 : ((amountNum / baseSubTotal) * 100).toFixed(2)
+      ? ((amountNum / baseSubTotal) * 100) > 100 ? 100 : ((amountNum / baseSubTotal) * 100).toFixed(2)
       : 0;
   }
 
