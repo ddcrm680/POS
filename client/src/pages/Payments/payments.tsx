@@ -111,7 +111,7 @@ export default function PaymentsPage() {
       render: (value: string, row: any) => (
         <span className="text-[blue] font-medium cursor-pointer" onClick={() =>{
            localStorage.removeItem('sidebar_active_parent')
-          navigate(`/invoices/manage?id=${row?.invoice?.id}&mode=view`)}
+          navigate(`/invoices/view?id=${row?.invoice?.id}`)}
         }>
           {value}
         </span>

@@ -217,7 +217,7 @@ export default function JobCard() {
               className="text-[blue] font-medium cursor-pointer hover:underline"
               onClick={() =>{
                  localStorage.removeItem('sidebar_active_parent')
-                navigate(`/invoices/manage?id=${row.invoice.id}&mode=view`)}}
+                navigate(`/invoices/view?id=${row.invoice.id}`)}}
             >
               {value}
             </span>
