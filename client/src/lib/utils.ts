@@ -320,47 +320,38 @@ export function calculateInvoiceRow(
   plan: any,
   gstType: "igst" | "cgst_sgst" = "igst"
 ) {
-  console.log(plan, 'planplanplan');
-
   const qty = Number(plan.qty || 1);
   const price = Number(plan.price || 0);
   const gstPercent = Number(plan.gst || 0);
 
-  // 1️⃣ Base amount
   const baseSubTotal = qty * price;
 
-  // 2️⃣ Discount handling
-  let discountPercent = Number(plan.discount_percent || 0);
-  let discountAmount = Number(plan.discount_amount || 0);
+  const rawPercent = plan.discount_percent ?? "";
+  const rawAmount = plan.discount_amount ?? "";
+
+  let percentNum = rawPercent || 0;
+  let amountNum = (rawAmount || 0);
 
   if (plan._discountSource === "percent") {
-    discountAmount = (baseSubTotal * discountPercent) / 100;
-  } else if (plan._discountSource === "amount") {
-    discountPercent = baseSubTotal
-      ? (discountAmount / baseSubTotal) * 100
+
+    amountNum = (baseSubTotal * percentNum) / 100;
+  } else if
+
+    (plan._discountSource === "amount") {
+    percentNum = baseSubTotal
+      ? (amountNum / baseSubTotal) * 100 > 100 ? 100 : ((amountNum / baseSubTotal) * 100).toFixed(2)
       : 0;
   }
 
-  // Clamp
-  discountPercent = Math.min(Math.max(discountPercent, 0), 100);
-  discountAmount = Math.min(Math.max(discountAmount, 0), baseSubTotal);
+  const discountedSubTotal = baseSubTotal - amountNum;
 
-  // 3️⃣ Discounted subtotal
-  const discountedSubTotal = baseSubTotal - discountAmount;
-
-  // 4️⃣ GST calculation
-  let cgst = 0,
-    sgst = 0,
-    igst = 0;
-
-  let cgstPercent = 0;
-  let sgstPercent = 0;
-  let igstPercent = 0;
+  // GST
+  let cgst = 0, sgst = 0, igst = 0;
+  let cgstPercent = 0, sgstPercent = 0, igstPercent = 0;
 
   if (gstType === "cgst_sgst") {
     cgstPercent = gstPercent / 2;
     sgstPercent = gstPercent / 2;
-
     cgst = (discountedSubTotal * cgstPercent) / 100;
     sgst = (discountedSubTotal * sgstPercent) / 100;
   } else {
@@ -368,7 +359,6 @@ export function calculateInvoiceRow(
     igst = (discountedSubTotal * igstPercent) / 100;
   }
 
-  // 5️⃣ Final total
   const total = discountedSubTotal + cgst + sgst + igst;
 
   return {
@@ -376,12 +366,11 @@ export function calculateInvoiceRow(
 
     qty,
 
-    // amounts
-    sub_amount: +discountedSubTotal.toFixed(2),
-    discount_percent: +discountPercent.toFixed(2),
-    discount_amount: +discountAmount.toFixed(2),
+    discount_percent: percentNum,
+    discount_amount: amountNum,
 
-    // GST
+    sub_amount: +discountedSubTotal.toFixed(2),
+
     cgst_percent: +cgstPercent.toFixed(2),
     sgst_percent: +sgstPercent.toFixed(2),
     igst_percent: +igstPercent.toFixed(2),

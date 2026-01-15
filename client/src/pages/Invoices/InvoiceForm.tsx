@@ -54,58 +54,58 @@ export default function InvoiceForm() {
     status: "",
     mode: ""
   });
-  
+
   // const [extraDiscountPercent, setExtraDiscountPercent] = useState('')
 
-const costSummary = useMemo(() => {
-  const subTotal = plans.reduce(
-    (sum, p) => sum + Number(p.sub_amount || 0),
-    0
-  );
+  const costSummary = useMemo(() => {
+    const subTotal = plans.reduce(
+      (sum, p) => sum + Number(p.sub_amount || 0),
+      0
+    );
     const totalItems = plans.reduce(
       (sum, p) => sum + Number(p.qty || 1),
       0
     );
-  const discountTotal = plans.reduce(
-    (sum, p) => sum + Number(p.discount_amount || 0),
-    0
-  );
+    const discountTotal = plans.reduce(
+      (sum, p) => sum + Number(p.discount_amount || 0),
+      0
+    );
 
-  const cgstTotal = plans.reduce(
-    (sum, p) => sum + Number(p.cgst_amount || 0),
-    0
-  );
+    const cgstTotal = plans.reduce(
+      (sum, p) => sum + Number(p.cgst_amount || 0),
+      0
+    );
 
-  const sgstTotal = plans.reduce(
-    (sum, p) => sum + Number(p.sgst_amount || 0),
-    0
-  );
+    const sgstTotal = plans.reduce(
+      (sum, p) => sum + Number(p.sgst_amount || 0),
+      0
+    );
 
-  const igstTotal = plans.reduce(
-    (sum, p) => sum + Number(p.igst_amount || 0),
-    0
-  );
+    const igstTotal = plans.reduce(
+      (sum, p) => sum + Number(p.igst_amount || 0),
+      0
+    );
 
-  const grandTotal =
-    subTotal + cgstTotal + sgstTotal + igstTotal;
+    const grandTotal =
+      subTotal + cgstTotal + sgstTotal + igstTotal;
 
-  return {
-    subTotal: +subTotal.toFixed(2),
-    discountTotal: +discountTotal.toFixed(2),
-    cgstTotal: +cgstTotal.toFixed(2),
-    sgstTotal: +sgstTotal.toFixed(2),
-    igstTotal: +igstTotal.toFixed(2),
-    totalItems,
-    grandTotal: +grandTotal.toFixed(2),
-     
-  };
-}, [plans]);
+    return {
+      subTotal: +subTotal.toFixed(2),
+      discountTotal: +discountTotal.toFixed(2),
+      cgstTotal: +cgstTotal.toFixed(2),
+      sgstTotal: +sgstTotal.toFixed(2),
+      igstTotal: +igstTotal.toFixed(2),
+      totalItems,
+      grandTotal: +grandTotal.toFixed(2),
 
-    //  const extraDiscountAmount =
-    //   (costSummary.grandTotal * Number(extraDiscountPercent || 0)) / 100;
+    };
+  }, [plans]);
 
-    const finalGrandTotal =
-      costSummary.grandTotal ;
+  //  const extraDiscountAmount =
+  //   (costSummary.grandTotal * Number(extraDiscountPercent || 0)) / 100;
+
+  const finalGrandTotal =
+    costSummary.grandTotal;
   const [lastPage, setLastPage] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -148,8 +148,8 @@ const costSummary = useMemo(() => {
       items: plans.map(plan => ({
         service_plan_id: plan.id,
         qty: Number(plan.qty || 1),
-        discount_percent:plan.discount_percent,
-        discount_amount:plan.discount_amount
+        discount_percent: plan.discount_percent,
+        discount_amount: plan.discount_amount
       })),
     };
   }
@@ -240,30 +240,20 @@ const costSummary = useMemo(() => {
         render: (_: any, row: any) => (
           <input
             type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
             value={row.discount_percent}
+
             onChange={(e) => {
-              let value = e.target.value.replace(/\D/g, "");
+              const value = e.target.value;
 
-              if (value === "") {
-                setPlans(prev =>
-                  prev.map(p =>
-                    p.id === row.id ? { ...p, discount_percent: "" } : p
-                  )
-                );
-                return;
-              }
-
-              if (/^0{2,}/.test(value)) return; // ❌ block 000
-
-              let percent = Math.min(Number(value), 100);
+              // allow decimal typing
+              if (!/^\d*(\.\d{0,2})?$/.test(value)) return;
+              if (Number(value) > 100) return;
 
               setPlans(prev =>
                 prev.map(p =>
                   p.id === row.id
                     ? calculateInvoiceRow(
-                      { ...p, discount_percent: percent, _discountSource: "percent" },
+                      { ...p, discount_percent: value, _discountSource: "percent" },
                       billingTo === "company" ? "cgst_sgst" : "igst"
                     )
                     : p
@@ -292,30 +282,41 @@ const costSummary = useMemo(() => {
         render: (_: any, row: any) => (
           <input
             type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
             value={row.discount_amount}
+
             onChange={(e) => {
-              let value = e.target.value.replace(/\D/g, "");
+              const value = e.target.value;
 
               if (value === "") {
                 setPlans(prev =>
                   prev.map(p =>
-                    p.id === row.id ? { ...p, discount_amount: "" } : p
+                    p.id === row.id
+                      ? { ...p, discount_amount: "", _discountSource: "amount" }
+                      : p
                   )
                 );
                 return;
               }
+              if (Number(value) > row.price) {
+                 toast({
+                  title: "Amount not allowed",
+                  description: "Amount reached above total amount",
+                  variant: "destructive",
+                });
+                return 
+              }
+              // allow decimals
+              if (!/^\d*(\.\d{0,2})?$/.test(value)) {
 
-              if (/^0{2,}/.test(value)) return;
-
-              let amount = Math.min(Number(value), row.sub_amount);
+               
+                return
+              }
 
               setPlans(prev =>
                 prev.map(p =>
                   p.id === row.id
                     ? calculateInvoiceRow(
-                      { ...p, discount_amount: amount, _discountSource: "amount" },
+                      { ...p, discount_amount: value, _discountSource: "amount" },
                       billingTo === "company" ? "cgst_sgst" : "igst"
                     )
                     : p
@@ -374,15 +375,16 @@ const costSummary = useMemo(() => {
           {
             key: "igst_amount",
             label: "IGST",
-            render: (_: any, row: any) =>{
+            render: (_: any, row: any) => {
               return (
-              <span>
-                ₹ {row.igst_amount}
-                <span className="text-green-600 text-xs pl-2">
-                  ({row.igst_percent}%)
+                <span>
+                  ₹ {row.igst_amount}
+                  <span className="text-green-600 text-xs pl-2">
+                    ({row.igst_percent}%)
+                  </span>
                 </span>
-              </span>
-            )}
+              )
+            }
           },
         ]),
 
