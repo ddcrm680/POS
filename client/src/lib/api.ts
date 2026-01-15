@@ -426,14 +426,14 @@ export async function fetchUnassignedStoreList() {
 export async function getPaymentsList({
   page,
   search,
-  mode,
+  payment_mode,
   per_page,
     status,
 }: {
   per_page: number;
   page: number;
   search: string;
-  mode?: string | number;
+  payment_mode?: string ;
   
   status?: string | number;
 }) {
@@ -444,7 +444,7 @@ export async function getPaymentsList({
     per_page: String(per_page)
   });
 
-  if (mode) params.append("mode", String(mode));
+  if (payment_mode) params.append("payment_mode", String(payment_mode));
   if (status !== "") params.append("status", String(status));
 
     const response: any = await api.get(

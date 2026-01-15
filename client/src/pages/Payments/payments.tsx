@@ -26,14 +26,14 @@ export default function PaymentsPage() {
   const [perPage, setPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [has_next, setHasNext] = useState(false)
-  const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: { value: string, label: string }[] ,payment_mode:{ value: string, label: string }[] }>({
+  const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: { value: string, label: string }[], payment_mode: { value: string, label: string }[] }>({
     status: [],
-    payment_mode:[]
+    payment_mode: []
   });
   const [, navigate] = useLocation();
   const [filters, setFilters] = useState({
     status: "",
-    payment_mode:""
+    payment_mode: ""
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -109,9 +109,10 @@ export default function PaymentsPage() {
       label: "Invoice No.",
       width: "130px",
       render: (value: string, row: any) => (
-        <span className="text-[blue] font-medium cursor-pointer" onClick={() =>{
-           localStorage.removeItem('sidebar_active_parent')
-          navigate(`/invoices/view?id=${row?.invoice?.id}`)}
+        <span className="text-[blue] font-medium cursor-pointer" onClick={() => {
+          localStorage.removeItem('sidebar_active_parent')
+          navigate(`/invoices/view?id=${row?.invoice?.id}`)
+        }
         }>
           {value}
         </span>
@@ -123,7 +124,7 @@ export default function PaymentsPage() {
       key: "amount",
       label: "Recieved amount",
       width: "180px",
-       render: (value: number) => (
+      render: (value: number) => (
         <span>₹ {value ?? 0}</span>
       ),
     },
@@ -134,11 +135,11 @@ export default function PaymentsPage() {
       key: "remarks",
       label: "Notes",
       width: "130px",
-     
+
     },
- {
+    {
       key: "payment_mode",
-        label: (
+      label: (
         <ColumnFilter
           label="Mode"
           value={filters.payment_mode}
@@ -150,9 +151,9 @@ export default function PaymentsPage() {
         />
       ),
       width: "120px",
-      render: (value:string) => (
+      render: (value: string) => (
         <span> {filterMetaInfo.payment_mode.find((item: any) => item.value === value)?.label}
-       </span>
+        </span>
       ),
     },
     /* ================= PAYMENT STATUS ================= */
@@ -173,20 +174,20 @@ export default function PaymentsPage() {
       render: (value: string) => {
         const styles: Record<string, string> = {
           issued: "bg-yellow-100 text-yellow-700",
-          received : "bg-emerald-100 text-emerald-700",
+          received: "bg-emerald-100 text-emerald-700",
           cancelled: "bg-red-100 text-red-700",
           "Partially-Paid": "bg-blue-100 text-blue-700",
         };
 
         return (
-           <Badge
-                                  className={`px-3 py-1 text-xs font-medium rounded-full  ${styles[value]}
+          <Badge
+            className={`px-3 py-1 text-xs font-medium rounded-full  ${styles[value]}
                               `}
-                              >
-                                  {filterMetaInfo.status.find((item: any) => item.value === value)?.label}
-          
-                              </Badge>
-        
+          >
+            {filterMetaInfo.status.find((item: any) => item.value === value)?.label}
+
+          </Badge>
+
         );
       },
     },
@@ -196,21 +197,21 @@ export default function PaymentsPage() {
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      console.log(filters.status, ' filters.status');
 
       const res =
         await getPaymentsList({
           per_page: perPage,
           page,
           search,
-          status: filters.status
+          status: filters.status,
+          payment_mode: filters.payment_mode
         });
 
-      const mappedData = res.data.map((item:any)=>({
+      const mappedData = res.data.map((item: any) => ({
         ...item,
         invoice_number: item.invoice?.invoice_number
       }))
-      
+
       setHasNext(res.meta.has_next)
       setTotal(res.meta.total)
       setPayments(mappedData);
@@ -232,7 +233,7 @@ export default function PaymentsPage() {
     setPage(1)
     setFilters({
       status: "",
-      payment_mode:""
+      payment_mode: ""
     })
   }
   const OrganizationCommonHandler = async (
@@ -281,6 +282,21 @@ export default function PaymentsPage() {
       setIsLoading(false);
     }
   };
+
+  const { user, Logout, } = useAuth();
+  const [isActionAllowed, setIsActionAllowed] = useState<boolean>(false);
+  useEffect(() => {
+    const actionAllowedRoleList = ["super-admin"]
+    const roleList = {
+      store: false,
+      admin: false,
+      default: false
+    }
+    const isActionAllow = actionAllowedRoleList.find((supremeUser) => supremeUser === user?.role)
+    if (isActionAllow && Object.keys(isActionAllow).length > 0)
+
+      setIsActionAllowed(true)
+  }, [user, roles])
   return (
     <div className="p-4">
       <div className="mb-6">
@@ -318,38 +334,36 @@ export default function PaymentsPage() {
               setPage(1); // reset page on new search
               // }
             }}
-            actions={(row: any) => {
-              return (
-                <>
-
-                  {(
-                    <Box className="gap-0">    
-                      {
-
-                        row.status !== 'cancelled' ? <IconButton
-                          size="xs"
-                          mr={2}
-                          title="Cancel"
-                          colorScheme="red"
-                          aria-label="Cancel"
-                          onClick={() => {
-                            setIsPaymentDeleteModalOpenInfo({ open: true, info: row });
-                          }}
-                        >
-                          <XCircle size={16} />
-                        </IconButton> :"-"}
-
-                    </Box>
-                  )}
-                </>
-              );
-            }}
+            actions={
+              isActionAllowed
+                ? (row: any) => (
+                  <Box className="gap-0">
+                    {row.status !== "cancelled" ? (
+                      <IconButton
+                        size="xs"
+                        mr={2}
+                        title="Cancel"
+                        colorScheme="red"
+                        aria-label="Cancel"
+                        onClick={() =>
+                          setIsPaymentDeleteModalOpenInfo({ open: true, info: row })
+                        }
+                      >
+                        <XCircle size={16} />
+                      </IconButton>
+                    ) : (
+                      "-"
+                    )}
+                  </Box>
+                )
+                : undefined
+            }
 
           />
           <CommonModal
             width={'80%'}
             maxWidth={'80%'}
-             isOpen={invoicePaymentModalOpenInfo.open}
+            isOpen={invoicePaymentModalOpenInfo.open}
             onClose={() => setIsInvoicePaymentModalOpenInfo({ open: false, info: {} })}
             title={"Payments"}
             isLoading={isLoading}
