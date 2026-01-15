@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconButton } from "@chakra-ui/react";
 
@@ -44,6 +44,19 @@ export default function InvoiceForm() {
       billing_state_id: "",
     },
   });
+  const billingStateId = Number(
+    useWatch({
+      control: form.control,
+      name: "billing_state_id",
+    })
+  );
+  const isSameState = useMemo(() => {
+    const storeStateId = invoiceView?.store?.state_id
+
+    return billingStateId && storeStateId &&
+      billingStateId === storeStateId
+  }, [billingStateId, invoiceView]);
+
   const [perPage, setPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [has_next, setHasNext] = useState(false)
@@ -128,12 +141,12 @@ export default function InvoiceForm() {
   useEffect(() => {
     if (!plans.length) return;
 
-    const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
+    const gstType = isSameState ? "cgst_sgst" : "igst"
 
     setPlans(prev =>
       prev.map(plan => calculateInvoiceRow(plan, gstType))
     );
-  }, [billingTo]);
+  }, [isSameState, billingStateId]);
   function buildInvoicePayload(values: any) {
     return {
       billing_type: values.billing_to,
@@ -154,7 +167,6 @@ export default function InvoiceForm() {
     };
   }
   const planColumns = useMemo(() => {
-    const isCompany = billingTo === "company";
 
     return [
       {
@@ -200,7 +212,7 @@ export default function InvoiceForm() {
               if (qty < 1) qty = 1;
               if (qty > 1000) qty = 1000;
 
-              const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
+              const gstType = isSameState ? "cgst_sgst" : "igst"
 
               setPlans(prev =>
                 prev.map(p =>
@@ -213,7 +225,7 @@ export default function InvoiceForm() {
             onBlur={() => {
               // normalize on blur
               if (!row.qty || Number(row.qty) < 1) {
-                const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
+                const gstType = isSameState ? "cgst_sgst" : "igst"
                 setPlans(prev =>
                   prev.map(p =>
                     p.id === row.id
@@ -266,7 +278,7 @@ export default function InvoiceForm() {
                   p.id === row.id
                     ? calculateInvoiceRow(
                       { ...p, discount_percent: value, _discountSource: "percent" },
-                      billingTo === "company" ? "cgst_sgst" : "igst"
+                      isSameState ? "cgst_sgst" : "igst"
                     )
                     : p
                 )
@@ -277,7 +289,7 @@ export default function InvoiceForm() {
                 setPlans(prev =>
                   prev.map(p =>
                     p.id === row.id
-                      ? calculateInvoiceRow({ ...p, discount_percent: 0 }, billingTo === "company" ? "cgst_sgst" : "igst")
+                      ? calculateInvoiceRow({ ...p, discount_percent: 0 }, isSameState ? "cgst_sgst" : "igst")
                       : p
                   )
                 );
@@ -289,7 +301,7 @@ export default function InvoiceForm() {
       },
       {
         key: "discount_amount",
-        label: "	Discount",
+        label: "	Discount(₹)",
         width: "90px",
         render: (_: any, row: any) => (
           <input
@@ -324,7 +336,7 @@ export default function InvoiceForm() {
                   p.id === row.id
                     ? calculateInvoiceRow(
                       { ...p, discount_amount: value, _discountSource: "amount" },
-                      billingTo === "company" ? "cgst_sgst" : "igst"
+                      isSameState ? "cgst_sgst" : "igst"
                     )
                     : p
                 )
@@ -335,7 +347,7 @@ export default function InvoiceForm() {
                 setPlans(prev =>
                   prev.map(p =>
                     p.id === row.id
-                      ? calculateInvoiceRow({ ...p, discount_amount: 0 }, billingTo === "company" ? "cgst_sgst" : "igst")
+                      ? calculateInvoiceRow({ ...p, discount_amount: 0 }, isSameState ? "cgst_sgst" : "igst")
                       : p
                   )
                 );
@@ -351,11 +363,12 @@ export default function InvoiceForm() {
         render: (v: number) => `₹ ${v ?? "-"}`,
       },
 
-      ...(isCompany
+      ...(isSameState
         ? [
           {
             key: "cgst_amount",
             label: "CGST",
+               width: "120px",
             render: (_: any, row: any) => (
               <span>
                 ₹ {row.cgst_amount}
@@ -368,6 +381,7 @@ export default function InvoiceForm() {
           {
             key: "sgst_amount",
             label: "SGST",
+               width: "120px",
             render: (_: any, row: any) => (
               <span>
                 ₹ {row.sgst_amount}
@@ -398,10 +412,11 @@ export default function InvoiceForm() {
       {
         key: "total_amount",
         label: "Amount",
+           width: "120px",
         render: (v: number) => `₹ ${v ?? "-"}`,
       },
     ];
-  }, [billingTo]);
+  }, [isSameState, billingStateId]);
 
   const [availablePlans, setAvailablePlans] = useState<any[]>([]);
   const [invoiceNumber, setInvoiceNumber] = useState('');
@@ -883,7 +898,7 @@ export default function InvoiceForm() {
                       );
                       if (!plan) return;
 
-                      const gstType = billingTo === "company" ? "cgst_sgst" : "igst";
+                      const gstType = isSameState ? "cgst_sgst" : "igst"
 
                       setPlans(prev => {
                         const existing = prev.find(p => p.id === plan.id);
