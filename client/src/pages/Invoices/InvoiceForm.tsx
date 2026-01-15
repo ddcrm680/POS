@@ -256,9 +256,9 @@ export default function InvoiceForm() {
               }
               // allow decimal typing
               // ❌ block 00, 000 etc
-              if (!/^(?:0|[1-9]\d*)(?:\.\d{0,2})?$/.test(value)) return;
+              if (!/^(?:0|[1-9]\d*)(?:\.\d{0,4})?$/.test(value)) return;
 
-              if (!/^\d*(\.\d{0,2})?$/.test(value)) return;
+              if (!/^\d*(\.\d{0,4})?$/.test(value)) return;
               if (Number(value) > 100) return;
 
               setPlans(prev =>
