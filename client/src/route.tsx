@@ -37,6 +37,8 @@ import Notification from "./pages/Notification/Noitification";
 import JobForm from "./pages/JobCard/JobForm";
 import CustomerForm from "./pages/Customer/CustomerForm";
 import PaymentsPage from "@/pages/Payments/payments";
+import CustomerView from "./pages/Customer/CustomerView";
+import JobCardView from "./pages/JobCard/JobCardView";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -78,6 +80,9 @@ export function Router() {
       {/* <Route path="/test" component={() => <ProtectedRoute component={ManagerDashboard} />} /> */}
       <Route path="/manager" component={() => <ProtectedRoute component={ManagerDashboard} />} />
       <Route path="/customers" component={() => <ProtectedRoute component={Customer} />} />
+      
+      <Route path="/job-cards/view" component={() => <ProtectedRoute component={JobCardView} />} />
+      <Route path="/customers/view" component={() => <ProtectedRoute component={CustomerView} />} />
         <Route path="/customers/manage" component={() => <ProtectedRoute component={CustomerForm} />} />
       <Route path="/job-cards" component={() => <ProtectedRoute component={JobCard} />} />
       <Route path="/appointments" component={() => <ProtectedRoute component={AppointmentsPage} />} />
