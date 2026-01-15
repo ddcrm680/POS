@@ -160,7 +160,7 @@ export default function InvoiceForm() {
       {
         key: "plan_name",
         label: "Plan Name",
-        width: "280px",
+        width: "150px",
       },
       {
         key: "sac",
