@@ -244,8 +244,20 @@ export default function InvoiceForm() {
 
             onChange={(e) => {
               const value = e.target.value;
-
+              if (value === "") {
+                setPlans(prev =>
+                  prev.map(p =>
+                    p.id === row.id
+                      ? { ...p, discount_percent: "", _discountSource: "percent" }
+                      : p
+                  )
+                );
+                return;
+              }
               // allow decimal typing
+              // ❌ block 00, 000 etc
+              if (!/^(?:0|[1-9]\d*)(?:\.\d{0,2})?$/.test(value)) return;
+
               if (!/^\d*(\.\d{0,2})?$/.test(value)) return;
               if (Number(value) > 100) return;
 
@@ -297,18 +309,13 @@ export default function InvoiceForm() {
                 );
                 return;
               }
-              if (Number(value) > row.price) {
-                 toast({
-                  title: "Amount not allowed",
-                  description: "Amount reached above total amount",
-                  variant: "destructive",
-                });
-                return 
-              }
+              // ❌ block 00, 000 etc
+              if (!/^(?:0|[1-9]\d*)(?:\.\d{0,2})?$/.test(value)) return;
+
               // allow decimals
               if (!/^\d*(\.\d{0,2})?$/.test(value)) {
 
-               
+
                 return
               }
 
@@ -404,7 +411,6 @@ export default function InvoiceForm() {
     const loadInvoice = async () => {
       setIsInfoLoading(true);
       try {
-        console.log(jobCardId, id, 'jobCardId');
 
         const res = jobCardId
           ? await getInvoiceInfoByJobCardPrefill({ id: jobCardId })
@@ -434,17 +440,14 @@ export default function InvoiceForm() {
         const customer = mapped.billing_prefill;
 
         const company = mapped.billing_prefillCompany;
-        console.log(customer, 'customercustomer');
 
         // 🔑 decide billing_to
         const billingTo =
           mapped.customer.type === "company" ? "company" : "individual";
 
         form.setValue("billing_to", billingTo);
-        console.log(billingTo, company, 'billingTo');
 
         if (billingTo === "individual") {
-          console.log('came in indidivual billingTo');
 
           // 🏢 COMPANY
           form.setValue("billing_name", customer.name ?? "");
@@ -459,7 +462,6 @@ export default function InvoiceForm() {
             String(customer.state_id ?? "")
           );
         } else {
-          console.log(company, 'came in company billingTo');
           // 👤 INDIVIDUAL
           form.setValue("billing_name", company.name ?? "");
           form.setValue("billing_phone", company.phone ?? "");
@@ -543,7 +545,6 @@ export default function InvoiceForm() {
         ...buildInvoicePayload(values),
         url: mode !== "edit" && jobCardId ? `job-cards/${jobCardId}/invoice` : `invoices/${id}/update`
       };
-      console.log("FINAL PAYLOAD 👉", payload);
 
       await createInvoice(payload);
 
@@ -578,10 +579,6 @@ export default function InvoiceForm() {
       setIsLoading(false);
     }
   }
-  useEffect(() => {
-    console.log(invoiceView, 'invoiceView');
-
-  }, [invoiceView])
   const InfoIfExists = ({ value, ...props }: any) => {
     if (value === null || value === undefined || value === "") return null
     return <Info gap="gap-12" colon={false} justify="justify-between" {...props} value={value} />
@@ -675,11 +672,9 @@ export default function InvoiceForm() {
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      console.log(filters.status, ' filters.status');
 
       const res =
         await getInvoicePayments(id ?? "");
-      console.log(res.data, 'res.data');
 
       const mappedData = res.data?.payments.map((item: any) => ({
         ...item,

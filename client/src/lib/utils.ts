@@ -32,7 +32,6 @@ export function formatTime(dateString: string) {
   return `${timePart}`;
 }
 export const findIdByName = (list: any[], name?: string) => {
-  console.log(name, 'namenamename');
 
   return list.find(item => item.id === Number(name))?.id ?? "";
 }
@@ -335,9 +334,14 @@ export function calculateInvoiceRow(
   if (plan._discountSource === "percent") {
 
     amountNum = (baseSubTotal * percentNum) / 100;
+    amountNum = ((baseSubTotal * percentNum) / 100) > plan.price ? plan.price : ((baseSubTotal * percentNum) / 100).toFixed(2)
+
   } else if
 
     (plan._discountSource === "amount") {
+    if (Number(amountNum) > plan.price) {
+      amountNum = plan.price
+    }
     percentNum = baseSubTotal
       ? (amountNum / baseSubTotal) * 100 > 100 ? 100 : ((amountNum / baseSubTotal) * 100).toFixed(2)
       : 0;
@@ -455,7 +459,6 @@ export function normalizeInvoiceToEditResponse(api: any) {
 
 
   const job = api.job_card
-  console.log(api, 'apiapi');
 
   // 🔹 INVOICE VIEW → CREATE PREFILL FORMAT
   return {
