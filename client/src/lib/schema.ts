@@ -958,6 +958,24 @@ export const NewJobCardSchema = z
         code: z.ZodIssueCode.custom,
       });
     }
+    if (!data.company_gstin) return;
+
+    if (data.company_gstin.length !== 15) {
+      ctx.addIssue({
+        path: ["company_gstin"],
+        message: "GSTIN must be exactly 15 characters",
+        code: z.ZodIssueCode.custom,
+      });
+      return;
+    }
+
+    if (!GSTIN_REGEX.test(data.company_gstin)) {
+      ctx.addIssue({
+        path: ["company_gstin"],
+        message: "Invalid GSTIN format",
+        code: z.ZodIssueCode.custom,
+      });
+    }
   });
 export const NewCustomerSchema = z
   .object({
@@ -977,7 +995,26 @@ export const NewCustomerSchema = z
     address: z.string().min(10, "Address must be at least 10 characters")
       .max(300, "Address must not exceed 300 characters"),
     store_id: z.string().optional(), // 🔑 optional, enforced below
-  })
+  }).superRefine((data, ctx) => {
+    if (!data.company_gstin) return;
+
+    if (data.company_gstin.length !== 15) {
+      ctx.addIssue({
+        path: ["company_gstin"],
+        message: "GSTIN must be exactly 15 characters",
+        code: z.ZodIssueCode.custom,
+      });
+      return;
+    }
+
+    if (!GSTIN_REGEX.test(data.company_gstin)) {
+      ctx.addIssue({
+        path: ["company_gstin"],
+        message: "Invalid GSTIN format",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });
 
 export const createInvoicePaymentSchema = (
   paymentModes: Array<{ value: string; requires_txn_id: boolean }>
@@ -1019,8 +1056,9 @@ export const createInvoicePaymentSchema = (
         });
       }
     });
+
 const GSTIN_REGEX =
-  /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/;
+  /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
 export const invoiceSchema = z
   .object({
     billing_to: z.enum(["individual", "company"]),
@@ -1032,7 +1070,7 @@ export const invoiceSchema = z
 
     billing_phone: z
       .string()
-      .min(10, "Mobile number required"),
+      .min(10, "Mobile number must be exactly 10 digits"),
 
     billing_email: z
       .string()
@@ -1064,11 +1102,19 @@ export const invoiceSchema = z
       return;
     }
 
-    // ❌ GSTIN invalid format
+    if (data.billing_gstin.length !== 15) {
+      ctx.addIssue({
+        path: ["billing_gstin"],
+        message: "Billing GSTIN must be exactly 15 characters",
+        code: z.ZodIssueCode.custom,
+      });
+      return;
+    }
+
     if (!GSTIN_REGEX.test(data.billing_gstin)) {
       ctx.addIssue({
         path: ["billing_gstin"],
-        message: "Invalid GSTIN format",
+        message: "Invalid Billing GSTIN format",
         code: z.ZodIssueCode.custom,
       });
     }
