@@ -171,7 +171,7 @@ export default function InvoiceForm() {
     return [
       {
         key: "plan_name",
-        label: "Plan Name",
+        label: " Name",
         width: "150px",
       },
       {

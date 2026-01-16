@@ -128,7 +128,7 @@ export default function InvoiceView() {
         return [
             {
                 key: "plan_name",
-                label: "Plan Name",
+                label: " Name",
                 width: "150px",
             },
             {
@@ -233,17 +233,15 @@ export default function InvoiceView() {
 
                 const res = await getInvoiceInfo(id);
                 setInvoiceNumber(res?.data?.invoice_number)
+                setPayments(res?.data?.payments)
                 // 👇 normalize ONLY when jobCardId is NOT present
                 const normalizedData = normalizeInvoiceToCreateResponse(res.data);
                 console.log(normalizedData, 'normalizedData');
 
+                const { consumer, job_card, store, payments, items, ...rest } = res?.data
                 // 👇 existing mapper stays SAME
                 const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
-                const stateList = await fetchStateList(101);
-                const name = stateList?.find((item: any) => (item.id === (mapped?.customer?.type == 'company' ? mapped?.billing_prefillCompany?.state_id :
-                    mapped?.billing_prefill?.state_id))).name
-                setStateName(name)
-                setInvoiceView(mapped);
+                setInvoiceView({ ...mapped, ...rest });
 
                 const gstType = mapped.customer.type === "company" ? "cgst_sgst" : "igst";
                 const planCalculated = mapped.plans.map((item: any) =>
@@ -266,7 +264,7 @@ export default function InvoiceView() {
 
 
 
-    const [stateName, setStateName] = useState<string>('');
+    // const [stateName, setStateName] = useState<string>('');
 
 
     const { toast } = useToast();
@@ -329,7 +327,9 @@ export default function InvoiceView() {
             key: "remarks",
             label: "Notes",
             width: "180px",
-
+            render: (value: number) => (
+                <span>{value ?? "-"}</span>
+            ),
         },
         {
             key: "payment_mode",
@@ -365,34 +365,7 @@ export default function InvoiceView() {
     const [isListLoading, setIsListLoading] = useState(true);
 
     const [payments, setPayments] = useState<Array<any>>([]);
-    const fetchPayments = async (isLoaderHide = false) => {
-        try {
-            if (!isLoaderHide)
-                setIsListLoading(true);
-            console.log(filters.status, ' filters.status');
 
-            const res =
-                await getInvoicePayments(id ?? "");
-            console.log(res.data, 'res.data');
-
-            const mappedData = res.data?.payments.map((item: any) => ({
-                ...item,
-                invoice_number: item.invoice?.invoice_number
-            }))
-
-            setPayments(mappedData);
-        } catch (e) {
-            console.error('error coming', e);
-
-        } finally {
-            if (!isLoaderHide)
-                setIsListLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchPayments(false);
-    }, []);
     function resetFilter() {
         setSearch('')
         setPage(1)
@@ -488,21 +461,15 @@ export default function InvoiceView() {
                                     Billing Info
                                 </CardTitle>
                                 <div className="space-y-2">
-                                    <InfoIfExists label="Bill To" value={invoiceView?.customer?.type == 'company' ? "Company" : "Individual"} />
-                                    <InfoIfExists label="Name" value={invoiceView?.customer?.type == 'company' ? invoiceView?.billing_prefillCompany?.name :
-                                        invoiceView?.billing_prefill?.name
+                                    <InfoIfExists label="Bill To" value={invoiceView?.billing_name
                                     } />
-                                    <InfoIfExists label="Phone" value={invoiceView?.customer?.type == 'company' ? invoiceView?.billing_prefillCompany?.phone :
-                                        invoiceView?.billing_prefill?.phone} />
-                                    <InfoIfExists label="Email" value={invoiceView?.customer?.type == 'company' ? invoiceView?.billing_prefillCompany?.email :
-                                        invoiceView?.billing_prefill?.email} />
-                                    <InfoIfExists label="State" value={stateName} />
+                                    <InfoIfExists label="Phone" value={invoiceView?.billing_phone} />
+                                    <InfoIfExists label="Email" value={invoiceView?.billing_email} />
+                                    <InfoIfExists label="State" value={invoiceView?.billing_state?.name} />
                                     {invoiceView?.billing_gstin && (
-                                        <InfoIfExists label="GSTIN" value={invoiceView?.customer?.type == 'company' ? invoiceView?.billing_prefillCompany?.gstin :
-                                            invoiceView?.billing_prefill?.gstin} />
+                                        <InfoIfExists label="GSTIN" value={invoiceView?.billing_gstin} />
                                     )}
-                                    {invoiceView?.billing_address && <InfoIfExists label="Billing Address" value={invoiceView?.customer?.type == 'company' ? invoiceView?.billing_prefillCompany?.address :
-                                        invoiceView?.billing_prefill?.address} />}
+                                    {invoiceView?.billing_address && <InfoIfExists label="Address" value={invoiceView?.billing_address} />}
                                 </div>
                             </Card>
 
@@ -513,7 +480,7 @@ export default function InvoiceView() {
                         <Card className="p-4 lg:col-span-3">
 
                             <CardTitle className="text-sm font-semibold text-gray-700">
-                                Plan Info
+                                Service Info
                             </CardTitle>
 
 
@@ -626,7 +593,7 @@ export default function InvoiceView() {
                                 perPage={perPage}
                                 setPerPage={setPerPage}
                                 resetFilter={resetFilter}
-                                isLoading={isListLoading}
+                                isLoading={isInfoLoading}
                                 total={total}
                                 hasNext={has_next}
                                 tabType=""
