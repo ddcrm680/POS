@@ -309,11 +309,11 @@ export function mapInvoiceApiToPrefilledViewModel(api: any) {
       edited_date: new Date(job.updated_at).toLocaleString(),
     },
 
-    plans: api.opted_services,
+    plans:(api.opted_services || []),
     billing_prefill: billing_prefill.individual,
     billing_prefillCompany: billing_prefill.company,
     store: job.store,
-    gst_type:api?.gst_type ?? ""
+    gst_type: api?.gst_type ?? ""
   };
 }
 export function calculateInvoiceRow(
@@ -322,8 +322,9 @@ export function calculateInvoiceRow(
 ) {
   const qty = Number(plan.qty || 1);
   const price = Number(plan.price || 0);
+  const CgstPercent = Number(plan.cgst || 0);
+  const SgstPercent = Number(plan.sgst || 0);
   const gstPercent = Number(plan.gst || 0);
-
   const baseSubTotal = qty * price;
 
   const rawPercent = plan.discount_percent ?? "";
@@ -354,8 +355,8 @@ export function calculateInvoiceRow(
   let cgstPercent = 0, sgstPercent = 0, igstPercent = 0;
 
   if (gstType === "cgst_sgst") {
-    cgstPercent = gstPercent / 2;
-    sgstPercent = gstPercent / 2;
+    cgstPercent = CgstPercent
+    sgstPercent = SgstPercent
     cgst = (discountedSubTotal * cgstPercent) / 100;
     sgst = (discountedSubTotal * sgstPercent) / 100;
   } else {
@@ -421,6 +422,8 @@ export function normalizeInvoiceToCreateResponse(api: any) {
 
       number_of_visits: Number(item.qty ?? 1),
       price: item.unit_price,
+      cgst: item?.cgst_percent,
+      sgst: item?.sgst_percent,
       gst:
         item.igst_percent
       ,
@@ -490,7 +493,32 @@ export function normalizeInvoiceToEditResponse(api: any) {
       edited_date: new Date(job.updated_at).toLocaleString(),
     },
 
-    plans: api.opted_services,
+    plans: (api?.invoice_data?.items || []).map((item: any) => ({
+      id: item.reference_id,
+      category_type: null,
+      category: null,
+      vehicle_type:  null,
+
+      plan_name: item.item_name ,
+      invoice_name: item.item_name,
+
+      number_of_visits: Number(item.qty ?? 1),
+      price: item.unit_price,
+      cgst: item?.cgst_percent,
+      sgst: item?.sgst_percent,
+      gst:
+        item.igst_percent
+      ,
+      discount_percent: item?.discount_percent,
+      discount_amount: item?.discount_amount,
+      is_tax_inclusive: false,
+      sac: item.sac,
+      description: item.description,
+      warranty_period: null,
+      warranty_in: null,
+      raw_materials: [],
+      status: true,
+    })),
     billing_prefill: {
       name: api?.invoice_data?.billing_name,
       phone: api?.invoice_data?.billing_phone ?? null,

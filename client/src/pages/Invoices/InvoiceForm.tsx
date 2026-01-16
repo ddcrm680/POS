@@ -445,9 +445,12 @@ export default function InvoiceForm() {
         setInvoiceView(mapped);
 
         const gstType = mapped.customer.type === "company" ? "cgst_sgst" : "igst";
-        const planCalculated = mapped.plans.map((item: any) =>
-          calculateInvoiceRow(item, gstType)
+        const planCalculated = mapped.plans.map((item: any) => {
+
+          return calculateInvoiceRow(item, gstType)
+        }
         );
+
         setPlans(planCalculated);
 
         // 🔑 billing state
@@ -887,54 +890,54 @@ export default function InvoiceForm() {
               {mode !== 'view' && <div className="flex items-end gap-3 mt-3 ">
 
                 <div >
-                    <select
-                      value=""
-                      onChange={(e) => {
-                        const selectedId = e.target.value;
-                        if (!selectedId) return;
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      const selectedId = e.target.value;
+                      if (!selectedId) return;
 
-                        const plan = availablePlans.find(
-                          (p) => String(p.id) === selectedId
-                        );
-                        if (!plan) return;
+                      const plan = availablePlans.find(
+                        (p) => String(p.id) === selectedId
+                      );
+                      if (!plan) return;
 
                       const gstType = isSameState ? "cgst_sgst" : "igst"
 
-                        setPlans(prev => {
-                          const existing = prev.find(p => p.id === plan.id);
+                      setPlans(prev => {
+                        const existing = prev.find(p => p.id === plan.id);
 
                         // ✅ If already exists → increment qty
-                          if (existing) {
-                            return prev.map(p =>
-                              p.id === plan.id
-                                ? calculateInvoiceRow(
-                                  { ...p, qty: Number(p.qty || 1) + 1 },
-                                  gstType
-                                )
-                                : p
-                            );
-                          }
+                        if (existing) {
+                          return prev.map(p =>
+                            p.id === plan.id
+                              ? calculateInvoiceRow(
+                                { ...p, qty: Number(p.qty || 1) + 1 },
+                                gstType
+                              )
+                              : p
+                          );
+                        }
 
                         // ✅ First time add → qty = 1
-                          return [
-                            ...prev,
-                            calculateInvoiceRow({ ...plan, qty: 1 }, gstType),
-                          ];
-                        });
+                        return [
+                          ...prev,
+                          calculateInvoiceRow({ ...plan, qty: 1 }, gstType),
+                        ];
+                      });
 
                       // reset dropdown back
-                        e.target.value = "";
-                      }}
+                      e.target.value = "";
+                    }}
                     className="w-full border rounded-md px-3 py-2 text-sm"
-                    >
+                  >
                     <option value="">Add Extra Plan</option>
-                      {availablePlans.map((plan) => (
-                        <option key={plan.id} value={plan.id}>
-                          {plan.plan_name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                    {availablePlans.map((plan) => (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.plan_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
 
               </div>}
