@@ -368,7 +368,7 @@ export default function InvoiceForm() {
           {
             key: "cgst_amount",
             label: "CGST",
-               width: "120px",
+            width: "120px",
             render: (_: any, row: any) => (
               <span>
                 ₹ {row.cgst_amount}
@@ -381,7 +381,7 @@ export default function InvoiceForm() {
           {
             key: "sgst_amount",
             label: "SGST",
-               width: "120px",
+            width: "120px",
             render: (_: any, row: any) => (
               <span>
                 ₹ {row.sgst_amount}
@@ -412,7 +412,7 @@ export default function InvoiceForm() {
       {
         key: "total_amount",
         label: "Amount",
-           width: "120px",
+        width: "120px",
         render: (v: number) => `₹ ${v ?? "-"}`,
       },
     ];
@@ -808,14 +808,14 @@ export default function InvoiceForm() {
             {/* Plans */}
             <Card className="p-4 lg:col-span-3">
               <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
-                PLAN INFO
+                Billing Info
               </CardTitle>
               <Form {...form}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
 
                   <FloatingRHFSelect
                     name="billing_to"
-                    label="Billing To"
+                    label="Bill To"
                     control={form.control}
                     isDisabled={isView}
                     isRequired
@@ -886,55 +886,55 @@ export default function InvoiceForm() {
               </Form>
               {mode !== 'view' && <div className="flex items-end gap-3 mt-3 ">
 
-                <div className="w-72">
-                  <select
-                    value=""
-                    onChange={(e) => {
-                      const selectedId = e.target.value;
-                      if (!selectedId) return;
+                <div >
+                    <select
+                      value=""
+                      onChange={(e) => {
+                        const selectedId = e.target.value;
+                        if (!selectedId) return;
 
-                      const plan = availablePlans.find(
-                        (p) => String(p.id) === selectedId
-                      );
-                      if (!plan) return;
+                        const plan = availablePlans.find(
+                          (p) => String(p.id) === selectedId
+                        );
+                        if (!plan) return;
 
                       const gstType = isSameState ? "cgst_sgst" : "igst"
 
-                      setPlans(prev => {
-                        const existing = prev.find(p => p.id === plan.id);
+                        setPlans(prev => {
+                          const existing = prev.find(p => p.id === plan.id);
 
                         // ✅ If already exists → increment qty
-                        if (existing) {
-                          return prev.map(p =>
-                            p.id === plan.id
-                              ? calculateInvoiceRow(
-                                { ...p, qty: Number(p.qty || 1) + 1 },
-                                gstType
-                              )
-                              : p
-                          );
-                        }
+                          if (existing) {
+                            return prev.map(p =>
+                              p.id === plan.id
+                                ? calculateInvoiceRow(
+                                  { ...p, qty: Number(p.qty || 1) + 1 },
+                                  gstType
+                                )
+                                : p
+                            );
+                          }
 
                         // ✅ First time add → qty = 1
-                        return [
-                          ...prev,
-                          calculateInvoiceRow({ ...plan, qty: 1 }, gstType),
-                        ];
-                      });
+                          return [
+                            ...prev,
+                            calculateInvoiceRow({ ...plan, qty: 1 }, gstType),
+                          ];
+                        });
 
                       // reset dropdown back
-                      e.target.value = "";
-                    }}
+                        e.target.value = "";
+                      }}
                     className="w-full border rounded-md px-3 py-2 text-sm"
-                  >
-                    <option value="">Add Service Plan</option>
-                    {availablePlans.map((plan) => (
-                      <option key={plan.id} value={plan.id}>
-                        {plan.plan_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    >
+                    <option value="">Add Extra Plan</option>
+                      {availablePlans.map((plan) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.plan_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
 
               </div>}
