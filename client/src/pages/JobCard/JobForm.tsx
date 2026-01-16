@@ -720,7 +720,7 @@ export default function JobForm() {
           // 🔸 New customer
           setCustomerFound(false);
           form.setValue("consumer_id", "");
-          form.setValue("phone", "");
+          form.setValue("phone", searchMobile);
           form.setValue("name", "");
           form.setValue("email", "");
           form.setValue("address", "");
@@ -745,7 +745,7 @@ export default function JobForm() {
         // 🔹 Existing customer
         setCustomerFound(true);
         form.setValue("consumer_id", String(customer.id));
-        form.setValue("phone", customer.phone || searchMobile);
+        form.setValue("phone", searchMobile);
         form.setValue("name", customer.name || "");
         form.setValue("email", customer.email || "");
         form.setValue("address", customer.address || "");
@@ -919,7 +919,7 @@ export default function JobForm() {
 
                         <SectionCard title="Customer Information" className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>
                           {/* BASIC INFO */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FloatingField
                               name="name"
                               label="Name"
@@ -929,13 +929,13 @@ export default function JobForm() {
                             />
 
 
-                            <FloatingField
+                            {/* <FloatingField
                               name="phone"
                               label="Mobile No"
                               isRequired
                               control={form.control}
                               isDisabled={customerFound === true || isView}
-                            />
+                            /> */}
 
                             <FloatingField
                               name="email"
