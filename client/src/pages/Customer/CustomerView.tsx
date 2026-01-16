@@ -85,7 +85,7 @@ export default function JobCardView() {
                 <InfoIfExists label="Name" value={customer?.name} />
                 <InfoIfExists label="Phone" value={customer?.phone} />
                 <InfoIfExists label="Email" value={customer?.email} />
-                <InfoIfExists label="Type" value={customer?.type} />
+                <InfoIfExists label="Type" value={customer?.type=="individual"? "Individual": customer?.type==="company"?"Company":""} />
               </div>
             </Card>
 

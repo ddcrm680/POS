@@ -485,10 +485,10 @@ export default function InvoiceView() {
 
                             <Card className="p-4">
                                 <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
-                                    Plan Info
+                                    Billing Info
                                 </CardTitle>
                                 <div className="space-y-2">
-                                    <InfoIfExists label="Billing To" value={invoiceView?.customer?.type == 'company' ? "Company" : "Individual"} />
+                                    <InfoIfExists label="Bill To" value={invoiceView?.customer?.type == 'company' ? "Company" : "Individual"} />
                                     <InfoIfExists label="Name" value={invoiceView?.customer?.type == 'company' ? invoiceView?.billing_prefillCompany?.name :
                                         invoiceView?.billing_prefill?.name
                                     } />
@@ -513,7 +513,7 @@ export default function InvoiceView() {
                         <Card className="p-4 lg:col-span-3">
 
                             <CardTitle className="text-sm font-semibold text-gray-700">
-                                Billing Info
+                                Plan Info
                             </CardTitle>
 
 
