@@ -313,6 +313,7 @@ export function mapInvoiceApiToPrefilledViewModel(api: any) {
     billing_prefill: billing_prefill.individual,
     billing_prefillCompany: billing_prefill.company,
     store: job.store,
+    gst_type:api?.gst_type ?? ""
   };
 }
 export function calculateInvoiceRow(
@@ -327,7 +328,7 @@ export function calculateInvoiceRow(
 
   const rawPercent = plan.discount_percent ?? "";
   const rawAmount = plan.discount_amount ?? "";
-  
+
   let percentNum = rawPercent || 0;
   let amountNum = (rawAmount || 0);
 
@@ -394,9 +395,11 @@ export function normalizeInvoiceToCreateResponse(api: any) {
   if (api.job_card && api.opted_services && api.billing_prefill) {
     return api;
   }
+  console.log(api, 'apiapiapi');
 
   // 🔹 INVOICE VIEW → CREATE PREFILL FORMAT
   return {
+    gst_type: api?.gst_type ?? "",
     job_card: {
       ...api.job_card,
       consumer: api.consumer,

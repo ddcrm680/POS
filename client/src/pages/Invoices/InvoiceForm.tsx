@@ -1001,7 +1001,7 @@ export default function InvoiceForm() {
                     </span>
                   </div>
 
-                  {form.getValues("billing_to") === "company" ? (
+                  {isSameState ? (
                     <>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">

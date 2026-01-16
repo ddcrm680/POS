@@ -40,57 +40,56 @@ export default function InvoiceView() {
         status: "",
         mode: ""
     });
+    const isSameState = useMemo(() => {
+        console.log(invoiceView, ' invoiceView ');
 
+        return invoiceView?.gst_type === "cgst_sgst" ? true : false
+    }, [invoiceView, invoiceView]);
     const [extraDiscountPercent, setExtraDiscountPercent] = useState('')
 
-   const costSummary = useMemo(() => {
-  const subTotal = plans.reduce(
-    (sum, p) => sum + Number(p.sub_amount || 0),
-    0
-  );
-    const totalItems = plans.reduce(
-      (sum, p) => sum + Number(p.qty || 1),
-      0
-    );
-  const discountTotal = plans.reduce(
-    (sum, p) => sum + Number(p.discount_amount || 0),
-    0
-  );
+    const costSummary = useMemo(() => {
+        const subTotal = plans.reduce(
+            (sum, p) => sum + Number(p.sub_amount || 0),
+            0
+        );
+        const totalItems = plans.reduce(
+            (sum, p) => sum + Number(p.qty || 1),
+            0
+        );
+        const discountTotal = plans.reduce(
+            (sum, p) => sum + Number(p.discount_amount || 0),
+            0
+        );
 
-  const cgstTotal = plans.reduce(
-    (sum, p) => sum + Number(p.cgst_amount || 0),
-    0
-  );
+        const cgstTotal = plans.reduce(
+            (sum, p) => sum + Number(p.cgst_amount || 0),
+            0
+        );
 
-  const sgstTotal = plans.reduce(
-    (sum, p) => sum + Number(p.sgst_amount || 0),
-    0
-  );
+        const sgstTotal = plans.reduce(
+            (sum, p) => sum + Number(p.sgst_amount || 0),
+            0
+        );
 
-  const igstTotal = plans.reduce(
-    (sum, p) => sum + Number(p.igst_amount || 0),
-    0
-  );
+        const igstTotal = plans.reduce(
+            (sum, p) => sum + Number(p.igst_amount || 0),
+            0
+        );
 
-  const grandTotal =
-    subTotal + cgstTotal + sgstTotal + igstTotal;
+        const grandTotal =
+            subTotal + cgstTotal + sgstTotal + igstTotal;
 
-  return {
-    subTotal: +subTotal.toFixed(2),
-    discountTotal: +discountTotal.toFixed(2),
-    cgstTotal: +cgstTotal.toFixed(2),
-    sgstTotal: +sgstTotal.toFixed(2),
-    igstTotal: +igstTotal.toFixed(2),
-    totalItems,
-    grandTotal: +grandTotal.toFixed(2),
-     
-  };
-}, [plans]);
+        return {
+            subTotal: +subTotal.toFixed(2),
+            discountTotal: +discountTotal.toFixed(2),
+            cgstTotal: +cgstTotal.toFixed(2),
+            sgstTotal: +sgstTotal.toFixed(2),
+            igstTotal: +igstTotal.toFixed(2),
+            totalItems,
+            grandTotal: +grandTotal.toFixed(2),
 
-    useEffect(() => {
-        console.log(invoiceView, 'invoiceView');
-
-    }, [invoiceView])
+        };
+    }, [plans]);
     const extraDiscountAmount =
         (costSummary.grandTotal * Number(extraDiscountPercent || 0)) / 100;
 
@@ -117,7 +116,7 @@ export default function InvoiceView() {
     useEffect(() => {
         if (!plans.length) return;
 
-        const gstType = invoiceView?.customer?.type === "company" ? "cgst_sgst" : "igst";
+        const gstType = isSameState ? "cgst_sgst" : "igst";
 
         setPlans(prev =>
             prev.map(plan => calculateInvoiceRow(plan, gstType))
@@ -125,7 +124,6 @@ export default function InvoiceView() {
     }, [invoiceView]);
 
     const planColumns = useMemo(() => {
-        const isCompany = invoiceView?.customer?.type === "company";
 
         return [
             {
@@ -174,7 +172,7 @@ export default function InvoiceView() {
                 render: (v: number) => `₹ ${v ?? "-"}`,
             },
 
-            ...(isCompany
+            ...(isSameState
                 ? [
                     {
                         key: "cgst_amount",
@@ -222,7 +220,7 @@ export default function InvoiceView() {
                 render: (v: number) => `₹ ${v ?? "-"}`,
             },
         ];
-    }, [invoiceView]);
+    }, [invoiceView, isSameState]);
 
     const [invoiceNumber, setInvoiceNumber] = useState('');
     useEffect(() => {
@@ -237,7 +235,7 @@ export default function InvoiceView() {
                 setInvoiceNumber(res?.data?.invoice_number)
                 // 👇 normalize ONLY when jobCardId is NOT present
                 const normalizedData = normalizeInvoiceToCreateResponse(res.data);
-console.log(normalizedData,'normalizedData');
+                console.log(normalizedData, 'normalizedData');
 
                 // 👇 existing mapper stays SAME
                 const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
@@ -251,8 +249,8 @@ console.log(normalizedData,'normalizedData');
                 const planCalculated = mapped.plans.map((item: any) =>
                     calculateInvoiceRow(item, gstType)
                 );
-                console.log(planCalculated,'planCalculated');
-                
+                console.log(planCalculated, 'planCalculated');
+
                 setPlans(planCalculated);
 
             } catch (e) {
@@ -557,7 +555,7 @@ console.log(normalizedData,'normalizedData');
                                         </span>
                                     </div>
 
-                                    {invoiceView?.customer?.type === "company" ? (
+                                    {isSameState ? (
                                         <>
                                             <div className="flex justify-between">
                                                 <span className="text-muted-foreground">
@@ -616,7 +614,7 @@ console.log(normalizedData,'normalizedData');
                         {/* Payments info */}
                         {<Card className="p-4 lg:col-span-3">
                             <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
-                               Payments Info
+                                Payments Info
                             </CardTitle>
                             <CommonTable
                                 columns={paymentColumn}
