@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { type Customer, type Vehicle, type JobCard } from "@/lib/types";
+import { type Customer, type JobCard } from "@/lib/types";
 import { 
   Phone, 
   User, 
@@ -25,13 +25,9 @@ import {
   DollarSign,
   Zap,
   UserPlus,
-  Search,
   Plus,
-  Loader2,
-  X
-} from "lucide-react";
+  Loader2} from "lucide-react";
 import { z } from "zod";
-import POSLayout from "@/components/layout/pos-layout";
 
 // Walk-in entry form schema
 const walkInSchema = z.object({

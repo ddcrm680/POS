@@ -1,4 +1,3 @@
-import POSLayout from "@/components/layout/pos-layout";
 
 export default function Workflow() {
   return (
