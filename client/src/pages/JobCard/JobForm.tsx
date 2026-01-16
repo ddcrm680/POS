@@ -656,7 +656,47 @@ export default function JobForm() {
     setCustomerFound(null);
     form.setValue("consumer_id", undefined);
   }, [searchMobile]);
+  const lookupToastShownRef = useRef(false);
+  useEffect(() => {
+    if (isAdmin) {
+      const isAdminStoreMissing = isAdmin && !store_id;
+      const hasMobile = searchMobile && searchMobile.length > 0;
 
+      // 🔴 Case 1: Mobile typed but store not selected (admin)
+      if (hasMobile && isAdminStoreMissing) {
+        if (!lookupToastShownRef.current) {
+          toast({
+            title: "Select Store",
+            description: "Please select a store before searching customer by mobile number.",
+            variant: "destructive",
+          });
+          lookupToastShownRef.current = true;
+        }
+        return;
+      }
+
+      // 🔴 Case 2: Store selected but mobile missing
+      if (store_id && !hasMobile) {
+        if (!lookupToastShownRef.current) {
+          toast({
+            title: "Enter Mobile Number",
+            description: "Please enter customer's mobile number to search.",
+            variant: "destructive",
+          });
+          lookupToastShownRef.current = true;
+        }
+        return;
+      }
+    }
+
+    // ✅ Reset toast guard when inputs are valid
+    if (
+      (!isAdmin || store_id) &&
+      (!searchMobile || searchMobile.length === 10)
+    ) {
+      lookupToastShownRef.current = false;
+    }
+  }, [searchMobile, store_id, isAdmin, toast]);
   useEffect(() => {
     if (!searchMobile || searchMobile.length !== 10 || !(store_id || user?.store_id)) {
       setIsLookingUp(false);
@@ -718,8 +758,8 @@ export default function JobForm() {
 
         form.setValue("company_gstin", customer.company_gstin ?? "");
         form.setValue("company_contact_no", customer.company_contact_no ?? "");
-        form.setValue("company_country_id", customer.company_country_id ? String(customer.company_country_id ): String(101));
-        form.setValue("company_state_id",customer.company_state_id ? String(customer.company_state_id) : "");
+        form.setValue("company_country_id", customer.company_country_id ? String(customer.company_country_id) : String(101));
+        form.setValue("company_state_id", customer.company_state_id ? String(customer.company_state_id) : "");
         form.clearErrors([
           "name",
           "phone",
@@ -1232,7 +1272,7 @@ export default function JobForm() {
                               control={form.control}
                               options={meta.vehicleTypes}
                             />
- {/* Service Type */}
+                            {/* Service Type */}
                             <FloatingRHFSelect
                               name="service_type"
                               label="Service Type"
@@ -1250,7 +1290,7 @@ export default function JobForm() {
                               isDisabled={isView}
                               control={form.control}
                             />
-                           
+
                             {/* Service Type (Multi) */}
 
                           </div>
@@ -1374,10 +1414,10 @@ export default function JobForm() {
           cancelText="No"
           shouldNotCancelOnOverlayClick={true}
           onCancel={() => navigate("/job-cards")}
-          onConfirm={() =>
-            {localStorage.removeItem('sidebar_active_parent')
+          onConfirm={() => {
+            localStorage.removeItem('sidebar_active_parent')
             navigate(`/invoices/manage?jobCardId=${isJobCardSubmissionDeleteModalInfo.info}&mode=create`)
-        }  }
+          }}
         />
       </div>
     </>
