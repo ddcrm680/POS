@@ -368,34 +368,42 @@ export default function InvoiceView() {
             mode: ""
         })
     }
+    const styles: Record<string, string> = {
+        issued: "bg-yellow-100 text-yellow-700 border-yellow-700",
+        paid: "bg-emerald-100 text-emerald-700  border-emerald-700",
+        cancelled: "bg-red-100 text-red-700  border-red-700",
+        "partially_paid": "bg-blue-100 text-blue-700  border-blue-700",
+    };
     return (
         <div className="max-w-7xl mx-auto p-4 space-y-4">
             {/* Header */}
             <div className="flex items-center justify-between gap-2">
-                 <div className="flex items-center gap-2">
-            
-                <button
-                    onClick={() => {
-                        localStorage.removeItem('sidebar_active_parent')
-                        window.history.back()
-                    }}
-                    // disabled={loading}
-                    className="text-muted-foreground hover:text-foreground"
-                >
-                    <ChevronLeft size={18} />
-                </button>
+                <div className="flex items-center gap-2">
 
-                <h1 className="text-lg font-semibold flex-1">Invoice {`#${invoiceNumber}`}</h1>
-                {invoiceView?.status && (
-                    <Badge
-                        className={
-                            "border-gray-600 bg-gray-50 text-gray-700"
-                        }
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem('sidebar_active_parent')
+                            window.history.back()
+                        }}
+                        // disabled={loading}
+                        className="text-muted-foreground hover:text-foreground"
                     >
-                        {formatStatusLabel(invoiceView.status)}
-                    </Badge>)}
+                        <ChevronLeft size={18} />
+                    </button>
 
-  </div>
+                    <h1 className="text-lg font-semibold flex-1">Invoice {`#${invoiceNumber}`}</h1>
+                    {invoiceView?.status && (
+                        <Badge
+                            className={`px-3 py-1 text-xs font-medium rounded-full  ${styles[invoiceView?.status]}
+                                        `}
+                        >
+                            {formatStatusLabel(invoiceView.status)}
+
+                        </Badge>
+
+                    )}
+
+                </div>
                 <div className="flex gap-2">
                     {
                         invoiceView?.status == 'issued' &&
