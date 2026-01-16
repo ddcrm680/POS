@@ -658,43 +658,45 @@ export default function JobForm() {
   }, [searchMobile]);
   const lookupToastShownRef = useRef(false);
   useEffect(() => {
-    if (isAdmin) {
-      const isAdminStoreMissing = isAdmin && !store_id;
-      const hasMobile = searchMobile && searchMobile.length > 0;
+    if (mode !== "edit") {
+      if (isAdmin) {
+        const isAdminStoreMissing = isAdmin && !store_id;
+        const hasMobile = searchMobile && searchMobile.length > 0;
 
-      // 🔴 Case 1: Mobile typed but store not selected (admin)
-      if (hasMobile && isAdminStoreMissing) {
-        if (!lookupToastShownRef.current) {
-          toast({
-            title: "Select Store",
-            description: "Please select a store before searching customer by mobile number.",
-            variant: "destructive",
-          });
-          lookupToastShownRef.current = true;
+        // 🔴 Case 1: Mobile typed but store not selected (admin)
+        if (hasMobile && isAdminStoreMissing) {
+          if (!lookupToastShownRef.current) {
+            toast({
+              title: "Select Store",
+              description: "Please select a store before searching customer by mobile number.",
+              variant: "destructive",
+            });
+            lookupToastShownRef.current = true;
+          }
+          return;
         }
-        return;
+
+        // 🔴 Case 2: Store selected but mobile missing
+        if (store_id && !hasMobile) {
+          if (!lookupToastShownRef.current) {
+            toast({
+              title: "Enter Mobile Number",
+              description: "Please enter customer's mobile number to search.",
+              variant: "destructive",
+            });
+            lookupToastShownRef.current = true;
+          }
+          return;
+        }
       }
 
-      // 🔴 Case 2: Store selected but mobile missing
-      if (store_id && !hasMobile) {
-        if (!lookupToastShownRef.current) {
-          toast({
-            title: "Enter Mobile Number",
-            description: "Please enter customer's mobile number to search.",
-            variant: "destructive",
-          });
-          lookupToastShownRef.current = true;
-        }
-        return;
+      // ✅ Reset toast guard when inputs are valid
+      if (
+        (!isAdmin || store_id) &&
+        (!searchMobile || searchMobile.length === 10)
+      ) {
+        lookupToastShownRef.current = false;
       }
-    }
-
-    // ✅ Reset toast guard when inputs are valid
-    if (
-      (!isAdmin || store_id) &&
-      (!searchMobile || searchMobile.length === 10)
-    ) {
-      lookupToastShownRef.current = false;
     }
   }, [searchMobile, store_id, isAdmin, toast]);
   useEffect(() => {
