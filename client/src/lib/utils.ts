@@ -539,3 +539,11 @@ export function normalizeInvoiceToEditResponse(api: any) {
 
   };
 }
+export function formatStatusLabel(value?: string) {
+  if (!value) return "-";
+
+  return value
+    .replace(/_/g, " ")                 // remove underscores
+    .toLowerCase()                      // normalize
+    .replace(/\b\w/g, char => char.toUpperCase()); // capitalize each word
+}

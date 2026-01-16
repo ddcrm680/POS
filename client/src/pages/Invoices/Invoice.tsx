@@ -343,7 +343,8 @@ export default function Invoice() {
                                                 <EyeIcon />
                                             </IconButton>
                                             {
-                                                row.status == 'issued' && <IconButton
+                                                row.status == 'issued' &&
+                                                 <IconButton
                                                     size="xs"
                                                     // mr={2}
                                                     aria-label="Edit"

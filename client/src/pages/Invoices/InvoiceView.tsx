@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Box } from "@chakra-ui/react";
 import { invoiceSchema } from "@/lib/schema";
 import { createInvoice, fetchStateList, getInvoiceInfo, getInvoiceInfoByJobCardPrefill, getInvoicePayments } from "@/lib/api";
-import { Trash2 } from "lucide-react";
-import { calculateInvoiceRow, formatDate, formatTime, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, normalizeInvoiceToEditResponse, } from "@/lib/utils";
+import { EditIcon, PrinterIcon, Trash2 } from "lucide-react";
+import { calculateInvoiceRow, formatDate, formatStatusLabel, formatTime, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, normalizeInvoiceToEditResponse, } from "@/lib/utils";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
@@ -41,7 +41,6 @@ export default function InvoiceView() {
         mode: ""
     });
     const isSameState = useMemo(() => {
-        console.log(invoiceView, ' invoiceView ');
 
         return invoiceView?.gst_type === "cgst_sgst" ? true : false
     }, [invoiceView, invoiceView]);
@@ -87,6 +86,7 @@ export default function InvoiceView() {
             igstTotal: +igstTotal.toFixed(2),
             totalItems,
             grandTotal: +grandTotal.toFixed(2),
+
 
         };
     }, [plans]);
@@ -229,14 +229,12 @@ export default function InvoiceView() {
         const loadInvoice = async () => {
             setIsInfoLoading(true);
             try {
-                console.log(jobCardId, id, 'jobCardId');
 
                 const res = await getInvoiceInfo(id);
                 setInvoiceNumber(res?.data?.invoice_number)
                 setPayments(res?.data?.payments)
                 // 👇 normalize ONLY when jobCardId is NOT present
                 const normalizedData = normalizeInvoiceToCreateResponse(res.data);
-                console.log(normalizedData, 'normalizedData');
 
                 const { consumer, job_card, store, payments, items, ...rest } = res?.data
                 // 👇 existing mapper stays SAME
@@ -247,7 +245,6 @@ export default function InvoiceView() {
                 const planCalculated = mapped.plans.map((item: any) =>
                     calculateInvoiceRow(item, gstType)
                 );
-                console.log(planCalculated, 'planCalculated');
 
                 setPlans(planCalculated);
 
@@ -270,10 +267,7 @@ export default function InvoiceView() {
     const { toast } = useToast();
     const mode = searchParams.get("mode");
 
-    useEffect(() => {
-        console.log(invoiceView, 'invoiceView');
 
-    }, [invoiceView])
     const InfoIfExists = ({ value, ...props }: any) => {
         if (value === null || value === undefined || value === "") return null
         return <Info gap="gap-12" colon={false} justify="justify-between" {...props} value={value} />
@@ -377,7 +371,9 @@ export default function InvoiceView() {
     return (
         <div className="max-w-7xl mx-auto p-4 space-y-4">
             {/* Header */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2">
+                 <div className="flex items-center gap-2">
+            
                 <button
                     onClick={() => {
                         localStorage.removeItem('sidebar_active_parent')
@@ -390,15 +386,42 @@ export default function InvoiceView() {
                 </button>
 
                 <h1 className="text-lg font-semibold flex-1">Invoice {`#${invoiceNumber}`}</h1>
-                {invoiceView?.status && <Badge
-                    className={
-                        invoiceView?.status
-                            ? "border-green-600 bg-green-50 text-green-700"
-                            : "border-red-600 bg-red-50 text-red-700"
-                    }
-                >
-                    {invoiceView?.status ?? "-"}
-                </Badge>}
+                {invoiceView?.status && (
+                    <Badge
+                        className={
+                            "border-gray-600 bg-gray-50 text-gray-700"
+                        }
+                    >
+                        {formatStatusLabel(invoiceView.status)}
+                    </Badge>)}
+
+  </div>
+                <div className="flex gap-2">
+                    {
+                        invoiceView?.status == 'issued' &&
+                        <IconButton
+                            size="xs"
+                            // mr={2}
+                            aria-label="Edit"
+                            onClick={() => {
+                                navigate(`/invoices/manage?id=${invoiceView.id}&mode=edit`)
+                            }
+                            }
+                        >
+                            <EditIcon />
+                        </IconButton>}
+                    <IconButton
+                        size="xs"
+                        // mr={2}
+                        aria-label="Print"
+                        disabled
+                        onClick={() => { }
+                        }
+                    >
+                        <PrinterIcon />
+                    </IconButton>
+                </div>
+
             </div>
             {
                 isInfoLoading && id ?
@@ -499,7 +522,25 @@ export default function InvoiceView() {
                                 hasNext={false}
 
                             />
+                            {/* <div className="flex justify-between items-center">
+                                        <span className="text-muted-foreground">
+                                            Extra Discount (%):
+                                        </span>
 
+                                        <div className="flex items-center gap-2">
+
+                                            <span className="text-muted-foreground">
+                                                {
+                                                    extraDiscountAmount
+                                                    ?? "-"} %
+                                            </span>
+                                            <span className="text-muted-foreground">
+                                                ₹ {
+                                                    costSummary?.extraDiscount
+                                                    ?? "-"}
+                                            </span>
+                                        </div>
+                                    </div> */}
                             {/* TOTALS */}
                             <div className="flex md:justify-end ">
                                 <div className="w-[300px] text-sm space-y-2">
@@ -521,7 +562,14 @@ export default function InvoiceView() {
                                             ₹ {costSummary.subTotal}
                                         </span>
                                     </div>
-
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
+                                            Total Discount Amount:
+                                        </span>
+                                        <span className="font-medium">
+                                            ₹ {costSummary.discountTotal}
+                                        </span>
+                                    </div>
                                     {isSameState ? (
                                         <>
                                             <div className="flex justify-between">
@@ -549,31 +597,34 @@ export default function InvoiceView() {
                                             ₹ {costSummary.igstTotal ?? "-"}
                                         </span>
                                     </div>}
-                                    {/* <div className="flex justify-between items-center">
-                                        <span className="text-muted-foreground">
-                                            Extra Discount (%):
-                                        </span>
 
-                                        <div className="flex items-center gap-2">
-
-                                            <span className="text-muted-foreground">
-                                                {
-                                                    extraDiscountAmount
-                                                    ?? "-"} %
-                                            </span>
-                                            <span className="text-muted-foreground">
-                                                ₹ {
-                                                    costSummary?.extraDiscount
-                                                    ?? "-"}
-                                            </span>
-                                        </div>
-                                    </div> */}
                                     <div className="flex justify-between font-semibold border-t pt-2">
                                         <span>Grand Total Amount:</span>
                                         <span>
                                             ₹ {costSummary?.grandTotal}
                                         </span>
                                     </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
+                                            Received Amount:
+                                        </span>
+                                        <span className="font-medium text-green-600">
+                                            ₹ {invoiceView?.paid_amount ?? "0"}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
+                                            Balance Amount:
+                                        </span>
+                                        <span
+                                            className={`font-semibold ${!invoiceView?.total_due ? "text-green-600" : "text-red-600"
+                                                }`}
+                                        >
+                                            ₹ {invoiceView?.total_due ?? "0"}
+                                        </span>
+                                    </div>
+
 
                                 </div>
                             </div>
