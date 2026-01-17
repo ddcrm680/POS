@@ -134,7 +134,9 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
       key: "remarks",
       label: "Notes",
       width: "130px",
-
+ render: (value: any) => (
+        <span> {value ?? "-"}</span>
+      ),
     },
     {
       key: "payment_mode",

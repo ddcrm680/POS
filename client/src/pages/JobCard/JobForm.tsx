@@ -911,7 +911,7 @@ useEffect(() => {
                             <div className="grid grid-cols-1 md:grid-cols-1 gap-1 items-end">
                               <FloatingField
                                 name="search_mobile"
-                                label="Search Mobile Number"
+                                label=" Mobile Number"
                                 isDisabled={isView}
                                 isRequired
                                 control={form.control}

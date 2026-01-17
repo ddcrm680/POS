@@ -44,6 +44,9 @@ export default function InvoiceForm() {
       billing_state_id: "",
     },
   });
+  
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
   const billingStateId = Number(
     useWatch({
       control: form.control,
@@ -57,6 +60,8 @@ export default function InvoiceForm() {
       billingStateId === storeStateId
   }, [billingStateId, invoiceView]);
 
+  const mode = searchParams.get("mode");
+  const isView = mode === "view";
   const [perPage, setPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [has_next, setHasNext] = useState(false)
@@ -129,8 +134,6 @@ export default function InvoiceForm() {
   const [isInfoLoading, setIsInfoLoading] = useState(false);
 
 
-  const [searchParams] = useSearchParams();
-  const id = searchParams.get("id");
 
   const jobCardId = searchParams.get("jobCardId");
   const [invoiceInfo, setInvoiceInfo] = useState<{
@@ -166,163 +169,164 @@ export default function InvoiceForm() {
       })),
     };
   }
-  const planColumns = useMemo(() => {
-
-    return [
-      {
-        key: "plan_name",
-        label: " Name",
-        width: "150px",
-      },
-      {
-        key: "sac",
-        label: "SAC",
-        width: "90px",
-        render: (v: string) => v ?? "-",
-      },
-      {
-        key: "qty",
-        label: "QTY",
-        width: "90px",
-        render: (_: any, row: any) => (
-          <input
-            type="text"
-            inputMode="numeric"      // 📱 mobile numeric keypad
-            pattern="[0-9]*"
-            disabled={isView}
-            className="w-16 border text-center rounded px-1 py-0.5 text-xs "
-            value={row.qty}
-            onChange={(e) => {
-              let value = e.target.value.replace(/\D/g, "");
+const planColumns = useMemo(() => {
+  return [
+    {
+      key: "plan_name",
+      label: "Name",
+      width: "150px",
+    },
+    {
+      key: "sac",
+      label: "SAC",
+      width: "90px",
+      render: (v: string) => v ?? "-",
+    },
+    {
+      key: "qty",
+      label: "QTY",
+      width: "90px",
+      render: (_: any, row: any) => (
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          disabled={isView}
+          className="w-16 border text-center rounded px-1 py-0.5 text-xs"
+          value={row.qty}
+          onChange={(e) => {
+            let value = e.target.value.replace(/\D/g, "");
 
               // allow empty while typing
-              if (value === "") {
-                setPlans(prev =>
-                  prev.map(p =>
+            if (value === "") {
+              setPlans(prev =>
+                prev.map(p =>
                     p.id === row.id
                       ? { ...p, qty: "" }
                       : p
-                  )
-                );
-                return;
-              }
+                )
+              );
+              return;
+            }
               let qty = Number(value);
 
               // 🔒 enforce limits: 1 → 1000
-              if (qty < 1) qty = 1;
-              if (qty > 1000) qty = 1000;
+            if (qty < 1) qty = 1;
+            if (qty > 1000) qty = 1000;
 
               const gstType = isSameState ? "cgst_sgst" : "igst"
 
+            setPlans(prev =>
+              prev.map(p =>
+                p.id === row.id
+                  ? calculateInvoiceRow({ ...p, qty }, gstType)
+                  : p
+              )
+            );
+          }}
+          onBlur={() => {
+              // normalize on blur
+            if (!row.qty || Number(row.qty) < 1) {
+                const gstType = isSameState ? "cgst_sgst" : "igst"
               setPlans(prev =>
                 prev.map(p =>
                   p.id === row.id
-                    ? calculateInvoiceRow({ ...p, qty }, gstType)
+                    ? calculateInvoiceRow({ ...p, qty: 1 }, gstType)
                     : p
                 )
               );
-            }}
-            onBlur={() => {
-              // normalize on blur
-              if (!row.qty || Number(row.qty) < 1) {
-                const gstType = isSameState ? "cgst_sgst" : "igst"
-                setPlans(prev =>
-                  prev.map(p =>
-                    p.id === row.id
-                      ? calculateInvoiceRow({ ...p, qty: 1 }, gstType)
-                      : p
-                  )
-                );
-              }
-            }}
-          />
-        ),
-      },
-      {
-        key: "price",
-        label: "Price (₹)",
-        width: "120px",
-        render: (v: number) => `₹ ${v}`,
-      },
+            }
+          }}
+        />
+      ),
+    },
+    {
+      key: "price",
+      label: "Price (₹)",
+      width: "120px",
+      render: (v: number) => `₹ ${v}`,
+    },
+    {
+      key: "discount_percent",
+      label: "Dis.(%)",
+      width: "90px",
+      render: (_: any, row: any) => (
+        <input
+          type="text"
+          value={row.discount_percent}
 
-      {
-        key: "discount_percent",
-        label: "Dis.(%)",
-        width: "90px",
-        render: (_: any, row: any) => (
-          <input
-            type="text"
-            value={row.discount_percent}
-
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === "") {
-                setPlans(prev =>
-                  prev.map(p =>
-                    p.id === row.id
-                      ? { ...p, discount_percent: "", _discountSource: "percent" }
-                      : p
-                  )
-                );
-                return;
-              }
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value === "") {
+              setPlans(prev =>
+                prev.map(p =>
+                  p.id === row.id
+                    ? { ...p, discount_percent: "", _discountSource: "percent" }
+                    : p
+                )
+              );
+              return;
+            }
               // allow decimal typing
               // ❌ block 00, 000 etc
               if (!/^(?:0|[1-9]\d*)(?:\.\d{0,4})?$/.test(value)) return;
 
               if (!/^\d*(\.\d{0,4})?$/.test(value)) return;
-              if (Number(value) > 100) return;
+            if (Number(value) > 100) return;
 
+            setPlans(prev =>
+              prev.map(p =>
+                p.id === row.id
+                  ? calculateInvoiceRow(
+                      { ...p, discount_percent: value, _discountSource: "percent" },
+                      isSameState ? "cgst_sgst" : "igst"
+                    )
+                  : p
+              )
+            );
+          }}
+          onBlur={() => {
+            if (!row.discount_percent) {
               setPlans(prev =>
                 prev.map(p =>
                   p.id === row.id
                     ? calculateInvoiceRow(
-                      { ...p, discount_percent: value, _discountSource: "percent" },
-                      isSameState ? "cgst_sgst" : "igst"
-                    )
+                        { ...p, discount_percent: 0 },
+                        isSameState ? "cgst_sgst" : "igst"
+                      )
                     : p
                 )
               );
-            }}
-            onBlur={() => {
-              if (!row.discount_percent) {
-                setPlans(prev =>
-                  prev.map(p =>
-                    p.id === row.id
-                      ? calculateInvoiceRow({ ...p, discount_percent: 0 }, isSameState ? "cgst_sgst" : "igst")
-                      : p
-                  )
-                );
-              }
-            }}
+            }
+          }}
             className="w-16 border rounded px-1 py-0.5 text-xs text-center"
-          />
-        ),
-      },
-      {
-        key: "discount_amount",
-        label: "	Discount(₹)",
-        width: "90px",
-        render: (_: any, row: any) => (
-          <input
-            type="text"
-            value={row.discount_amount}
+        />
+      ),
+    },
+    {
+      key: "discount_amount",
+      label: "Discount (₹)",
+      width: "90px",
+      render: (_: any, row: any) => (
+        <input
+          type="text"
+          value={row.discount_amount}
 
-            onChange={(e) => {
-              const value = e.target.value;
+          onChange={(e) => {
+            const value = e.target.value;
 
-              if (value === "") {
-                setPlans(prev =>
-                  prev.map(p =>
-                    p.id === row.id
-                      ? { ...p, discount_amount: "", _discountSource: "amount" }
-                      : p
-                  )
-                );
-                return;
-              }
+            if (value === "") {
+              setPlans(prev =>
+                prev.map(p =>
+                  p.id === row.id
+                    ? { ...p, discount_amount: "", _discountSource: "amount" }
+                    : p
+                )
+              );
+              return;
+            }
               // ❌ block 00, 000 etc
-              if (!/^(?:0|[1-9]\d*)(?:\.\d{0,2})?$/.test(value)) return;
+            if (!/^(?:0|[1-9]\d*)(?:\.\d{0,2})?$/.test(value)) return;
 
               // allow decimals
               if (!/^\d*(\.\d{0,2})?$/.test(value)) {
@@ -331,40 +335,40 @@ export default function InvoiceForm() {
                 return
               }
 
-              setPlans(prev =>
-                prev.map(p =>
-                  p.id === row.id
-                    ? calculateInvoiceRow(
+            setPlans(prev =>
+              prev.map(p =>
+                p.id === row.id
+                  ? calculateInvoiceRow(
                       { ...p, discount_amount: value, _discountSource: "amount" },
                       isSameState ? "cgst_sgst" : "igst"
                     )
+                  : p
+              )
+            );
+          }}
+          onBlur={() => {
+            if (!row.discount_amount) {
+              setPlans(prev =>
+                prev.map(p =>
+                  p.id === row.id
+                      ? calculateInvoiceRow({ ...p, discount_amount: 0 }, isSameState ? "cgst_sgst" : "igst")
                     : p
                 )
               );
-            }}
-            onBlur={() => {
-              if (!row.discount_amount) {
-                setPlans(prev =>
-                  prev.map(p =>
-                    p.id === row.id
-                      ? calculateInvoiceRow({ ...p, discount_amount: 0 }, isSameState ? "cgst_sgst" : "igst")
-                      : p
-                  )
-                );
-              }
-            }}
+            }
+          }}
             className="w-16 border rounded px-1 py-0.5 text-xs text-center"
-          />
-        ),
-      },
-      {
-        key: "sub_amount",
-        label: "Sub Amount",
-        render: (v: number) => `₹ ${v ?? "-"}`,
-      },
+        />
+      ),
+    },
+    {
+      key: "sub_amount",
+      label: "Sub Total",
+      render: (v: number) => `₹ ${v ?? "-"}`,
+    },
 
-      ...(isSameState
-        ? [
+    ...(isSameState
+      ? [
           {
             key: "cgst_amount",
             label: "CGST",
@@ -392,32 +396,60 @@ export default function InvoiceForm() {
             ),
           },
         ]
-        : [
+      : [
           {
             key: "igst_amount",
             label: "IGST",
-            render: (_: any, row: any) => {
-              return (
-                <span>
-                  ₹ {row.igst_amount}
-                  <span className="text-green-600 text-xs pl-2">
-                    ({row.igst_percent}%)
-                  </span>
+            render: (_: any, row: any) => (
+              <span>
+                ₹ {row.igst_amount}
+                <span className="text-green-600 text-xs pl-2">
+                  ({row.igst_percent}%)
                 </span>
-              )
-            }
+              </span>
+            ),
           },
         ]),
 
-      {
-        key: "total_amount",
-        label: "Amount",
-        width: "120px",
-        render: (v: number) => `₹ ${v ?? "-"}`,
-      },
-    ];
-  }, [isSameState, billingStateId]);
+    {
+      key: "total_amount",
+      label: "Total",
+      width: "120px",
+      render: (v: number) => `₹ ${v ?? "-"}`,
+    },
 
+    ...(!isView
+      ? [
+          {
+            key: "amount",
+            label: "Action",
+            width: "120px",
+            render: (_: any, row: any) => (
+              <Box className="gap-3">
+                <IconButton
+                  size="xs"
+                  mr={2}
+                  colorScheme="red"
+                  disabled={plans.length <= 1}
+                  aria-label="Delete"
+                  onClick={() => removePlan(row.id)}
+                >
+                  <Trash2 size={16} />
+                </IconButton>
+              </Box>
+            ),
+          },
+        ]
+      : []),
+  ];
+}, [
+  isSameState,
+  isView,
+  plans.length,
+  setPlans,
+  removePlan,
+  calculateInvoiceRow,
+]);
   const [availablePlans, setAvailablePlans] = useState<any[]>([]);
   const [invoiceNumber, setInvoiceNumber] = useState('');
   useEffect(() => {
@@ -547,7 +579,6 @@ export default function InvoiceForm() {
   }, []);
 
   const { toast } = useToast();
-  const mode = searchParams.get("mode");
   async function handleInvoiceSubmission(values: any) {
     setIsLoading(true);
     if (!plans.length) {
@@ -602,7 +633,6 @@ export default function InvoiceForm() {
     return <Info gap="gap-12" colon={false} justify="justify-between" {...props} value={value} />
   }
 
-  const isView = mode === "view";
   const paymentColumn = [
     /* ================= CREATED DATE ================= */
     {
@@ -954,24 +984,7 @@ export default function InvoiceForm() {
                 setPage={() => { }}
                 lastPage={1}
                 hasNext={false}
-                actions={
-                  isView
-                    ? undefined
-                    : (row: any) => (
-                      <Box className="gap-3">
-                        <IconButton
-                          size="xs"
-                          mr={2}
-                          colorScheme="red"
-                          disabled={plans.length <= 1}
-                          aria-label="Delete"
-                          onClick={() => removePlan(row.id)}
-                        >
-                          <Trash2 size={16} />
-                        </IconButton>
-                      </Box>
-                    )
-                }
+                
               />
 
               {/* TOTALS */}
@@ -997,7 +1010,7 @@ export default function InvoiceForm() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      Total Discount Amount:
+                      Total Discount :
                     </span>
                     <span className="font-medium">
                       ₹ {costSummary.discountTotal}
@@ -1008,7 +1021,7 @@ export default function InvoiceForm() {
                     <>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">
-                          CGST Amount :
+                          CGST  :
                         </span>
                         <span className="font-medium">
                           ₹ {costSummary.cgstTotal ?? "-"}
@@ -1016,7 +1029,7 @@ export default function InvoiceForm() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">
-                          SGST Amount :
+                          SGST  :
                         </span>
                         <span className="font-medium">
                           ₹ {costSummary.sgstTotal ?? "-"}
@@ -1025,7 +1038,7 @@ export default function InvoiceForm() {
                     </>
                   ) : <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      IGST Amount :
+                      IGST  :
                     </span>
                     <span className="font-medium">
                       ₹ {costSummary.igstTotal ?? "-"}
@@ -1062,7 +1075,7 @@ export default function InvoiceForm() {
                     </div>
                   </div> */}
                   <div className="flex justify-between font-semibold border-t pt-2">
-                    <span>Grand Total Amount:</span>
+                    <span>Grand Total :</span>
                     <span>
                       ₹ {costSummary?.grandTotal}
                     </span>

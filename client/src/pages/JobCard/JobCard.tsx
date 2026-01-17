@@ -148,8 +148,19 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
     /* ================= VEHICLE TYPE ================= */
     {
       key: "vehicle_type",
-      label: "Vehicle Type",
+      label: " Type",
       width: "120px",
+       render: (_: any, row: any) => (
+        <span className="text-sx font-medium">
+                  {[
+                    row?.vehicle_type,
+                    row?.vmake?.name,
+                    row?.vmodel?.name,
+                  ]
+                    .filter(Boolean)
+                    .join(" • ")}
+                </span>
+      ),
     },
 
     /* ================= REG NO ================= */
