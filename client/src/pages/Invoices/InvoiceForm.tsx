@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconButton } from "@chakra-ui/react";
@@ -430,7 +430,7 @@ const planColumns = useMemo(() => {
                   size="xs"
                   mr={2}
                   colorScheme="red"
-                  disabled={plans.length <= 1}
+                  // disabled={plans.length <= 1}
                   aria-label="Delete"
                   onClick={() => removePlan(row.id)}
                 >
@@ -578,18 +578,23 @@ const planColumns = useMemo(() => {
     loadStates();
   }, []);
 
+const addPlanRef = useRef<HTMLSelectElement | null>(null);
   const { toast } = useToast();
   async function handleInvoiceSubmission(values: any) {
-    setIsLoading(true);
+   
     if (!plans.length) {
       toast({
         title: "No Plans Added",
         description: "Please add at least one plan",
         variant: "destructive",
       });
+      
+    // ✅ focus Add Extra Plan selector
+    addPlanRef.current?.focus();
       return;
     }
     try {
+       setIsLoading(true);
       const payload = {
         ...buildInvoicePayload(values),
         url: mode !== "edit" && jobCardId ? `job-cards/${jobCardId}/invoice` : `invoices/${id}/update`
@@ -922,6 +927,7 @@ const planColumns = useMemo(() => {
                 <div >
                   <select
                     value=""
+                     ref={addPlanRef}
                     onChange={(e) => {
                       const selectedId = e.target.value;
                       if (!selectedId) return;
@@ -1126,7 +1132,7 @@ const planColumns = useMemo(() => {
           <Button
             variant="outline"
             disabled={isLoading || isInfoLoading}
-            className={'hover:bg-[#E3EDF6] hover:text-[#000] text-xs'}
+            className={'hover:bg-[#E3EDF6] hover:text-[#000] '}
             onClick={() => navigate("/invoices")}
           >
             {'Cancel'}
