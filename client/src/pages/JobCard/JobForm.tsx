@@ -847,7 +847,7 @@ useEffect(() => {
 
   return (
     <>
-      <div className="max-w-7xl  mx-auto px-4 py-4 space-y-3">
+    <div className="max-w-5xl mx-auto px-3 sm:px-3 py-3 space-y-3">
         {/* HEADER */}
         <div className="flex items-center gap-3">
           <button
@@ -868,7 +868,7 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 rounded-xl ">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-3 rounded-xl ">
 
 
 
@@ -877,19 +877,19 @@ useEffect(() => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="">
               {
                 isInfoLoading && id ?
-                  <Card className="mb-6"><div className="min-h-[150px] flex justify-center items-center">
-                    <div className="p-3 text-sm "><Loader /></div>
+                  <Card className="mb-4"><div className="min-h-[150px] flex justify-center items-center">
+                    <div className="p-4 text-sm "><Loader /></div>
                   </div></Card> : <>
                     {(mode !== "view" && mode !== 'edit') && <>
-                      <Card className="mb-6 p-3">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card className="mb-6 p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
                           {isAdmin && <div
                             className={cn(
                               "bg-white  rounded-xl p-0",
                             )} >
                             <h3 className={`text-sm font-semibold text-gray-700 mb-4`}>{"Store Information"}</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
                               <FloatingRHFSelect
                                 name="store_id"
                                 label="Select Store"
@@ -947,11 +947,11 @@ useEffect(() => {
                       </Card>
 
                       {/* Customer Lookup Section */}
-                      {customerFound !== null && <Card className="mb-6">
+                      {customerFound !== null && <Card className="mb-3">
 
-                        <SectionCard title="Customer Information" className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>
+                        <SectionCard title="Customer Information" className="pb-4 grid gap-3" headingMarginBottom={"mb-0"}>
                           {/* BASIC INFO */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <FloatingField
                               name="name"
                               label="Name"
@@ -981,7 +981,7 @@ useEffect(() => {
 
                           </div>
                           {/* ADDRESS + MESSAGE */}
-                          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
                             <FloatingTextarea
                               name="address"
                               label="Address"
@@ -991,7 +991,7 @@ useEffect(() => {
                             />
 
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 
                             {/* COUNTRY */}
                             <FloatingRHFSelect
@@ -1078,7 +1078,7 @@ useEffect(() => {
                                   GST Information
                                 </h4>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 
 
                                   <FloatingField
@@ -1152,8 +1152,8 @@ useEffect(() => {
 
                       {/* Vehicle Information */}
                       <Card>
-                        <SectionCard title="Vehicle Information" className="pb-4">
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <SectionCard title="Vehicle Information" className="pb-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                             <FloatingRHFSelect
                               name="vehicle_company_id"
                               label="Vehicle Make"
@@ -1218,12 +1218,12 @@ useEffect(() => {
                               Vehicle Paint Condition
                             </p>
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                               <FormField
                                 control={form.control}
                                 name="isRepainted"
                                 render={({ field }) => (
-                                  <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`flex  items-center gap-2 ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1293,8 +1293,8 @@ useEffect(() => {
 
                       {/* Service Selection & Summary */}
                       <Card>
-                        <SectionCard title="Service Information" className="pb-4 space-y-3">
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <SectionCard title="Service Information" className="pb-3 space-y-3">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             {/* Vehicle Type */}
                             <FloatingRHFSelect
                               name="vehicle_type"
@@ -1351,7 +1351,7 @@ useEffect(() => {
                                   No services found for the selected vehicle and service type
                                 </p>
                               )}
-                            {!loadingServices && services.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {!loadingServices && services.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                               {services.map(service => {
                                 const isSelected = selectedServices.includes(service.id);
 
@@ -1409,7 +1409,7 @@ useEffect(() => {
                     </div>
                   </>}
               {mode !== 'view' &&
-                <div className="  pb-4 flex justify-end gap-3 mt-4">
+                <div className="  pb-3 flex justify-end gap-3 mt-3">
                   <Button
                     variant="outline"
                     disabled={isLoading || isInfoLoading}
