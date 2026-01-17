@@ -100,7 +100,7 @@ export default function StoreDetails() {
     }
     const storeStatus = normalizeStatus(store.is_active);
     return (
-        <div className="p-4 sm:p-4 space-y-4 max-w-7xl mx-auto">
+        <div className="p-3 sm:p-3 space-y-3 max-w-7xl mx-auto">
 
             {/* ---------- HEADER ---------- */}
             <div className="flex items-center gap-2">

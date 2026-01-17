@@ -52,7 +52,7 @@ export default function CustomerLookupModal({ open, onOpenChange, onCustomerSele
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div>
             <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
             <div className="relative">
@@ -72,7 +72,7 @@ export default function CustomerLookupModal({ open, onOpenChange, onCustomerSele
           {/* Customer Details */}
           {isLoading && phoneNumber.length >= 10 && (
             <Card>
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <p className="text-sm text-muted-foreground">Searching for customer...</p>
               </CardContent>
             </Card>
@@ -80,7 +80,7 @@ export default function CustomerLookupModal({ open, onOpenChange, onCustomerSele
 
           {error && phoneNumber.length >= 10 && (
             <Card>
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <p className="text-sm text-muted-foreground">
                   Customer not found. Would you like to create a new customer?
                 </p>
@@ -93,7 +93,7 @@ export default function CustomerLookupModal({ open, onOpenChange, onCustomerSele
 
           {customer && (
             <Card className="border-primary/20">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">

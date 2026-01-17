@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "full-icu": "^1.5.0"
+  }
+}

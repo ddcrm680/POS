@@ -9,7 +9,7 @@ export function InfoCard({
 }) {
     return (
         <Card className="rounded-xl">
-            <CardHeader className="p-4 pb-2">
+            <CardHeader className="p-3 pb-2">
                 <h3 className="text-[11px] uppercase font-semibold tracking-wide text-muted-foreground">
                     {title}
                 </h3>

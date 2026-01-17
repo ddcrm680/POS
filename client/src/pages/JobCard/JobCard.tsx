@@ -80,7 +80,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       render: (value: string) => (
         <Box className="flex flex-col items-center">
           <span className="font-bold">{formatDate(value)}</span>
-          <span className="text-sm text-gray-700">
+          <span className="text-sx text-gray-700">
             {formatTime(value)}
           </span>
         </Box>
@@ -94,7 +94,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       width: "110px",
       render: (value: string, row: any) => (
         <span
-          className="text-[blue] font-medium cursor-pointer hover:underline"
+          className="text-[blue] font-medium cursor-pointer hover:underline text-sx "
           onClick={() =>{
             
               localStorage.getItem("sidebar_active_parent",);
@@ -139,7 +139,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       label: "Service Date",
       width: "140px",
       render: (value: string) => (
-        <span className="text-sm">
+        <span className="text-xs">
           {formatDate(value)}
         </span>
       ),
@@ -165,7 +165,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       label: "Store",
       width: "150px",
       render: (_: any, row: any) => (
-        <span className="text-sm">
+        <span className="text-xs">
           {row.store?.name ?? "-"}
         </span>
       ),
@@ -312,7 +312,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
   }
   const allowedActions = hideColumnListInCustomer?.actionShowedList;
   return (
-    <div className={`${noPadding ? "" : "p-4"}`}>
+    <div className={`${noPadding ? "" : "p-3"}`}>
       {!noTitle && <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>

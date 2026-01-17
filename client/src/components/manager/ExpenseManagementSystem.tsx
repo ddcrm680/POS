@@ -244,7 +244,7 @@ const { data: analytics = {},  } = useQuery<any>({
       {/* Analytics Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2 mb-2">
               <DollarSign className="h-4 w-4 text-green-600" />
               <span className="text-sm font-medium text-muted-foreground">Today's Expenses</span>
@@ -259,7 +259,7 @@ const { data: analytics = {},  } = useQuery<any>({
         </Card>
 
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2 mb-2">
               <AlertCircle className="h-4 w-4 text-orange-600" />
               <span className="text-sm font-medium text-muted-foreground">Pending Approval</span>
@@ -274,7 +274,7 @@ const { data: analytics = {},  } = useQuery<any>({
         </Card>
 
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2 mb-2">
               <Calendar className="h-4 w-4 text-blue-600" />
               <span className="text-sm font-medium text-muted-foreground">This Month</span>
@@ -289,7 +289,7 @@ const { data: analytics = {},  } = useQuery<any>({
         </Card>
 
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="h-4 w-4 text-purple-600" />
               <span className="text-sm font-medium text-muted-foreground">Avg Daily</span>
@@ -445,7 +445,7 @@ const { data: analytics = {},  } = useQuery<any>({
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {isLoading ? (
                   <div className="text-center py-8">Loading expenses...</div>
                 ) : filteredExpenses.length === 0 ? (
@@ -459,7 +459,7 @@ const { data: analytics = {},  } = useQuery<any>({
                     
                     return (
                       <Card key={expense.id} className="transition-all hover:shadow-md">
-                        <CardContent className="p-4">
+                        <CardContent className="p-3">
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3">
                               <div className={`p-2 rounded-full ${categoryInfo.color}`}>

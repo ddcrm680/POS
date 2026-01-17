@@ -50,10 +50,10 @@ export default function Master() {
   return (
     <div>
       <div className="grid gap-4 transition-all duration-300 grid-cols-1">
-        <div className="p-4">
-          <div className="mx-auto space-y-4">
+        <div className="p-3">
+          <div className="mx-auto space-y-3">
 
-            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-3">
               <div className="mb-6 flex justify-between items-center">
                
   <div>

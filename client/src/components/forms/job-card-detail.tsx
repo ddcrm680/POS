@@ -374,9 +374,9 @@ export default function JobCardDetail({ jobCardId, onStatusUpdate, onClose }: Jo
 
       {/* SOP Checklist and Status Advancement */}
       <Card>
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="p-6 space-y-3">
           {/* SOP Drawer Trigger */}
-          <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-3">
               <ClipboardCheck className="h-5 w-5 text-muted-foreground" />
               <div>
@@ -436,7 +436,7 @@ export default function JobCardDetail({ jobCardId, onStatusUpdate, onClose }: Jo
               Customer & Vehicle
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3">
              <div>
             {customer && (
               <div>
@@ -489,7 +489,7 @@ export default function JobCardDetail({ jobCardId, onStatusUpdate, onClose }: Jo
               Service Details
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3">
             <>
             {/* Key Tag */}
             <div className="flex items-center gap-2">

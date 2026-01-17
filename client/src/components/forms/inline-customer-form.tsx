@@ -119,7 +119,7 @@ export default function InlineCustomerForm({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Phone Number (Read-only, auto-filled) */}
               <FormField

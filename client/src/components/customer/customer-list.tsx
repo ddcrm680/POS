@@ -223,9 +223,9 @@ export default function CustomerList({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {/* Filters */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Search and quick filters */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">

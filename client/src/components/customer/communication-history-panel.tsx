@@ -373,7 +373,7 @@ export default function CommunicationHistoryPanel({
           ) : stats && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               {/* Total Messages */}
-              <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="bg-blue-50 p-3 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-blue-600">Total Messages</p>
@@ -384,7 +384,7 @@ export default function CommunicationHistoryPanel({
               </div>
 
               {/* Response Rate */}
-              <div className="bg-green-50 p-4 rounded-lg">
+              <div className="bg-green-50 p-3 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-green-600">Response Rate</p>
@@ -395,7 +395,7 @@ export default function CommunicationHistoryPanel({
               </div>
 
               {/* Engagement Score */}
-              <div className="bg-purple-50 p-4 rounded-lg">
+              <div className="bg-purple-50 p-3 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-purple-600">Engagement</p>
@@ -408,7 +408,7 @@ export default function CommunicationHistoryPanel({
               </div>
 
               {/* Preferred Channel */}
-              <div className="bg-orange-50 p-4 rounded-lg">
+              <div className="bg-orange-50 p-3 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-orange-600">Preferred Channel</p>
@@ -465,9 +465,9 @@ export default function CommunicationHistoryPanel({
         <CardContent>
           <ScrollArea className="h-96">
             {communicationsLoading ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="flex items-start gap-4 p-4 border rounded-lg">
+                  <div key={i} className="flex items-start gap-4 p-3 border rounded-lg">
                     <Skeleton className="w-10 h-10 rounded-full" />
                     <div className="flex-1 space-y-2">
                       <Skeleton className="h-4 w-32" />
@@ -495,11 +495,11 @@ export default function CommunicationHistoryPanel({
                 )}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {filteredCommunications.map((comm) => (
                   <div 
                     key={comm.id}
-                    className="flex items-start gap-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="flex items-start gap-4 p-3 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                     onClick={() => setSelectedRecord(comm)}
                     data-testid={`message-${comm.id}`}
                   >
@@ -562,7 +562,7 @@ export default function CommunicationHistoryPanel({
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Channel Breakdown */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <h4 className="font-medium">Messages by Channel</h4>
                 <div className="space-y-3">
                   {Object.entries(stats.channelBreakdown).map(([channel, count]) => (
@@ -586,7 +586,7 @@ export default function CommunicationHistoryPanel({
               </div>
 
               {/* Communication Insights */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <h4 className="font-medium">Insights</h4>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
@@ -621,7 +621,7 @@ export default function CommunicationHistoryPanel({
             <DialogTitle>Send Message to {customer.fullName}</DialogTitle>
           </DialogHeader>
           <Form {...messageForm}>
-            <form onSubmit={messageForm.handleSubmit(onSendMessage)} className="space-y-4">
+            <form onSubmit={messageForm.handleSubmit(onSendMessage)} className="space-y-3">
               <FormField
                 control={messageForm.control}
                 name="type"
@@ -711,14 +711,14 @@ export default function CommunicationHistoryPanel({
             <DialogTitle>Communication Preferences</DialogTitle>
           </DialogHeader>
           {preferencesLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {Array.from({ length: 6 }).map((_, i) => (
                 <Skeleton key={i} className="h-12 w-full" />
               ))}
             </div>
           ) : (
             <Form {...preferencesForm}>
-              <form onSubmit={preferencesForm.handleSubmit(onUpdatePreferences)} className="space-y-4">
+              <form onSubmit={preferencesForm.handleSubmit(onUpdatePreferences)} className="space-y-3">
                 <FormField
                   control={preferencesForm.control}
                   name="preferredChannel"
@@ -773,7 +773,7 @@ export default function CommunicationHistoryPanel({
                   />
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <Label>Communication Preferences</Label>
                   
                   <FormField

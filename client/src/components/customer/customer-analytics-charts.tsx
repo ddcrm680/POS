@@ -381,7 +381,7 @@ export default function CustomerAnalyticsCharts({ className = "" }: CustomerAnal
           </CardHeader>
           <CardContent>
             {retention ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">

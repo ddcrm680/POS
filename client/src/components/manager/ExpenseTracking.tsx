@@ -202,7 +202,7 @@ export default function ExpenseTracking() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="enhanced-card">
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-green-600" />
               <span className="text-sm font-medium text-muted-foreground">Today</span>
@@ -214,7 +214,7 @@ export default function ExpenseTracking() {
         </Card>
         
         <Card className="enhanced-card">
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-blue-600" />
               <span className="text-sm font-medium text-muted-foreground">This Week</span>
@@ -226,7 +226,7 @@ export default function ExpenseTracking() {
         </Card>
         
         <Card className="enhanced-card">
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2">
               <Receipt className="h-4 w-4 text-purple-600" />
               <span className="text-sm font-medium text-muted-foreground">This Month</span>
@@ -238,7 +238,7 @@ export default function ExpenseTracking() {
         </Card>
         
         <Card className="enhanced-card">
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-orange-600" />
               <span className="text-sm font-medium text-muted-foreground">Pending</span>
@@ -468,7 +468,7 @@ export default function ExpenseTracking() {
               </Form>
             </TabsContent>
             
-            <TabsContent value="list" className="space-y-4">
+            <TabsContent value="list" className="space-y-3">
               
               {/* Filters */}
               <div className="flex flex-wrap gap-4">
@@ -516,7 +516,7 @@ export default function ExpenseTracking() {
                 <div className="space-y-3">
                   {filteredExpenses.map((expense) => (
                     <Card key={expense.id} className="enhanced-card">
-                      <CardContent className="p-4">
+                      <CardContent className="p-3">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">

@@ -59,17 +59,17 @@ export default function ConsumerDashboardRedesign() {
     };
   return (
     <div className="min-h-screen ">
-      <div className="mx-auto max-w-7xl p-3 sm:p-4 space-y-4">
+      <div className="mx-auto max-w-7xl p-3 sm:p-3 space-y-3">
 
         {/* Top Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-xl bg-[#FE0000] flex items-center justify-center text-white font-bold">
+            <div className="h-10 w-10 rounded-lg bg-[#FE0000] flex items-center justify-center text-white font-bold">
               {getInitials(customer?.consumer?.name)}
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-slate-900">{customer?.consumer?.name ?? "-"}</h1>
-              <p className="text-sm text-slate-500"> {customer?.consumer?.phone ?? "-"} · {customer?.consumer?.state?.name ?? "-"}</p>
+              <h1 className="text-[14px] font-semibold text-slate-900">{customer?.consumer?.name ?? "-"}</h1>
+              <p className="text-xs text-slate-500"> {customer?.consumer?.phone ?? "-"} · {customer?.consumer?.state?.name ?? "-"}</p>
             </div>
           </div>
 
@@ -80,9 +80,9 @@ export default function ConsumerDashboardRedesign() {
                 navigate(`/job-cards/manage?phone=${customerView.phone}&store_id=${customerView.store_id}`)
 
               }}
-              className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex gap-2"
+              className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex gap-2 !text-[12px] !h-8"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-3 w-3" />
               Add {"Job Card"}
             </Button>
           </div>
@@ -126,14 +126,14 @@ export default function ConsumerDashboardRedesign() {
         <div className="grid lg:grid-cols-[240px_1fr] gap-4">
 
           {/* Sidebar Tabs */}
-          <Card className="rounded-2xl">
-            <CardContent className="p-2">
+          <Card className="rounded-lg">
+            <CardContent className="p-2 flex flex-col gap-1">
               {TABS.map(tab => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition",
+                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg !text-[12px] font-[600] transition py-2",
                     activeTab === tab.key
                       ? "bg-[#FE0000] text-white"
                       : "text-slate-600 hover:bg-slate-100"
@@ -147,7 +147,7 @@ export default function ConsumerDashboardRedesign() {
           </Card>
 
           {/* Content */}
-          <Card className="rounded-2xl !px-0">
+          <Card className={`rounded-lg ${activeTab === "overview"? "" :"border-0"} !px-0`}>
             <CardContent className="p-0">
               <motion.div
                 key={activeTab}

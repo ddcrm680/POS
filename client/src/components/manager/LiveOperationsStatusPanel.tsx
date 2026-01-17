@@ -34,7 +34,7 @@ function ServiceBayCard({
   
   return (
     <Card className={`border-2 ${isOccupied ? 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20' : 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20'}`}>
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <Car className={`h-4 w-4 ${isOccupied ? 'text-blue-600' : 'text-green-600'}`} />
@@ -139,7 +139,7 @@ export default function LiveOperationsStatusPanel() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="animate-pulse space-y-4">
+          <div className="animate-pulse space-y-3">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
             ))}
@@ -185,7 +185,7 @@ export default function LiveOperationsStatusPanel() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
             ))}
@@ -282,7 +282,7 @@ export default function LiveOperationsStatusPanel() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Staff Status */}
             <Card className="border">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="h-4 w-4 text-blue-500" />
                   <span className="text-sm font-medium">Staff on Duty</span>
@@ -303,7 +303,7 @@ export default function LiveOperationsStatusPanel() {
 
             {/* Equipment Status */}
             <Card className="border">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Wrench className="h-4 w-4 text-orange-500" />
                   <span className="text-sm font-medium">Equipment</span>
@@ -326,7 +326,7 @@ export default function LiveOperationsStatusPanel() {
 
             {/* Parking Status */}
             <Card className="border">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Building className="h-4 w-4 text-purple-500" />
                   <span className="text-sm font-medium">Parking</span>
@@ -354,7 +354,7 @@ export default function LiveOperationsStatusPanel() {
               Next Priority
             </h3>
             <Card className="border-2 border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/20">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <AlertTriangle className="h-5 w-5 text-yellow-600" />

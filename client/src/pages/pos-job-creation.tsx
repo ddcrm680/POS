@@ -377,7 +377,7 @@ export default function POSJobCreation() {
                     Customer Information
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="phone-lookup" className="text-sm font-medium">Phone Number *</Label>
@@ -492,7 +492,7 @@ export default function POSJobCreation() {
                       Vehicle Information
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3">
                     <FormField
                       control={form.control}
                       name="vehicleMake"
@@ -581,7 +581,7 @@ export default function POSJobCreation() {
                       Cost Summary
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3">
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span>Subtotal:</span>
@@ -655,7 +655,7 @@ export default function POSJobCreation() {
                         onClick={() => toggleService(service.id)}
                         data-testid={`service-card-${service.id}`}
                       >
-                        <CardContent className="p-4">
+                        <CardContent className="p-3">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">

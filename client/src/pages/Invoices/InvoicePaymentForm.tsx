@@ -132,7 +132,7 @@ export default function InvoicePaymentForm({
                 {
                     isDataLoading ?
                     <div className="min-h-[150px] flex justify-center items-center">
-                                <div className="p-4 text-sm "><Loader /></div>
+                                <div className="p-3 text-sm "><Loader /></div>
                               </div>:      <div className="pb-4  max-h-[60vh] overflow-y-auto">
                     <SectionCard title="Invoice Summary" className="mt-0">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

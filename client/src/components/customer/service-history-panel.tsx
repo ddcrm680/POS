@@ -129,7 +129,7 @@ export default function ServiceHistoryPanel({
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {/* Customer Info */}
         <div className="bg-green-100 p-3 rounded-lg">
           <div className="flex items-center justify-between">

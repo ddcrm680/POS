@@ -171,7 +171,7 @@ export default function SOPDrawer({ jobCard, isOpen = false, onOpenChange, child
         className="w-[400px] sm:w-[500px] p-0 overflow-hidden"
         data-testid="sop-drawer"
       >
-        <SheetHeader className="p-4 pb-2 border-b">
+        <SheetHeader className="p-3 pb-2 border-b">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-lg">SOP Checklist</SheetTitle>
             <StatusDisplay />
@@ -204,7 +204,7 @@ export default function SOPDrawer({ jobCard, isOpen = false, onOpenChange, child
               className="h-full"
             />
           ) : (
-            <div className="p-6 text-center space-y-4">
+            <div className="p-6 text-center space-y-3">
               <div className="text-muted-foreground">
                 <ClipboardCheck className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <h3 className="font-medium mb-1">No SOP Template Assigned</h3>

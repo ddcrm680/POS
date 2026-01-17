@@ -74,7 +74,7 @@ export default function JobCards() {
   const renderStatisticsCards = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Active Jobs</p>
@@ -86,7 +86,7 @@ export default function JobCards() {
       </Card>
 
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Overdue</p>
@@ -98,7 +98,7 @@ export default function JobCards() {
       </Card>
 
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Completed Today</p>
@@ -110,7 +110,7 @@ export default function JobCards() {
       </Card>
 
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Total Jobs</p>
@@ -160,7 +160,7 @@ export default function JobCards() {
             {filteredJobCards.map((jobCard) => (
               <div
                 key={jobCard.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
                 onClick={() => handleJobCardSelect(jobCard)}
                 data-testid={`job-card-row-${jobCard.id}`}
               >
@@ -205,7 +205,7 @@ export default function JobCards() {
 
   return (
     <>
-      <div className="p-4">
+      <div className="p-3">
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>

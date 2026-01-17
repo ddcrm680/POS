@@ -221,7 +221,7 @@ export default function EODWorkflowSystem() {
         </CardHeader>
         <CardContent>
           {step.id === 'cash_reconciliation' && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Physical Cash Count</Label>
@@ -267,7 +267,7 @@ export default function EODWorkflowSystem() {
           )}
 
           {step.id === 'inventory_verification' && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div>
                 <Label>Critical Items Check</Label>
                 <Textarea
@@ -291,7 +291,7 @@ export default function EODWorkflowSystem() {
           )}
 
           {step.id === 'equipment_security' && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="space-y-3">
                 {[
                   { id: 'equipmentSecured', label: 'All equipment powered down and secured' },
@@ -314,7 +314,7 @@ export default function EODWorkflowSystem() {
           )}
 
           {step.id === 'daily_reporting' && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
                   <input
@@ -349,7 +349,7 @@ export default function EODWorkflowSystem() {
           )}
 
           {step.id === 'staff_handover' && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -370,7 +370,7 @@ export default function EODWorkflowSystem() {
           )}
 
           {step.id === 'performance_review' && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <Textarea
                 placeholder="Daily performance notes and insights..."
                 value={data.performanceNotes || ''}
@@ -418,7 +418,7 @@ export default function EODWorkflowSystem() {
 
       {/* Progress Bar */}
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center gap-4">
             <Clock className="h-5 w-5 text-blue-600" />
             <div className="flex-1">

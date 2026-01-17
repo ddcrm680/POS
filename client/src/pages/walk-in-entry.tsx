@@ -317,7 +317,7 @@ export default function WalkInEntry() {
                       )}
                       
                       {customerLookup && !isLookingUp && (
-                        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
                           <div className="flex items-center justify-center gap-2 text-green-700 dark:text-green-300 mb-2">
                             <CheckCircle size={20} />
                             <span className="font-medium">Existing Customer Found!</span>
@@ -338,7 +338,7 @@ export default function WalkInEntry() {
                       )}
 
                       {lookupError && !isLookingUp && (
-                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
                           <div className="flex items-center justify-center gap-2 text-blue-700 dark:text-blue-300 mb-2">
                             <UserPlus size={20} />
                             <span className="font-medium">New Customer</span>
@@ -369,7 +369,7 @@ export default function WalkInEntry() {
                     {existingCustomer ? 'Confirm Customer Details' : 'Customer Information'}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -454,7 +454,7 @@ export default function WalkInEntry() {
                     Vehicle Information
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -585,12 +585,12 @@ export default function WalkInEntry() {
                     Select Service
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {quickServices.map((service) => (
                       <div
                         key={service.id}
-                        className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                        className={`border-2 rounded-lg p-3 cursor-pointer transition-all ${
                           form.watch('selectedService') === service.id
                             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                             : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600'
@@ -680,7 +680,7 @@ export default function WalkInEntry() {
                   </div>
 
                   {/* Booking Summary */}
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                     <h3 className="font-medium mb-3">Booking Summary</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">

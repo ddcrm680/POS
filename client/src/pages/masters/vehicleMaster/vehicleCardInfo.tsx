@@ -63,12 +63,12 @@ export function VehicleCardInfo({
   );
 
   if (isInModal) {
-    return <div className="p-4">{content}</div>;
+    return <div className="p-3">{content}</div>;
   }
   
   return (
     <Card className="rounded-xl border border-slate-200 bg-white hover:border-primary/60 transition">
-      <CardContent className="p-4">{content}</CardContent>
+      <CardContent className="p-3">{content}</CardContent>
     </Card>
   );
 }

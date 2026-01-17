@@ -16,18 +16,20 @@ export function Info({
   gap?:string
 }) {
   return (
-    <div className={`flex ${gap}  ${justify ? justify : ""}`}>
-      <p className="text-gray-500 whitespace-nowrap">{`${label} ${colon ? ":" : ""}`} </p>
+    <div className={`flex text-[12px] ${gap}  ${justify ? justify : ""}`}>
+      
+      <p className="text-slate-500">{`${label} ${colon ? ":" : ""}`} </p>
       {link ? (
         <a
           href={value}
           target="_blank"
-          className="text-blue-600 break-all hover:underline"
+          className="text-blue-600 break-all hover:underline font-medium text-slate-800 font-[600]"
         >
           {value}
         </a>
       ) : (
-        <p className={`break-all ${mono ? "font-mono" : ""}`}>
+        // "font-medium text-slate-800"
+        <p className={`break-all font-medium text-slate-800 font-[600] `}>
           {value || "-"}
         </p>
       )}

@@ -245,7 +245,7 @@ export default function LoginPage() {
 
                 <CardContent className="px-8 pb-8">
                   <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                       <FormField
                         control={form.control}
                         name="email"
@@ -384,7 +384,7 @@ export default function LoginPage() {
 
               <CardContent className="px-8 pb-8">
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                     <FormField
                       control={form.control}
                       name="email"

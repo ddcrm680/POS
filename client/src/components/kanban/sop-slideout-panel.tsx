@@ -204,7 +204,7 @@ export default function SOPSlideoutPanel({
 
             {/* Progress Section */}
             <Card className="bg-white/60 backdrop-blur-sm">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium">Progress</span>
                   <span className="text-sm text-gray-600">
@@ -240,7 +240,7 @@ export default function SOPSlideoutPanel({
                 stepPhotos={stepPhotos}
                 onStepToggle={handleStepToggle}
                 onPhotoCapture={handlePhotoCapture}
-                className="space-y-4"
+                className="space-y-3"
               />
             ) : (
               <div className="text-center py-8">

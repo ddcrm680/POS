@@ -375,7 +375,7 @@ export default function InvoiceView() {
         "partially_paid": "bg-blue-100 text-blue-700  border-blue-700",
     };
     return (
-        <div className="max-w-7xl mx-auto p-4 space-y-4">
+        <div className="max-w-7xl mx-auto p-3 space-y-3">
             {/* Header */}
             <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
@@ -434,12 +434,12 @@ export default function InvoiceView() {
             {
                 isInfoLoading && id ?
                     <Card className="mb-6"><div className="min-h-[150px] flex justify-center items-center">
-                        <div className="p-4 text-sm "><Loader /></div>
+                        <div className="p-3 text-sm "><Loader /></div>
                     </div></Card> : <>
                         {/* Top Info */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {invoiceView?.customer && <Card className="p-4">
-                                <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {invoiceView?.customer && <Card className="p-3">
+                                <CardTitle className=" text-sm font-semibold mb-3 text-gray-700 flex gap-2 items-center">
                                     Customer Detail
                                 </CardTitle>
                                 <div className="space-y-2">
@@ -462,8 +462,8 @@ export default function InvoiceView() {
                                 </div>
                             </Card>}
 
-                            {invoiceView?.jobcard && <Card className="p-4">
-                                <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+                            {invoiceView?.jobcard && <Card className="p-3">
+                                <CardTitle className=" text-sm font-semibold mb-3 text-gray-700 flex gap-2 items-center">
                                     Jobcard Info
                                 </CardTitle>
                                 <div className="space-y-2">
@@ -471,8 +471,8 @@ export default function InvoiceView() {
                                     <InfoIfExists label="Edited Date" value={invoiceView?.jobcard.edited_date} />
                                 </div>
                             </Card>}
-                            {invoiceView?.vehicle && <Card className="p-4">
-                                <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+                            {invoiceView?.vehicle && <Card className="p-3">
+                                <CardTitle className=" text-sm font-semibold mb-3 text-gray-700 flex gap-2 items-center">
                                     Vehicle Info  </CardTitle>   <div className="space-y-2">
                                     <InfoIfExists label="Type" value={invoiceView?.vehicle?.type} />
                                     <InfoIfExists label="Make" value={invoiceView?.vehicle?.make} />
@@ -487,8 +487,8 @@ export default function InvoiceView() {
                             </Card>
                             }
 
-                            <Card className="p-4">
-                                <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
+                            <Card className="p-3">
+                                <CardTitle className=" text-sm font-semibold mb-3 text-gray-700 flex gap-2 items-center">
                                     Billing Info
                                 </CardTitle>
                                 <div className="space-y-2">
@@ -508,7 +508,7 @@ export default function InvoiceView() {
 
 
                         {/* Plans */}
-                        <Card className="p-4 lg:col-span-3">
+                        <Card className="p-3 lg:col-span-3">
 
                             <CardTitle className="text-sm font-semibold text-gray-700">
                                 Service Info
@@ -551,7 +551,7 @@ export default function InvoiceView() {
                                     </div> */}
                             {/* TOTALS */}
                             <div className="flex md:justify-end ">
-                                <div className="w-[300px] text-sm space-y-2">
+                                <div className="w-[300px] text-xs space-y-2">
 
                                     <div className="flex justify-between">
                                         <span className="text-muted-foreground">
@@ -638,7 +638,7 @@ export default function InvoiceView() {
                             </div>
                         </Card>
                         {/* Payments info */}
-                        {<Card className="p-4 lg:col-span-3">
+                        {<Card className="p-3 lg:col-span-3">
                             <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
                                 Payments Info
                             </CardTitle>

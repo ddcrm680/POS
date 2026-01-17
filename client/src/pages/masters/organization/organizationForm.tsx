@@ -228,9 +228,9 @@ export default function OrganizationForm({
         onSubmit={form.handleSubmit((values) =>
           onSubmit(values, form.setError)
         )}
-        className="space-y-4"
+        className="space-y-3"
       >
-        <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
+        <div className="p-3 space-y-3 max-h-[60vh] overflow-y-auto">
 
           {/* ================= ROW 1 ================= */}
           <section className="flex flex-col sm:flex-row gap-6 items-start">

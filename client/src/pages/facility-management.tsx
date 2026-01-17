@@ -129,7 +129,7 @@ const TaskCard = ({ task, onAction }: { task: any; onAction: (action: string, ta
       </CardHeader>
       
       <CardContent className="pt-0">
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Task Description */}
           <p className="text-sm text-muted-foreground">{task.taskDescription}</p>
           
@@ -204,7 +204,7 @@ const TaskCard = ({ task, onAction }: { task: any; onAction: (action: string, ta
               ) : (
                 <div className="space-y-2">
                   <label htmlFor={`photo-upload-${task.id}`} className="block">
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:border-blue-400 transition-colors cursor-pointer">
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 text-center hover:border-blue-400 transition-colors cursor-pointer">
                       {isUploading ? (
                         <div className="flex items-center justify-center gap-2">
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
@@ -256,7 +256,7 @@ const AreaSummaryCard = ({ area }: { area: any }) => {
   
   return (
     <Card className="transition-all duration-300 hover:shadow-md">
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="font-semibold text-sm">{area.areaName}</h3>
@@ -400,7 +400,7 @@ export default function FacilityManagement() {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <div className="  p-4">
+        <div className="  p-3">
           
           {/* Header */}
           <div className="mb-6">
@@ -492,7 +492,7 @@ export default function FacilityManagement() {
           </div>
 
           {/* Task Cards */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-blue-500" />

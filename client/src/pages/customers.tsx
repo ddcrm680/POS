@@ -107,7 +107,7 @@ export default function Customers() {
 
   return (
     <>
-      <div className="p-4">
+      <div className="p-3">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">

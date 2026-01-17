@@ -225,7 +225,7 @@ export default function CustomerForm({ customer, onSuccess, onCancel }: Customer
               />
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <FormField
                 control={form.control}
                 name="whatsappConsent"

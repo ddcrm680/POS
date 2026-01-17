@@ -573,7 +573,7 @@ export default function PhotoCaptureModal({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-4xl w-full h-[90vh] max-h-[700px] md:max-h-[600px] p-0 overflow-hidden touch-manipulation">
-        <DialogHeader className="p-4 pb-2">
+        <DialogHeader className="p-3 pb-2">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <DialogTitle className="text-lg font-semibold">{stepName}</DialogTitle>
@@ -865,7 +865,7 @@ export default function PhotoCaptureModal({
           {showGuide && captureGuides.length > 0 && (
             <div className="hidden lg:block w-80 bg-gray-50 dark:bg-gray-900 border-l">
               <ScrollArea className="h-full">
-                <div className="p-4 space-y-4">
+                <div className="p-3 space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium text-sm">Capture Guide</h3>
                     <Button
@@ -910,9 +910,9 @@ export default function PhotoCaptureModal({
         </div>
 
           {/* Enhanced Controls */}
-          <div className="p-4 bg-card border-t">
+          <div className="p-3 bg-card border-t">
             {hasMedia ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {/* Quality Feedback */}
                 {qualityFeedback.length > 0 && (
                   <div className="space-y-2">
@@ -958,7 +958,7 @@ export default function PhotoCaptureModal({
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {/* Mobile-Optimized Capture Mode Info */}
                 <div className="text-center">
                   <div className="text-sm text-muted-foreground mb-2">

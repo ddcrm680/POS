@@ -306,7 +306,7 @@ export default function EODProcedures() {
         </CardHeader>
         
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span>Progress: {completedTasksCount} of {totalTasks} tasks completed</span>
@@ -316,7 +316,7 @@ export default function EODProcedures() {
             </div>
             
             {!dailySummary?.isEodCompleted && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-3 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertTriangle className="h-4 w-4 text-blue-600" />
                   <span className="font-medium text-blue-900 dark:text-blue-300">
@@ -333,7 +333,7 @@ export default function EODProcedures() {
             )}
             
             {dailySummary?.isEodCompleted && (
-              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4 rounded-lg">
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="h-4 w-4 text-green-600" />
                   <span className="font-medium text-green-900 dark:text-green-300">EOD Completed</span>
@@ -357,13 +357,13 @@ export default function EODProcedures() {
               <TabsTrigger value="finalize" data-testid="tab-finalize">Finalize EOD</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="checklist" className="space-y-4">
+            <TabsContent value="checklist" className="space-y-3">
               <div className="space-y-3">
                 {eodTasks.map((task) => (
                   <Card key={task.id} className={`transition-all ${
                     task.isCompleted ? 'bg-green-50 dark:bg-green-900/10 border-green-200' : 'bg-background'
                   }`}>
-                    <CardContent className="p-4">
+                    <CardContent className="p-3">
                       <div className="flex items-start gap-3">
                         <div className={`p-2 rounded-full ${
                           task.isCompleted ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
@@ -415,19 +415,19 @@ export default function EODProcedures() {
               </div>
             </TabsContent>
             
-            <TabsContent value="summary" className="space-y-4">
+            <TabsContent value="summary" className="space-y-3">
               {summaryLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
                   <span className="ml-2">Loading daily summary...</span>
                 </div>
               ) : dailySummary ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   
                   {/* Key Metrics */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Card>
-                      <CardContent className="p-4">
+                      <CardContent className="p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <TrendingUp className="h-4 w-4 text-green-600" />
                           <span className="text-sm font-medium">Total Revenue</span>
@@ -439,7 +439,7 @@ export default function EODProcedures() {
                     </Card>
                     
                     <Card>
-                      <CardContent className="p-4">
+                      <CardContent className="p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Users className="h-4 w-4 text-blue-600" />
                           <span className="text-sm font-medium">Jobs Completed</span>
@@ -451,7 +451,7 @@ export default function EODProcedures() {
                     </Card>
                     
                     <Card>
-                      <CardContent className="p-4">
+                      <CardContent className="p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Calculator className="h-4 w-4 text-purple-600" />
                           <span className="text-sm font-medium">Net Profit</span>
@@ -545,7 +545,7 @@ export default function EODProcedures() {
               )}
             </TabsContent>
             
-            <TabsContent value="finalize" className="space-y-4">
+            <TabsContent value="finalize" className="space-y-3">
               {dailySummary?.isEodCompleted ? (
                 <div className="text-center py-8">
                   <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-600" />
@@ -557,7 +557,7 @@ export default function EODProcedures() {
                     Completed by {dailySummary.completedBy} on {format(new Date(dailySummary.completedAt!), 'MMM dd, yyyy at h:mm a')}
                   </p>
                   {dailySummary.eodNotes && (
-                    <div className="mt-4 p-4 bg-muted/50 rounded text-left">
+                    <div className="mt-4 p-3 bg-muted/50 rounded text-left">
                       <h4 className="font-medium mb-2">EOD Notes:</h4>
                       <p className="text-sm">{dailySummary.eodNotes}</p>
                     </div>
@@ -568,7 +568,7 @@ export default function EODProcedures() {
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     
                     {!canCompleteEOD && (
-                      <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 p-4 rounded-lg">
+                      <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 p-3 rounded-lg">
                         <div className="flex items-center gap-2 mb-2">
                           <AlertTriangle className="h-4 w-4 text-orange-600" />
                           <span className="font-medium text-orange-900 dark:text-orange-300">Tasks Incomplete</span>
@@ -579,7 +579,7 @@ export default function EODProcedures() {
                       </div>
                     )}
                     
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <h3 className="text-lg font-semibold">Final Verification</h3>
                       
                       {/* Verification Checkboxes */}

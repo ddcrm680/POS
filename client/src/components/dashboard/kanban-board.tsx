@@ -113,7 +113,7 @@ function JobCardComponent({ jobCard, customer, vehicle, onCardClick, onStatusCha
 
   return (
     <div
-      className={`bg-white border-2 border-gray-200 rounded-xl p-4 cursor-grab transition-all hover:shadow-lg hover:border-gray-300 ${isDragging ? 'opacity-50 transform rotate-3' : ''}`}
+      className={`bg-white border-2 border-gray-200 rounded-xl p-3 cursor-grab transition-all hover:shadow-lg hover:border-gray-300 ${isDragging ? 'opacity-50 transform rotate-3' : ''}`}
       draggable
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}

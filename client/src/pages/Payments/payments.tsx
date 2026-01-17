@@ -99,9 +99,7 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
       render: (value: string) => (
         <Box className="flex flex-col">
           <span className="font-medium">{formatDate(value)}</span>
-          <span className="text-xs text-muted-foreground">
-            {formatTime(value)}
-          </span>
+         
         </Box>
       ),
     },
@@ -316,7 +314,7 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
       setIsActionAllowed(true)
   }, [user, roles])
   return (
-    <div className={`${noPadding ? "" : "p-4"}`}>
+    <div className={`${noPadding ? "" : "p-3"}`}>
       {!noTitle && <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>

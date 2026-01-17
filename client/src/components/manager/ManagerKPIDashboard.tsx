@@ -63,7 +63,7 @@ function KPICard({
 
   return (
     <Card className={`border-2 ${getStatusColor()}`} data-testid={testId}>
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-center justify-between mb-2">
           <Icon className="h-5 w-5 text-muted-foreground" />
           {getTrendIcon()}

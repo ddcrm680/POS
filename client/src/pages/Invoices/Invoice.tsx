@@ -296,7 +296,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
     const allowedActions = hideColumnListInCustomer?.actionShowedList;
 
     return (
-        <div className={`${noPadding ? "" : "p-4"}`}>
+        <div className={`${noPadding ? "" : "p-3"}`}>
             {!noTitle && <div className="mb-6">
                 <div className="flex items-center justify-between">
                     <div>

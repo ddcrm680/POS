@@ -396,7 +396,7 @@ export default function CustomerForm() {
 
   return (
     <>
-      <div className="max-w-7xl  mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-7xl  mx-auto px-4 py-4 space-y-3">
         {/* HEADER */}
         <div className="flex items-center gap-3">
           <button
@@ -430,7 +430,7 @@ export default function CustomerForm() {
 
               {
                 isInfoLoading && id ? <div className="min-h-[150px] flex justify-center items-center">
-                  <div className="p-4 text-sm "><Loader /></div>
+                  <div className="p-3 text-sm "><Loader /></div>
                 </div> :
                
                     <SectionCard className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>

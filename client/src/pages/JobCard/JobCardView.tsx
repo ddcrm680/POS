@@ -91,7 +91,7 @@ export default function JobCardView() {
     const card = jobcard?.job_card;
     const services = jobcard?.opted_services ?? [];
     return (
-        <div className="max-w-7xl mx-auto p-4 space-y-4">
+        <div className="max-w-7xl mx-auto p-3 space-y-3">
             {/* HEADER */}
             <div className="flex items-center gap-2">
                 <button
@@ -119,13 +119,13 @@ export default function JobCardView() {
             ) : (
                 <>
                     {/* ================= VEHICLE INFO ================= */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                         <Card className="p-5">
-                            <CardTitle className="text-sm font-semibold mb-4 text-gray-700">
+                            <CardTitle className="text-sm font-semibold mb-3 text-gray-700">
                                 Vehicle Information
                             </CardTitle>
 
-                            <div className="space-y-3">
+                            <div className="space-y-1">
                                 <InfoIfExists label="Vehicle Make" value={vehicleNames.company} />
                                 <InfoIfExists label="Vehicle Model" value={vehicleNames.model} />
                                 <InfoIfExists label="Vehicle Color" value={card?.color} />
@@ -139,11 +139,11 @@ export default function JobCardView() {
                         </Card>
 
                         <Card className="p-5">
-                            <CardTitle className="text-sm font-semibold mb-4 text-gray-700">
+                            <CardTitle className="text-sm font-semibold mb-3 text-gray-700">
                                 Vehicle Paint Condition
                             </CardTitle>
 
-                            <div className="space-y-3">
+                            <div className="space-y-1">
                                 <InfoIfExists
                                     label="Repainted Vehicle"
                                     value={card?.isRepainted ? (
@@ -181,15 +181,15 @@ export default function JobCardView() {
                     </div>
 
                     {/* ================= SERVICE INFO ================= */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
                         {/* -------- SERVICE META INFO -------- */}
                         <Card className="p-5">
-                            <CardTitle className="text-sm font-semibold mb-4 text-gray-700">
+                            <CardTitle className="text-sm font-semibold mb-3 text-gray-700">
                                 Service Information
                             </CardTitle>
 
-                            <div className="space-y-4">
+                            <div className="space-y-1">
                                 <InfoIfExists label="Vehicle Type" value={card?.vehicle_type} />
                                 <InfoIfExists
                                     label="Service Type"
@@ -206,41 +206,41 @@ export default function JobCardView() {
 
                         {/* -------- SELECTED SERVICES -------- */}
                         <Card className="p-5">
-                            <CardTitle className="text-sm font-semibold mb-4 text-gray-700">
+                            <CardTitle className="text-sm font-semibold mb-3 text-gray-700">
                                 Selected Services
                             </CardTitle>
 
                             {services.length ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {services.map((s: any) => (
                                         <div
                                             key={s.id}
                                             className="
               flex items-start justify-between
               border rounded-md p-3
-              min-h-[70px]
+              min-h-[30px]
             "
                                         >
                                             <div className="pr-3">
-                                                <p className="font-medium leading-tight">
+                                                <p className="font-[600]  leading-tight text-[12px]">
                                                     {s.plan_name}
                                                 </p>
 
                                                 {s.description && (
-                                                    <p className="text-xs text-muted-foreground mt-1">
+                                                    <p className="text-[10px] text-muted-foreground mt-1">
                                                         {s.description}
                                                     </p>
                                                 )}
                                             </div>
 
-                                            <p className="font-semibold text-green-600 whitespace-nowrap">
+                                            <p className="font-bold text-[12px] text-green-600 whitespace-nowrap">
                                                 ₹{s.price}
                                             </p>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-[12px] text-muted-foreground">
                                     No services selected
                                 </p>
                             )}

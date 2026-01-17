@@ -249,7 +249,7 @@ export default function ManagerTimeClock() {
         <CardContent className="space-y-6">
           {/* Time Summary */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Timer className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-medium text-blue-900 dark:text-blue-300">Current Session</span>
@@ -259,7 +259,7 @@ export default function ManagerTimeClock() {
               </div>
             </div>
             
-            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+            <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Calendar className="h-4 w-4 text-green-600" />
                 <span className="text-sm font-medium text-green-900 dark:text-green-300">Today's Hours</span>
@@ -269,7 +269,7 @@ export default function ManagerTimeClock() {
               </div>
             </div>
             
-            <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+            <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Clock className="h-4 w-4 text-purple-600" />
                 <span className="text-sm font-medium text-purple-900 dark:text-purple-300">Week Hours</span>
@@ -282,7 +282,7 @@ export default function ManagerTimeClock() {
 
           {/* Current Session Details */}
           {managerSession?.currentRecord && (
-            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+            <div className="bg-primary/5 p-3 rounded-lg border border-primary/20">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <User className="h-4 w-4" />
                 Current Session Details
@@ -315,7 +315,7 @@ export default function ManagerTimeClock() {
 
           {/* EOD Status Alert */}
           {managerSession?.currentRecord && !eodStatus?.isCompleted && (
-            <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 p-4 rounded-lg">
+            <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 p-3 rounded-lg">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5" />
                 <div>
@@ -346,7 +346,7 @@ export default function ManagerTimeClock() {
             {!managerSession?.currentRecord ? (
               // Clock In Form
               <Form {...clockInForm}>
-                <form onSubmit={clockInForm.handleSubmit((data) => clockInMutation.mutate(data))} className="flex-1 space-y-4">
+                <form onSubmit={clockInForm.handleSubmit((data) => clockInMutation.mutate(data))} className="flex-1 space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={clockInForm.control}

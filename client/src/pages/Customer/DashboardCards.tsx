@@ -10,13 +10,13 @@ type KpiProps = {
 
 export function Kpi({ label, value, sub = [], tone }: KpiProps) {
   return (
-    <Card className="rounded-xl">
-      <CardContent className="p-4">
+    <Card className="rounded-lg">
+      <CardContent className="p-3">
         <p className="text-xs text-slate-500">{label}</p>
 
         <p
           className={cn(
-            "mt-1 text-lg font-semibold",
+            "mt-1 text-md font-semibold",
             tone === "success" && "text-emerald-600",
             tone === "danger" && "text-rose-600",
             tone === "info" && "text-sky-600",

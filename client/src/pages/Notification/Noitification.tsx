@@ -20,7 +20,7 @@ export default function NotificationPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-4 space-y-4">
+    <div className="max-w-5xl mx-auto px-4 py-4 space-y-3">
       {/* HEADER */}
       <div className="flex items-center gap-2">
         <button
@@ -66,7 +66,7 @@ export default function NotificationPage() {
               onClick={() => !n.is_read && readNotification(n.id)}
               className={`w-full text-left ${!n.is_read ?" cursor-pointer" :"cursor-default"}`}
             >
-              <CardContent className="p-4 space-y-1">
+              <CardContent className="p-3 space-y-1">
                 <div className="flex justify-between items-start gap-3">
                   <p
                     className={`text-sm ${

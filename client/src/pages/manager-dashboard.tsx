@@ -72,7 +72,7 @@ const CriticalAlertCard = ({ alert, onAction }: { alert: any; onAction: (action:
 
   return (
     <Card className={`transition-all duration-500 hover:shadow-lg hover:scale-[1.02] cursor-pointer border-l-4 transform-gpu ${getUrgencyColor()}`}>
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -160,7 +160,7 @@ const CriticalAlertCard = ({ alert, onAction }: { alert: any; onAction: (action:
 const TodoCard = ({ todo, onAction }: { todo: any; onAction: (action: string, todo: any) => void }) => {
   return (
     <Card className="transition-all duration-300 hover:shadow-md cursor-pointer border-l-4 border-l-green-500 bg-green-50/30 dark:bg-green-900/10">
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -208,7 +208,7 @@ const QuickStats = ({ stats }: { stats: any }) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs opacity-90">Today's Revenue</p>
@@ -222,7 +222,7 @@ const QuickStats = ({ stats }: { stats: any }) => {
       </Card>
       
       <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs opacity-90">Jobs Today</p>
@@ -236,7 +236,7 @@ const QuickStats = ({ stats }: { stats: any }) => {
       </Card>
       
       <Card className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-0">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs opacity-90">Active Customers</p>
@@ -250,7 +250,7 @@ const QuickStats = ({ stats }: { stats: any }) => {
       </Card>
       
       <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs opacity-90">Urgent Items</p>
@@ -369,7 +369,7 @@ export default function ManagerDashboard() {
 
   return (
     <>
-      <div className="p-4 space-y-6" data-testid="manager-dashboard">
+      <div className="p-3 space-y-6" data-testid="manager-dashboard">
         
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -413,7 +413,7 @@ Manager Dashboard</h1>
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <Card className="enhanced-card">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-4 w-4 text-green-600" />
                 <span className="text-sm font-medium text-muted-foreground">Revenue</span>
@@ -428,7 +428,7 @@ Manager Dashboard</h1>
           </Card>
           
           <Card className="enhanced-card">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-medium text-muted-foreground">Completed</span>
@@ -443,7 +443,7 @@ Manager Dashboard</h1>
           </Card>
           
           <Card className="enhanced-card">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center gap-2 mb-2">
                 <Users className="h-4 w-4 text-purple-600" />
                 <span className="text-sm font-medium text-muted-foreground">Staff</span>
@@ -456,7 +456,7 @@ Manager Dashboard</h1>
           </Card>
           
           <Card className="enhanced-card">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="h-4 w-4 text-green-600" />
                 <span className="text-sm font-medium text-muted-foreground">Cash</span>
@@ -469,7 +469,7 @@ Manager Dashboard</h1>
           </Card>
           
           <Card className="enhanced-card">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center gap-2 mb-2">
                 <Receipt className="h-4 w-4 text-orange-600" />
                 <span className="text-sm font-medium text-muted-foreground">Expenses</span>
@@ -482,7 +482,7 @@ Manager Dashboard</h1>
           </Card>
           
           <Card className="enhanced-card">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-medium text-muted-foreground">EOD</span>
@@ -550,7 +550,7 @@ Manager Dashboard</h1>
                             Daily Progress
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-3">
                           <div>
                             <div className="flex justify-between text-sm mb-1">
                               <span>Revenue Target</span>

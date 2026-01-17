@@ -45,14 +45,14 @@ export default function OrganizationView({ info }: { info: any }) {
 
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 p-3">
       {/* ================= HEADER ================= */}
 
 
       {/* ================= GRID ================= */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {/* Company */}
-        <Card className="p-4">
+        <Card className="p-3">
             <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
               Company Information
             </CardTitle>
@@ -65,7 +65,7 @@ export default function OrganizationView({ info }: { info: any }) {
         </Card>
 
         {/* Banking */}
-        <Card className="p-4">
+        <Card className="p-3">
             <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
               Banking Details
             </CardTitle>
@@ -88,7 +88,7 @@ export default function OrganizationView({ info }: { info: any }) {
         </Card>
 
         {/* Tax */}
-        <Card className="p-4">
+        <Card className="p-3">
             <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
               Tax Information
             </CardTitle>
@@ -104,7 +104,7 @@ export default function OrganizationView({ info }: { info: any }) {
         </Card>
 
         {/* Address */}
-        <Card className="p-4 lg:col-span-3">
+        <Card className="p-3 lg:col-span-3">
             <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
               Address
             </CardTitle>

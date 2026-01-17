@@ -496,7 +496,7 @@ export default function CustomerPreferencesPanel({
 
             <CardContent>
               {serviceLoading ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {Array.from({ length: 6 }).map((_, i) => (
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
@@ -505,7 +505,7 @@ export default function CustomerPreferencesPanel({
                 <Form {...serviceForm}>
                   <form onSubmit={serviceForm.handleSubmit(onServiceSubmit)} className="space-y-6">
                     {/* Service Timing */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <h4 className="font-medium">Service Timing</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
@@ -554,7 +554,7 @@ export default function CustomerPreferencesPanel({
                     </div>
 
                     {/* Service Location */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <h4 className="font-medium">Service Location</h4>
                       <FormField
                         control={serviceForm.control}
@@ -601,7 +601,7 @@ export default function CustomerPreferencesPanel({
                     </div>
 
                     {/* Favorite Services */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <h4 className="font-medium">Favorite Services</h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                         {availableServices.map((service) => (
@@ -653,9 +653,9 @@ export default function CustomerPreferencesPanel({
                     />
 
                     {/* Service Options */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <h4 className="font-medium">Service Options</h4>
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <FormField
                           control={serviceForm.control}
                           name="autoBookingEnabled"
@@ -911,7 +911,7 @@ export default function CustomerPreferencesPanel({
 
             <CardContent>
               {billingLoading ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
@@ -1001,9 +1001,9 @@ export default function CustomerPreferencesPanel({
                       />
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <h4 className="font-medium">Payment Options</h4>
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <FormField
                           control={billingForm.control}
                           name="autoPayEnabled"
@@ -1165,7 +1165,7 @@ export default function CustomerPreferencesPanel({
 
             <CardContent>
               {notificationLoading ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <Skeleton key={i} className="h-20 w-full" />
                   ))}
@@ -1328,7 +1328,7 @@ export default function CustomerPreferencesPanel({
 
             <CardContent>
               {personalLoading ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {Array.from({ length: 6 }).map((_, i) => (
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
@@ -1391,9 +1391,9 @@ export default function CustomerPreferencesPanel({
                       />
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <h4 className="font-medium">Privacy Settings</h4>
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <FormField
                           control={personalForm.control}
                           name="privacy.shareDataForImprovement"
@@ -1476,9 +1476,9 @@ export default function CustomerPreferencesPanel({
                       </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <h4 className="font-medium">Accessibility</h4>
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <FormField
                           control={personalForm.control}
                           name="accessibility.largeFonts"

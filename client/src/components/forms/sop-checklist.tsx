@@ -75,7 +75,7 @@ function StepItem({ step, isCompleted, photos, onToggle, onPhotoCapture, isReadO
   const validationMessage = getValidationMessage();
 
   return (
-    <div className={`p-4 rounded-lg border-2 transition-all ${
+    <div className={`p-3 rounded-lg border-2 transition-all ${
       isCompleted ? 'bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700 shadow-sm' :
       step.required && !canComplete ? 'bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800 shadow-sm' :
       step.required ? 'bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800 shadow-sm' :
@@ -461,7 +461,7 @@ export default function SOPChecklist({
 
       {/* Steps List */}
       <CardContent className="flex-1 overflow-auto p-0">
-        <div className="px-6 space-y-4">
+        <div className="px-6 space-y-3">
           {Object.entries(stepsByCategory).map(([category, steps]) => (
             <div key={category} className="space-y-2">
               {/* Category Header */}

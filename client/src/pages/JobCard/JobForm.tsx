@@ -847,7 +847,7 @@ useEffect(() => {
 
   return (
     <>
-      <div className="max-w-7xl  mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-7xl  mx-auto px-4 py-4 space-y-3">
         {/* HEADER */}
         <div className="flex items-center gap-3">
           <button
@@ -878,10 +878,10 @@ useEffect(() => {
               {
                 isInfoLoading && id ?
                   <Card className="mb-6"><div className="min-h-[150px] flex justify-center items-center">
-                    <div className="p-4 text-sm "><Loader /></div>
+                    <div className="p-3 text-sm "><Loader /></div>
                   </div></Card> : <>
                     {(mode !== "view" && mode !== 'edit') && <>
-                      <Card className="mb-6 p-4">
+                      <Card className="mb-6 p-3">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                           {isAdmin && <div
@@ -1293,7 +1293,7 @@ useEffect(() => {
 
                       {/* Service Selection & Summary */}
                       <Card>
-                        <SectionCard title="Service Information" className="pb-4 space-y-4">
+                        <SectionCard title="Service Information" className="pb-4 space-y-3">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {/* Vehicle Type */}
                             <FloatingRHFSelect
@@ -1365,7 +1365,7 @@ useEffect(() => {
                                         : "hover:border-muted-foreground/30"}
   `}
                                   >
-                                    <CardContent className="p-4">
+                                    <CardContent className="p-3">
                                       <div className="flex items-start justify-between gap-3">
                                         <div className="flex items-start gap-2">
                                           <Checkbox

@@ -352,7 +352,7 @@ export default function VehicleInformationPanel({
                   <DialogTitle>Add New Vehicle</DialogTitle>
                 </DialogHeader>
                 <Form {...addForm}>
-                  <form onSubmit={addForm.handleSubmit(onAddSubmit)} className="space-y-4">
+                  <form onSubmit={addForm.handleSubmit(onAddSubmit)} className="space-y-3">
                     <FormField
                       control={addForm.control}
                       name="registrationNumber"
@@ -508,9 +508,9 @@ export default function VehicleInformationPanel({
 
         <CardContent>
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="border rounded-lg p-4">
+                <div key={i} className="border rounded-lg p-3">
                   <div className="flex items-center gap-4">
                     <Skeleton className="w-12 h-12 rounded-lg" />
                     <div className="flex-1 space-y-2">
@@ -537,11 +537,11 @@ export default function VehicleInformationPanel({
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {vehicles.map((vehicle) => (
                 <div 
                   key={vehicle.id}
-                  className={`border rounded-lg p-4 transition-colors cursor-pointer hover:bg-gray-50 ${
+                  className={`border rounded-lg p-3 transition-colors cursor-pointer hover:bg-gray-50 ${
                     selectedVehicle?.id === vehicle.id ? 'bg-blue-50 border-blue-200' : ''
                   }`}
                   onClick={() => handleVehicleSelect(vehicle)}
@@ -647,10 +647,10 @@ export default function VehicleInformationPanel({
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="overview" className="space-y-4">
+              <TabsContent value="overview" className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Vehicle Information */}
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <h4 className="font-medium">Vehicle Information</h4>
                     <div className="space-y-3">
                       <div className="flex justify-between">
@@ -685,7 +685,7 @@ export default function VehicleInformationPanel({
                   </div>
 
                   {/* Service Statistics */}
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <h4 className="font-medium">Service Statistics</h4>
                     <div className="space-y-3">
                       <div className="flex justify-between">
@@ -724,9 +724,9 @@ export default function VehicleInformationPanel({
                 </div>
               </TabsContent>
               
-              <TabsContent value="service-history" className="space-y-4">
+              <TabsContent value="service-history" className="space-y-3">
                 {historyLoading ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
                       <Skeleton key={i} className="h-20 w-full" />
                     ))}
@@ -739,7 +739,7 @@ export default function VehicleInformationPanel({
                 ) : (
                   <div className="space-y-3">
                     {vehicleHistory?.jobCards?.map((jobCard) => (
-                      <div key={jobCard.id} className="border rounded-lg p-4">
+                      <div key={jobCard.id} className="border rounded-lg p-3">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">Job #{jobCard.jobCardNumber}</span>
                           <Badge variant="outline">{jobCard.status}</Badge>
@@ -755,11 +755,11 @@ export default function VehicleInformationPanel({
                 )}
               </TabsContent>
               
-              <TabsContent value="maintenance" className="space-y-4">
-                <div className="space-y-4">
+              <TabsContent value="maintenance" className="space-y-3">
+                <div className="space-y-3">
                   <h4 className="font-medium">Maintenance Schedule</h4>
                   {selectedVehicle.nextServiceDue ? (
-                    <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="bg-blue-50 p-3 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Bell className="w-4 h-4 text-blue-600" />
                         <span className="font-medium text-blue-900">Next Service Due</span>
@@ -777,7 +777,7 @@ export default function VehicleInformationPanel({
                 </div>
               </TabsContent>
               
-              <TabsContent value="analytics" className="space-y-4">
+              <TabsContent value="analytics" className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <h4 className="font-medium">Service Trends</h4>
@@ -815,7 +815,7 @@ export default function VehicleInformationPanel({
             <DialogTitle>Edit Vehicle</DialogTitle>
           </DialogHeader>
           <Form {...editForm}>
-            <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+            <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-3">
               <FormField
                 control={editForm.control}
                 name="registrationNumber"

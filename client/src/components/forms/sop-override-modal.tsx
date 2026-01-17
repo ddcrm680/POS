@@ -85,7 +85,7 @@ export default function SOPOverrideModal({
           </div>
         </DialogHeader>
 
-        <div className="flex-1 space-y-4">
+        <div className="flex-1 space-y-3">
           {/* Alert */}
           <Alert className="border-red-200 bg-red-50">
             <AlertTriangle className="h-4 w-4" />

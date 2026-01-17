@@ -204,7 +204,7 @@ export default function Reports() {
         {/* EOD Status Summary - Always Visible */}
         {(dailySummary || cashRegister) && (
           <Card className="border-gray-200 bg-gray-50 mb-6">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="text-lg font-semibold text-gray-800">End of Day Progress:</div>
@@ -260,7 +260,7 @@ export default function Reports() {
           {dailySummary && !cashRegister && !dailySummary.isEodCompleted && (
             <Card className="border-blue-200 bg-blue-50">
               <CardContent className="p-6">
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold">2</div>
                     <div>
@@ -270,19 +270,19 @@ export default function Reports() {
                   </div>
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
-                    <div className="text-center p-4 bg-white rounded-lg border">
+                    <div className="text-center p-3 bg-white rounded-lg border">
                       <div className="text-3xl font-bold text-green-600">₹{dailySummary.totalRevenue}</div>
                       <div className="text-sm text-gray-600">Total Sales</div>
                     </div>
-                    <div className="text-center p-4 bg-white rounded-lg border">
+                    <div className="text-center p-3 bg-white rounded-lg border">
                       <div className="text-3xl font-bold text-blue-600">{dailySummary.totalJobsCompleted}</div>
                       <div className="text-sm text-gray-600">Jobs Completed</div>
                     </div>
-                    <div className="text-center p-4 bg-white rounded-lg border">
+                    <div className="text-center p-3 bg-white rounded-lg border">
                       <div className="text-3xl font-bold text-purple-600">₹{dailySummary.netProfit}</div>
                       <div className="text-sm text-gray-600">Net Profit</div>
                     </div>
-                    <div className="text-center p-4 bg-white rounded-lg border">
+                    <div className="text-center p-3 bg-white rounded-lg border">
                       <div className="text-3xl font-bold text-orange-600">{dailySummary.totalJobsInProgress}</div>
                       <div className="text-sm text-gray-600">Jobs Pending</div>
                     </div>
@@ -309,7 +309,7 @@ export default function Reports() {
           {dailySummary && !cashRegister && activeAction === 'count-cash' && (
             <Card className="border-purple-200 bg-purple-50">
               <CardContent className="p-6">
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold">3</div>
                     <div>
@@ -318,7 +318,7 @@ export default function Reports() {
                     </div>
                   </div>
                   
-                  <div className="bg-white p-6 rounded-lg border space-y-4">
+                  <div className="bg-white p-6 rounded-lg border space-y-3">
                     <Label htmlFor="cash-amount" className="text-lg font-semibold">How much cash do you have in total?</Label>
                     <Input
                       id="cash-amount"
@@ -347,7 +347,7 @@ export default function Reports() {
           {dailySummary && cashRegister && !dailySummary.isEodCompleted && (
             <Card className="border-red-200 bg-red-50">
               <CardContent className="p-6">
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white text-xl font-bold">4</div>
                     <div>
@@ -356,8 +356,8 @@ export default function Reports() {
                     </div>
                   </div>
                   
-                  <div className="bg-white p-6 rounded-lg border space-y-4">
-                    <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 text-yellow-800">
+                  <div className="bg-white p-6 rounded-lg border space-y-3">
+                    <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-3 text-yellow-800">
                       <div className="font-semibold">✅ Cash Recorded: ₹{cashRegister.openingAmount}</div>
                       <div className="text-sm mt-1">Ready to close the day</div>
                     </div>
@@ -409,21 +409,21 @@ export default function Reports() {
                 <CardTitle className="text-xl">📊 Today's Business Summary</CardTitle>
                 <CardDescription>Simple overview of today's performance</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-center p-3 bg-green-50 rounded-lg">
                     <div className="text-2xl font-bold text-green-600">{formatCurrency(dailySummary.totalRevenue)}</div>
                     <div className="text-sm text-green-700">Total Sales</div>
                   </div>
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-center p-3 bg-blue-50 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600">{dailySummary.totalJobsCompleted}</div>
                     <div className="text-sm text-blue-700">Jobs Done</div>
                   </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <div className="text-center p-3 bg-purple-50 rounded-lg">
                     <div className="text-2xl font-bold text-purple-600">{formatCurrency(dailySummary.netProfit)}</div>
                     <div className="text-sm text-purple-700">Profit Made</div>
                   </div>
-                  <div className="text-center p-4 bg-orange-50 rounded-lg">
+                  <div className="text-center p-3 bg-orange-50 rounded-lg">
                     <div className="text-2xl font-bold text-orange-600">{dailySummary.totalJobsInProgress}</div>
                     <div className="text-sm text-orange-700">Jobs Pending</div>
                   </div>
@@ -440,7 +440,7 @@ export default function Reports() {
               </CardHeader>
               <CardContent className="space-y-6">
                 {!cashRegister?.isCompleted ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div>
                       <Label htmlFor="opening-amount" className="text-lg">How much cash do you have right now?</Label>
                       <Input
@@ -463,7 +463,7 @@ export default function Reports() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="text-center space-y-4">
+                  <div className="text-center space-y-3">
                     <div className="text-3xl">✅</div>
                     <div className="text-xl font-semibold">Cash Counted!</div>
                     <div className="text-lg">Opening: {formatCurrency(cashRegister.openingAmount)}</div>
@@ -483,7 +483,7 @@ export default function Reports() {
                 <CardDescription>Finish today and lock all records</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                   <div className="text-yellow-800">
                     <div className="font-semibold">Before closing:</div>
                     <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
@@ -625,7 +625,7 @@ export default function Reports() {
                     Finalize the day's operations and lock the records
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div>
                     <Label htmlFor="eod-staff">Completed by (Staff Name)</Label>
                     <Input
@@ -657,7 +657,7 @@ export default function Reports() {
                     <CardTitle>Revenue Breakdown</CardTitle>
                     <CardDescription>Payment methods and service types</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3">
                     <div>
                       <h4 className="font-medium mb-2">By Payment Method</h4>
                       <div className="space-y-2">
@@ -695,7 +695,7 @@ export default function Reports() {
                     <CardTitle>Cost Analysis</CardTitle>
                     <CardDescription>Material costs and expenses</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3">
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span>Material Costs</span>
@@ -783,7 +783,7 @@ export default function Reports() {
                   <CardTitle>Open Cash Register</CardTitle>
                   <CardDescription>Record opening cash amount for the day</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   {!cashRegister ? (
                     <>
                       <div>
@@ -821,7 +821,7 @@ export default function Reports() {
                   <CardTitle>Close Cash Register</CardTitle>
                   <CardDescription>Record closing cash amount and reconcile</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   {cashRegister && !cashRegister.isCompleted ? (
                     <>
                       <div>

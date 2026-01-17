@@ -98,7 +98,7 @@ export default function CommonTable({
 
 
   return (
-    <div className={`w-full space-y-4 pt-4 ${className}`}>
+    <div className={`w-full space-y-3 pt-4 ${className}`}>
       {/* Search Bar */}
       {searchable && (
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
@@ -117,7 +117,7 @@ export default function CommonTable({
                 setLocalSearch(e.target.value);
               }}
      className="
-  pl-9 h-9 text-sm
+  pl-9 h-9 text-[12px]
   bg-white
   border border-gray-300
   rounded-md
@@ -137,16 +137,16 @@ export default function CommonTable({
             <Box className="flex gap-3">
               {isClear && <Button
                 variant="outline"
-                className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                className={'hover:bg-[#E3EDF6] hover:text-[#000]  !text-[12px] !h-8'}
                 onClick={() => { resetFilter() }}
               >
                 {'Clear Filter'}
               </Button>}
               {isAdd && <Button
                 onClick={() => setIsModalOpen(true)}
-                className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex gap-2"
+                className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex gap-2  !text-[12px] !h-8"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-3 w-3" />
                 Add {tabDisplayName || "Item"}
               </Button>}
             </Box>
@@ -254,14 +254,14 @@ export default function CommonTable({
 {
   (total > perPageOptions[0] || lastPage > 1) && <>  {setPerPage && total > perPageOptions[0] && (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Rows per page</span>
+              <span className="text-xs text-gray-600">Rows per page</span>
               <select
                 value={perPage}
                 onChange={(e) => {
                   setPerPage(Number(e.target.value));
                   setPage(1);
                 }}
-                className="border rounded px-2 py-1 text-sm"
+                className="border rounded px-2 py-1 text-xs"
               >
                 {perPageOptions.map((size: number) => (
                   <option key={size} value={size}>
@@ -284,7 +284,7 @@ export default function CommonTable({
       Prev
     </Button>
 
-            <span className="text-sm">
+            <span className="text-xs">
               <strong>{page}</strong> of <strong>{lastPage}</strong>
             </span>
 
@@ -300,7 +300,7 @@ export default function CommonTable({
 }
           {/* Per Page selector */}
         
-       {isTotal &&   <span className="text-sm text-gray-600">
+       {isTotal &&   <span className="text-xs text-gray-600">
             Total : <strong>{total}</strong>
           </span>}
           {/* )} */}

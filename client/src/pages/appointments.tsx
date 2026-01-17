@@ -470,7 +470,7 @@ const CalendarView = ({ appointments, onAppointmentClick }: {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-lg border shadow-sm">
       {/* Calendar Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-3 border-b">
         <Button
           variant="outline"
           size="sm"
@@ -493,7 +493,7 @@ const CalendarView = ({ appointments, onAppointmentClick }: {
       </div>
       
       {/* Calendar Grid */}
-      <div className="p-4">
+      <div className="p-3">
         {/* Week Headers */}
         <div className="grid grid-cols-7 gap-2 mb-2">
           {weekDays.map(day => (
@@ -674,7 +674,7 @@ export default function AppointmentsPage() {
 
   return (
     <>
-      <div className="min-h-screen p-4">
+      <div className="min-h-screen p-3">
         <div className=" space-y-8">
         
         {/* Header Section with Metrics */}
@@ -696,7 +696,7 @@ export default function AppointmentsPage() {
           {/* Metrics Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-blue-100">Total</p>
@@ -708,7 +708,7 @@ export default function AppointmentsPage() {
             </Card>
 
             <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white border-0">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-red-100">Critical</p>
@@ -720,7 +720,7 @@ export default function AppointmentsPage() {
             </Card>
 
             <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-orange-100">Urgent</p>
@@ -732,7 +732,7 @@ export default function AppointmentsPage() {
             </Card>
 
             <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-green-100">Confirmed</p>
@@ -744,7 +744,7 @@ export default function AppointmentsPage() {
             </Card>
 
             <Card className="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white border-0">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-yellow-100">Pending</p>
@@ -756,7 +756,7 @@ export default function AppointmentsPage() {
             </Card>
 
             <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-purple-100">Total Value</p>
@@ -770,7 +770,7 @@ export default function AppointmentsPage() {
         </div>
 
         {/* View Controls and Search */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             {/* View Mode Toggle */}
             <div className="flex items-center gap-2">
@@ -829,7 +829,7 @@ export default function AppointmentsPage() {
         </div>
 
         {/* Content Area */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {viewMode === "calendar" ? (
             /* Calendar View */
             <CalendarView 
@@ -934,7 +934,7 @@ export default function AppointmentsPage() {
                   {selectedAppointment.notes && (
                     <div className="space-y-3">
                       <h4 className="font-semibold text-lg">Notes</h4>
-                      <div className="p-4 bg-muted rounded-lg">
+                      <div className="p-3 bg-muted rounded-lg">
                         <p>{selectedAppointment.notes}</p>
                       </div>
                     </div>

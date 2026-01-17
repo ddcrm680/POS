@@ -426,7 +426,7 @@ export default function PhotoSlideoutPanel({
 
               {/* Progress Section */}
               <Card className="bg-white/60 backdrop-blur-sm">
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">Overall Progress</span>
                     <span className="text-sm text-gray-600">
@@ -529,7 +529,7 @@ export default function PhotoSlideoutPanel({
                     </div>
                     
                     <ScrollArea className="h-[calc(100vh-420px)]">
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {filteredSteps.map((step) => {
                           const priority = getStepPriority(step);
                           const status = getStepStatus(step);
@@ -718,7 +718,7 @@ export default function PhotoSlideoutPanel({
                 
                 <TabsContent value="areas" className="flex-1 mt-0">
                   <ScrollArea className="h-full">
-                    <div className="p-6 space-y-4">
+                    <div className="p-6 space-y-3">
                       {areaProgress.map((area) => (
                         <Card key={area.area} className="overflow-hidden">
                           <CardHeader className="pb-3 bg-gradient-to-r from-gray-50 to-gray-100">
@@ -749,7 +749,7 @@ export default function PhotoSlideoutPanel({
                             <Progress value={area.total > 0 ? (area.completed / area.total) * 100 : 0} className="mt-3" />
                           </CardHeader>
                           
-                          <CardContent className="p-4">
+                          <CardContent className="p-3">
                             <div className="grid grid-cols-1 gap-2">
                               {area.steps.map((step) => {
                                 const status = getStepStatus(step);
@@ -814,13 +814,13 @@ export default function PhotoSlideoutPanel({
                             Quality Analytics
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-3">
                           <div className="grid grid-cols-2 gap-4">
-                            <div className="text-center p-4 bg-blue-50 rounded-lg">
+                            <div className="text-center p-3 bg-blue-50 rounded-lg">
                               <div className="text-3xl font-bold text-blue-600">{qualityMetrics.qualityScore}%</div>
                               <div className="text-sm text-blue-800">Overall Quality Score</div>
                             </div>
-                            <div className={`text-center p-4 rounded-lg ${getEfficiencyColor(qualityMetrics.efficiencyRating)}`}>
+                            <div className={`text-center p-3 rounded-lg ${getEfficiencyColor(qualityMetrics.efficiencyRating)}`}>
                               <div className="text-lg font-bold">{qualityMetrics.efficiencyRating.toUpperCase()}</div>
                               <div className="text-sm">Efficiency Rating</div>
                             </div>
@@ -857,7 +857,7 @@ export default function PhotoSlideoutPanel({
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="space-y-4">
+                          <div className="space-y-3">
                             {areaProgress.map((area) => (
                               <div key={area.area} className="space-y-2">
                                 <div className="flex justify-between items-center">
@@ -882,7 +882,7 @@ export default function PhotoSlideoutPanel({
             </div>
 
             {/* Enhanced Footer */}
-            <div className="p-4 border-t bg-gray-50 dark:bg-gray-900">
+            <div className="p-3 border-t bg-gray-50 dark:bg-gray-900">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-1">
@@ -938,7 +938,7 @@ export default function PhotoSlideoutPanel({
       {/* Photo View Modal */}
       {selectedPhotoForView && (
         <div 
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-3"
           onClick={() => setSelectedPhotoForView(null)}
         >
           <div className="max-w-4xl max-h-full">

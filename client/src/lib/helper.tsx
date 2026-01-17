@@ -24,7 +24,7 @@ export function mapColumnsForCustomerView(
           switch (cfg.name) {
             case "vehicle_type":
               return (
-                <span className="text-sm font-medium">
+                <span className="text-sx font-medium">
                   {[
                     row?.vehicle_type,
                     row?.vmake?.name,
@@ -37,7 +37,7 @@ export function mapColumnsForCustomerView(
 
             case "reg_no":
               return (
-                <div className="flex flex-col text-sm">
+                <div className="flex flex-col text-sx">
                   <span>
                     {row.reg_no || row.chasis_no || "-"}
                   </span>

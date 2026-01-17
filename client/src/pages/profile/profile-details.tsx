@@ -13,9 +13,9 @@ export default function ProfileDetails() {
  
   return (
     <>
-       <div className="p-4 sm:p-4 space-y-4 max-w-7xl mx-auto">
+       <div className="p-3 sm:p-3 space-y-3 max-w-7xl mx-auto">
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3">
 
           <div className=" flex justify-between">
             <div className="flex items-center gap-2">
@@ -71,15 +71,15 @@ export default function ProfileDetails() {
 
           <div className={`grid gap-4 transition-all duration-300 ${showServiceHistory ? 'grid-cols-12' : 'grid-cols-1'
             }`}>
-            <div className=" mx-auto space-y-4 w-full">
+            <div className=" mx-auto space-y-3 w-full">
               {/* Main Content Tabs */}
               {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-4 mt-0">
+              <TabsContent value="overview" className="space-y-3 mt-0">
                 <Profile />
               </TabsContent>
 
               {/* Vehicle Information Tab */}
-              <TabsContent value="password" className="space-y-4 mt-0">
+              <TabsContent value="password" className="space-y-3 mt-0">
                 <Password />
               </TabsContent>
             </div>

@@ -176,7 +176,7 @@ export default function CashierPaymentSystem() {
                     onClick={() => setSelectedJobCard(card)}
                     data-testid={`card-jobcard-${card.id}`}
                   >
-                    <CardContent className="p-4">
+                    <CardContent className="p-3">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <div className="font-semibold text-sm">{card.id}</div>
@@ -220,7 +220,7 @@ export default function CashierPaymentSystem() {
             {selectedJobCard ? (
               <>
                 {/* Selected Job Card Summary */}
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
                   <h3 className="font-semibold mb-2">Job Card Details</h3>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>

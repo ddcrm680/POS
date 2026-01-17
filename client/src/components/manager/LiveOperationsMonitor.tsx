@@ -40,7 +40,7 @@ function AppointmentCard({ appointment }: { appointment: TodayAppointment }) {
 
   return (
     <Card className={`border-l-4 ${appointment.isVip ? 'border-l-yellow-500' : 'border-l-blue-500'} ${statusConfig.color}`} data-testid={`appointment-${appointment.id}`}>
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
@@ -119,7 +119,7 @@ function TaskCard({
 
   return (
     <Card className={`border-l-4 ${config.color} ${isOverdue ? 'border-l-red-500' : ''}`} data-testid={`task-${task.id}`}>
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-start gap-2 flex-1">
             <Icon className="h-4 w-4 mt-0.5 text-muted-foreground" />
@@ -175,7 +175,7 @@ export default function AppointmentTasksPanel() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
             ))}

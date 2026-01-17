@@ -287,7 +287,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
           </div>
         )}
         {/* MAIN CONTENT */}
-        <main className="flex-1 overflow-y-auto p-4">
+        <main className="flex-1 overflow-y-auto p-3">
           {children}
         </main>
       </div>

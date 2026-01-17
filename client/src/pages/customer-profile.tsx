@@ -88,7 +88,7 @@ export default function CustomerProfile() {
         <div className="p-6">
           <div className="max-w-6xl mx-auto space-y-6">
             {/* Header Skeleton */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <Skeleton className="h-8 w-64" />
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Skeleton className="h-32" />
@@ -312,7 +312,7 @@ export default function CustomerProfile() {
                         Customer Health
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-3">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span>Satisfaction Score</span>

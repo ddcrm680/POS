@@ -190,10 +190,10 @@ export default function StoreView() {
       {/* Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* LEFT */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-3">
           {/* Store Info */}
           <Card>
-            <CardHeader className="p-4 pb-0">
+            <CardHeader className="p-3 pb-0">
               <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
                 <Building2 className="h-4 w-4" />
                 Store Information
@@ -220,7 +220,7 @@ export default function StoreView() {
 
           {/* Address */}
           <Card>
-            <CardHeader className="p-4 pb-0">
+            <CardHeader className="p-3 pb-0">
               <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
                 <MapPin className="h-4 w-4" />
                 Location & Address
@@ -252,7 +252,7 @@ export default function StoreView() {
 
           {/* Banking */}
           <Card>
-            <CardHeader className="p-4 pb-0">
+            <CardHeader className="p-3 pb-0">
               <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
                 <Landmark className="h-4 w-4" />
                 Banking & Tax
@@ -269,13 +269,13 @@ export default function StoreView() {
         {/* RIGHT */}
         <div className="space-y-6">
           <Card>
-            <CardHeader className="p-4 pb-0">
+            <CardHeader className="p-3 pb-0">
               <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
                 <FileText className="h-4 w-4" />
                 Documents
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <FilePreviewCard
                 label="PAN Card"
                 src={docUrl(data.pan_card_file)}
@@ -292,7 +292,7 @@ export default function StoreView() {
           </Card>
 
           <Card>
-            <CardHeader className="p-4 pb-0">
+            <CardHeader className="p-3 pb-0">
               <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">Additional  Notes</CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">

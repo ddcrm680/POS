@@ -236,7 +236,7 @@ export default function Inventory() {
     <>
       <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
         {/* Fixed Header with Metrics */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex-shrink-0">
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">Inventory Management</h1>
@@ -254,9 +254,9 @@ export default function Inventory() {
                   <DialogHeader>
                     <DialogTitle>Receive Inventory Shipment</DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {shipmentItems.map((item, index) => (
-                      <div key={index} className="grid grid-cols-6 gap-4 p-4 border rounded-lg">
+                      <div key={index} className="grid grid-cols-6 gap-4 p-3 border rounded-lg">
                         <div>
                           <Label>Item</Label>
                           <Select 
@@ -499,7 +499,7 @@ export default function Inventory() {
         </div>
 
         {/* Main Content Grid - No Scrolling */}
-        <div className="flex-1 p-4 overflow-hidden">
+        <div className="flex-1 p-3 overflow-hidden">
           {isLoading ? (
             <div className="grid grid-cols-4 gap-4 h-full">
               {Array.from({ length: 12 }).map((_, i) => (
@@ -526,7 +526,7 @@ export default function Inventory() {
                     className={`h-full transition-all duration-200 hover:shadow-lg cursor-pointer border-2 ${stockStatus.borderColor} ${stockStatus.bgColor}`}
                     data-testid={`inventory-item-${item.id}`}
                   >
-                    <CardContent className="p-4 h-full flex flex-col">
+                    <CardContent className="p-3 h-full flex flex-col">
                       {/* Header with Status */}
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1 min-w-0">
@@ -605,7 +605,7 @@ export default function Inventory() {
                             <DialogHeader>
                               <DialogTitle>Adjust Stock - {item.itemName}</DialogTitle>
                             </DialogHeader>
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                               <div>
                                 <Label>Current Stock: {item.currentStock} {item.unit}</Label>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">

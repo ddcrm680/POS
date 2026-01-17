@@ -14,7 +14,7 @@ export default function DashboardPreview() {
     </div>
 
       {/* Content */}
-      <div className="p-4 space-y-6">
+      <div className="p-3 space-y-6">
          {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Stat label="Today's Revenue" value={`₹${metrics.todayRevenue}`} />

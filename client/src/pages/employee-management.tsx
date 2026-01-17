@@ -130,7 +130,7 @@ const EmployeeCard = ({ employee, onClockAction }: { employee: any; onClockActio
       </CardHeader>
       
       <CardContent className="pt-0">
-        <div className="space-y-4">
+        <div className="space-y-3">
           
           {/* Current Session Info */}
           {isActive && currentSession && (
@@ -249,7 +249,7 @@ const TeamSummaryCard = ({ title, value, icon, trend, color }: {
 }) => {
   return (
     <Card className="transition-all duration-300 hover:shadow-md">
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-center justify-between mb-3">
           <div className={`p-2 rounded ${color} text-white`}>
             {icon}
@@ -373,7 +373,7 @@ export default function EmployeeManagement() {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <div className=" p-4">
+        <div className=" p-3">
           
           {/* Header */}
           <div className="mb-6">
@@ -489,7 +489,7 @@ export default function EmployeeManagement() {
           </div>
 
           {/* Employee Cards */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-blue-500" />

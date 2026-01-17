@@ -281,7 +281,7 @@ export default function CustomerFiltersSidebar({
         <Separator />
 
         {/* Location Filters */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <Label className="flex items-center gap-2 text-sm font-medium">
             <MapPin size={14} />
             Location

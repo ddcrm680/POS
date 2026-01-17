@@ -726,7 +726,7 @@ export default function InvoiceForm() {
     })
   }
   return (
-    <div className="max-w-7xl mx-auto p-4 space-y-4">
+    <div className="max-w-7xl mx-auto p-3 space-y-3">
       {/* Header */}
       <div className="flex items-center gap-2">
         <button
@@ -754,11 +754,11 @@ export default function InvoiceForm() {
       {
         isInfoLoading && id ?
           <Card className="mb-6"><div className="min-h-[150px] flex justify-center items-center">
-            <div className="p-4 text-sm "><Loader /></div>
+            <div className="p-3 text-sm "><Loader /></div>
           </div></Card> : <>
             {/* Top Info */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {invoiceView?.customer && <Card className="p-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {invoiceView?.customer && <Card className="p-3">
                 <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
                   Customer Detail
                 </CardTitle>
@@ -782,7 +782,7 @@ export default function InvoiceForm() {
                 </div>
               </Card>}
 
-              {invoiceView?.vehicle && <Card className="p-4">
+              {invoiceView?.vehicle && <Card className="p-3">
                 <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
                   Vehicle Info  </CardTitle>   <div className="space-y-2">
                   <InfoIfExists label="Type" value={invoiceView?.vehicle?.type} />
@@ -797,7 +797,7 @@ export default function InvoiceForm() {
                 </div>
               </Card>
               }
-              {invoiceView?.jobcard && <Card className="p-4">
+              {invoiceView?.jobcard && <Card className="p-3">
                 <CardTitle className=" text-sm font-semibold mb-4 text-gray-700 flex gap-2 items-center">
                   Jobcard Info
                 </CardTitle>
@@ -809,12 +809,12 @@ export default function InvoiceForm() {
             </div>
 
             {/* Plans */}
-            <Card className="p-4 lg:col-span-3">
+            <Card className="p-3 lg:col-span-3">
               <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
                 Billing Info
               </CardTitle>
               <Form {...form}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
 
                   <FloatingRHFSelect
                     name="billing_to"
@@ -875,7 +875,7 @@ export default function InvoiceForm() {
                   />}
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-3">
                   <FloatingTextarea
 
                     isView={isView}
@@ -928,7 +928,7 @@ export default function InvoiceForm() {
                       // reset dropdown back
                       e.target.value = "";
                     }}
-                    className="w-full border rounded-md px-3 py-2 text-sm"
+                    className="w-full border rounded-md px-3 py-2 text-xs"
                   >
                     <option value="">Add Extra Plan</option>
                     {availablePlans.map((plan) => (
@@ -976,7 +976,7 @@ export default function InvoiceForm() {
 
               {/* TOTALS */}
               <div className="flex md:justify-end ">
-                <div className="w-[300px] text-sm space-y-2">
+                <div className="w-[300px] text-xs space-y-2">
 
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
@@ -1072,7 +1072,7 @@ export default function InvoiceForm() {
               </div>
             </Card>
             {/* Payments info */}
-            {mode == 'view' && <Card className="p-4 lg:col-span-3">
+            {mode == 'view' && <Card className="p-3 lg:col-span-3">
               <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
                 PAYMENTS INFO
               </CardTitle>
@@ -1109,11 +1109,11 @@ export default function InvoiceForm() {
 
 
       {mode !== 'view' &&
-        <div className="  pb-4 flex justify-end gap-3 mt-4">
+        <div className="  pb-3 flex justify-end gap-3 mt-3">
           <Button
             variant="outline"
             disabled={isLoading || isInfoLoading}
-            className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+            className={'hover:bg-[#E3EDF6] hover:text-[#000] text-xs'}
             onClick={() => navigate("/invoices")}
           >
             {'Cancel'}
@@ -1136,3 +1136,16 @@ export default function InvoiceForm() {
     </div>
   );
 }
+
+// {
+//     "success": false,
+//     "code": 422,
+//     "errors": {
+//         "items.0.name": [
+//             "The items.0.name field is required."
+//         ],
+//         "items.1.name": [
+//             "The items.1.name field is required."
+//         ]
+//     }
+// }
