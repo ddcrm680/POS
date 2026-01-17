@@ -91,7 +91,7 @@ export default function JobCardView() {
     const card = jobcard?.job_card;
     const services = jobcard?.opted_services ?? [];
     return (
-        <div className="max-w-7xl mx-auto p-3 space-y-3">
+        <div className="max-w-6xl mx-auto p-3 space-y-3">
             {/* HEADER */}
             <div className="flex items-center gap-2">
                 <button

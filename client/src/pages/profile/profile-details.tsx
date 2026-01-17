@@ -13,7 +13,7 @@ export default function ProfileDetails() {
  
   return (
     <>
-       <div className="p-3 sm:p-3 space-y-3 max-w-7xl mx-auto">
+       <div className="p-3 sm:p-3 space-y-3 max-w-6xl mx-auto">
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3">
 

@@ -59,7 +59,7 @@ export default function ConsumerDashboardRedesign() {
     };
   return (
     <div className="min-h-screen ">
-      <div className="mx-auto max-w-7xl p-3 sm:p-3 space-y-3">
+      <div className="mx-auto max-w-6xl p-3 sm:p-3 space-y-3">
 
         {/* Top Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

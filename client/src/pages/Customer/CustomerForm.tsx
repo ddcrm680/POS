@@ -396,7 +396,7 @@ export default function CustomerForm() {
 
   return (
     <>
-      <div className="max-w-7xl  mx-auto px-4 py-4 space-y-3">
+      <div className="max-w-5xl  mx-auto px-4 py-4 space-y-3">
         {/* HEADER */}
         <div className="flex items-center gap-3">
           <button

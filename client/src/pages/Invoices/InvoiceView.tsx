@@ -375,7 +375,7 @@ export default function InvoiceView() {
         "partially_paid": "bg-blue-100 text-blue-700  border-blue-700",
     };
     return (
-        <div className="max-w-7xl mx-auto p-3 space-y-3">
+        <div className="max-w-6xl mx-auto p-3 space-y-3">
             {/* Header */}
             <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">

@@ -345,7 +345,7 @@ export default function POSJobCreation() {
   if (step === 'job-creation') {
     return (
       <>
-        <div className="max-w-7xl mx-auto p-6">
+        <div className="max-w-5xl mx-auto p-6">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Job Card</h1>
             <p className="text-gray-600">Complete service booking in one streamlined workflow</p>
