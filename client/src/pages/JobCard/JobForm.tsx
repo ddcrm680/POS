@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useForm, UseFormSetError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -58,9 +58,9 @@ export default function JobForm() {
 
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
-  
+
   const paramStoreId = searchParams.get("store_id");
-  
+
   const paramPhone = searchParams.get("phone");
   const mode = searchParams.get("mode");
   const isView = mode === "view";
@@ -220,6 +220,7 @@ export default function JobForm() {
   }, [vehicleType, serviceTypes]);
   const vehicleCompanyId = form.watch("vehicle_company_id");
   const hasInitializedModelsRef = useRef(false);
+
   useEffect(() => {
     if (!vehicleCompanyId) {
       setMeta(prev => ({ ...prev, vehicleModels: [] }));
@@ -652,33 +653,33 @@ export default function JobForm() {
       setIsLoading(false);
     }
   }
-const paramsHydratedRef = useRef(false);
+  const paramsHydratedRef = useRef(false);
 
-useEffect(() => {
-  // prevent re-run
-  if (paramsHydratedRef.current) return;
+  useEffect(() => {
+    // prevent re-run
+    if (paramsHydratedRef.current) return;
 
-  // nothing to hydrate
-  if (!paramPhone && !paramStoreId) return;
+    // nothing to hydrate
+    if (!paramPhone && !paramStoreId) return;
 
-  // 1️⃣ set store first (important for admin lookup)
-  if (paramStoreId) {
-    form.setValue("store_id", String(paramStoreId), {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  }
+    // 1️⃣ set store first (important for admin lookup)
+    if (paramStoreId) {
+      form.setValue("store_id", String(paramStoreId), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
 
-  // 2️⃣ set mobile number → this will trigger lookup
-  if (paramPhone) {
-    form.setValue("search_mobile", String(paramPhone), {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  }
+    // 2️⃣ set mobile number → this will trigger lookup
+    if (paramPhone) {
+      form.setValue("search_mobile", String(paramPhone), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
 
-  paramsHydratedRef.current = true;
-}, [paramPhone, paramStoreId, form]);
+    paramsHydratedRef.current = true;
+  }, [paramPhone, paramStoreId, form]);
   const searchMobile = form.watch("search_mobile");
   const customerMobile = form.watch("phone");
   const store_id = form.watch("store_id");
@@ -729,16 +730,29 @@ useEffect(() => {
       }
     }
   }, [searchMobile, store_id, isAdmin, toast]);
-  useEffect(() => {
-    if (!searchMobile || searchMobile.length !== 10 || !(store_id || user?.store_id)) {
-      setIsLookingUp(false);
+  const isLookupReady = useMemo(() => {
+    if (isAdmin) {
+      return Boolean(store_id && searchMobile && searchMobile.length === 10);
+    }
+    return Boolean(searchMobile && searchMobile.length === 10);
+  }, [searchMobile, store_id, isAdmin]);
 
+
+  useEffect(() => {
+    // if (!searchMobile || searchMobile.length !== 10 || !(store_id || user?.store_id)) {
+    //   setIsLookingUp(false);
+
+    //   return;
+    // }
+    if (!isLookupReady) {
+      setIsLookingUp(false);
       return;
     }
 
     let cancelled = false;
 
     const lookup = async () => {
+
       setIsLookingUp(true);
       setCustomerFound(null);
 
@@ -811,6 +825,34 @@ useEffect(() => {
         console.error(e);
       } finally {
         if (!cancelled) setIsLookingUp(false);
+        if (!mode) {
+          setServices([]);
+          setSelectedServices([]);
+          form.setValue("year", "")
+          form.setValue("reg_no", '')
+          form.setValue("chasis_no", "")
+          form.setValue("vehicle_condition", "")
+          form.setValue("remarks", "")
+          form.setValue("color", "")
+          form.setValue("isRepainted", false)
+          form.setValue("isSingleStagePaint", false)
+          form.setValue("isPaintThickness", false)
+          form.setValue("isVehicleOlder", false)
+          form.setValue("jobcard_date", "")
+          form.setValue("service_ids", []);
+          form.setValue("service_type", []);
+
+          form.setValue("vehicle_type", "");
+          form.setValue("vehicle_company_id", "");
+          form.setValue("vehicle_model_id", "");
+
+          setMeta(prev => ({
+            ...prev,
+            vehicleModels: [],
+          }));
+        }
+
+
       }
     };
 
@@ -847,7 +889,7 @@ useEffect(() => {
 
   return (
     <>
-    <div className="max-w-5xl mx-auto px-3 sm:px-3 py-3 space-y-3">
+      <div className="max-w-5xl mx-auto px-3 sm:px-3 py-3 space-y-3">
         {/* HEADER */}
         <div className="flex items-center gap-3">
           <button
@@ -945,23 +987,25 @@ useEffect(() => {
                 </SectionCard> */}
                         </div>
                       </Card>
+                      <>
+                        {<>
 
-                      {/* Customer Lookup Section */}
-                      {customerFound !== null && <Card className="mb-3">
+                          {/* Customer Lookup Section */}
+                          {isLookupReady && !isLookingUp && customerFound !== null && <Card className="mb-3">
 
-                        <SectionCard title="Customer Information" className="pb-4 grid gap-3" headingMarginBottom={"mb-0"}>
-                          {/* BASIC INFO */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <FloatingField
-                              name="name"
-                              label="Name"
-                              isRequired
-                              isDisabled={isView}
-                              control={form.control}
-                            />
+                            <SectionCard title="Customer Information" className="pb-4 grid gap-3" headingMarginBottom={"mb-0"}>
+                              {/* BASIC INFO */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <FloatingField
+                                  name="name"
+                                  label="Name"
+                                  isRequired
+                                  isDisabled={isView}
+                                  control={form.control}
+                                />
 
 
-                            {/* <FloatingField
+                                {/* <FloatingField
                               name="phone"
                               label="Mobile No"
                               isRequired
@@ -969,185 +1013,187 @@ useEffect(() => {
                               isDisabled={customerFound === true || isView}
                             /> */}
 
-                            <FloatingField
-                              name="email"
-                              label="Email"
-                              isDisabled={isView}
-                              isRequired
-                              control={form.control}
-                            />
+                                <FloatingField
+                                  name="email"
+                                  label="Email"
+                                  isDisabled={isView}
+                                  isRequired
+                                  control={form.control}
+                                />
 
 
 
-                          </div>
-                          {/* ADDRESS + MESSAGE */}
-                          <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
-                            <FloatingTextarea
-                              name="address"
-                              label="Address"
-                              isView={isView}
-                              isRequired
-                              control={form.control}
-                            />
+                              </div>
+                              {/* ADDRESS + MESSAGE */}
+                              <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
+                                <FloatingTextarea
+                                  name="address"
+                                  label="Address"
+                                  isView={isView}
+                                  isRequired
+                                  control={form.control}
+                                />
 
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 
-                            {/* COUNTRY */}
-                            <FloatingRHFSelect
-                              name="country_id"
-                              label="Country"
-                              control={form.control}
-                              isRequired
-                              isDisabled={isView}
-                              options={countryList.map(c => ({
-                                value: String(c.id),
-                                label: c.name,
-                              }))}
-                              onValueChange={async (value) => {
-                                if (isHydratingRef.current) return;
+                                {/* COUNTRY */}
+                                <FloatingRHFSelect
+                                  name="country_id"
+                                  label="Country"
+                                  control={form.control}
+                                  isRequired
+                                  isDisabled={isView}
+                                  options={countryList.map(c => ({
+                                    value: String(c.id),
+                                    label: c.name,
+                                  }))}
+                                  onValueChange={async (value) => {
+                                    if (isHydratingRef.current) return;
 
-                                setStates([]);
-                                setCities([]);
-                                form.setValue("state_id", "");
-                                // form.setValue("city_id", "");
+                                    setStates([]);
+                                    setCities([]);
+                                    form.setValue("state_id", "");
+                                    // form.setValue("city_id", "");
 
-                                setLoadingState(true);
-                                const stateList = await fetchStateList(Number(value));
-                                setStates(stateList);
-                                setLoadingState(false);
-                              }}
-                            />
+                                    setLoadingState(true);
+                                    const stateList = await fetchStateList(Number(value));
+                                    setStates(stateList);
+                                    setLoadingState(false);
+                                  }}
+                                />
 
-                            {/* STATE */}
-                            <FloatingRHFSelect
-                              name="state_id"
-                              label="State"
-                              control={form.control}
-                              isRequired
-                              isDisabled={isView || !form.getValues("country_id")}
-                              options={states.map(s => ({
-                                value: String(s.id),
-                                label: s.name,
-                              }))}
-                              onValueChange={async (value) => {
-                                if (isHydratingRef.current) return;
+                                {/* STATE */}
+                                <FloatingRHFSelect
+                                  name="state_id"
+                                  label="State"
+                                  control={form.control}
+                                  isRequired
+                                  isDisabled={isView || !form.getValues("country_id")}
+                                  options={states.map(s => ({
+                                    value: String(s.id),
+                                    label: s.name,
+                                  }))}
+                                  onValueChange={async (value) => {
+                                    if (isHydratingRef.current) return;
 
-                                setCities([]);
-                                // form.setValue("city_id", "");
+                                    setCities([]);
+                                    // form.setValue("city_id", "");
 
-                                setLoadingCity(true);
-                                const cityList = await fetchCityList(Number(value));
-                                setCities(cityList);
-                                setLoadingCity(false);
-                              }}
-                            />
-                            <div className="flex flex-col items-start">
-                              <FloatingRHFSelect
-                                name="type"
-                                label="Bill To"
-                                control={form.control}
-                                isRequired
-                                isDisabled={isView}
-                                options={[
-                                  { label: "Company", value: "company" },
-                                  { label: "Individual", value: "individual" },
-                                ]}
-                                onValueChange={(value) => {
-                                  if (typeof value !== "string") return;
-                                  const billingType = value as "company" | "individual";
-                                  form.setValue("type", billingType);
-                                }}
-                              />
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Select <b>Company</b> if you need GST invoice
-                              </p>
-                            </div>
-
-                          </div>
-
-
-
-                          {/* GST OPTIONAL */}
-
-                          {
-                            form.watch("type") === "company" &&
-                            (
-                              <div className="">
-                                <h4 className="text-sm font-semibold mb-4">
-                                  GST Information
-                                </h4>
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-
-
-                                  <FloatingField
-                                    name="company_contact_no"
-                                    label="Company Contact No."
-                                    isDisabled={isView}
-                                    control={form.control}
-                                  />
-
-                                  <FloatingField
-                                    name="company_gstin"
-                                    label="GSTIN"
-                                    control={form.control}
-                                    isDisabled={isView}
-                                  />
-
+                                    setLoadingCity(true);
+                                    const cityList = await fetchCityList(Number(value));
+                                    setCities(cityList);
+                                    setLoadingCity(false);
+                                  }}
+                                />
+                                <div className="flex flex-col items-start">
                                   <FloatingRHFSelect
-                                    name="company_country_id"
-                                    label="Country"
+                                    name="type"
+                                    label="Bill To"
                                     control={form.control}
+                                    isRequired
                                     isDisabled={isView}
-                                    options={countryList.map(c => ({
-                                      value: String(c.id),
-                                      label: c.name,
-                                    }))}
-                                    onValueChange={async (value) => {
-                                      if (isGstHydratingRef.current) return;
-
-                                      setGstStates([]);
-                                      setGstCities([]);
-                                      form.setValue("company_state_id", "");
-                                      // form.setValue("gst_city_id", "");
-
-                                      setLoadingGstState(true);
-                                      const stateList = await fetchStateList(Number(value));
-                                      setGstStates(stateList);
-                                      setLoadingGstState(false);
+                                    options={[
+                                      { label: "Company", value: "company" },
+                                      { label: "Individual", value: "individual" },
+                                    ]}
+                                    onValueChange={(value) => {
+                                      if (typeof value !== "string") return;
+                                      const billingType = value as "company" | "individual";
+                                      form.setValue("type", billingType);
                                     }}
                                   />
-                                  <FloatingRHFSelect
-                                    name="company_state_id"
-                                    label="State"
-                                    control={form.control}
-                                    isDisabled={isView || !form.getValues("company_country_id")}
-                                    options={gstStates.map(s => ({
-                                      value: String(s.id),
-                                      label: s.name,
-                                    }))}
-                                    onValueChange={async (value) => {
-                                      if (isGstHydratingRef.current) return;
-
-                                      setGstCities([]);
-                                      // form.setValue("gst_city_id", "");
-
-                                      setLoadingGstCity(true);
-                                      const cityList = await fetchCityList(Number(value));
-                                      setGstCities(cityList);
-                                      setLoadingGstCity(false);
-                                    }}
-                                  />
-
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Select <b>Company</b> if you need GST invoice
+                                  </p>
                                 </div>
 
                               </div>
-                            )}
-                        </SectionCard>
-                      </Card>
-                      }</>}
-                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+
+
+
+                              {/* GST OPTIONAL */}
+
+                              {
+                                form.watch("type") === "company" &&
+                                (
+                                  <div className="">
+                                    <h4 className="text-sm font-semibold mb-4">
+                                      GST Information
+                                    </h4>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+
+                                      <FloatingField
+                                        name="company_contact_no"
+                                        label="Company Contact No."
+                                        isDisabled={isView}
+                                        control={form.control}
+                                      />
+
+                                      <FloatingField
+                                        name="company_gstin"
+                                        label="GSTIN"
+                                        control={form.control}
+                                        isDisabled={isView}
+                                      />
+
+                                      <FloatingRHFSelect
+                                        name="company_country_id"
+                                        label="Country"
+                                        control={form.control}
+                                        isDisabled={isView}
+                                        options={countryList.map(c => ({
+                                          value: String(c.id),
+                                          label: c.name,
+                                        }))}
+                                        onValueChange={async (value) => {
+                                          if (isGstHydratingRef.current) return;
+
+                                          setGstStates([]);
+                                          setGstCities([]);
+                                          form.setValue("company_state_id", "");
+                                          // form.setValue("gst_city_id", "");
+
+                                          setLoadingGstState(true);
+                                          const stateList = await fetchStateList(Number(value));
+                                          setGstStates(stateList);
+                                          setLoadingGstState(false);
+                                        }}
+                                      />
+                                      <FloatingRHFSelect
+                                        name="company_state_id"
+                                        label="State"
+                                        control={form.control}
+                                        isDisabled={isView || !form.getValues("company_country_id")}
+                                        options={gstStates.map(s => ({
+                                          value: String(s.id),
+                                          label: s.name,
+                                        }))}
+                                        onValueChange={async (value) => {
+                                          if (isGstHydratingRef.current) return;
+
+                                          setGstCities([]);
+                                          // form.setValue("gst_city_id", "");
+
+                                          setLoadingGstCity(true);
+                                          const cityList = await fetchCityList(Number(value));
+                                          setGstCities(cityList);
+                                          setLoadingGstCity(false);
+                                        }}
+                                      />
+
+                                    </div>
+
+                                  </div>
+                                )}
+                            </SectionCard>
+                          </Card>
+                          }</>}
+                      </>
+                    </>}
+                    {(mode !== 'edit' ? isLookupReady && !isLookingUp : true) && <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
 
 
                       {/* Vehicle Information */}
@@ -1228,6 +1274,12 @@ useEffect(() => {
                                       disabled={isView}
                                       checked={field.value}
                                       onCheckedChange={(val) => field.onChange(Boolean(val))}
+                                       className="
+    border-blue-800
+    data-[state=checked]:bg-blue-700
+    data-[state=checked]:border-blue-700
+    focus-visible:ring-blue-500
+  "
                                     />
                                     Repainted Vehicle
                                   </label>
@@ -1242,6 +1294,12 @@ useEffect(() => {
                                       disabled={isView}
                                       checked={field.value}
                                       onCheckedChange={(val) => field.onChange(Boolean(val))}
+                                     className="
+    border-blue-800
+    data-[state=checked]:bg-blue-700
+    data-[state=checked]:border-blue-700
+    focus-visible:ring-blue-500
+  "
                                     />
                                     Single Stage Paint
                                   </label>
@@ -1257,6 +1315,12 @@ useEffect(() => {
                                       disabled={isView}
                                       checked={field.value}
                                       onCheckedChange={(val) => field.onChange(Boolean(val))}
+                                         className="
+    border-blue-800
+    data-[state=checked]:bg-blue-700
+    data-[state=checked]:border-blue-700
+    focus-visible:ring-blue-500
+  "
                                     />
                                     Paint Thickness below 2 MIL
                                   </label>
@@ -1272,6 +1336,12 @@ useEffect(() => {
                                       disabled={isView}
                                       checked={field.value}
                                       onCheckedChange={(val) => field.onChange(Boolean(val))}
+                                      className="
+    border-blue-800
+    data-[state=checked]:bg-blue-700
+    data-[state=checked]:border-blue-700
+    focus-visible:ring-blue-500
+  "
                                     />
                                     Vehicle older than 5 years
                                   </label>
@@ -1406,7 +1476,7 @@ useEffect(() => {
 
                         </SectionCard>
                       </Card>
-                    </div>
+                    </div>}
                   </>}
               {mode !== 'view' &&
                 <div className="  pb-3 flex justify-end gap-3 mt-3">

@@ -29,7 +29,7 @@ export function Info({
         </a>
       ) : (
         // "font-medium text-slate-800"
-        <p className={`break-all font-medium text-slate-800 font-[600] `}>
+        <p className={`break-all font-[600] text-slate-800 font-[600] `}>
           {value || "-"}
         </p>
       )}
