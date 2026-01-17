@@ -202,9 +202,12 @@ export default function CustomerForm() {
       const res =
         await getCustomerView(id ?? "");
       setInitialValues(res?.data)
-    } catch (e) {
+    } catch (e:any) {
       console.error(e);
 
+      if (e?.response?.data?.code === 404) {
+        navigate("/customers")
+      }
     } finally {
       setIsInfoLoading(false);
     }

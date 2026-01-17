@@ -40,23 +40,30 @@ export default function ConsumerDashboardRedesign() {
   };
 
   useEffect(() => {
-    if (id){
+    if (id) {
       fetchCustomerView()
-      fetchCustomer();}
-  }, [id]);
-     const [customerView, setCustomerView] = useState<any | null>(null);
+      fetchCustomer();
+    }
 
-    const fetchCustomerView = async () => {
-        try {
-            setIsLoading(true);
-            const res = await getCustomerView(id ?? "");
-            setCustomerView(res?.data ?? null);
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  }, [id]);
+  const [customerView, setCustomerView] = useState<any | null>(null);
+
+  const fetchCustomerView = async () => {
+    try {
+      setIsLoading(true);
+      const res = await getCustomerView(id ?? "");
+      setCustomerView(res?.data ?? null);
+
+    } catch (e: any) {
+
+      if (e?.response?.data?.code === 404) {
+        navigate("/customers")
+      }
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen ">
       <div className="mx-auto max-w-6xl p-3 sm:p-3 space-y-3">
@@ -147,7 +154,7 @@ export default function ConsumerDashboardRedesign() {
           </Card>
 
           {/* Content */}
-          <Card className={`rounded-lg ${activeTab === "overview"? "" :"border-0"} !px-0`}>
+          <Card className={`rounded-lg ${activeTab === "overview" ? "" : "border-0"} !px-0`}>
             <CardContent className="p-0">
               <motion.div
                 key={activeTab}
@@ -157,8 +164,8 @@ export default function ConsumerDashboardRedesign() {
               >
                 {activeTab === "overview" && <Overview id={id ?? ""} customer={customerView} />}
                 {activeTab === "jobcards" && <JobCard noTitle={true} noPadding={true} apiLink={`/api/consumers/${id}/job-cards`} hideColumnListInCustomer={hideColumnListInCustomer.jobcard} />}
-                {activeTab === "invoices" && <Invoice noTitle={true} noPadding={true} apiLink={`/api/consumers/${id}/invoices`}  hideColumnListInCustomer={hideColumnListInCustomer.invoice}/>}
-                {activeTab === "payments" && <PaymentsPage noTitle={true} noPadding={true} apiLink={`/api/consumers/${id}/payments`}  hideColumnListInCustomer={hideColumnListInCustomer.payment}/>}
+                {activeTab === "invoices" && <Invoice noTitle={true} noPadding={true} apiLink={`/api/consumers/${id}/invoices`} hideColumnListInCustomer={hideColumnListInCustomer.invoice} />}
+                {activeTab === "payments" && <PaymentsPage noTitle={true} noPadding={true} apiLink={`/api/consumers/${id}/payments`} hideColumnListInCustomer={hideColumnListInCustomer.payment} />}
               </motion.div>
             </CardContent>
           </Card>
@@ -166,7 +173,7 @@ export default function ConsumerDashboardRedesign() {
       </div>
     </div>
   );
-  
+
 }
 
 
