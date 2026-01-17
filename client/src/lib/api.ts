@@ -424,31 +424,33 @@ export async function fetchUnassignedStoreList() {
   throw new Error(response.data?.message || "Failed to fetch unassigned store list");
 }
 export async function getPaymentsList({
-  page,
-  search,
-  payment_mode,
-  per_page,
-    status,
+  apiLink,param
+
 }: {
+  apiLink:string
+  param:{
+
   per_page: number;
   page: number;
   search: string;
-  payment_mode?: string ;
+  payment_mode?: string;
   
   status?: string | number;
+  }
+
 }) {
   try {
-     const params = new URLSearchParams({
-    page: String(page),
-    search,
-    per_page: String(per_page)
-  });
+    const params = new URLSearchParams({
+      page: String(param.page),
+      search:param.search,
+      per_page: String(param.per_page)
+    });
 
-  if (payment_mode) params.append("payment_mode", String(payment_mode));
-  if (status !== "") params.append("status", String(status));
+    if (param.payment_mode) params.append("payment_mode", String(param.payment_mode));
+    if (param.status !== "") params.append("status", String(param.status));
 
     const response: any = await api.get(
-      `/api/payments?${params.toString()}`
+    apiLink?`${apiLink}?${params.toString()}`:  `/api/payments?${params.toString()}`
     );
 
     if (response?.data?.success === true) {
@@ -676,10 +678,10 @@ export async function getConsumer({
   try {
     const params = new URLSearchParams();
 
-  if (page !== undefined) params.append("page", String(page));
-  if (per_page !== undefined) params.append("per_page", String(per_page));
-  if (search) params.append("search", search);
-  if (status) params.append("status", String(status));
+    if (page !== undefined) params.append("page", String(page));
+    if (per_page !== undefined) params.append("per_page", String(per_page));
+    if (search) params.append("search", search);
+    if (status) params.append("status", String(status));
 
     const response: any = await api.get(
       `/api/consumers?${params.toString()}`,
@@ -699,29 +701,31 @@ export async function getConsumer({
   }
 }
 export async function getJobCard({
-  page,
-  search,
-  status,
-  consumer,
-  per_page
+  apiLink,
+  param
 }: {
-  per_page?: number;
-  page?: number;
-  search?: string;
-  consumer?:string
-  status?: string | number;
+  apiLink: String
+  param: {
+    per_page?: number;
+    page?: number;
+    search?: string;
+    consumer?: string
+    status?: string | number;
+  }
+
 }) {
   try {
     const params = new URLSearchParams();
 
-  if (page !== undefined) params.append("page", String(page));
-  if (per_page !== undefined) params.append("per_page", String(per_page));
-  if (search) params.append("search", search);
-  if (status) params.append("status", String(status));
-  if (consumer) params.append("consumer", String(consumer));
+    if (param.page !== undefined) params.append("page", String(param.page));
+    if (param.per_page !== undefined) params.append("per_page", String(param.per_page));
+    if (param.search) params.append("search", param.search);
+    if (param.status) params.append("status", String(param.status));
+    if (param.consumer) params.append("consumer", String(param.consumer));
 
     const response: any = await api.get(
-      `/api/job-cards?${params.toString()}`,
+      apiLink ?`${apiLink}?${params.toString()}` :
+        `/api/job-cards?${params.toString()}`,
     );
 
     if (response?.data?.success === true) {
@@ -972,7 +976,6 @@ export async function lookupCustomerByPhone(phone: string, store_id?: string) {
     const params = new URLSearchParams({
       phone: String(phone),
     });
-console.log(store_id,'store_idstore_id');
 
     if (store_id) params.append("store_id", String(store_id));
 
@@ -995,7 +998,7 @@ console.log(store_id,'store_idstore_id');
 }
 export async function jobCardMetaInfo() {
   try {
-   
+
     const response: any = await api.get(
       `/api/utility/job-card-meta`,
     );
@@ -1013,9 +1016,9 @@ export async function jobCardMetaInfo() {
     throw error;
   }
 }
-export async function jobCardModelInfo(id:string) {
+export async function jobCardModelInfo(id: string) {
   try {
-   
+
     const response: any = await api.get(
       `/api/utility/vehicle-companies/${id}/models`,
     );
@@ -1033,7 +1036,7 @@ export async function jobCardModelInfo(id:string) {
     throw error;
   }
 }
-export async function jobFormSubmission(data: any ) {
+export async function jobFormSubmission(data: any) {
   try {
     const response: any = await api.post(
       `/api/job-cards${data.id ? `/${data.id}` : ''}/${data.id ? 'update' : 'save'}`,
@@ -1051,7 +1054,7 @@ export async function jobFormSubmission(data: any ) {
     throw response;
   }
 }
-export async function consumerSave(data:any) {
+export async function consumerSave(data: any) {
   try {
     const response: any = await api.post(
       `/api/consumers/save`,
@@ -1069,7 +1072,7 @@ export async function consumerSave(data:any) {
     throw response;
   }
 }
-export async function getServiceOptionByTypeVehicle(data:any) {
+export async function getServiceOptionByTypeVehicle(data: any) {
   try {
     const response: any = await api.post(
       `/api/utility/services/by-vehicle-and-type`,
@@ -1087,7 +1090,7 @@ export async function getServiceOptionByTypeVehicle(data:any) {
     throw response;
   }
 }
-export async function jobCardCancel(id:any) {
+export async function jobCardCancel(id: any) {
   try {
     const response: any = await api.post(
       `/api/job-cards/${id}/cancel`,
@@ -1104,11 +1107,11 @@ export async function jobCardCancel(id:any) {
     throw response;
   }
 }
-export async function getCustomerView(id:any) {
+export async function getCustomerView(id: any) {
   try {
     const response: any = await api.get(
       `/api/consumers/${id}/view`,
-      
+
     );
 
     if (response?.data?.success === true) {
@@ -1122,7 +1125,7 @@ export async function getCustomerView(id:any) {
     throw response;
   }
 }
-export async function consumerUpdate(data:any) {
+export async function consumerUpdate(data: any) {
   try {
     const response: any = await api.post(
       `/api/consumers/${data.id}/update`,
@@ -1139,7 +1142,7 @@ export async function consumerUpdate(data:any) {
     throw response;
   }
 }
-export async function getJobCardItem(data:any) {
+export async function getJobCardItem(data: any) {
   try {
     const response: any = await api.get(
       `/api/job-cards/${data.id}`,
@@ -1155,7 +1158,7 @@ export async function getJobCardItem(data:any) {
     throw response;
   }
 }
-export async function getJobCardPrefillData(data:any) {
+export async function getJobCardPrefillData(data: any) {
   try {
     const response: any = await api.get(
       `/api/job-cards/${data.id}/invoice/prefill`,
@@ -1171,18 +1174,17 @@ export async function getJobCardPrefillData(data:any) {
     throw response;
   }
 }
-export async function createInvoice(data:any) {
+export async function createInvoice(data: any) {
   try {
-    const {url, ...rest} = data;
-    console.log(data,'datadata');
-    
+    const { url, ...rest } = data;
+
     const response: any = await api.post(
       `/api/${url}`,
       rest
     );
 
     if (response?.data?.success === true) {
-      return response.data.data; 
+      return response.data.data;
     }
     throw new Error(
       response?.data?.message || "Failed to create invoice"
@@ -1191,7 +1193,7 @@ export async function createInvoice(data:any) {
     throw response;
   }
 }
-export async function updateInvoice(data:any) {
+export async function updateInvoice(data: any) {
   try {
     const response: any = await api.post(
       `/api/invoices/${data.id}/update`,
@@ -1199,7 +1201,7 @@ export async function updateInvoice(data:any) {
     );
 
     if (response?.data?.success === true) {
-      return response.data.data; 
+      return response.data.data;
     }
     throw new Error(
       response?.data?.message || "Failed to update invoice"
@@ -1208,7 +1210,7 @@ export async function updateInvoice(data:any) {
     throw response;
   }
 }
-export async function getInvoiceInfo(id:any) {
+export async function getInvoiceInfo(id: any) {
   try {
     const response: any = await api.get(
       `/api/invoices/${id}`,
@@ -1224,7 +1226,7 @@ export async function getInvoiceInfo(id:any) {
     throw response;
   }
 }
-export async function cancelInvoice(data:any) {
+export async function cancelInvoice(data: any) {
   try {
     const response: any = await api.post(
       `/api/invoices/${data.id}/cancel`,
@@ -1240,27 +1242,29 @@ export async function cancelInvoice(data:any) {
     throw response;
   }
 }
-  export async function getInvoiceList({
-  page,
-  search,
-  status,
-  per_page
+export async function getInvoiceList({
+  apiLink,
+  param
 }: {
-  per_page?: number;
-  page?: number;
-  search?: string;
-  status?: string 
+  apiLink: string,
+  param: {
+    per_page?: number;
+    page?: number;
+    search?: string;
+    status?: string
+  }
+
 }) {
   const params = new URLSearchParams();
 
-  if (page !== undefined) params.append("page", String(page));
-  if (per_page !== undefined) params.append("per_page", String(per_page));
-  if (search) params.append("search", search);
-  if (status) params.append("status", String(status));
+  if (param.page !== undefined) params.append("page", String(param.page));
+  if (param.per_page !== undefined) params.append("per_page", String(param.per_page));
+  if (param.search) params.append("search", param.search);
+  if (param.status) params.append("status", String(param.status));
 
   try {
     const response: any = await api.get(
-      `/api/invoices?${params.toString()}`,
+     apiLink? `${apiLink}?${params.toString()}`: `/api/invoices?${params.toString()}`,
     );
 
     if (response?.data?.success === true) {
@@ -1273,7 +1277,7 @@ export async function cancelInvoice(data:any) {
     throw response;
   }
 }
-export async function getInvoiceInfoByJobCardPrefill(data:any) {
+export async function getInvoiceInfoByJobCardPrefill(data: any) {
   try {
     const response: any = await api.get(
       `/api/job-cards/${data.id}/invoice/prefill`,
@@ -1340,6 +1344,25 @@ export async function cancelPayment(paymentId: number | string) {
 
     throw new Error(
       response?.data?.message || "Failed to cancel payment"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+
+export async function getCustomerDashboardView(id: any) {
+  try {
+    const response: any = await api.get(
+      `api/consumers/${id}/dashboard`,
+
+    );
+
+    if (response?.data?.success === true) {
+      return response.data; // customer object
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to get customer dashboard view"
     );
   } catch (response: any) {
     throw response;

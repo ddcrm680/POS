@@ -58,6 +58,10 @@ export default function JobForm() {
 
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
+  
+  const paramStoreId = searchParams.get("store_id");
+  
+  const paramPhone = searchParams.get("phone");
   const mode = searchParams.get("mode");
   const isView = mode === "view";
 
@@ -648,7 +652,33 @@ export default function JobForm() {
       setIsLoading(false);
     }
   }
+const paramsHydratedRef = useRef(false);
 
+useEffect(() => {
+  // prevent re-run
+  if (paramsHydratedRef.current) return;
+
+  // nothing to hydrate
+  if (!paramPhone && !paramStoreId) return;
+
+  // 1️⃣ set store first (important for admin lookup)
+  if (paramStoreId) {
+    form.setValue("store_id", String(paramStoreId), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }
+
+  // 2️⃣ set mobile number → this will trigger lookup
+  if (paramPhone) {
+    form.setValue("search_mobile", String(paramPhone), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }
+
+  paramsHydratedRef.current = true;
+}, [paramPhone, paramStoreId, form]);
   const searchMobile = form.watch("search_mobile");
   const customerMobile = form.watch("phone");
   const store_id = form.watch("store_id");

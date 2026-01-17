@@ -738,3 +738,16 @@ export type SaveInvoicePaymentPayload = {
   txn_id?: string | null;
   remarks?: string;
 };
+export type reusableComponentType={
+  noTitle?:boolean 
+   noPadding?:boolean
+   hideColumnListInCustomer?:
+   
+   {
+    list :{
+    name:string
+    label:string
+   }[]
+  
+  actionShowedList:string[]}
+   apiLink:string}

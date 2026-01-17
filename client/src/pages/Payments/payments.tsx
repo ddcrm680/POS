@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { cancelInvoice, cancelPayment, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, getPaymentsList, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
-import { InvoicePaymentFormValues, organizationFormType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
+import { InvoicePaymentFormValues, organizationFormType, reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
 import { EditIcon, EyeIcon, PrinterIcon, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
@@ -18,8 +18,9 @@ import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, invoiceMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import InvoicePaymentForm from "../Invoices/InvoicePaymentForm";
+import { mapColumnsForCustomerView } from "@/lib/helper";
 
-export default function PaymentsPage() {
+export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer = { list: [], actionShowedList: [] }, noPadding = false, apiLink = "" }: reusableComponentType) {
   const { toast } = useToast();
   const { roles } = useAuth();
   const [payments, setPayments] = useState<Array<any>>([]);
@@ -200,11 +201,15 @@ export default function PaymentsPage() {
 
       const res =
         await getPaymentsList({
-          per_page: perPage,
-          page,
-          search,
-          status: filters.status,
-          payment_mode: filters.payment_mode
+          apiLink,
+          param: {
+            per_page: perPage,
+            page,
+            search,
+            status: filters.status,
+            payment_mode: filters.payment_mode
+          }
+
         });
 
       const mappedData = res.data.map((item: any) => ({
@@ -236,6 +241,19 @@ export default function PaymentsPage() {
       payment_mode: ""
     })
   }
+  
+      const resolvedColumns = useMemo(() => {
+          const list = hideColumnListInCustomer?.list;
+  
+          // 🔓 No config → show all columns
+          if (!Array.isArray(list) || list.length === 0) {
+              return columns;
+          }
+  
+          return mapColumnsForCustomerView(columns, list);
+      }, [columns, hideColumnListInCustomer]);
+      const allowedActions = hideColumnListInCustomer?.actionShowedList;
+
   const OrganizationCommonHandler = async (
     value: InvoicePaymentFormValues,
     setError: UseFormSetError<InvoicePaymentFormValues>
@@ -298,8 +316,8 @@ export default function PaymentsPage() {
       setIsActionAllowed(true)
   }, [user, roles])
   return (
-    <div className="p-4">
-      <div className="mb-6">
+    <div className={`${noPadding ? "" : "p-4"}`}>
+      {!noTitle && <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold">Payment Management</h1>
@@ -308,11 +326,11 @@ export default function PaymentsPage() {
             </p>
           </div>
         </div>
-      </div>
+      </div>}
       <Card className="w-full">
         <CardContent>
           <CommonTable
-            columns={columns}
+         columns={resolvedColumns}
             isClear={true}
             data={payments}
             isAdd={false}

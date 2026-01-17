@@ -24,7 +24,8 @@ import {
   MapPinned,
   Key,
   BarChart3,
-  Wallet
+  Wallet,
+  Briefcase
 } from "lucide-react";
 
 export const Constant = {
@@ -255,3 +256,95 @@ export const jobCardStatusList = [
   { label: "Cancel", value: 'cancel' },
   { label: "Partially Paid", value: 'partially-paid' },
 ]
+
+export const TABS = [
+  { key: "overview", label: "Overview", icon: User },
+  { key: "jobcards", label: "Job Cards", icon: Briefcase },
+  { key: "invoices", label: "Invoices", icon: FileText },
+  { key: "payments", label: "Payments", icon: CreditCard },
+];
+
+export const hideColumnListInCustomer = {
+  jobcard: {
+    list: [
+      {
+        label: "Created On",
+        name: "created_at"
+      },
+      {
+        label: "JC No.",
+        name: "job_card_number"
+      },
+
+      {
+        label: "Service Date",
+        name: "jobcard_date"
+      },
+      {
+        label: "Type",
+        name: "vehicle_type",
+        type: "customer-custom",
+
+      },
+
+      {
+        label: "Reg No./Chasis",
+        name: "reg_no",
+        type: "customer-custom",
+      },
+      {
+        label: "Status",
+        name: "status"
+      },
+
+
+    ],
+    actionShowedList: ['print', 'edit', 'delete']
+  },
+  invoice: {
+    list: [
+      {
+        label: "Created Date",
+        name: "created_at",
+      },
+      {
+        label: "Invoice No.",
+        name: "invoice_number"
+      },
+      {
+        name: "grand_total",
+        label: "Amount",
+      },
+      {
+        name: "total_due",
+        label: " Due",
+      },
+      {
+        name: "status",
+        label: "Status"
+      }
+    ],
+    actionShowedList: ['print', 'edit', 'delete']
+  },
+  payment: {
+    list: [
+      {
+        label: "Created Date",
+        name: "created_at",
+      },
+      {
+        label: "Payment Date",
+        name: "payment_date"
+      },
+      {
+        name: "invoice_number",
+        label: "Invoice No.",
+      },
+      {
+        name: "status",
+        label: "Status"
+      }
+    ],
+    actionShowedList: []
+  },
+}

@@ -8,18 +8,19 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
-import { InvoicePaymentFormValues, organizationFormType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
+import { InvoicePaymentFormValues, organizationFormType, reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
 import { EditIcon, EyeIcon, PrinterIcon, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
-import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
+import { canShowAction, formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, invoiceMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import InvoicePaymentForm from "./InvoicePaymentForm";
+import { mapColumnsForCustomerView } from "@/lib/helper";
 
-export default function Invoice() {
+export default function Invoice({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
     const { toast } = useToast();
     const { roles } = useAuth();
     const [invoices, setInvoices] = useState<Array<any>>([]);
@@ -93,7 +94,8 @@ export default function Invoice() {
             label: "Invoice No.",
             width: "130px",
             render: (value: string, row: any) => (
-                <span className="text-[blue] font-medium cursor-pointer" onClick={() => navigate(`/invoices/view?id=${row.id}`)
+                <span className="text-[blue] font-medium cursor-pointer" onClick={() =>
+                    navigate(`/invoices/view?id=${row.id}`)
                 }>
                     {value}
                 </span>
@@ -101,31 +103,31 @@ export default function Invoice() {
         },
 
         /* ================= CONSUMER ================= */
-        { 
+        {
             key: "consumer",
             label: "Customer",
             width: "180px",
-            render: (value: { name: string ,phone:string}, row: any) => (
+            render: (value: { name: string, phone: string }, row: any) => (
 
                 <div className="flex flex-col leading-tight">
-      {/* Customer Name */}
-      <span
-        className="text-blue-600 font-medium cursor-pointer hover:underline"
-        onClick={() => {
-          localStorage.setItem("sidebar_active_parent", "customers");
-           navigate(`/customers/view?id=${row.consumer_id}`)
-        }}
-      >
-        {value?.name ?? "-"}
-      </span>
+                    {/* Customer Name */}
+                    <span
+                        className="text-blue-600 font-medium cursor-pointer hover:underline"
+                        onClick={() => {
+                            localStorage.setItem("sidebar_active_parent", "customers");
+                            navigate(`/customers/view?id=${row.consumer_id}`)
+                        }}
+                    >
+                        {value?.name ?? "-"}
+                    </span>
 
-      {/* Phone Number */}
-      {value?.phone && (
-        <span className="text-xs text-muted-foreground mt-0.5">
-          {value.phone}
-        </span>
-      )}
-    </div>
+                    {/* Phone Number */}
+                    {value?.phone && (
+                        <span className="text-xs text-muted-foreground mt-0.5">
+                            {value.phone}
+                        </span>
+                    )}
+                </div>
             ),
         },
 
@@ -189,18 +191,33 @@ export default function Invoice() {
         },
 
     ];
+
+    const resolvedColumns = useMemo(() => {
+        const list = hideColumnListInCustomer?.list;
+
+        // 🔓 No config → show all columns
+        if (!Array.isArray(list) || list.length === 0) {
+            return columns;
+        }
+
+        return mapColumnsForCustomerView(columns, list);
+    }, [columns, hideColumnListInCustomer]);
+
     const fetchInvoices = async (isLoaderHide = false) => {
         try {
             if (!isLoaderHide)
                 setIsListLoading(true);
-            console.log(filters.status, ' filters.status');
 
             const res =
                 await getInvoiceList({
-                    per_page: perPage,
-                    page,
-                    search,
-                    status: filters.status
+                    apiLink,
+                    param: {
+                        per_page: perPage,
+                        page,
+                        search,
+                        status: filters.status
+                    }
+
                 });
 
             const mappedData = res.data
@@ -217,10 +234,7 @@ export default function Invoice() {
                 setIsListLoading(false);
         }
     };
-    useEffect(() => {
-        console.log(invoices, 'invoicesinvoices');
-
-    }, [invoices])
+ 
     useEffect(() => {
         fetchInvoices(false);
     }, [search, page, perPage, filters]);
@@ -278,9 +292,12 @@ export default function Invoice() {
             setIsLoading(false);
         }
     };
+
+    const allowedActions = hideColumnListInCustomer?.actionShowedList;
+
     return (
-        <div className="p-4">
-            <div className="mb-6">
+        <div className={`${noPadding ? "" : "p-4"}`}>
+            {!noTitle && <div className="mb-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-xl font-semibold">Invoice Management</h1>
@@ -289,11 +306,11 @@ export default function Invoice() {
                         </p>
                     </div>
                 </div>
-            </div>
+            </div>}
             <Card className="w-full">
                 <CardContent>
                     <CommonTable
-                        columns={columns}
+                        columns={resolvedColumns}
                         isClear={true}
                         data={invoices}
                         isAdd={false}
@@ -320,7 +337,7 @@ export default function Invoice() {
                                 <>
 
                                     {(
-                                        <Box className="gap-0">     <IconButton
+                                        <Box className="gap-0">   {canShowAction('print', allowedActions) && <IconButton
                                             size="xs"
                                             // mr={2}
                                             aria-label="Print"
@@ -329,8 +346,8 @@ export default function Invoice() {
                                             }
                                         >
                                             <PrinterIcon />
-                                        </IconButton>
-                                            <IconButton
+                                        </IconButton>}
+                                            {canShowAction('view', allowedActions) && <IconButton
                                                 size="xs"
                                                 // mr={2}
                                                 aria-label="View"
@@ -341,10 +358,10 @@ export default function Invoice() {
                                                 }
                                             >
                                                 <EyeIcon />
-                                            </IconButton>
+                                            </IconButton>}
                                             {
-                                                row.status == 'issued' &&
-                                                 <IconButton
+                                                canShowAction('edit', allowedActions) && row.status == 'issued' &&
+                                                <IconButton
                                                     size="xs"
                                                     // mr={2}
                                                     aria-label="Edit"
@@ -362,12 +379,12 @@ export default function Invoice() {
 
                                             {
 
-                                                (row?.status === "partially_paid" || row.status == 'issued') &&
+                                      canShowAction('Wallet', allowedActions) &&           (row?.status === "partially_paid" || row.status == 'issued') &&
                                                 <IconButton
                                                     size="xs"
                                                     // mr={2}
                                                     colorScheme="red"
-                                                    aria-label="Delete"
+                                                    aria-label="Wallet"
                                                     onClick={() => {
                                                         setIsInvoicePaymentModalOpenInfo({ open: true, info: row });
                                                     }}
@@ -376,7 +393,7 @@ export default function Invoice() {
                                                 </IconButton>}
                                             {
 
-                                                row.status == 'issued' && <IconButton
+                                            canShowAction('delete', allowedActions) &&      row.status == 'issued' && <IconButton
                                                     size="xs"
                                                     // mr={2}
                                                     title="Cancel"

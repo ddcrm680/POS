@@ -396,7 +396,6 @@ export function normalizeInvoiceToCreateResponse(api: any) {
   if (api.job_card && api.opted_services && api.billing_prefill) {
     return api;
   }
-  console.log(api, 'apiapiapi');
 
   // 🔹 INVOICE VIEW → CREATE PREFILL FORMAT
   return {
@@ -546,4 +545,25 @@ export function formatStatusLabel(value?: string) {
     .replace(/_/g, " ")                 // remove underscores
     .toLowerCase()                      // normalize
     .replace(/\b\w/g, char => char.toUpperCase()); // capitalize each word
+}
+export function getInitials(value?: string) {
+  if (!value) return "";
+
+  return value
+    .trim()
+    .split(/\s+/)          // split by spaces
+    .filter(Boolean)       // remove empty parts
+    .map(word => word[0].toUpperCase())
+    .join("");
+}
+export function canShowAction(
+  action: string,
+  allowedActions?: string[]
+) {
+  // 🔓 No restriction provided
+  if (!Array.isArray(allowedActions) || allowedActions.length === 0) {
+    return true;
+  }
+
+  return allowedActions.includes(action);
 }

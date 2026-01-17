@@ -1,13 +1,24 @@
 
-import { useEffect, useState } from "react";
-import { Card, CardTitle } from "@/components/ui/card";
-import { ChevronLeft } from "lucide-react";
-import { Info } from "@/components/common/viewInfo";
-import { useLocation, useSearchParams } from "wouter";
-import { Loader } from "@/components/common/loader";
-import { getCustomerView } from "@/lib/api";
 
-export default function JobCardView() {
+import React, { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { getInitials, cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { Search, CreditCard, FileText, Briefcase, User, Plus } from "lucide-react";
+import { Overview } from "./Overview";
+import { DataList } from "./CommonDataList";
+import { Kpi } from "./DashboardCards";
+import { hideColumnListInCustomer, TABS } from "@/lib/constant";
+import { getCustomerDashboardView, getCustomerView } from "@/lib/api";
+import { useLocation, useSearchParams } from "wouter";
+import JobCard from "../JobCard/JobCard";
+import Invoice from "../Invoices/Invoice";
+import PaymentsPage from "../Payments/payments";
+
+
+export default function ConsumerDashboardRedesign() {
+  const [activeTab, setActiveTab] = useState("overview");
   const [, navigate] = useLocation();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
@@ -18,7 +29,8 @@ export default function JobCardView() {
   const fetchCustomer = async () => {
     try {
       setIsLoading(true);
-      const res = await getCustomerView(id ?? "");
+      const res = await getCustomerDashboardView(id ?? "");
+
       setCustomer(res?.data ?? null);
     } catch (e) {
       console.error(e);
@@ -28,138 +40,136 @@ export default function JobCardView() {
   };
 
   useEffect(() => {
-    if (id) fetchCustomer();
+    if (id){
+      fetchCustomerView()
+      fetchCustomer();}
   }, [id]);
+     const [customerView, setCustomerView] = useState<any | null>(null);
 
-  const InfoIfExists = ({ value, ...props }: any) => {
-    if (value === null || value === undefined || value === "") return null;
-    return (
-      <Info
-        gap="gap-12"
-        colon={false}
-        justify="justify-between"
-        {...props}
-        value={value}
-      />
-    );
-  };
-
-  const isCompany = customer?.type === "company";
-
+    const fetchCustomerView = async () => {
+        try {
+            setIsLoading(true);
+            const res = await getCustomerView(id ?? "");
+            setCustomerView(res?.data ?? null);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsLoading(false);
+        }
+    };
   return (
-    <div className="max-w-7xl mx-auto p-4 space-y-4">
-      {/* HEADER */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => {
-            localStorage.removeItem("sidebar_active_parent");
-            window.history.back();
-          }}
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <ChevronLeft size={18} />
-        </button>
+    <div className="min-h-screen ">
+      <div className="mx-auto max-w-7xl p-3 sm:p-4 space-y-4">
 
-        <h1 className="text-lg font-semibold flex-1">
-          View Customer
-        </h1>
-      </div>
-
-      {/* LOADER */}
-      {isLoading ? (
-        <Card>
-          <div className="min-h-[150px] flex justify-center items-center">
-            <Loader />
-          </div>
-        </Card>
-      ) : (
-        <>
-          {/* CUSTOMER BASIC INFO */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="p-4">
-              <CardTitle className="text-sm font-semibold mb-4 text-gray-700">
-                Basic Details
-              </CardTitle>
-
-              <div className="space-y-2">
-                <InfoIfExists label="Name" value={customer?.name} />
-                <InfoIfExists label="Phone" value={customer?.phone} />
-                <InfoIfExists label="Email" value={customer?.email} />
-                <InfoIfExists label="Type" value={customer?.type=="individual"? "Individual": customer?.type==="company"?"Company":""} />
-              </div>
-            </Card>
-
-            {/* INDIVIDUAL ADDRESS */}
-            { (
-              <Card className="p-4">
-                <CardTitle className="text-sm font-semibold mb-4 text-gray-700">
-                  Address
-                </CardTitle>
-
-                <div className="space-y-2">
-                  <InfoIfExists
-                    label="Address"
-                    value={customer?.address}
-                  />
-                  <InfoIfExists
-                    label="State"
-                    value={customer?.state?.name}
-                  />
-                  <InfoIfExists
-                    label="Country"
-                    value={customer?.country?.name}
-                  />
-                </div>
-              </Card>
-            )}
-          </div>
-
-          {/* COMPANY SECTION */}
-          {isCompany && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* COMPANY DETAILS */}
-              <Card className="p-4 flex-1">
-                <CardTitle className="text-sm font-semibold mb-4 text-gray-700">
-                  Company Details
-                </CardTitle>
-
-                <div className="space-y-2">
-                  <InfoIfExists
-                    label="Company Contact No"
-                    value={customer?.company_contact_no}
-                  />
-                  <InfoIfExists
-                    label="GSTIN"
-                    value={customer?.company_gstin}
-                  />
-                </div>
-              </Card>
-
-              {/* COMPANY ADDRESS */}
-              <Card className="p-4 flex-1">
-                <CardTitle className="text-sm font-semibold mb-4 text-gray-700">
-                  Company Address
-                </CardTitle>
-
-                <div className="space-y-2">
-                  <InfoIfExists
-                    label="Address"
-                    value={customer?.address}
-                  />
-                  <InfoIfExists
-                    label="State"
-                    value={customer?.company_state?.name}
-                  />
-                  <InfoIfExists
-                    label="Country"
-                    value={customer?.company_country?.name}
-                  />
-                </div>
-              </Card>
+        {/* Top Bar */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-xl bg-[#FE0000] flex items-center justify-center text-white font-bold">
+              {getInitials(customer?.consumer?.name)}
             </div>
-          )}
-        </>
-      )}
+            <div>
+              <h1 className="text-xl font-semibold text-slate-900">{customer?.consumer?.name ?? "-"}</h1>
+              <p className="text-sm text-slate-500"> {customer?.consumer?.phone ?? "-"} · {customer?.consumer?.state?.name ?? "-"}</p>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              onClick={() => {
+                localStorage.removeItem('sidebar_active_parent')
+                navigate(`/job-cards/manage?phone=${customerView.phone}&store_id=${customerView.store_id}`)
+
+              }}
+              className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add {"Job Card"}
+            </Button>
+          </div>
+        </div>
+
+        {/* KPI Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <>
+            <Kpi
+              label="Job Cards"
+              value={customer?.job_cards.total}
+              sub={[`${customer?.job_cards.open ?? 0} Open`, `${customer?.job_cards.completed ?? 0} Complete`]}
+              tone="info"
+            />
+
+            <Kpi
+              label="Invoices"
+              value={customer?.invoices.total}
+              sub={[`${customer?.invoices.paid ?? 0} Paid`]}
+              tone="info"
+            />
+
+            <Kpi
+              label="Paid"
+              value={`₹${Number(customer?.payments.received ?? 0).toLocaleString("en-IN")}`}
+              // sub={`Billed ₹${Number(customer?.invoices.total_billed).toLocaleString("en-IN")}`}
+              tone="success"
+            />
+
+            <Kpi
+              label="Outstanding"
+              value={`₹${Number(customer?.invoices.due_amount ?? 0).toLocaleString("en-IN")}`}
+              // sub="Pending Payment"
+              tone="danger"
+            />
+          </>
+
+        </div>
+
+        {/* Main Layout */}
+        <div className="grid lg:grid-cols-[240px_1fr] gap-4">
+
+          {/* Sidebar Tabs */}
+          <Card className="rounded-2xl">
+            <CardContent className="p-2">
+              {TABS.map(tab => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition",
+                    activeTab === tab.key
+                      ? "bg-[#FE0000] text-white"
+                      : "text-slate-600 hover:bg-slate-100"
+                  )}
+                >
+                  <tab.icon className="h-4 w-4" />
+                  {tab.label}
+                </button>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Content */}
+          <Card className="rounded-2xl !px-0">
+            <CardContent className="p-0">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                {activeTab === "overview" && <Overview id={id ?? ""} customer={customerView} />}
+                {activeTab === "jobcards" && <JobCard noTitle={true} noPadding={true} apiLink={`/api/consumers/${id}/job-cards`} hideColumnListInCustomer={hideColumnListInCustomer.jobcard} />}
+                {activeTab === "invoices" && <Invoice noTitle={true} noPadding={true} apiLink={`/api/consumers/${id}/invoices`}  hideColumnListInCustomer={hideColumnListInCustomer.invoice}/>}
+                {activeTab === "payments" && <PaymentsPage noTitle={true} noPadding={true} apiLink={`/api/consumers/${id}/payments`}  hideColumnListInCustomer={hideColumnListInCustomer.payment}/>}
+              </motion.div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
+  
 }
+
+
+
+
+

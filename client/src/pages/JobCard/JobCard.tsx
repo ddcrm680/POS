@@ -8,18 +8,19 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getJobCard, jobCardCancel, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
-import { TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
+import { reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
 import { EditIcon, EyeIcon, PrinterIcon, Trash2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
-import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
+import { canShowAction, formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import { jobCardStatusList } from "@/lib/constant";
+import { mapColumnsForCustomerView } from "@/lib/helper";
 
-export default function JobCard() {
+export default function JobCard({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
   const { toast } = useToast();
   const { roles } = useAuth();
   const [jobCards, setJobCards] = useState<Array<any>>([]);
@@ -94,7 +95,10 @@ export default function JobCard() {
       render: (value: string, row: any) => (
         <span
           className="text-[blue] font-medium cursor-pointer hover:underline"
-          onClick={() => navigate(`/job-cards/view?id=${row.id}`)}
+          onClick={() =>{
+            
+              localStorage.getItem("sidebar_active_parent",);
+            navigate(`/job-cards/view?id=${row.id}`)}}
         >
           {value}
         </span>
@@ -102,33 +106,33 @@ export default function JobCard() {
     },
 
     /* ================= CUSTOMER ================= */
-{
-  key: "consumer",
-  label: "Customer",
-  width: "180px",
-  render: (_: any, row: any) => (
-    <div className="flex flex-col leading-tight">
-      {/* Customer Name */}
-      <span
-        className="text-blue-600 font-medium cursor-pointer hover:underline"
-        onClick={() => {
-          localStorage.setItem("sidebar_active_parent", "customers");
-           navigate(`/customers/view?id=${row.consumer_id}`)
-        }}
-      >
-        {row.consumer?.name ?? "-"}
-      </span>
+    {
+      key: "consumer",
+      label: "Customer",
+      width: "180px",
+      render: (_: any, row: any) => (
+        <div className="flex flex-col leading-tight">
+          {/* Customer Name */}
+          <span
+            className="text-blue-600 font-medium cursor-pointer hover:underline"
+            onClick={() => {
+              localStorage.setItem("sidebar_active_parent", "customers");
+              navigate(`/customers/view?id=${row.consumer_id}`)
+            }}
+          >
+            {row.consumer?.name ?? "-"}
+          </span>
 
-      {/* Phone Number */}
-      {row.consumer?.phone && (
-        <span className="text-xs text-muted-foreground mt-0.5">
-          {row.consumer.phone}
-        </span>
-      )}
-    </div>
-  ),
-}
-,
+          {/* Phone Number */}
+          {row.consumer?.phone && (
+            <span className="text-xs text-muted-foreground mt-0.5">
+              {row.consumer.phone}
+            </span>
+          )}
+        </div>
+      ),
+    }
+    ,
     /* ================= SERVICE DATE ================= */
     {
       key: "jobcard_date",
@@ -215,9 +219,10 @@ export default function JobCard() {
           return (
             <span
               className="text-[blue] font-medium cursor-pointer hover:underline"
-              onClick={() =>{
-                 localStorage.removeItem('sidebar_active_parent')
-                navigate(`/invoices/view?id=${row.invoice.id}`)}}
+              onClick={() => {
+                localStorage.removeItem('sidebar_active_parent')
+                navigate(`/invoices/view?id=${row.invoice.id}`)
+              }}
             >
               {value}
             </span>
@@ -228,7 +233,7 @@ export default function JobCard() {
         return (
           <button
             onClick={() => {
-               localStorage.removeItem('sidebar_active_parent')
+              localStorage.removeItem('sidebar_active_parent')
               navigate(`/invoices/manage?jobCardId=${row.id}&mode=create`)
             }}
             className="
@@ -245,6 +250,16 @@ export default function JobCard() {
     }
 
   ];
+ const resolvedColumns = useMemo(() => {
+  const list = hideColumnListInCustomer?.list;
+
+  // 🔓 No config → show all columns
+  if (!Array.isArray(list) || list.length === 0) {
+    return columns;
+  }
+
+  return mapColumnsForCustomerView(columns, list);
+}, [columns, hideColumnListInCustomer]);
 
   const fetchJobCard = async (isLoaderHide = false) => {
     try {
@@ -252,17 +267,26 @@ export default function JobCard() {
         setIsListLoading(true);
       const res =
         await getJobCard({
-          per_page: perPage,
-          page,
-          search,
-          status: filters.status,
-          consumer: filters.consumer_id
+          apiLink: apiLink,
+          param: {
+            per_page: perPage,
+            page,
+            search,
+            status: filters.status,
+            consumer: filters.consumer_id
+          }
+
         });
 
-      const mappedTerritory = res.data.map((item: any) => ({ ...item, invoice_id: item?.invoice?.invoice_number ?? "" }))
+      const mappedJobCards = res.data.map((item: any) => ({
+        ...item,
+        invoice_id: item.invoice?.invoice_number ?? null, // 🔑 REQUIRED
+        invoice: item.invoice ?? null
+      }));
+
+      setJobCards(mappedJobCards);
       setHasNext(res.meta.has_next)
       setTotal(res.meta.total)
-      setJobCards(mappedTerritory);
       setLastPage(res.meta.last_page);
 
       setFilterMetaInfo(res.meta.filters)
@@ -286,23 +310,25 @@ export default function JobCard() {
       consumer_id: ""
     })
   }
+  const allowedActions = hideColumnListInCustomer?.actionShowedList;
   return (
-    <div className="p-4">
-      <div className="mb-6">
+    <div className={`${noPadding ? "" : "p-4"}`}>
+      {!noTitle && <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold">Job Card Management</h1>
             <p className="text-muted-foreground">Manage service workflow and track vehicles</p>
           </div>
         </div>
-      </div>
+      </div>}
+
       <Card className="w-full">
         <CardContent>
           <CommonTable
-            columns={columns}
+            columns={resolvedColumns}
             isClear={true}
             data={jobCards}
-            isAdd={true}
+            isAdd={noTitle ? false:true}
             perPage={perPage}
             setPerPage={setPerPage}
             resetFilter={resetFilter}
@@ -330,7 +356,7 @@ export default function JobCard() {
 
                   {(
                     <Box className="gap-0">
-                      <IconButton
+                      {canShowAction('print', allowedActions) && <IconButton
                         size="xs"
                         mr={2}
                         disabled
@@ -339,33 +365,36 @@ export default function JobCard() {
                         }
                       >
                         <PrinterIcon />
-                      </IconButton>
-
-                      <IconButton
-                        size="xs"
-                        mr={2}
-                        aria-label="View"
-                        onClick={() => {
- navigate(`/job-cards/view?id=${row.id}`)
-                        }
-                        }
-                      >
-                        <EyeIcon />
-                      </IconButton>
-                      {row.status === 'created' && <IconButton
-                        size="xs"
-                        mr={2}
-                        aria-label="Edit"
-                        onClick={() => {
-                          navigate(`/job-cards/manage?id=${row.id}&mode=edit`)
-
-                        }
-                        }
-                      >
-                        <EditIcon />
                       </IconButton>}
 
                       {
+                        canShowAction('view', allowedActions) && <IconButton
+                          size="xs"
+                          mr={2}
+                          aria-label="View"
+                          onClick={() => {
+                            navigate(`/job-cards/view?id=${row.id}`)
+                          }
+                          }
+                        >
+                          <EyeIcon />
+                        </IconButton  >
+                      }
+                      {canShowAction('edit', allowedActions) && row.status === 'created' && (
+                        <IconButton
+                          size="xs"
+                          mr={2}
+                          aria-label="Edit"
+                          onClick={() =>
+                            navigate(`/job-cards/manage?id=${row.id}&mode=edit`)
+                          }
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      )}
+
+                      {
+                        canShowAction('delete', allowedActions) &&
 
                         row.status === 'created' && <IconButton
                           size="xs"
