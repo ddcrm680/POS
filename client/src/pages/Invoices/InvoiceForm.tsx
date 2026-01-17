@@ -1235,15 +1235,3 @@ export default function InvoiceForm() {
   );
 }
 
-// {
-//     "success": false,
-//     "code": 422,
-//     "errors": {
-//         "items.0.name": [
-//             "The items.0.name field is required."
-//         ],
-//         "items.1.name": [
-//             "The items.1.name field is required."
-//         ]
-//     }
-// }
