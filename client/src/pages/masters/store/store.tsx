@@ -239,7 +239,7 @@ export default function Store() {
                   <Box className="gap-3">
                     <IconButton
                       size="xs"
-                      mr={2}
+                      // mr={2}
                       aria-label="View"
                       onClick={() =>
                         navigate(`/master/stores/manage?id=${row.id}&mode=view`)
@@ -249,7 +249,7 @@ export default function Store() {
                     </IconButton>
                     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
                       size="xs"
-                      mr={2}
+                      // mr={2}
                       aria-label="Edit"
                       onClick={() =>
                         navigate(`/master/stores/manage?id=${row.id}&mode=edit`)

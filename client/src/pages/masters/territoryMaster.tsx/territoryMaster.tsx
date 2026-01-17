@@ -277,7 +277,7 @@ const [isLoading, setIsLoading] = useState(false);
                   <Box className="gap-3">
                     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
                       size="xs"
-                      mr={2}
+                      // mr={2}
                       aria-label="Edit"
                       onClick={() => {
                         navigate(`/master/territory/manage?id=${row.id}&mode=edit`)
@@ -292,7 +292,7 @@ const [isLoading, setIsLoading] = useState(false);
                       Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && !row.store &&
                       <IconButton
                         size="xs"
-                        mr={2}
+                        // mr={2}
                         colorScheme="red"
                         aria-label="Delete"
                         onClick={() => {

@@ -344,7 +344,7 @@ export default function SystemLog() {
                   <Box className="gap-3">
                     <IconButton
                       size="xs"
-                      mr={2}
+                      // mr={2}
                       aria-label="View"
                       onClick={() =>
                         setIsServicePlanModalOpenInfo({
@@ -361,7 +361,7 @@ export default function SystemLog() {
                       Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id &&
                       <IconButton
                         size="xs"
-                        mr={2}
+                        // mr={2}
                         colorScheme="red"
                         aria-label="Delete"
                         onClick={() => {

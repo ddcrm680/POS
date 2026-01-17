@@ -426,7 +426,7 @@ export default function Services() {
                   <Box className="gap-0">
                     <IconButton
                       size="xs"
-                      mr={2}
+                      // mr={2}
                       aria-label="View"
                       onClick={() =>
                         setIsServicePlanModalOpenInfo({
@@ -440,7 +440,7 @@ export default function Services() {
                     </IconButton>
                     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
                       size="xs"
-                      mr={2}
+                      // mr={2}
                       aria-label="Edit"
                       onClick={() =>
                         setIsServicePlanModalOpenInfo({

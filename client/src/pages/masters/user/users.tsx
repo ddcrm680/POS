@@ -344,7 +344,7 @@ export default function Users() {
                   <Box className="gap-3">
                     <IconButton
                       size="xs"
-                      mr={2}
+                      // mr={2}
                       aria-label="View"
                       onClick={() =>
                         setIsUserModalOpenInfo({
@@ -358,7 +358,7 @@ export default function Users() {
                     </IconButton>
                     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
                       size="xs"
-                      mr={2}
+                      // mr={2}
                       aria-label="Edit"
                       onClick={() =>
                         setIsUserModalOpenInfo({
@@ -375,7 +375,7 @@ export default function Users() {
                       Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id &&
                       <IconButton
                         size="xs"
-                        mr={2}
+                        // mr={2}
                         colorScheme="red"
                         aria-label="Delete"
                         onClick={() => {

@@ -359,7 +359,7 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
                     {row.status !== "cancelled" ? (
                       <IconButton
                         size="xs"
-                        mr={2}
+                        // mr={2}
                         title="Cancel"
                         colorScheme="red"
                         aria-label="Cancel"

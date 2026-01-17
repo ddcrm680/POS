@@ -206,7 +206,7 @@ export default function Customer() {
                     <Box className="gap-0">
                       <IconButton
                         size="xs"
-                        mr={2}
+                        // mr={2}
                         aria-label="View"
                         onClick={() => {
                           navigate(`/customers/view?id=${row.id}`)
@@ -218,7 +218,7 @@ export default function Customer() {
                       </IconButton>
                       {<IconButton
                         size="xs"
-                        mr={2}
+                        // mr={2}
                         aria-label="Edit"
                         onClick={() => {
                           navigate(`/customers/manage?id=${row.id}&mode=edit`)

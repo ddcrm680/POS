@@ -369,7 +369,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                     <Box className="gap-0">
                       {canShowAction('print', allowedActions) && <IconButton
                         size="xs"
-                        mr={2}
+                        // mr={2}
                         disabled
                         aria-label="Print"
                         onClick={() => { }
@@ -381,7 +381,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                       {
                         canShowAction('view', allowedActions) && <IconButton
                           size="xs"
-                          mr={2}
+                          // mr={2}
                           aria-label="View"
                           onClick={() => {
                             navigate(`/job-cards/view?id=${row.id}`)
@@ -394,7 +394,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                       {canShowAction('edit', allowedActions) && row.status === 'created' && (
                         <IconButton
                           size="xs"
-                          mr={2}
+                          // mr={2}
                           aria-label="Edit"
                           onClick={() =>
                             navigate(`/job-cards/manage?id=${row.id}&mode=edit`)
@@ -409,7 +409,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
 
                         row.status === 'created' && <IconButton
                           size="xs"
-                          mr={2}
+                          // mr={2}
                           title="Cancel"
                           colorScheme="red"
                           aria-label="Cancel"
