@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Box } from "@chakra-ui/react";
 import { invoiceSchema } from "@/lib/schema";
 import { createInvoice, fetchStateList, getInvoiceInfo, getInvoiceInfoByJobCardPrefill, getInvoicePayments } from "@/lib/api";
-import { Trash2 } from "lucide-react";
+import { Trash2, Info } from "lucide-react";
 import { calculateInvoiceRow, formatDate, formatTime, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, normalizeInvoiceToEditResponse, } from "@/lib/utils";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
@@ -22,7 +22,7 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft } from "lucide-react";
 import CommonTable from "@/components/common/CommonTable";
-import { Info } from "@/components/common/viewInfo";
+import { Info as InfoComp } from "@/components/common/viewInfo";
 import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
 import { useToast } from "@/hooks/use-toast";
@@ -44,7 +44,7 @@ export default function InvoiceForm() {
       billing_state_id: "",
     },
   });
-  
+
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const billingStateId = Number(
@@ -133,7 +133,7 @@ export default function InvoiceForm() {
 
   const [isInfoLoading, setIsInfoLoading] = useState(false);
 
-
+  const [planErrors, setPlanErrors] = useState<Record<string, string>>({});
 
   const jobCardId = searchParams.get("jobCardId");
   const [invoiceInfo, setInvoiceInfo] = useState<{
@@ -169,206 +169,251 @@ export default function InvoiceForm() {
       })),
     };
   }
-const planColumns = useMemo(() => {
-  return [
-    {
-      key: "plan_name",
-      label: "Name",
-      width: "150px",
-    },
-    {
-      key: "sac",
-      label: "SAC",
-      width: "90px",
-      render: (v: string) => v ?? "-",
-    },
-    {
-      key: "qty",
-      label: "QTY",
-      width: "90px",
-      render: (_: any, row: any) => (
-        <input
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          disabled={isView}
-          className="w-16 border text-center rounded px-1 py-0.5 text-xs"
-          value={row.qty}
-          onChange={(e) => {
-            let value = e.target.value.replace(/\D/g, "");
+  const CellError = ({ message }: { message?: string }) => {
+    if (!message) return null;
 
-              // allow empty while typing
-            if (value === "") {
-              setPlans(prev =>
-                prev.map(p =>
-                    p.id === row.id
-                      ? { ...p, qty: "" }
-                      : p
-                )
-              );
-              return;
-            }
-              let qty = Number(value);
+    return (
+      <div className="absolute right-[-14px] top-1/2 -translate-y-1/2 group " title={message}>
+        <Info className="w-3 h-3 text-red-500 cursor-pointer" />
 
-              // 🔒 enforce limits: 1 → 1000
-            if (qty < 1) qty = 1;
-            if (qty > 1000) qty = 1000;
+      </div>
+    );
+  };
 
-              const gstType = isSameState ? "cgst_sgst" : "igst"
+  const planColumns = useMemo(() => {
+    return [
+      {
+        key: "plan_name",
+        label: "Name",
+        width: "150px",
+      },
+      {
+        key: "sac",
+        label: "SAC",
+        width: "90px",
+        render: (v: string) => v ?? "-",
+      },
+      {
+        key: "qty",
+        label: "QTY",
+        width: "90px",
+        render: (_: any, row: any, rowIndex: number) => {
+          const error = getPlanCellError(rowIndex, "qty");
 
-            setPlans(prev =>
-              prev.map(p =>
-                p.id === row.id
-                  ? calculateInvoiceRow({ ...p, qty }, gstType)
-                  : p
-              )
-            );
-          }}
-          onBlur={() => {
-              // normalize on blur
-            if (!row.qty || Number(row.qty) < 1) {
-                const gstType = isSameState ? "cgst_sgst" : "igst"
-              setPlans(prev =>
-                prev.map(p =>
-                  p.id === row.id
-                    ? calculateInvoiceRow({ ...p, qty: 1 }, gstType)
-                    : p
-                )
-              );
-            }
-          }}
-        />
-      ),
-    },
-    {
-      key: "price",
-      label: "Price (₹)",
-      width: "120px",
-      render: (v: number) => `₹ ${v}`,
-    },
-    {
-      key: "discount_percent",
-      label: "Dis.(%)",
-      width: "90px",
-      render: (_: any, row: any) => (
-        <input
-          type="text"
-          value={row.discount_percent}
+          return (
+            <div className="relative flex justify-center">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={row.qty}
+                className={`
+            w-16 border rounded px-1 py-0.5 text-xs text-center
+            ${error ? "border-red-500" : ""}
+          `}
+                onChange={(e) => {
+                  clearPlanCellError(rowIndex, "qty");
+                  let value = e.target.value.replace(/\D/g, "");
 
-          onChange={(e) => {
-            const value = e.target.value;
-            if (value === "") {
-              setPlans(prev =>
-                prev.map(p =>
-                  p.id === row.id
-                    ? { ...p, discount_percent: "", _discountSource: "percent" }
-                    : p
-                )
-              );
-              return;
-            }
-              // allow decimal typing
-              // ❌ block 00, 000 etc
-              if (!/^(?:0|[1-9]\d*)(?:\.\d{0,4})?$/.test(value)) return;
-
-              if (!/^\d*(\.\d{0,4})?$/.test(value)) return;
-            if (Number(value) > 100) return;
-
-            setPlans(prev =>
-              prev.map(p =>
-                p.id === row.id
-                  ? calculateInvoiceRow(
-                      { ...p, discount_percent: value, _discountSource: "percent" },
-                      isSameState ? "cgst_sgst" : "igst"
-                    )
-                  : p
-              )
-            );
-          }}
-          onBlur={() => {
-            if (!row.discount_percent) {
-              setPlans(prev =>
-                prev.map(p =>
-                  p.id === row.id
-                    ? calculateInvoiceRow(
-                        { ...p, discount_percent: 0 },
-                        isSameState ? "cgst_sgst" : "igst"
+                  // allow empty while typing
+                  if (value === "") {
+                    setPlans(prev =>
+                      prev.map(p =>
+                        p.id === row.id
+                          ? { ...p, qty: "" }
+                          : p
                       )
-                    : p
-                )
-              );
-            }
-          }}
-            className="w-16 border rounded px-1 py-0.5 text-xs text-center"
-        />
-      ),
-    },
-    {
-      key: "discount_amount",
-      label: "Discount (₹)",
-      width: "90px",
-      render: (_: any, row: any) => (
-        <input
-          type="text"
-          value={row.discount_amount}
+                    );
+                    return;
+                  }
+                  let qty = Number(value);
 
-          onChange={(e) => {
-            const value = e.target.value;
+                  // 🔒 enforce limits: 1 → 1000
+                  if (qty < 1) qty = 1;
+                  if (qty > 1000) qty = 1000;
 
-            if (value === "") {
-              setPlans(prev =>
-                prev.map(p =>
-                  p.id === row.id
-                    ? { ...p, discount_amount: "", _discountSource: "amount" }
-                    : p
-                )
-              );
-              return;
-            }
-              // ❌ block 00, 000 etc
-            if (!/^(?:0|[1-9]\d*)(?:\.\d{0,2})?$/.test(value)) return;
+                  const gstType = isSameState ? "cgst_sgst" : "igst"
 
-              // allow decimals
-              if (!/^\d*(\.\d{0,2})?$/.test(value)) {
-
-
-                return
-              }
-
-            setPlans(prev =>
-              prev.map(p =>
-                p.id === row.id
-                  ? calculateInvoiceRow(
-                      { ...p, discount_amount: value, _discountSource: "amount" },
-                      isSameState ? "cgst_sgst" : "igst"
+                  setPlans(prev =>
+                    prev.map(p =>
+                      p.id === row.id
+                        ? calculateInvoiceRow({ ...p, qty }, gstType)
+                        : p
                     )
-                  : p
-              )
-            );
-          }}
-          onBlur={() => {
-            if (!row.discount_amount) {
-              setPlans(prev =>
-                prev.map(p =>
-                  p.id === row.id
-                      ? calculateInvoiceRow({ ...p, discount_amount: 0 }, isSameState ? "cgst_sgst" : "igst")
-                    : p
-                )
-              );
-            }
-          }}
-            className="w-16 border rounded px-1 py-0.5 text-xs text-center"
-        />
-      ),
-    },
-    {
-      key: "sub_amount",
-      label: "Sub Total",
-      render: (v: number) => `₹ ${v ?? "-"}`,
-    },
+                  );
+                }}
+                onBlur={() => {
+                  // normalize on blur
+                  if (!row.qty || Number(row.qty) < 1) {
+                    const gstType = isSameState ? "cgst_sgst" : "igst"
+                    setPlans(prev =>
+                      prev.map(p =>
+                        p.id === row.id
+                          ? calculateInvoiceRow({ ...p, qty: 1 }, gstType)
+                          : p
+                      )
+                    );
+                  }
+                }}
+              />
 
-    ...(isSameState
-      ? [
+              <CellError message={error} />
+            </div>
+          );
+        },
+      },
+      {
+        key: "price",
+        label: "Price (₹)",
+        width: "120px",
+        render: (v: number) => `₹ ${v}`,
+      },
+      {
+        key: "discount_percent",
+        label: "Dis.(%)",
+        width: "90px",
+        render: (_: any, row: any, rowIndex: number) => {
+          const error = getPlanCellError(rowIndex, "discount_percent");
+
+          return (
+            <div className="relative flex justify-center">
+              <input
+                type="text"
+                value={row.discount_percent}
+                className={`
+            w-16 border rounded px-1 py-0.5 text-xs text-center
+            ${error ? "border-red-500" : ""}
+          `}
+                onChange={(e) => {
+                  clearPlanCellError(rowIndex, "discount_percent");
+
+                  const value = e.target.value;
+                  if (value === "") {
+                    setPlans(prev =>
+                      prev.map(p =>
+                        p.id === row.id
+                          ? { ...p, discount_percent: "", _discountSource: "percent" }
+                          : p
+                      )
+                    );
+                    return;
+                  }
+                  // allow decimal typing
+                  // ❌ block 00, 000 etc
+                  if (!/^(?:0|[1-9]\d*)(?:\.\d{0,4})?$/.test(value)) return;
+
+                  if (!/^\d*(\.\d{0,4})?$/.test(value)) return;
+                  if (Number(value) > 100) return;
+
+                  setPlans(prev =>
+                    prev.map(p =>
+                      p.id === row.id
+                        ? calculateInvoiceRow(
+                          { ...p, discount_percent: value, _discountSource: "percent" },
+                          isSameState ? "cgst_sgst" : "igst"
+                        )
+                        : p
+                    )
+                  );
+                }}
+                onBlur={() => {
+                  if (!row.discount_percent) {
+                    setPlans(prev =>
+                      prev.map(p =>
+                        p.id === row.id
+                          ? calculateInvoiceRow(
+                            { ...p, discount_percent: 0 },
+                            isSameState ? "cgst_sgst" : "igst"
+                          )
+                          : p
+                      )
+                    );
+                  }
+                }}
+              />
+
+              <CellError message={error} />
+            </div>
+          );
+        },
+      },
+      {
+        key: "discount_amount",
+        label: "Discount (₹)",
+        width: "90px",
+        render: (_: any, row: any, rowIndex: number) => {
+          const error = getPlanCellError(rowIndex, "discount_amount");
+
+          return (
+            <div className="relative flex justify-center">
+              <input
+                type="text"
+                value={row.discount_amount}
+                className={`
+            w-16 border rounded px-1 py-0.5 text-xs text-center
+            ${error ? "border-red-500" : ""}
+          `}
+                onChange={(e) => {
+                  clearPlanCellError(rowIndex, "discount_amount");
+
+                  const value = e.target.value;
+
+                  if (value === "") {
+                    setPlans(prev =>
+                      prev.map(p =>
+                        p.id === row.id
+                          ? { ...p, discount_amount: "", _discountSource: "amount" }
+                          : p
+                      )
+                    );
+                    return;
+                  }
+                  // ❌ block 00, 000 etc
+                  if (!/^(?:0|[1-9]\d*)(?:\.\d{0,2})?$/.test(value)) return;
+
+                  // allow decimals
+                  if (!/^\d*(\.\d{0,2})?$/.test(value)) {
+
+
+                    return
+                  }
+
+                  setPlans(prev =>
+                    prev.map(p =>
+                      p.id === row.id
+                        ? calculateInvoiceRow(
+                          { ...p, discount_amount: value, _discountSource: "amount" },
+                          isSameState ? "cgst_sgst" : "igst"
+                        )
+                        : p
+                    )
+                  );
+                }}
+                onBlur={() => {
+                  if (!row.discount_amount) {
+                    setPlans(prev =>
+                      prev.map(p =>
+                        p.id === row.id
+                          ? calculateInvoiceRow({ ...p, discount_amount: 0 }, isSameState ? "cgst_sgst" : "igst")
+                          : p
+                      )
+                    );
+                  }
+                }}
+              />
+
+              <CellError message={error} />
+            </div>
+          );
+        },
+      },
+      {
+        key: "sub_amount",
+        label: "Sub Total",
+        render: (v: number) => `₹ ${v ?? "-"}`,
+      },
+
+      ...(isSameState
+        ? [
           {
             key: "cgst_amount",
             label: "CGST",
@@ -396,7 +441,7 @@ const planColumns = useMemo(() => {
             ),
           },
         ]
-      : [
+        : [
           {
             key: "igst_amount",
             label: "IGST",
@@ -411,15 +456,15 @@ const planColumns = useMemo(() => {
           },
         ]),
 
-    {
-      key: "total_amount",
-      label: "Total",
-      width: "120px",
-      render: (v: number) => `₹ ${v ?? "-"}`,
-    },
+      {
+        key: "total_amount",
+        label: "Total",
+        width: "120px",
+        render: (v: number) => `₹ ${v ?? "-"}`,
+      },
 
-    ...(!isView
-      ? [
+      ...(!isView
+        ? [
           {
             key: "amount",
             label: "Action",
@@ -440,16 +485,16 @@ const planColumns = useMemo(() => {
             ),
           },
         ]
-      : []),
-  ];
-}, [
-  isSameState,
-  isView,
-  plans.length,
-  setPlans,
-  removePlan,
-  calculateInvoiceRow,
-]);
+        : []),
+    ];
+  }, [
+    isSameState,
+    isView,
+    plans.length,
+    setPlans,
+    removePlan,
+    calculateInvoiceRow,
+  ]);
   const [availablePlans, setAvailablePlans] = useState<any[]>([]);
   const [invoiceNumber, setInvoiceNumber] = useState('');
   useEffect(() => {
@@ -533,9 +578,16 @@ const planColumns = useMemo(() => {
         setIsInfoLoading(false);
       }
     };
-
-    loadInvoice();
+    if (id)
+      loadInvoice();
   }, [id]);
+  const clearPlanCellError = (rowIndex: number, field: string) => {
+    setPlanErrors(prev => {
+      const next = { ...prev };
+      delete next[`items.${rowIndex}.${field}`];
+      return next;
+    });
+  };
   function removePlan(planId: number) {
     setPlans(prev => prev.filter(p => p.id !== planId));
   }
@@ -578,23 +630,23 @@ const planColumns = useMemo(() => {
     loadStates();
   }, []);
 
-const addPlanRef = useRef<HTMLSelectElement | null>(null);
+  const addPlanRef = useRef<HTMLSelectElement | null>(null);
   const { toast } = useToast();
   async function handleInvoiceSubmission(values: any) {
-   
+
     if (!plans.length) {
       toast({
         title: "No Plans Added",
         description: "Please add at least one plan",
         variant: "destructive",
       });
-      
-    // ✅ focus Add Extra Plan selector
-    addPlanRef.current?.focus();
+
+      // ✅ focus Add Extra Plan selector
+      addPlanRef.current?.focus();
       return;
     }
     try {
-       setIsLoading(true);
+      setIsLoading(true);
       const payload = {
         ...buildInvoicePayload(values),
         url: mode !== "edit" && jobCardId ? `job-cards/${jobCardId}/invoice` : `invoices/${id}/update`
@@ -603,24 +655,49 @@ const addPlanRef = useRef<HTMLSelectElement | null>(null);
       await createInvoice(payload);
 
       toast({
-        title: "Add Invoice",
-        description: "Invoice added successfully",
+        title: id ? "Update Invoice" : "Add Invoice",
+        description: `Invoice ${id ? "updated" : "added"} successfully`,
         variant: "success",
       });
 
       navigate("/invoices");
     } catch (err: any) {
+
       const apiErrors = err?.response?.data?.errors;
 
 
       // 👇 THIS IS THE KEY PART
       if (apiErrors && err?.response?.status === 422) {
+        const tableErrors: Record<string, string> = {};
+
         Object.entries(apiErrors).forEach(([field, messages]) => {
+          const message = (messages as string[])[0];
+
+          // 🔹 Plan table errors (items.*)
+          if (field.startsWith("items.")) {
+            tableErrors[field] = message;
+            return;
+          }
+
+          // 🔹 Normal form fields
           form.setError(field as any, {
             type: "server",
-            message: (messages as string[])[0],
+            message,
           });
         });
+
+        // ✅ Save plan errors separately
+        if (Object.keys(tableErrors).length) {
+          setPlanErrors(tableErrors);
+
+          toast({
+            title: "Error",
+            description: err?.response?.data?.message,
+            variant: "destructive",
+          });
+
+        }
+
         return;
       }
       toast({
@@ -635,9 +712,11 @@ const addPlanRef = useRef<HTMLSelectElement | null>(null);
   }
   const InfoIfExists = ({ value, ...props }: any) => {
     if (value === null || value === undefined || value === "") return null
-    return <Info gap="gap-12" colon={false} justify="justify-between" {...props} value={value} />
+    return <InfoComp gap="gap-12" colon={false} justify="justify-between" {...props} value={value} />
   }
-
+  const getPlanCellError = (rowIndex: number, field: string) => {
+    return planErrors[`items.${rowIndex}.${field}`];
+  };
   const paymentColumn = [
     /* ================= CREATED DATE ================= */
     {
@@ -927,7 +1006,7 @@ const addPlanRef = useRef<HTMLSelectElement | null>(null);
                 <div >
                   <select
                     value=""
-                     ref={addPlanRef}
+                    ref={addPlanRef}
                     onChange={(e) => {
                       const selectedId = e.target.value;
                       if (!selectedId) return;
@@ -990,7 +1069,7 @@ const addPlanRef = useRef<HTMLSelectElement | null>(null);
                 setPage={() => { }}
                 lastPage={1}
                 hasNext={false}
-                
+
               />
 
               {/* TOTALS */}
