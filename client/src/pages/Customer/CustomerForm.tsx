@@ -429,16 +429,16 @@ export default function CustomerForm() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="">
           
-             <Card className="mb-6">
+             <Card className="">
 
               {
                 isInfoLoading && id ? <div className="min-h-[150px] flex justify-center items-center">
-                  <div className="p-3 text-sm "><Loader /></div>
+                  <div className="p-4 text-sm "><Loader /></div>
                 </div> :
                
-                    <SectionCard className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>
+                    <SectionCard className="pb-4 grid gap-4 p-4" headingMarginBottom={"mb-0"}>
                       {/* BASIC INFO */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <FloatingField
                           name="name"
                           label="Name"
@@ -640,11 +640,11 @@ export default function CustomerForm() {
 
               }
  </Card>
-              {mode !== 'view' && <div className="  pb-4 flex justify-end gap-3 mt-4">
+              {mode !== 'view' && <div className="  pb-3 flex justify-end gap-3 mt-3">
                 <Button
                   variant="outline"
                   disabled={isLoading || isInfoLoading}
-                  className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                  className={'hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'}
                   onClick={() => navigate("/customers")}
                 >
                   {'Cancel'}
@@ -654,7 +654,7 @@ export default function CustomerForm() {
                   <Button type="button"
                     disabled={isLoading || isInfoLoading}
                     onClick={form.handleSubmit(handleJobCardSubmission,)}
-                    className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
+                    className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]  h-8 text-xs">
                     {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
                     {isLoading
                       ? id ? "Updating..." : "Adding..."

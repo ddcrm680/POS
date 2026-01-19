@@ -58,6 +58,7 @@ export default function CommonDeleteModal({
           <Button
             variant="outline"
             onClick={onCancel}
+            className="h-8 text-xs"
             disabled={isLoading}
           >
             {cancelText}
@@ -66,7 +67,7 @@ export default function CommonDeleteModal({
           <Button
             onClick={onConfirm}
             disabled={isLoading}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-red-600 hover:bg-red-700 h-8 text-xs"
           >
             {isLoading && <svg
               className="h-6 w-6 animate-spin text-[#fff]"

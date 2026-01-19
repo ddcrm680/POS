@@ -13,7 +13,7 @@ export const SectionCard = ({
 }) => (
   <div
     className={cn(
-      "bg-white  rounded-xl p-3 pb-0",
+      "bg-white  rounded-xl p-4 pb-0",
       className
     )} >
   {title &&  <h3 className={`text-sm font-semibold ${headingMarginBottom} text-gray-700`}>{title}</h3>}

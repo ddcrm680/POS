@@ -434,11 +434,11 @@ export default function InvoiceView() {
             {
                 isInfoLoading && id ?
                     <Card className="mb-6"><div className="min-h-[150px] flex justify-center items-center">
-                        <div className="p-3 text-sm "><Loader /></div>
+                        <div className="p-4 text-sm "><Loader /></div>
                     </div></Card> : <>
                         {/* Top Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {invoiceView?.customer && <Card className="p-3">
+                            {invoiceView?.customer && <Card className="p-4">
                                 <CardTitle className=" text-sm font-semibold mb-3 text-gray-700 flex gap-2 items-center">
                                     Customer Detail
                                 </CardTitle>
@@ -462,7 +462,7 @@ export default function InvoiceView() {
                                 </div>
                             </Card>}
 
-                            {invoiceView?.jobcard && <Card className="p-3">
+                            {invoiceView?.jobcard && <Card className="p-4">
                                 <CardTitle className=" text-sm font-semibold mb-3 text-gray-700 flex gap-2 items-center">
                                     Jobcard Info
                                 </CardTitle>
@@ -471,7 +471,7 @@ export default function InvoiceView() {
                                     <InfoIfExists label="Edited Date" value={invoiceView?.jobcard.edited_date} />
                                 </div>
                             </Card>}
-                            {invoiceView?.vehicle && <Card className="p-3">
+                            {invoiceView?.vehicle && <Card className="p-4">
                                 <CardTitle className=" text-sm font-semibold mb-3 text-gray-700 flex gap-2 items-center">
                                     Vehicle Info  </CardTitle>   <div className="space-y-2">
                                     <InfoIfExists label="Type" value={invoiceView?.vehicle?.type} />
@@ -487,7 +487,7 @@ export default function InvoiceView() {
                             </Card>
                             }
 
-                            <Card className="p-3">
+                            <Card className="p-4">
                                 <CardTitle className=" text-sm font-semibold mb-3 text-gray-700 flex gap-2 items-center">
                                     Billing Info
                                 </CardTitle>
@@ -508,7 +508,7 @@ export default function InvoiceView() {
 
 
                         {/* Plans */}
-                        <Card className="p-3 lg:col-span-3">
+                        <Card className="p-4 lg:col-span-3">
 
                             <CardTitle className="text-sm font-semibold text-gray-700">
                                 Service Info
@@ -638,7 +638,7 @@ export default function InvoiceView() {
                             </div>
                         </Card>
                         {/* Payments info */}
-                        {<Card className="p-3 lg:col-span-3">
+                        {<Card className="p-4 lg:col-span-3">
                             <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
                                 Payments Info
                             </CardTitle>

@@ -895,7 +895,8 @@ export default function JobForm() {
     <>
       <div className="max-w-5xl mx-auto px-3 sm:px-3 py-3 space-y-3">
         {/* HEADER */}
-        <div className="flex items-center gap-3">
+        <div className="grid grid-cols-1">
+  <div className="inline-flex items-center gap-3">
           <button
             onClick={() => {
               localStorage.removeItem('sidebar_active_parent')
@@ -914,6 +915,8 @@ export default function JobForm() {
           </div>
         </div>
 
+        </div>
+      
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-3 rounded-xl ">
 
 
@@ -1202,7 +1205,7 @@ export default function JobForm() {
 
                       {/* Vehicle Information */}
                       <Card>
-                        <SectionCard title="Vehicle Information" className="pb-3">
+                        <SectionCard title="Vehicle Information" className="pb-3 p-4">
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                             <FloatingRHFSelect
                               name="vehicle_company_id"
@@ -1367,7 +1370,7 @@ export default function JobForm() {
 
                       {/* Service Selection & Summary */}
                       <Card>
-                        <SectionCard title="Service Information" className="pb-3 space-y-3">
+                        <SectionCard title="Service Information" className="pb-3 p-4 space-y-3">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             {/* Vehicle Type */}
                             <FloatingRHFSelect
@@ -1495,7 +1498,7 @@ export default function JobForm() {
                   <Button
                     variant="outline"
                     disabled={isLoading || isInfoLoading}
-                    className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                    className={'hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'}
                     onClick={() => navigate("/job-cards")}
                   >
                     {'Cancel'}
@@ -1505,7 +1508,7 @@ export default function JobForm() {
                     <Button type="button"
                       disabled={isLoading || isInfoLoading}
                       onClick={form.handleSubmit(handleJobCardSubmission,)}
-                      className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]">
+                      className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] h-8 text-xs">
                       {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
                       {isLoading
                         ? id ? "Updating..." : "Adding..."

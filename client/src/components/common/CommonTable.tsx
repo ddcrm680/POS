@@ -23,7 +23,7 @@ export default function CommonTable({
   tabType,
   setIsUserModalOpenInfo,
   searchable = true,
-  isTotal=true,
+  isTotal = true,
   lastPage,
   setPage,
   isAdd = false,
@@ -102,7 +102,7 @@ export default function CommonTable({
       {/* Search Bar */}
       {searchable && (
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-         <div className="relative flex-1 max-w-sm">
+          <div className="relative flex-1 max-w-sm">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2
              text-gray-400 w-4 h-4
@@ -116,8 +116,8 @@ export default function CommonTable({
                 hasUserTyped.current = true;   // 👈 user action
                 setLocalSearch(e.target.value);
               }}
-     className="
-  pl-9 h-9 text-[12px]
+              className="
+  pl-9 h-8 text-[12px]
   bg-white
   border border-gray-300
   rounded-md
@@ -159,14 +159,14 @@ export default function CommonTable({
         renderCardView()
       ) : (<div className="relative overflow-x-auto rounded-lg border">
         <Table.Root size="sm" className="min-w-[900px]" >
-         <Table.Header className="sticky top-0 z-20 bg-gray-50 backdrop-blur border-b">
+          <Table.Header className="sticky top-0 z-20 bg-gray-50 backdrop-blur border-b">
             <Table.Row className="!bg-gray-100 border-b border-gray-200">
               {columns.map((col: any) => (
                 <Table.ColumnHeader
                   key={col.key}
                   textAlign={col.align || "start"}
                   width={col.width}
-                 className="
+                  className="
   !py-2 !px-3
   text-xs font-semibold uppercase tracking-wide
   text-gray-600
@@ -177,12 +177,12 @@ export default function CommonTable({
               ))}
 
               {actions && (
-               <Table.ColumnHeader
-  width="160px"
-  className="sticky right-0 z-30 bg-inherit text-xs font-semibold    text-gray-600 uppercase"
->
-  Actions
-</Table.ColumnHeader>
+                <Table.ColumnHeader
+                  width="160px"
+                  className="sticky right-0 z-30 bg-inherit text-xs font-semibold    text-gray-600 uppercase"
+                >
+                  Actions
+                </Table.ColumnHeader>
               )}
             </Table.Row>
           </Table.Header>
@@ -213,7 +213,7 @@ export default function CommonTable({
                 <Table.Row
                   key={row.id ?? rowIndex}
                   onClick={() => onRowClick?.(row, rowIndex)}
-                 className="
+                  className="
   group
   transition-colors
   border-b border-gray-100
@@ -226,7 +226,7 @@ export default function CommonTable({
                       key={col.key}
                       textAlign={col.align || "start"}
                       width={col.width}
-                    className="!py-2 !px-3 text-[13px] text-gray-700 leading-snug"
+                      className="!py-2 !px-3 text-[13px] text-gray-700 leading-snug"
                     >
                       {col.render
                         ? col.render(row[col.key], row, rowIndex)
@@ -235,9 +235,9 @@ export default function CommonTable({
                   ))}
 
                   {actions && (
-                    <Table.Cell  width="100px"
-    className="sticky right-0 z-10 bg-inherit"
->
+                    <Table.Cell width="100px"
+                      className="sticky right-0 z-10 bg-inherit"
+                    >
                       {actions(row)}
                     </Table.Cell>
                   )}
@@ -249,65 +249,65 @@ export default function CommonTable({
       </div>)}
 
       {/* Pagination */}
-      { (
+      {(
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
-{
-  (total > perPageOptions[0] || lastPage > 1) && <>  {setPerPage && total > perPageOptions[0] && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-600">Rows per page</span>
-              <select
-                value={perPage}
-                onChange={(e) => {
-                  setPerPage(Number(e.target.value));
-                  setPage(1);
-                }}
-                className="border rounded px-2 py-1 text-xs"
-              >
-                {perPageOptions.map((size: number) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          {
+            (total > perPageOptions[0] || lastPage > 1) && <>  {setPerPage && total > perPageOptions[0] && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600">Rows per page</span>
+                <select
+                  value={perPage}
+                  onChange={(e) => {
+                    setPerPage(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  className="border rounded px-2 py-1 text-xs"
+                >
+                  {perPageOptions.map((size: number) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-          {/* Pagination buttons */}
-          {/* {lastPage > 1 && ( */}
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              disabled={page === 1}
-              className="py-1 h-[27.2px] rounded"
-              onClick={() => setPage((p: number) => p - 1)}
-            >
-      Prev
-    </Button>
+              {/* Pagination buttons */}
+              {/* {lastPage > 1 && ( */}
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  disabled={page === 1}
+                  className="py-1 h-[27.2px] rounded"
+                  onClick={() => setPage((p: number) => p - 1)}
+                >
+                  Prev
+                </Button>
 
-            <span className="text-xs">
-              <strong>{page}</strong> of <strong>{lastPage}</strong>
-            </span>
+                <span className="text-xs">
+                  <strong>{page}</strong> of <strong>{lastPage}</strong>
+                </span>
 
-            <Button
-              variant="outline"  className="py-1 h-[27.2px] rounded"
-              disabled={!hasNext || page === lastPage}
-              onClick={() => setPage((p: number) => p + 1)}
-            >
-      Next
-    </Button>
-             
-</div></>
-}
+                <Button
+                  variant="outline" className="py-1 h-[27.2px] rounded"
+                  disabled={!hasNext || page === lastPage}
+                  onClick={() => setPage((p: number) => p + 1)}
+                >
+                  Next
+                </Button>
+
+              </div></>
+          }
           {/* Per Page selector */}
-        
-       {isTotal &&   <span className="text-xs text-gray-600">
+
+          {isTotal && <span className="text-xs text-gray-600">
             Total : <strong>{total}</strong>
           </span>}
           {/* )} */}
 
         </div>
       )}
-      
+
     </div>
   );
 }
