@@ -1207,7 +1207,7 @@ export default function InvoiceForm() {
 
 
       {mode !== 'view' &&
-        <div className="  pb-3 flex justify-end gap-3 mt-3">
+        <div className="  pb-4 flex justify-end gap-3 mt-4">
           <Button
             variant="outline"
             disabled={isLoading || isInfoLoading}
