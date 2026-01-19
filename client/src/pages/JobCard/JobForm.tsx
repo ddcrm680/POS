@@ -1273,7 +1273,7 @@ export default function JobForm() {
                                 control={form.control}
                                 name="isRepainted"
                                 render={({ field }) => (
-                                  <label className={`flex  items-center gap-2 relative text-sm ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`inline-flex w-fit  items-center gap-2 relative text-sm ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1293,7 +1293,7 @@ export default function JobForm() {
                                 control={form.control}
                                 name="isSingleStagePaint"
                                 render={({ field }) => (
-                                  <label className={`flex items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`inline-flex w-fit items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1314,7 +1314,7 @@ export default function JobForm() {
                                 control={form.control}
                                 name="isPaintThickness"
                                 render={({ field }) => (
-                                  <label className={`flex items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`inline-flex w-fit items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1335,7 +1335,7 @@ export default function JobForm() {
                                 control={form.control}
                                 name="isVehicleOlder"
                                 render={({ field }) => (
-                                  <label className={`flex items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`inline-flex w-fit items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
