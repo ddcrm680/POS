@@ -1272,7 +1272,7 @@ const paramStoreId = encryptedStoreId
                                 control={form.control}
                                 name="isRepainted"
                                 render={({ field }) => (
-                                  <label className={`flex  items-center gap-2 ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`flex  items-center gap-2 relative ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1292,7 +1292,7 @@ const paramStoreId = encryptedStoreId
                                 control={form.control}
                                 name="isSingleStagePaint"
                                 render={({ field }) => (
-                                  <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`flex items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1313,7 +1313,7 @@ const paramStoreId = encryptedStoreId
                                 control={form.control}
                                 name="isPaintThickness"
                                 render={({ field }) => (
-                                  <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`flex items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1334,7 +1334,7 @@ const paramStoreId = encryptedStoreId
                                 control={form.control}
                                 name="isVehicleOlder"
                                 render={({ field }) => (
-                                  <label className={`flex items-center gap-2 text-sm ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`flex items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
