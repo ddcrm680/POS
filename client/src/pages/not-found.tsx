@@ -11,9 +11,9 @@ export default function NotFound() {
   return (
     <div className="h-full w-full flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md mx-4">
-        <CardContent className="pt-6 text-center">
-          <div className="flex items-center justify-center mb-4 gap-2">
-            <AlertCircle className="h-8 w-8 text-red-500" />
+        <CardContent className="p-6 text-center">
+          <div className="flex flex-col items-center justify-center mb-4 gap-2">
+            <AlertCircle className="h-9 w-9 text-red-500" />
             <h1 className="text-2xl font-bold text-gray-900">
               404 Page Not Found
             </h1>

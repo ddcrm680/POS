@@ -22,7 +22,7 @@ export function GlobalLoader({ isShowLoadingText = true, color = "" }: { isShowL
                     d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                 />
             </svg>
-            <p className="font-medium text-[20px] leading-tight">Loading...</p>
+            <p className="font-medium text-[20px] leading-tight text-black">Loading...</p>
         </div>
     </div>
 

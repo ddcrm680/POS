@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getInitials, cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Search, CreditCard, FileText, Briefcase, User, Plus } from "lucide-react";
+import { Search, CreditCard, FileText, Briefcase, User, Plus, ChevronLeft, ArrowLeft } from "lucide-react";
 import { Overview } from "./Overview";
 import { DataList } from "./CommonDataList";
 import { Kpi } from "./DashboardCards";
@@ -15,6 +15,7 @@ import { useLocation, useSearchParams } from "wouter";
 import JobCard from "../JobCard/JobCard";
 import Invoice from "../Invoices/Invoice";
 import PaymentsPage from "../Payments/payments";
+import { GlobalLoader } from "@/components/common/GlobalLoader";
 
 
 export default function ConsumerDashboardRedesign() {
@@ -23,8 +24,9 @@ export default function ConsumerDashboardRedesign() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [customer, setCustomer] = useState<any | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
   const fetchCustomer = async () => {
     try {
@@ -32,8 +34,11 @@ export default function ConsumerDashboardRedesign() {
       const res = await getCustomerDashboardView(id ?? "");
 
       setCustomer(res?.data ?? null);
-    } catch (e) {
+    } catch (e:any) {
       console.error(e);
+       if (e?.response?.data?.code === 404) {
+        setNotFound(true);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -46,6 +51,7 @@ export default function ConsumerDashboardRedesign() {
     }
 
   }, [id]);
+
   const [customerView, setCustomerView] = useState<any | null>(null);
 
   const fetchCustomerView = async () => {
@@ -57,13 +63,58 @@ export default function ConsumerDashboardRedesign() {
     } catch (e: any) {
 
       if (e?.response?.data?.code === 404) {
-        navigate("/customers")
+        setNotFound(true);
       }
       console.error(e);
     } finally {
       setIsLoading(false);
     }
   };
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-sm text-slate-500">
+          <GlobalLoader />
+        </div>
+      </div>
+    );
+  }
+  const showNotFound = !isLoading && notFound;
+
+  if (showNotFound) {
+    return (
+      <div className="h-full flex items-center justify-center p-4">
+         <Card className="w-full max-w-md mx-4">
+        <CardContent className="p-6 text-center">
+          <div className="flex flex-col items-center justify-center mb-4 gap-2">
+            <div className="border-[3px] p-1 border-red-500 rounded-[50%]">
+              <User className="h-9 w-9 text-red-500" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Customer Not Found
+            </h1>
+          </div>
+
+          <p className="mt-2 text-sm text-gray-600">
+          The customer you are trying to view does not exist or may have been deleted.
+            </p>
+
+          {/* 👇 Go Home Button */}
+          <div className="mt-6">
+            <Button
+                onClick={() => navigate("/customers")}
+              className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex items-center gap-2 mx-auto"
+            >
+              <ArrowLeft size={16} />
+              Go Back
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+     
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen ">
       <div className="mx-auto max-w-6xl p-3 sm:p-3 space-y-3">
@@ -71,6 +122,17 @@ export default function ConsumerDashboardRedesign() {
         {/* Top Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                localStorage.removeItem('sidebar_active_parent')
+                window.history.back()
+              }}
+              disabled={isLoading}
+
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ChevronLeft size={18} />
+            </button>
             <div className="h-10 w-10 rounded-lg bg-[#FE0000] flex items-center justify-center text-white font-bold">
               {getInitials(customer?.consumer?.name)}
             </div>
