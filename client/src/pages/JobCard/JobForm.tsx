@@ -33,7 +33,8 @@ import {
   Receipt,
   Clock,
   Loader2,
-  ChevronLeft
+  ChevronLeft,
+  Check
 } from "lucide-react";
 import { z } from "zod";
 import POSLayout from "@/components/layout/pos-layout";
@@ -59,11 +60,11 @@ export default function JobForm() {
 
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
-const encryptedStoreId = searchParams.get("store_id");
+  const encryptedStoreId = searchParams.get("store_id");
 
-const paramStoreId = encryptedStoreId
-  ? decryptQuery(decodeURIComponent(encryptedStoreId))
-  : null;
+  const paramStoreId = encryptedStoreId
+    ? decryptQuery(decodeURIComponent(encryptedStoreId))
+    : null;
   const paramPhone = searchParams.get("phone");
   const mode = searchParams.get("mode");
   const isView = mode === "view";
@@ -1272,12 +1273,12 @@ const paramStoreId = encryptedStoreId
                                 control={form.control}
                                 name="isRepainted"
                                 render={({ field }) => (
-                                  <label className={`flex  items-center gap-2 relative ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`flex  items-center gap-2 relative text-sm ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
                                       onCheckedChange={(val) => field.onChange(Boolean(val))}
-                                       className="
+                                      className="
     border-blue-800
     data-[state=checked]:bg-blue-700
     data-[state=checked]:border-blue-700
@@ -1297,7 +1298,7 @@ const paramStoreId = encryptedStoreId
                                       disabled={isView}
                                       checked={field.value}
                                       onCheckedChange={(val) => field.onChange(Boolean(val))}
-                                     className="
+                                      className="
     border-blue-800
     data-[state=checked]:bg-blue-700
     data-[state=checked]:border-blue-700
@@ -1318,7 +1319,7 @@ const paramStoreId = encryptedStoreId
                                       disabled={isView}
                                       checked={field.value}
                                       onCheckedChange={(val) => field.onChange(Boolean(val))}
-                                         className="
+                                      className="
     border-blue-800
     data-[state=checked]:bg-blue-700
     data-[state=checked]:border-blue-700
@@ -1431,23 +1432,31 @@ const paramStoreId = encryptedStoreId
                                 return (
                                   <Card
                                     key={service.id}
+                                    onClick={() => {
+                                      if (!isView) toggleService(service.id)
+                                    }}
                                     className={`
-    transition-all border
+    cursor-pointer transition-all border
     ${isSelected
                                         ? "border-primary bg-primary/5 shadow-sm"
-                                        : "hover:border-muted-foreground/30"}
+                                        : "hover:border-muted-foreground/30"
+                                      }
   `}
                                   >
                                     <CardContent className="p-3">
                                       <div className="flex items-start justify-between gap-3">
                                         <div className="flex items-start gap-2">
-                                          <Checkbox
-                                            checked={isSelected}
-                                            disabled={isView}
-                                            onCheckedChange={() => toggleService(service.id)}
-                                            onClick={(e) => e.stopPropagation()} // 🔴 IMPORTANT
-                                          />
-
+                                          <div
+                                            className={`
+    min-h-4 min-w-4 rounded border flex items-center justify-center
+    ${isSelected
+                                                ? "bg-primary border-primary text-white"
+                                                : "border-muted-foreground"
+                                              }
+  `}
+                                          >
+                                            {isSelected && <Check className="h-3 w-3" />}
+                                          </div>
                                           <div>
                                             <p className="font-medium leading-tight">
                                               {service.label}
@@ -1462,12 +1471,12 @@ const paramStoreId = encryptedStoreId
                                           <p className="text-lg font-semibold text-green-600">
                                             ₹{service.price}
                                           </p>
-
                                         </div>
                                       </div>
                                     </CardContent>
                                   </Card>
-                                );
+
+                                )
                               })}
                             </div>}
 
