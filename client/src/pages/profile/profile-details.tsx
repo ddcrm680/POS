@@ -15,7 +15,7 @@ export default function ProfileDetails() {
     <>
        <div className="p-3 sm:p-3 space-y-3 max-w-6xl mx-auto">
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 ">
 
           <div className=" flex justify-between">
             <div className="flex items-center gap-2">
@@ -38,7 +38,7 @@ export default function ProfileDetails() {
     scrollbar-hide
     lg:grid lg:grid-cols-2
     justify-start
-     lg:w-[40]
+     lg:w-[40] 
      
   ">
               {profileMenu.map((item) => {
@@ -47,7 +47,7 @@ export default function ProfileDetails() {
                   value={item.value}
                  className="
     flex items-center gap-2
-    whitespace-nowrap px-3 py-2
+    whitespace-nowrap px-3 
     transition-all duration-200
 
     hover:bg-muted
@@ -56,7 +56,7 @@ export default function ProfileDetails() {
 
     data-[state=active]:bg-white
     data-[state=active]:text-[#65758b]
-    data-[state=active]:shadow
+    data-[state=active]:shadow h-8 text-xs
   "
                   data-testid={item.dataTestId}
                 >

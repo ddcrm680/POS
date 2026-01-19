@@ -86,7 +86,7 @@ text-xl font-semibold
 
     data-[state=active]:bg-white
     data-[state=active]:text-[#65758b]
-    data-[state=active]:shadow
+    data-[state=active]:shadow  h-8 text-xs
   "
                     >
                       <Icon size={16} />

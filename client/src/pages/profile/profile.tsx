@@ -297,7 +297,7 @@ export default function Profile() {
                 variant="outline"
 
                 disabled={isLoading}
-                className='hover:bg-[#E3EDF6] hover:text-[#000]'
+                className='hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'
                  onClick={() => {
  localStorage.removeItem('sidebar_active_parent')
               window.history.back()
@@ -313,7 +313,7 @@ export default function Profile() {
                           hover:bg-[rgb(238,6,6)]
                           hover:border-black
                           transition-all duration-200
-                          flex items-center justify-center gap-2
+                          flex items-center justify-center gap-2 h-8 text-xs
                         "
                   type="button" onClick={(e) => {
                     e.preventDefault();
@@ -323,7 +323,7 @@ export default function Profile() {
                   {"Update "}
                 </Button> :
                 <>   <Button type="button"
-                  className='hover:bg-[#E3EDF6] hover:text-[#000]'
+                  className='hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'
 
                   variant="outline"
                   onClick={(e) => {
@@ -342,8 +342,8 @@ export default function Profile() {
                           bg-[#FE0000] 
                           hover:bg-[rgb(238,6,6)]
                           hover:border-black
-                          transition-all duration-200
-                          flex items-center justify-center gap-2
+                          transition-all duration-200 
+                          flex items-center justify-center gap-2 h-8 text-xs 
                         "
                     disabled={isLoading}
                   >

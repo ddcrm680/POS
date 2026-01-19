@@ -710,7 +710,7 @@ export default function StoreForm() {
                   <Button
                     variant="outline"
                     disabled={isLoading || isInfoLoading}
-                    className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+                    className={'hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'}
                     onClick={() => navigate("/master")}
                   >
                     {'Cancel'}
@@ -718,7 +718,7 @@ export default function StoreForm() {
                   <Button
                     type="submit"
                     disabled={isLoading || isInfoLoading}
-                    className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
+                    className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] h-8 text-xs"
                   >
                     {isLoading && <Loader isShowLoadingText={false} color="#fff" />}
                     {isLoading

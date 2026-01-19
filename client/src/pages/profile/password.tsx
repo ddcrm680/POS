@@ -92,7 +92,7 @@ export default function Password() {
               <Button
                 type="button"
                 variant="outline"
-                className='hover:bg-[#E3EDF6] hover:text-[#000]'
+                className='hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'
                 disabled={isLoading}
                  onClick={() => {
  localStorage.removeItem('sidebar_active_parent')
@@ -108,7 +108,7 @@ export default function Password() {
                           hover:bg-[rgb(238,6,6)]
                           hover:border-black
                           transition-all duration-200
-                          flex items-center justify-center gap-2
+                          flex items-center justify-center gap-2 h-8 text-xs
                         "
                 disabled={isLoading}
               >

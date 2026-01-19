@@ -481,7 +481,7 @@ export default function ServiceForm({
             <Button
               variant="outline"
               disabled={isLoading}
-              className={'hover:bg-[#E3EDF6] hover:text-[#000]'}
+              className={'hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'}
               onClick={onClose}
             >
               {'Cancel'}
@@ -489,7 +489,7 @@ export default function ServiceForm({
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
+              className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] h-8 text-xs"
             >
               {isLoading && <svg
                 className="h-6 w-6 animate-spin text-[#fff]"
