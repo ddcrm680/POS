@@ -51,6 +51,7 @@ import { consumerSave, consumerUpdate, fetchCityList, fetchStateList, fetchStore
 import { JobCardOnlySchema, NewJobCardSchema } from "@/lib/schema";
 import { useAuth } from "@/lib/auth";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
+import { decryptQuery } from "@/lib/crypto";
 
 export default function JobForm() {
   const [step, setStep] = useState(1);
@@ -58,9 +59,11 @@ export default function JobForm() {
 
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
+const encryptedStoreId = searchParams.get("store_id");
 
-  const paramStoreId = searchParams.get("store_id");
-
+const paramStoreId = encryptedStoreId
+  ? decryptQuery(decodeURIComponent(encryptedStoreId))
+  : null;
   const paramPhone = searchParams.get("phone");
   const mode = searchParams.get("mode");
   const isView = mode === "view";

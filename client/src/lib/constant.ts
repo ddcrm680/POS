@@ -31,6 +31,7 @@ import {
 export const Constant = {
   REACT_APP_BASE_URL: 'https://pos.detailingdevils.com',
   REACT_APP_API_TIMEOUT: 30000,
+  CRYPTO_QUERY_SECRET:"dfdfhregrwtqr32r2r#!@$@r23",
   REACT_APP_PUSHER_KEY: "99a4e310f0775a0c4dea",
   REACT_APP_PUSHER_CLUSTER: "ap2",
   superAdmin: "super-admin",
