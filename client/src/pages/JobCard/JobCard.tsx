@@ -366,8 +366,9 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                 <>
 
                   {(
-                    <Box className="gap-0">
-                      {canShowAction('print', allowedActions) && <IconButton
+                      <Box className="   grid grid-cols-2       
+    sm:flex sm:flex-wrap sm:gap-1 
+    justify-center">      {canShowAction('print', allowedActions) && <IconButton
                         size="xs"
                         // mr={2}
                         disabled

@@ -178,8 +178,8 @@ export default function CommonTable({
 
               {actions && (
                 <Table.ColumnHeader
-                  width="160px"
-                  className="sticky right-0 z-30 bg-inherit text-xs font-semibold    text-gray-600 uppercase"
+                  width="100px"
+                  className="sticky right-0 z-30 bg-inherit text-xs font-semibold text-center   text-gray-600 uppercase"
                 >
                   Actions
                 </Table.ColumnHeader>
@@ -236,7 +236,7 @@ export default function CommonTable({
 
                   {actions && (
                     <Table.Cell width="100px"
-                      className="sticky right-0 z-10 bg-inherit"
+                      className="sticky right-0 z-10 text-center bg-white"
                     >
                       {actions(row)}
                     </Table.Cell>

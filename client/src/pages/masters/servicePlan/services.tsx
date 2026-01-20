@@ -423,8 +423,9 @@ export default function Services() {
               <>
 
                 {(
-                  <Box className="gap-0">
-                    <IconButton
+                    <Box className="   grid grid-cols-2       
+    sm:flex sm:flex-wrap sm:gap-1 
+    justify-center">     <IconButton
                       size="xs"
                       // mr={2}
                        title="View"

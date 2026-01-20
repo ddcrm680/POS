@@ -101,7 +101,7 @@ export default function Store() {
           ]}
         />
       ),
-      width: "120px",
+      width: "150px",
       render: (value: string, _row: any,) => {
         const isActive = value;
 
@@ -236,8 +236,9 @@ export default function Store() {
               <>
 
                 {(
-                  <Box className="gap-3">
-                    <IconButton
+                   <Box className="   grid grid-cols-2       
+    sm:flex sm:flex-wrap sm:gap-1 
+    justify-center">      <IconButton
                       size="xs"
                       // mr={2}
                       title="View"
