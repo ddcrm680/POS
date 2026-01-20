@@ -164,7 +164,7 @@ export default function ConsumerDashboardRedesign() {
         </div>
 
         {/* KPI Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <>
             <Kpi
               label="Job Cards"
