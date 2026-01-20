@@ -429,8 +429,8 @@ export default function Users() {
           }
         </CommonModal>
         <CommonDeleteModal
-          width="420px"
-          maxWidth="420px"
+          width="330px"
+          maxWidth="330px"
           isOpen={isUserDeleteModalInfo.open}
           title="Delete User"
           description={`Are you sure you want to delete this user? This action cannot be undone.`}
