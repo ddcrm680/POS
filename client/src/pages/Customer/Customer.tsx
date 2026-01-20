@@ -86,7 +86,7 @@
       {
         key: "name",
         label: "Name",
-        width: "150px",
+        width: "100px",
       },
 
       /* ================= MOBILE ================= */

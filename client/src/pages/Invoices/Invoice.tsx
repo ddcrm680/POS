@@ -92,7 +92,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
         {
             key: "invoice_number",
             label: "Invoice No.",
-            width: "130px",
+            width: "150px",
             render: (value: string, row: any) => (
                 <span className="text-[blue] font-medium cursor-pointer" onClick={() =>
                     navigate(`/invoices/view?id=${row.id}`)
@@ -106,7 +106,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
         {
             key: "consumer",
             label: "Customer",
-            width: "180px",
+            width: "150px",
             render: (value: { name: string, phone: string }, row: any) => (
 
                 <div className="flex flex-col leading-tight">
