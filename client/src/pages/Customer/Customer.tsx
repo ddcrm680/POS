@@ -162,8 +162,8 @@ export default function Customer() {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold">Customer Management</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-lg font-bold">Customer Management</h1>
+            <p className="text-muted-foreground text-sm">
               Comprehensive customer analytics and management dashboard
             </p>
           </div>

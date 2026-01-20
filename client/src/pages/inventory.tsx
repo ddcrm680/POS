@@ -239,8 +239,8 @@ export default function Inventory() {
         <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Inventory Management</h1>
-              <p className="text-gray-600 dark:text-gray-400">Real-time stock tracking and management</p>
+              <h1 className="text-lg font-bold text-gray-900 dark:text-white">Inventory Management</h1>
+              <p className="text-gray-600  text-sm dark:text-gray-400">Real-time stock tracking and management</p>
             </div>
             <div className="flex gap-2">
               <Dialog open={showReceiveModal} onOpenChange={setShowReceiveModal}>

@@ -14,11 +14,11 @@ export default function StoreList() {
                             <div className="mb-6">
                                 <div>
                                     <h1 className="
-text-xl font-semibold
+text-lg font-semibold
 ">
                                         Store List
                                     </h1>
-                                    <p className="text-muted-foreground">
+                                    <p className="text-muted-foreground text-sm">
                                         Control and manage all registered stores
                                     </p>
                                 </div>

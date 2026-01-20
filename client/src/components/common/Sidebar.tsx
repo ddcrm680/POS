@@ -139,7 +139,7 @@ if (tab.path === "/master") {
                   ${
                     parentActive
                       ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-muted"
+                      : "text-muted-foreground hover:bg-slate-100"
                   }
                 `}
               >
@@ -151,7 +151,7 @@ if (tab.path === "/master") {
 
                 {/* CHEVRON (NO BUTTON) */}
                 {!collapsed && tab.children && (
-                  <span className="ml-auto p-1 rounded hover:bg-muted">
+                  <span className="ml-auto p-1 rounded hover:bg-slate-100">
                     <ChevronDown
                       size={16}
                       className={`transition ${
@@ -186,7 +186,7 @@ if (tab.path === "/master") {
                           ${
                             childActive
                               ? "text-primary bg-primary/10"
-                              : "text-muted-foreground hover:bg-muted"
+                              : "text-muted-foreground hover:bg-slate-100"
                           }
                         `}
                       >

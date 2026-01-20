@@ -908,7 +908,7 @@ export default function JobForm() {
             <ChevronLeft size={18} />
           </button>
           <div>
-            <h1 className="text-xl font-semibold">
+            <h1 className="text-lg font-semibold">
               {isView ? "View Job Card" : id ? "Edit Job Card" : "Create New Job Card"}
             </h1>
 

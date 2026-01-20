@@ -374,9 +374,9 @@ export default function ManagerDashboard() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-                  <h1 className="text-xl font-semibold flex gap-2">  
+                  <h1 className="text-lg font-semibold flex gap-2">  
 Manager Dashboard</h1>
-              <p className="text-muted-foreground">     Complete daily operations management
+              <p className="text-muted-foreground text-sm">     Complete daily operations management
         </p>
           </div>
           

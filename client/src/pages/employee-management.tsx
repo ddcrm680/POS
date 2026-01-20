@@ -379,10 +379,10 @@ export default function EmployeeManagement() {
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-semibold">
+                <h1 className="text-lg font-semibold">
                   Employee Management
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Time tracking and team management
                 </p>
               </div>

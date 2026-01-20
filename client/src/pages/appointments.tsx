@@ -681,8 +681,8 @@ export default function AppointmentsPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-               <h1 className="text-xl font-semibold">Appointment Management</h1>
-              <p className="text-muted-foreground">  Advanced appointment system with real-time communication</p>
+               <h1 className="text-lg font-semibold">Appointment Management</h1>
+              <p className="text-muted-foreground text-sm">  Advanced appointment system with real-time communication</p>
             </div>
             <Button 
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg touch-manipulation "

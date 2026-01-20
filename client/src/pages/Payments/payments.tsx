@@ -320,8 +320,8 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
       {!noTitle && <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold">Payment Management</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-lg font-semibold">Payment Management</h1>
+            <p className="text-muted-foreground text-sm">
               Create, manage, and track payments
             </p>
           </div>

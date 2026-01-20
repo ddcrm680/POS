@@ -327,8 +327,8 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       {!noTitle && <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold">Job Card Management</h1>
-            <p className="text-muted-foreground">Manage service workflow and track vehicles</p>
+            <h1 className="text-lg font-semibold">Job Card Management</h1>
+            <p className="text-muted-foreground text-sm">Manage service workflow and track vehicles</p>
           </div>
         </div>
       </div>}

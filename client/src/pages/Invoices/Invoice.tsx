@@ -300,8 +300,8 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
             {!noTitle && <div className="mb-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-semibold">Invoice Management</h1>
-                        <p className="text-muted-foreground">
+                        <h1 className="text-lg font-semibold">Invoice Management</h1>
+                        <p className="text-muted-foreground text-sm">
                             Create, manage, and track customer invoices
                         </p>
                     </div>

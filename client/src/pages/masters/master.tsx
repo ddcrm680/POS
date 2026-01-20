@@ -58,7 +58,7 @@ export default function Master() {
                
   <div>
                 <h1 className="
-text-xl font-semibold
+text-lg font-semibold
 ">
                   Master Details
                 </h1>

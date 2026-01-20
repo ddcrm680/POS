@@ -414,7 +414,7 @@ export default function CustomerForm() {
             <ChevronLeft size={18} />
           </button>
           <div>
-            <h1 className="text-xl font-semibold">
+            <h1 className="text-lg font-semibold">
               {isView ? "View Customer" : id ? "Edit Customer" : "Create New Customer"}
             </h1>
 

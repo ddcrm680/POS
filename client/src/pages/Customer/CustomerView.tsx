@@ -208,10 +208,18 @@ export default function ConsumerDashboardRedesign() {
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg !text-[12px] font-[600] transition py-2",
+                    `
+    w-full flex items-center gap-3 px-4 py-2.5 rounded-lg
+    text-sm font-medium
+    transition-colors
+    focus-visible:outline-none
+    focus-visible:ring-2
+    focus-visible:ring-primary
+    focus-visible:ring-offset-2
+    `,
                     activeTab === tab.key
-                      ? "bg-[#FE0000] text-white"
-                      : "text-slate-600 hover:bg-slate-100"
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-slate-100"
                   )}
                 >
                   <tab.icon className="h-4 w-4" />

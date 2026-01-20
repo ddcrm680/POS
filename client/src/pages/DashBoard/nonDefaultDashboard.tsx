@@ -5,7 +5,7 @@ export default function DashboardPreview() {
   return (
     <div className="min-h-screen bg-muted/30">
       <div className=" py-4 pb-2 mx-4">
-      <h1 className="text-xl md:text-xl font-semibold tracking-tight">
+      <h1 className="text-lg md:text-xl font-semibold tracking-tight">
         POS Dashboard
       </h1>
       <p className="text-sm text-muted-foreground mt-1">
