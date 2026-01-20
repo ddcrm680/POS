@@ -310,8 +310,8 @@ const [isLoading, setIsLoading] = useState(false);
 
         />
          <CommonDeleteModal
-                width="420px"
-                maxWidth="420px"
+                width="330px"
+                maxWidth="330px"
                 isOpen={isTerritoryDeleteModalInfo.open}
                 title="Delete Territory"
                 description={`Are you sure you want to delete this territory? This action cannot be undone.`}

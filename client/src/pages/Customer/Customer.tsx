@@ -236,8 +236,8 @@ export default function Customer() {
 
           />
           <CommonDeleteModal
-            width="420px"
-            maxWidth="420px"
+            width="330px"
+            maxWidth="330px"
             isOpen={isCustomerDeleteModalInfo.open}
             title="Delete Customer"
             description={`Are you sure you want to delete this customer? This action cannot be undone.`}

@@ -428,8 +428,8 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
 
           />
           <CommonDeleteModal
-            width="420px"
-            maxWidth="420px"
+            width="330px"
+            maxWidth="330px"
             isOpen={isJobCardDeleteModalInfo.open}
             title="Cancel Job Card"
             description={`Are you sure you want to cancel this job card? This action cannot be undone.`}

@@ -1521,8 +1521,8 @@ export default function JobForm() {
           </Form>
         </div>
         <CommonDeleteModal
-          width="420px"
-          maxWidth="420px"
+          width="330px"
+          maxWidth="330px"
           showCloseIcon={false}
           isOpen={isJobCardSubmissionDeleteModalInfo.open}
           title="Job Card Created"

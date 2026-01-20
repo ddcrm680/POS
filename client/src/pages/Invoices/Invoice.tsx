@@ -445,8 +445,8 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                         }
                     </CommonModal>
                     <CommonDeleteModal
-                        width="420px"
-                        maxWidth="420px"
+                        width="330px"
+                        maxWidth="330px"
                         isOpen={invoiceDeleteModalOpenInfo.open}
                         title="Cancel Invoice"
                         description={`Are you sure you want to cancel this invoice? This action cannot be undone.`}

@@ -408,8 +408,8 @@ export default function SystemLog() {
 
         </CommonModal>
         <CommonDeleteModal
-                  width="420px"
-                  maxWidth="420px"
+                  width="330px"
+                  maxWidth="330px"
                   isOpen={isSystemLogDeleteModalInfo.open}
                   title="Delete System Log"
                   description={`Are you sure you want to delete this system log? This action cannot be undone.`}

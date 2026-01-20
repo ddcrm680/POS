@@ -410,8 +410,8 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
             }
           </CommonModal>
           <CommonDeleteModal
-            width="420px"
-            maxWidth="420px"
+            width="330px"
+            maxWidth="330px"
             isOpen={paymentDeleteModalOpenInfo.open}
             title="Cancel Payment"
             description={`Are you sure you want to cancel this payment? This action cannot be undone.`}
