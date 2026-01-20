@@ -1,15 +1,9 @@
 // import { Info } from "@/components/common/viewInfo";
+import { Info } from "@/components/common/viewInfo";
 import { Card,  } from "@/components/ui/card";
 import { getCustomerView } from "@/lib/api";
 import { useEffect, useState } from "react";
-function Info({ label,value,  }:any) {
-  return (
-    <div  className="flex justify-between text-sm">
-            <span className="text-slate-500 text-[12px]">{label}</span>
-            <span className="font-[600] text-slate-800 text-[12px]">{value}</span>
-          </div>
-  );
-}
+
 export function Overview({ id,customer }: { id: string,customer:any }) {
    const InfoIfExists = ({ value, ...props }: any) => {
   if (value === null || value === undefined || value === "") return null;
