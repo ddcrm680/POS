@@ -132,21 +132,21 @@ export const STORE_MANAGEMENT_ROUTES = [
   "/master/stores",
   "/master/stores/manage",
 ];
-export const nonAdminTabs: nonAdminTabsItem[] = [
-  { path: "/home", icon: Home, label: "Dashboard" },
-  { path: "/manager", icon: Settings, label: "Manager" },
-  { path: "/appointments", icon: Calendar, label: "Appointments" },
-  { path: "/facility-management", icon: Building, label: "Facility" },
-  { path: "/employee-management", icon: UserCheck, label: "Team" },
+export const nonAdminTabs: TabItem[] = [
+  {id:"home", path: "/home", icon: Home, label: "Dashboard" },
+  {id:"manager", path: "/manager", icon: Settings, label: "Manager" },
+  {id:"appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
+  {id:"facility-management", path: "/facility-management", icon: Building, label: "Facility" },
+  {id:"employee-management", path: "/employee-management", icon: UserCheck, label: "Team" },
 
 
-  { path: "/customers", icon: Users, label: "Customers" },
-  { path: "/job-cards", icon: ClipboardList, label: "Job Card" },
+  {id:"customers", path: "/customers", icon: Users, label: "Customers" },
+  {id:"job-cards", path: "/job-cards", icon: ClipboardList, label: "Job Card" },
 
-  { path: "/invoices", icon: FileText, label: "Invoices" },
+  {id:"invoices", path: "/invoices", icon: FileText, label: "Invoices" },
 
-  { path: "/payments", icon: Wallet, label: "Payments" },
-  { path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
+  {id:"payments", path: "/payments", icon: Wallet, label: "Payments" },
+  {id:"inventory", path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
 ];
 export const bottomTabs: TabItem[] = [
   { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },

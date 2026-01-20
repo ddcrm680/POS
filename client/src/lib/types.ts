@@ -208,6 +208,7 @@ export interface nonAdminTabsItem {
   path: string;
   icon: React.ComponentType<any>;
   label: string;
+  id:String
   defaultChildId?: string
   badge?: number;
 

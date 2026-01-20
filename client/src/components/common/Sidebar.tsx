@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import dummyProfile from "@/lib/images/dummy-Profile.webp";
 import { SidebarProps } from "@/lib/types";
-import { bottomTabs, Constant } from "@/lib/constant";
+import { bottomTabs, Constant, defaultBottomTabs, nonAdminTabs } from "@/lib/constant";
 import { getActiveChild, isChildActive, isParentActive } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 
@@ -46,19 +46,10 @@ export default function Sidebar({
     setOpenParent(active?.id ?? null);
   }, [location]);
 
-  const filterTab = !roleView.store
-    ? bottomTabs.map((item) =>
-        item.path === "/store"
-          ? {
-              ...item,
-              children: item.children?.filter(
-                (child) => child.path !== "/store-details"
-              ),
-            }
-          : item
-      )
-    : bottomTabs;
-console.log(filterTab,'filterTab');
+  const filterTab = roleView.store
+    ? nonAdminTabs : roleView.admin ?
+      bottomTabs : defaultBottomTabs;
+  console.log(filterTab, 'filterTab');
 
   return (
     <aside className="h-full bg-card border-r flex flex-col justify-between">
@@ -78,9 +69,8 @@ console.log(filterTab,'filterTab');
                 />
               </div>
               <span
-                className={`absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
-                  user?.is_active ? "bg-green-500" : "bg-red-500"
-                }`}
+                className={`absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-white ${user?.is_active ? "bg-green-500" : "bg-red-500"
+                  }`}
               />
             </div>
 
@@ -109,9 +99,9 @@ console.log(filterTab,'filterTab');
               <button
                 onClick={() => {
                   localStorage.setItem("sidebar_active_parent", tab.id);
-if (tab.path === "/master") {
-            localStorage.removeItem("master_active_tab");
-          }
+                  if (tab.path === "/master") {
+                    localStorage.removeItem("master_active_tab");
+                  }
                   if (tab.children) {
                     setOpenParent(expanded ? null : tab.id);
 
@@ -137,10 +127,9 @@ if (tab.path === "/master") {
                 className={`
                   w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
                   text-sm font-medium transition
-                  ${
-                    parentActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-slate-100"
+                  ${parentActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-slate-100"
                   }
                 `}
               >
@@ -155,9 +144,8 @@ if (tab.path === "/master") {
                   <span className="ml-auto p-1 rounded hover:bg-slate-100">
                     <ChevronDown
                       size={16}
-                      className={`transition ${
-                        expanded ? "rotate-180" : ""
-                      }`}
+                      className={`transition ${expanded ? "rotate-180" : ""
+                        }`}
                     />
                   </span>
                 )}
@@ -184,10 +172,9 @@ if (tab.path === "/master") {
                         className={`
                           group w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm
                           transition
-                          ${
-                            childActive
-                              ? "text-primary bg-primary/10"
-                              : "text-muted-foreground hover:bg-slate-100"
+                          ${childActive
+                            ? "text-primary bg-primary/10"
+                            : "text-muted-foreground hover:bg-slate-100"
                           }
                         `}
                       >
