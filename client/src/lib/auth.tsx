@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
   const [roles, setRoles] = useState<{ id: number, name: string, slug: string }[]>([]);
-  
+
   const [countries, setCountries] = useState<{ id: number, name: string, slug: string }[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -156,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
- 
+
   const fetchRoles = async () => {
     try {
       const res = await fetchRoleList();
@@ -172,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setRoles([]);
     }
   };
-   const fetchCountry = async () => {
+  const fetchCountry = async () => {
     try {
       const res = await fetchCountryList();
       if (res && Array.isArray(res)) {
@@ -204,7 +204,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
- 
+  useEffect(() => {
+    const handleBackNavigation = () => {
+      localStorage.removeItem("sidebar_active_parent");
+    };
+
+    window.addEventListener("popstate", handleBackNavigation);
+
+    return () => {
+      window.removeEventListener("popstate", handleBackNavigation);
+    };
+  }, []);
+
   const value: AuthContextValue = {
     user,
     isLoading,
