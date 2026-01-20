@@ -221,7 +221,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
     {
       key: "invoice_id",
       label: "Invoice No.",
-      width: "150px",
+      width: "160px",
       render: (value: any, row: any) => {
         if (!value && row?.status === "cancelled")
           return <span>-</span>
