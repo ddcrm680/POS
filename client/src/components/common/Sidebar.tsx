@@ -58,6 +58,7 @@ export default function Sidebar({
           : item
       )
     : bottomTabs;
+console.log(filterTab,'filterTab');
 
   return (
     <aside className="h-full bg-card border-r flex flex-col justify-between">

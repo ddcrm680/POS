@@ -301,8 +301,8 @@ export default function POSLayout({ children }: { children: ReactNode }) {
         </nav>
       )}
       <CommonDeleteModal
-        width="420px"
-        maxWidth="420px"
+        width="330px"
+        maxWidth="330px"
         isOpen={isUserLogoutModalInfo.open}
         title="Logout"
         loadingText="Logging out..."
