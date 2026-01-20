@@ -4,31 +4,36 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Password from "./password";
 import Profile from "./profile";
 import { ChevronLeft } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 export default function ProfileDetails() {
   const [activeTab, setActiveTab] = useState("overview");
+  const { user, } = useAuth();
+
+  const isAdmin =
+    user?.role === "admin" || user?.role === "super-admin";
 
   const [showServiceHistory, setShowServiceHistory] = useState(false);
 
- 
+
   return (
     <>
-       <div className="p-3 sm:p-3 space-y-3 max-w-6xl mx-auto">
+      <div className={`p-3 sm:p-3 space-y-3 ${isAdmin ? '' : ' max-w-6xl'} mx-auto`}>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 ">
 
           <div className=" flex justify-between">
             <div className="flex items-center gap-2">
-                  <button
-                     onClick={() => {
- localStorage.removeItem('sidebar_active_parent')
-              window.history.back()
-            }}
-                    className="text-muted-foreground hover:text-foreground"
-                >
-                    <ChevronLeft size={18} />
-                </button>
-                 <h1 className="text-lg font-semibold">Profile Details</h1>
+              <button
+                onClick={() => {
+                  localStorage.removeItem('sidebar_active_parent')
+                  window.history.back()
+                }}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <h1 className="text-lg font-semibold">Profile Details</h1>
 
 
             </div>
@@ -42,10 +47,10 @@ export default function ProfileDetails() {
      
   ">
               {profileMenu.map((item) => {
-                 const Icon = item.emoji;
+                const Icon = item.emoji;
                 return <TabsTrigger
                   value={item.value}
-                 className="
+                  className="
     flex items-center gap-2
     whitespace-nowrap px-3 
     transition-all duration-200
@@ -60,7 +65,7 @@ export default function ProfileDetails() {
   "
                   data-testid={item.dataTestId}
                 >
-                 <Icon size={16} />
+                  <Icon size={16} />
                   <span className="hidden sm:inline">{item.label}</span>
                 </TabsTrigger>
               })}

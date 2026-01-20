@@ -893,7 +893,7 @@ export default function JobForm() {
 
   return (
     <>
-      <div className="max-w-5xl mx-auto px-3 sm:px-3 py-3 space-y-3">
+      <div className=" mx-auto px-3 sm:px-3 py-3 space-y-3">
         {/* HEADER */}
         <div className="grid grid-cols-1">
   <div className="inline-flex items-center gap-3">

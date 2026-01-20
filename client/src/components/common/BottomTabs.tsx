@@ -88,7 +88,7 @@ export const BottomTabs = ({
                 {tab.badge && (
                   <span
                     className="
-                      absolute -top-1.5 -right-1.5
+                      absolute -top-0.5 -right-0.5
                       min-w-[16px] h-4 px-1
                       rounded-full
                       flex items-center justify-center

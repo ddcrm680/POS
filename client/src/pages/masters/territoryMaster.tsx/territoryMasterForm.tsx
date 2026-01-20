@@ -300,7 +300,7 @@ export default function TerritoryMasterForm() {
   }, [initialValues]);
 
   return (
-    <div className="p-3 sm:p-3 space-y-3 max-w-5xl mx-auto">
+    <div className="p-3 sm:p-3 space-y-3  mx-auto">
 
       {/* ---------- HEADER ---------- */}
       <div className="flex items-center gap-2">

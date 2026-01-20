@@ -3,6 +3,7 @@ import { ChevronLeft, Bell } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { GlobalLoader } from "@/components/common/GlobalLoader";
 import { useNotifications } from "@/lib/hooks/useNotifications";
+import { useAuth } from "@/lib/auth";
 
 export default function NotificationPage() {
   const {
@@ -10,6 +11,10 @@ export default function NotificationPage() {
     loading,
     readNotification,
   } = useNotifications();
+  const { user, } = useAuth();
+
+  const isAdmin =
+    user?.role === "admin" || user?.role === "super-admin";
 
   if (loading) {
     return (
@@ -20,7 +25,7 @@ export default function NotificationPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-4 space-y-3">
+    <div className={    `${isAdmin ? '' : ' max-w-6xl'}  mx-auto px-4 py-4 space-y-3`}>
       {/* HEADER */}
       <div className="flex items-center gap-2">
         <button

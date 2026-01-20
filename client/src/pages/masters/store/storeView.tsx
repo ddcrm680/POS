@@ -112,6 +112,9 @@ export default function StoreView() {
     hydrate();
   }, [countryId, stateId, cityId, countries]);
 
+  const isAdmin =
+    user?.role === "admin" || user?.role === "super-admin";
+
   const docUrl = (path?: string | null) =>
     path ? `${baseUrl}/${path}` : null;
 
@@ -157,7 +160,7 @@ export default function StoreView() {
   </div>
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-4">
+    <div className={`${isAdmin ? '' : ' max-w-6xl'} mx-auto px-4 py-4`}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <button
