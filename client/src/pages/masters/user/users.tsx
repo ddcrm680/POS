@@ -345,6 +345,7 @@ export default function Users() {
                     <IconButton
                       size="xs"
                       // mr={2}
+                       title="View"
                       aria-label="View"
                       onClick={() =>
                         setIsUserModalOpenInfo({
@@ -359,6 +360,7 @@ export default function Users() {
                     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
                       size="xs"
                       // mr={2}
+                       title="Edit"
                       aria-label="Edit"
                       onClick={() =>
                         setIsUserModalOpenInfo({
@@ -377,6 +379,8 @@ export default function Users() {
                         size="xs"
                         // mr={2}
                         colorScheme="red"
+                        
+                         title="Delete"
                         aria-label="Delete"
                         onClick={() => {
                           setIsUserDeleteModalOpenInfo({ open: true, info: row });

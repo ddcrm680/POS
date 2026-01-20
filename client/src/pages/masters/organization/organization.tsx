@@ -362,6 +362,7 @@ export default function Organization() {
                     <IconButton
                       size="xs"
                       // mr={2}
+                       title="View"
                       aria-label="View"
                       onClick={() =>
                         setIsOrganizationModalOpenInfo({
@@ -376,6 +377,7 @@ export default function Organization() {
                     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin")?.id && <IconButton
                       size="xs"
                       // mr={2}
+                       title="Edit"
                       aria-label="Edit"
                       onClick={() =>
                         setIsOrganizationModalOpenInfo({

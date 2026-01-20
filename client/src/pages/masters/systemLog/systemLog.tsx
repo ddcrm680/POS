@@ -345,6 +345,7 @@ export default function SystemLog() {
                     <IconButton
                       size="xs"
                       // mr={2}
+                       title="View"
                       aria-label="View"
                       onClick={() =>
                         setIsServicePlanModalOpenInfo({
@@ -363,6 +364,7 @@ export default function SystemLog() {
                         size="xs"
                         // mr={2}
                         colorScheme="red"
+                         title="Delete"
                         aria-label="Delete"
                         onClick={() => {
                           setIsSystemLogDeleteModalOpenInfo({ open: true, info: row });

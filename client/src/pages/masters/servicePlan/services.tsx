@@ -427,6 +427,7 @@ export default function Services() {
                     <IconButton
                       size="xs"
                       // mr={2}
+                       title="View"
                       aria-label="View"
                       onClick={() =>
                         setIsServicePlanModalOpenInfo({
@@ -441,6 +442,7 @@ export default function Services() {
                     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
                       size="xs"
                       // mr={2}
+                       title="Edit"
                       aria-label="Edit"
                       onClick={() =>
                         setIsServicePlanModalOpenInfo({

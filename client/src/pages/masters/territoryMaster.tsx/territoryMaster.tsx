@@ -278,6 +278,7 @@ const [isLoading, setIsLoading] = useState(false);
                     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
                       size="xs"
                       // mr={2}
+                       title="Edit"
                       aria-label="Edit"
                       onClick={() => {
                         navigate(`/master/territory/manage?id=${row.id}&mode=edit`)
@@ -294,6 +295,7 @@ const [isLoading, setIsLoading] = useState(false);
                         size="xs"
                         // mr={2}
                         colorScheme="red"
+                         title="Delete"
                         aria-label="Delete"
                         onClick={() => {
                           setIsTerritoryDeleteModalOpenInfo({ open: true, info: row });

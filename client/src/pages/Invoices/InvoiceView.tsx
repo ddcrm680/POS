@@ -410,7 +410,8 @@ export default function InvoiceView() {
                         <IconButton
                             size="xs"
                             // mr={2}
-                            aria-label="Edit"
+                             title="Edit"
+                      aria-label="Edit"
                             onClick={() => {
                                 navigate(`/invoices/manage?id=${invoiceView.id}&mode=edit`)
                             }

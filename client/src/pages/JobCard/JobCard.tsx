@@ -382,7 +382,8 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                         canShowAction('view', allowedActions) && <IconButton
                           size="xs"
                           // mr={2}
-                          aria-label="View"
+                           title="View"
+                      aria-label="View"
                           onClick={() => {
                             navigate(`/job-cards/view?id=${row.id}`)
                           }
@@ -395,7 +396,8 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                         <IconButton
                           size="xs"
                           // mr={2}
-                          aria-label="Edit"
+                           title="Edit"
+                      aria-label="Edit"
                           onClick={() =>
                             navigate(`/job-cards/manage?id=${row.id}&mode=edit`)
                           }

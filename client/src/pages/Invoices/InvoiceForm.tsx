@@ -196,6 +196,7 @@ export default function InvoiceForm() {
       {
         key: "qty",
         label: "QTY",
+        align: "center",
         width: "90px",
         render: (_: any, row: any, rowIndex: number) => {
           const error = getPlanCellError(rowIndex, "qty");
@@ -339,7 +340,7 @@ export default function InvoiceForm() {
       {
         key: "discount_amount",
         label: "Discount (₹)",
-        width: "90px",
+        width: "120px",
         render: (_: any, row: any, rowIndex: number) => {
           const error = getPlanCellError(rowIndex, "discount_amount");
 
@@ -409,6 +410,8 @@ export default function InvoiceForm() {
       {
         key: "sub_amount",
         label: "Sub Total",
+
+        width: "120px",
         render: (v: number) => `₹ ${v ?? "-"}`,
       },
 
@@ -476,7 +479,8 @@ export default function InvoiceForm() {
                   mr={2}
                   colorScheme="red"
                   // disabled={plans.length <= 1}
-                  aria-label="Delete"
+                   title="Delete"
+                        aria-label="Delete"
                   onClick={() => removePlan(row.id)}
                 >
                   <Trash2 size={16} />

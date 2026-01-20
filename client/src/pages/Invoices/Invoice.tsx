@@ -350,7 +350,8 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                             {canShowAction('view', allowedActions) && <IconButton
                                                 size="xs"
                                                 // mr={2}
-                                                aria-label="View"
+                                                 title="View"
+                      aria-label="View"
                                                 onClick={() => {
                                                     navigate(`/invoices/view?id=${row.id}`)
 
@@ -364,7 +365,8 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                                 <IconButton
                                                     size="xs"
                                                     // mr={2}
-                                                    aria-label="Edit"
+                                                     title="Edit"
+                      aria-label="Edit"
                                                     onClick={() => {
                                                         navigate(`/invoices/manage?id=${row.id}&mode=edit`)
 
@@ -385,6 +387,8 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                                     // mr={2}
                                                     colorScheme="red"
                                                     aria-label="Wallet"
+                                                    
+                                                     title="Wallet"
                                                     onClick={() => {
                                                         setIsInvoicePaymentModalOpenInfo({ open: true, info: row });
                                                     }}

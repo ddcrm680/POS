@@ -240,6 +240,7 @@ export default function Store() {
                     <IconButton
                       size="xs"
                       // mr={2}
+                      title="View"
                       aria-label="View"
                       onClick={() =>
                         navigate(`/master/stores/manage?id=${row.id}&mode=view`)
@@ -250,6 +251,8 @@ export default function Store() {
                     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
                       size="xs"
                       // mr={2}
+                      
+                      title="Edit"
                       aria-label="Edit"
                       onClick={() =>
                         navigate(`/master/stores/manage?id=${row.id}&mode=edit`)
