@@ -10,7 +10,7 @@ export function Overview({ id,customer }: { id: string,customer:any }) {
 
   return (
     <Info
-      gap="gap-3"                  // ⬅️ was gap-12
+      gap="gap-8"                  // ⬅️ was gap-12
       colon={false}
       justify="justify-between"
       labelClassName="text-xs text-muted-foreground font-medium"
