@@ -79,7 +79,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
             key: "created_at",
             label: "Created Date",
             align: "center",
-            width: "120px",
+            width: "150px",
             render: (value: string) => (
                 <Box className="flex flex-col">
                     <span className="font-medium">{formatDate(value)}</span>
@@ -137,7 +137,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
         {
             key: "grand_total",
             label: "Amount",
-            width: "120px",
+            width: "150px",
             render: (value: number) => (
                 <span>₹ {value}</span>
             ),
@@ -338,7 +338,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
 
                                     {(
                                            <Box className="   grid grid-cols-2       
-    sm:flex sm:flex-wrap sm:gap-1 
+    sm:flex sm:gap-1 
     justify-center">    {canShowAction('print', allowedActions) && <IconButton
                                             size="xs"
                                             // mr={2}

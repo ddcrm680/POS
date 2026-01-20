@@ -198,7 +198,7 @@ export default function ConsumerDashboardRedesign() {
         </div>
 
         {/* Main Layout */}
-        <div className="grid lg:grid-cols-[240px_1fr] gap-4">
+        <div className="grid lg:grid-cols-[240px_1fr] gap-3">
 
           {/* Sidebar Tabs */}
           <Card className="rounded-lg">

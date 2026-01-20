@@ -359,7 +359,7 @@ export default function Organization() {
 
                 {(
                  <Box className="   grid grid-cols-2       
-    sm:flex sm:flex-wrap sm:gap-1 
+    sm:flex sm:gap-1 
     justify-center">          <IconButton
                       size="xs"
                       // mr={2}
