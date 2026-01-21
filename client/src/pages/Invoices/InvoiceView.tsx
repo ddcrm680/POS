@@ -162,7 +162,7 @@ export default function InvoiceView() {
             {
                 key: "discount_amount",
                 label: "	Discount",
-                width: "90px",
+                width: "120px",
                 render: (value: any) => {
                     return <span> ₹ {value}</span>
                 }
@@ -170,6 +170,8 @@ export default function InvoiceView() {
             {
                 key: "sub_amount",
                 label: "Sub Amount",
+                
+        width: "120px",
                 render: (v: number) => `₹ ${v ?? "-"}`,
             },
 
@@ -178,6 +180,7 @@ export default function InvoiceView() {
                     {
                         key: "cgst_amount",
                         label: "CGST",
+                             width: "120px",
                         render: (_: any, row: any) => (
                             <span>
                                 ₹ {row.cgst_amount}
@@ -190,6 +193,7 @@ export default function InvoiceView() {
                     {
                         key: "sgst_amount",
                         label: "SGST",
+                             width: "120px",
                         render: (_: any, row: any) => (
                             <span>
                                 ₹ {row.sgst_amount}
@@ -204,6 +208,7 @@ export default function InvoiceView() {
                     {
                         key: "igst_amount",
                         label: "IGST",
+                             width: "120px",
                         render: (_: any, row: any) => (
                             <span>
                                 ₹ {row.igst_amount}
@@ -218,6 +223,8 @@ export default function InvoiceView() {
             {
                 key: "total_amount",
                 label: "Amount",
+                
+        width: "120px",
                 render: (v: number) => `₹ ${v ?? "-"}`,
             },
         ];
