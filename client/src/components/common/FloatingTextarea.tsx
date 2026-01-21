@@ -18,7 +18,7 @@ export function FloatingTextarea({
   label,
   control,
   isView,
-  rows=2,
+  rows=1,
   isRequired = false,
 }: FloatingTextareaProps) {
   const [focused, setFocused] = useState(false)

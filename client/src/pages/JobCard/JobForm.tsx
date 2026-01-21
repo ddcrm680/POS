@@ -896,7 +896,7 @@ export default function JobForm() {
       <div className=" mx-auto px-3 sm:px-3 py-3 space-y-3">
         {/* HEADER */}
         <div className="grid grid-cols-1">
-  <div className="inline-flex items-center gap-3">
+  <div className="inline-flex items-center gap-4">
           <button
             onClick={() => {
               localStorage.removeItem('sidebar_active_parent')
@@ -917,7 +917,7 @@ export default function JobForm() {
 
         </div>
       
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-3 rounded-xl ">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 rounded-xl ">
 
 
 
@@ -931,14 +931,14 @@ export default function JobForm() {
                   </div></Card> : <>
                     {(mode !== "view" && mode !== 'edit') && <>
                       <Card className="mb-6 p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                           {isAdmin && <div
                             className={cn(
                               "bg-white  rounded-xl p-0",
                             )} >
                             <h3 className={`text-sm font-semibold text-gray-700 mb-4`}>{"Store Information"}</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                               <FloatingRHFSelect
                                 name="store_id"
                                 label="Select Store"
@@ -1000,9 +1000,9 @@ export default function JobForm() {
                           {/* Customer Lookup Section */}
                           {isLookupReady && !isLookingUp && customerFound !== null && <Card className="mb-3">
 
-                            <SectionCard title="Customer Information" className="pb-4 grid gap-3" headingMarginBottom={"mb-0"}>
+                            <SectionCard title="Customer Information" className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>
                               {/* BASIC INFO */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FloatingField
                                   name="name"
                                   label="Name"
@@ -1032,7 +1032,7 @@ export default function JobForm() {
 
                               </div>
                               {/* ADDRESS + MESSAGE */}
-                              <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
+                              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                                 <FloatingTextarea
                                   name="address"
                                   label="Address"
@@ -1042,7 +1042,7 @@ export default function JobForm() {
                                 />
 
                               </div>
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                                 {/* COUNTRY */}
                                 <FloatingRHFSelect
@@ -1129,7 +1129,7 @@ export default function JobForm() {
                                       GST Information
                                     </h4>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
 
                                       <FloatingField
@@ -1206,7 +1206,7 @@ export default function JobForm() {
                       {/* Vehicle Information */}
                       <Card>
                         <SectionCard title="Vehicle Information" className="pb-3 p-4">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <FloatingRHFSelect
                               name="vehicle_company_id"
                               label="Vehicle Make"
@@ -1271,12 +1271,12 @@ export default function JobForm() {
                               Vehicle Paint Condition
                             </p>
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                               <FormField
                                 control={form.control}
                                 name="isRepainted"
                                 render={({ field }) => (
-                                  <label className={`inline-flex w-fit  items-center gap-2 relative text-sm ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`inline-flex w-fit  items-center gap-2 relative  ${isView ? '' : 'cursor-pointer'}  text-[12px]`}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1286,6 +1286,7 @@ export default function JobForm() {
     data-[state=checked]:bg-blue-700
     data-[state=checked]:border-blue-700
     focus-visible:ring-blue-500
+    text-[12px]
   "
                                     />
                                     Repainted Vehicle
@@ -1296,7 +1297,7 @@ export default function JobForm() {
                                 control={form.control}
                                 name="isSingleStagePaint"
                                 render={({ field }) => (
-                                  <label className={`inline-flex w-fit items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`inline-flex w-fit items-center gap-2  text-[12px] relative ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1317,7 +1318,7 @@ export default function JobForm() {
                                 control={form.control}
                                 name="isPaintThickness"
                                 render={({ field }) => (
-                                  <label className={`inline-flex w-fit items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`inline-flex w-fit items-center gap-2  text-[12px] relative ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1338,7 +1339,7 @@ export default function JobForm() {
                                 control={form.control}
                                 name="isVehicleOlder"
                                 render={({ field }) => (
-                                  <label className={`inline-flex w-fit items-center gap-2 text-sm relative ${isView ? '' : 'cursor-pointer'}  `}>
+                                  <label className={`inline-flex w-fit items-center gap-2  text-[12px] relative ${isView ? '' : 'cursor-pointer'}  `}>
                                     <Checkbox
                                       disabled={isView}
                                       checked={field.value}
@@ -1371,7 +1372,7 @@ export default function JobForm() {
                       {/* Service Selection & Summary */}
                       <Card>
                         <SectionCard title="Service Information" className="pb-3 p-4 space-y-3">
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {/* Vehicle Type */}
                             <FloatingRHFSelect
                               name="vehicle_type"
@@ -1428,7 +1429,7 @@ export default function JobForm() {
                                   No services found for the selected vehicle and service type
                                 </p>
                               )}
-                            {!loadingServices && services.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {!loadingServices && services.length > 0 && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                               {services.map(service => {
                                 const isSelected = selectedServices.includes(service.id);
 
@@ -1447,7 +1448,7 @@ export default function JobForm() {
   `}
                                   >
                                     <CardContent className="p-3">
-                                      <div className="flex items-start justify-between gap-3">
+                                      <div className="flex items-start justify-between gap-4">
                                         <div className="flex items-start gap-2">
                                           <div
                                             className={`
@@ -1461,17 +1462,17 @@ export default function JobForm() {
                                             {isSelected && <Check className="h-3 w-3" />}
                                           </div>
                                           <div>
-                                            <p className="font-medium leading-tight">
+                                            <p className="font-[600] text-[12px] leading-tight">
                                               {service.label}
                                             </p>
-                                            <p className="text-xs text-muted-foreground mt-1">
+                                            <p className="text-[10px] text-muted-foreground mt-1">
                                               {service.description}
                                             </p>
                                           </div>
                                         </div>
 
                                         <div className="text-right">
-                                          <p className="text-lg font-semibold text-green-600">
+                                          <p className="font-[600] text-[12px] text-green-600">
                                             ₹{service.price}
                                           </p>
                                         </div>
@@ -1494,7 +1495,7 @@ export default function JobForm() {
                     </div>}
                   </>}
               {mode !== 'view' &&
-                <div className="  pb-3 flex justify-end gap-3 mt-3">
+                <div className="  pb-3 flex justify-end gap-4 mt-3">
                   <Button
                     variant="outline"
                     disabled={isLoading || isInfoLoading}
