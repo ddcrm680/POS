@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, invoiceSend, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { InvoicePaymentFormValues, organizationFormType, reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, PrinterIcon, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
+import { EditIcon, EyeIcon, PrinterIcon, Send, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { canShowAction, formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
@@ -49,6 +49,17 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
         open: false,
         info: {}
     });
+
+    const [sendModal, setSendModal] = useState<any>({ open: false, jobCard: {} })
+    const [roleView, setRoleView] = useState<{
+        store: boolean,
+        admin: boolean,
+        default: boolean
+    }>({
+        store: false,
+        admin: false,
+        default: false
+    });
     const PER_PAGE = 10;
     const InvoiceDeleteHandler = async () => {
         try {
@@ -73,6 +84,41 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
             setIsLoading(false);
         }
     };
+    const InvoiceSendHandler = async () => {
+        try {
+            setIsLoading(true);
+
+            await invoiceSend(sendModal?.jobCard?.id);
+            toast({ title: `Send Invoice`, description: "Invoice send successfully", variant: "success", });
+
+        } catch (err: any) {
+
+            toast({
+                title: "Error",
+                description:
+                    err?.response?.data?.message ||
+                    err.message || `Failed to send invoice`,
+                variant: "destructive",
+            });
+        } finally {
+            setSendModal({ open: false, jobCard: {} });
+            setIsLoading(false);
+        }
+    };
+    const { user, Logout, } = useAuth();
+    useEffect(() => {
+        const supremeUserRoleList = ['admin', "super-admin"]
+        const managerList = ['store-manager']
+        const roleList = {
+            store: false,
+            admin: false,
+            default: false
+        }
+
+        managerList.find((manager) => manager === user?.role) ? roleList.store = true :
+            supremeUserRoleList.find((supremeUser) => supremeUser === user?.role) ? roleList.admin = true : roleList.default = true
+        setRoleView(roleList)
+    }, [user, roles])
     const columns = [
         /* ================= CREATED DATE ================= */
         {
@@ -234,7 +280,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                 setIsListLoading(false);
         }
     };
- 
+
     useEffect(() => {
         fetchInvoices(false);
     }, [search, page, perPage, filters]);
@@ -337,23 +383,23 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                 <>
 
                                     {(
-                                           <Box className="   grid grid-cols-2       
+                                        <Box className="   grid grid-cols-2       
     sm:flex sm:gap-1 
     justify-center">    {canShowAction('print', allowedActions) && <IconButton
-                                            size="xs"
-                                            // mr={2}
-                                            aria-label="Print"
-                                            disabled
-                                            onClick={() => { }
-                                            }
-                                        >
-                                            <PrinterIcon />
-                                        </IconButton>}
+                                                size="xs"
+                                                // mr={2}
+                                                aria-label="Print"
+                                                disabled
+                                                onClick={() => { }
+                                                }
+                                            >
+                                                <PrinterIcon />
+                                            </IconButton>}
                                             {canShowAction('view', allowedActions) && <IconButton
                                                 size="xs"
                                                 // mr={2}
-                                                 title="View"
-                      aria-label="View"
+                                                title="View"
+                                                aria-label="View"
                                                 onClick={() => {
                                                     navigate(`/invoices/view?id=${row.id}`)
 
@@ -367,8 +413,8 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                                 <IconButton
                                                     size="xs"
                                                     // mr={2}
-                                                     title="Edit"
-                      aria-label="Edit"
+                                                    title="Edit"
+                                                    aria-label="Edit"
                                                     onClick={() => {
                                                         navigate(`/invoices/manage?id=${row.id}&mode=edit`)
 
@@ -383,14 +429,14 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
 
                                             {
 
-                                      canShowAction('Wallet', allowedActions) &&           (row?.status === "partially_paid" || row.status == 'issued') &&
+                                                canShowAction('Wallet', allowedActions) && (row?.status === "partially_paid" || row.status == 'issued') &&
                                                 <IconButton
                                                     size="xs"
                                                     // mr={2}
                                                     colorScheme="red"
                                                     aria-label="Wallet"
-                                                    
-                                                     title="Wallet"
+
+                                                    title="Wallet"
                                                     onClick={() => {
                                                         setIsInvoicePaymentModalOpenInfo({ open: true, info: row });
                                                     }}
@@ -399,7 +445,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                                 </IconButton>}
                                             {
 
-                                            canShowAction('delete', allowedActions) &&      row.status == 'issued' && <IconButton
+                                                canShowAction('delete', allowedActions) && row.status == 'issued' && <IconButton
                                                     size="xs"
                                                     // mr={2}
                                                     title="Cancel"
@@ -411,6 +457,20 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                                 >
                                                     <XCircle size={16} />
                                                 </IconButton>}
+                                            {(roleView.admin || roleView.store) && <IconButton
+                                                size="xs"
+                                                title="Send Job Card"
+                                                aria-label="Send Job Card"
+                                                onClick={() => {
+                                                    setSendModal({
+                                                        open: true,
+                                                        jobCard: row
+                                                    });
+                                                }}
+                                            >
+                                                <Send size={16} />
+                                            </IconButton>
+                                            }
 
                                         </Box>
                                     )}
@@ -453,17 +513,28 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                     <CommonDeleteModal
                         width="330px"
                         maxWidth="330px"
-                        isOpen={invoiceDeleteModalOpenInfo.open}
-                        title="Cancel Invoice"
-                        description={`Are you sure you want to cancel this invoice? This action cannot be undone.`}
-                        confirmText="Yes, Cancel"
+                        isOpen={sendModal.open || invoiceDeleteModalOpenInfo.open}
+                        title={`${sendModal.open ? "Send Invoice " : "Cancel Invoice"}`}
+                        description={`Are you sure you want to ${sendModal.open ? 'send' : 'cancel'} this invoice? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
+                        confirmText={`Yes, ${sendModal.open ? 'Send' : 'Cancel'}`}
                         cancelText="No"
-                        loadingText="Cancelling..."
+                        loadingText={`${sendModal.open ? 'Sending' : 'Cancelling'}...`}
                         isLoading={isLoading}
-                        onCancel={() =>
-                            setIsInvoiceDeleteModalOpenInfo({ open: false, info: {} })
+                        onCancel={() => {
+                            if (sendModal) {
+                                setSendModal({ open: false, jobCard: {} })
+
+                            } else
+                                setIsInvoiceDeleteModalOpenInfo({ open: false, info: {} })
                         }
-                        onConfirm={InvoiceDeleteHandler}
+                        }
+                        onConfirm={() => {
+                            if (sendModal) {
+                                InvoiceSendHandler()
+                            } else {
+                                InvoiceDeleteHandler()
+                            }
+                        }}
                     />
 
                 </CardContent>

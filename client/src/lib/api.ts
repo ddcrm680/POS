@@ -1107,6 +1107,40 @@ export async function jobCardCancel(id: any) {
     throw response;
   }
 }
+export async function jobCardSend(id: any) {
+  try {
+    const response: any = await api.post(
+      `/api/job-cards/${id}/send`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to send job card"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function invoiceSend(id: any) {
+  try {
+    const response: any = await api.post(
+      `/api/invoice/${id}/send`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to send invoice"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
 export async function getCustomerView(id: any) {
   try {
     const response: any = await api.get(

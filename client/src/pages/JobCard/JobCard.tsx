@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getJobCard, jobCardCancel, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getJobCard, jobCardCancel, jobCardSend, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, PrinterIcon, Trash2, XCircle } from "lucide-react";
+import { EditIcon, EyeIcon, PrinterIcon, Send, Trash2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { canShowAction, formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
@@ -19,6 +19,7 @@ import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import { jobCardStatusList } from "@/lib/constant";
 import { mapColumnsForCustomerView } from "@/lib/helper";
+import { Checkbox } from "@radix-ui/react-checkbox";
 
 export default function JobCard({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
   const { toast } = useToast();
@@ -28,10 +29,34 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
   const [total, setTotal] = useState(0);
   const [has_next, setHasNext] = useState(false)
   const [, navigate] = useLocation();
+  const [roleView, setRoleView] = useState<{
+    store: boolean,
+    admin: boolean,
+    default: boolean
+  }>({
+    store: false,
+    admin: false,
+    default: false
+  });
   const [filters, setFilters] = useState({
     status: "",
     consumer_id: ""
   });
+
+  const { user, Logout, } = useAuth();
+  useEffect(() => {
+    const supremeUserRoleList = ['admin', "super-admin"]
+    const managerList = ['store-manager']
+    const roleList = {
+      store: false,
+      admin: false,
+      default: false
+    }
+
+    managerList.find((manager) => manager === user?.role) ? roleList.store = true :
+      supremeUserRoleList.find((supremeUser) => supremeUser === user?.role) ? roleList.admin = true : roleList.default = true
+    setRoleView(roleList)
+  }, [user, roles])
   const [isLoading, setIsLoading] = useState(false);
 
   const [lastPage, setLastPage] = useState(1);
@@ -67,6 +92,27 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       setIsLoading(false);
     }
   };
+  const JobCardSendHandler = async () => {
+    try {
+      setIsLoading(true);
+
+      await jobCardSend(sendModal?.jobCard?.id);
+      toast({ title: `Send Job Card`, description: "Job Card send successfully", variant: "success", });
+
+    } catch (err: any) {
+
+      toast({
+        title: "Error",
+        description:
+          err?.response?.data?.message ||
+          err.message || `Failed to send jobcard`,
+        variant: "destructive",
+      });
+    } finally {
+      setSendModal({ open: false, jobCard: {} });
+      setIsLoading(false);
+    }
+  };
   const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: { value: string, label: string }[] }>({
     status: []
   });
@@ -95,10 +141,11 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       render: (value: string, row: any) => (
         <span
           className="text-[blue] font-medium cursor-pointer hover:underline text-sx "
-          onClick={() =>{
-            
-              localStorage.getItem("sidebar_active_parent",);
-            navigate(`/job-cards/view?id=${row.id}`)}}
+          onClick={() => {
+
+            localStorage.getItem("sidebar_active_parent",);
+            navigate(`/job-cards/view?id=${row.id}`)
+          }}
         >
           {value}
         </span>
@@ -150,16 +197,16 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       key: "vehicle_type",
       label: " Type",
       width: "120px",
-       render: (_: any, row: any) => (
+      render: (_: any, row: any) => (
         <span className="text-sx font-medium">
-                  {[
-                    row?.vehicle_type,
-                    row?.vmake?.name,
-                    row?.vmodel?.name,
-                  ]
-                    .filter(Boolean)
-                    .join(" • ")}
-                </span>
+          {[
+            row?.vehicle_type,
+            row?.vmake?.name,
+            row?.vmodel?.name,
+          ]
+            .filter(Boolean)
+            .join(" • ")}
+        </span>
       ),
     },
 
@@ -222,7 +269,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       key: "invoice_id",
       label: "Invoice No.",
       width: "180px",
-       align: "center",
+      align: "center",
       render: (value: any, row: any) => {
         if (!value && row?.status === "cancelled")
           return <span>-</span>
@@ -262,16 +309,16 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
     }
 
   ];
- const resolvedColumns = useMemo(() => {
-  const list = hideColumnListInCustomer?.list;
+  const resolvedColumns = useMemo(() => {
+    const list = hideColumnListInCustomer?.list;
 
-  // 🔓 No config → show all columns
-  if (!Array.isArray(list) || list.length === 0) {
-    return columns;
-  }
+    // 🔓 No config → show all columns
+    if (!Array.isArray(list) || list.length === 0) {
+      return columns;
+    }
 
-  return mapColumnsForCustomerView(columns, list);
-}, [columns, hideColumnListInCustomer]);
+    return mapColumnsForCustomerView(columns, list);
+  }, [columns, hideColumnListInCustomer]);
 
   const fetchJobCard = async (isLoaderHide = false) => {
     try {
@@ -322,6 +369,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       consumer_id: ""
     })
   }
+  const [sendModal, setSendModal] = useState<any>({ open: false, jobCard: {} })
   const allowedActions = hideColumnListInCustomer?.actionShowedList;
   return (
     <div className={`${noPadding ? "" : "p-3"}`}>
@@ -340,7 +388,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             columns={resolvedColumns}
             isClear={true}
             data={jobCards}
-            isAdd={noTitle ? false:true}
+            isAdd={noTitle ? false : true}
             perPage={perPage}
             setPerPage={setPerPage}
             resetFilter={resetFilter}
@@ -367,7 +415,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                 <>
 
                   {(
-                      <Box className="   grid grid-cols-2       
+                    <Box className="   grid grid-cols-2       
     sm:flex sm:gap-1 
     justify-center">      {canShowAction('print', allowedActions) && <IconButton
                         size="xs"
@@ -384,8 +432,8 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                         canShowAction('view', allowedActions) && <IconButton
                           size="xs"
                           // mr={2}
-                           title="View"
-                      aria-label="View"
+                          title="View"
+                          aria-label="View"
                           onClick={() => {
                             navigate(`/job-cards/view?id=${row.id}`)
                           }
@@ -398,8 +446,8 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                         <IconButton
                           size="xs"
                           // mr={2}
-                           title="Edit"
-                      aria-label="Edit"
+                          title="Edit"
+                          aria-label="Edit"
                           onClick={() =>
                             navigate(`/job-cards/manage?id=${row.id}&mode=edit`)
                           }
@@ -423,7 +471,20 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                         >
                           <XCircle size={16} />
                         </IconButton>}
-
+                      {(roleView.admin || roleView.store) && <IconButton
+                        size="xs"
+                        title="Send Job Card"
+                        aria-label="Send Job Card"
+                        onClick={() => {
+                          setSendModal({
+                            open: true,
+                            jobCard: row
+                          });
+                        }}
+                      >
+                        <Send size={16} />
+                      </IconButton>
+                      }
                     </Box>
                   )}
                 </>
@@ -431,20 +492,32 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             }}
 
           />
+
           <CommonDeleteModal
             width="330px"
             maxWidth="330px"
-            isOpen={isJobCardDeleteModalInfo.open}
-            title="Cancel Job Card"
-            description={`Are you sure you want to cancel this job card? This action cannot be undone.`}
-            confirmText="Yes, Cancel"
+            isOpen={sendModal.open || isJobCardDeleteModalInfo.open}
+            title={`${sendModal.open ? "Send Job Card " : "Cancel Job Card"}`}
+            description={`Are you sure you want to ${sendModal.open ? 'send' : 'cancel'} this job card? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
+            confirmText={`Yes, ${sendModal.open ? 'Send' : 'Cancel'}`}
             cancelText="No"
-            loadingText="Cancelling..."
+            loadingText={`${sendModal.open ? 'Sending' : 'Cancelling'}...`}
             isLoading={isLoading}
-            onCancel={() =>
-              setIsJobCardDeleteModalOpenInfo({ open: false, info: {} })
+            onCancel={() => {
+              if (sendModal) {
+                setSendModal({ open: false, jobCard: {} })
+
+              } else
+                setIsJobCardDeleteModalOpenInfo({ open: false, info: {} })
             }
-            onConfirm={JobCardDeleteHandler}
+            }
+            onConfirm={() => {
+              if (sendModal) {
+                JobCardSendHandler()
+              } else {
+                JobCardDeleteHandler()
+              }
+            }}
           />
 
         </CardContent>
