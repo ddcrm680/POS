@@ -236,7 +236,7 @@ export default function CommonTable({
 
                   {actions && (
                     <Table.Cell width="100px"
-                      className="sticky right-0 z-10 text-center bg-white"
+                      className="sticky right-0 z-10 text-center bg-white lg:bg-inherit "
                     >
                       {actions(row)}
                     </Table.Cell>

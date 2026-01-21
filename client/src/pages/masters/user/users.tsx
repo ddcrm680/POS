@@ -18,6 +18,7 @@ import { formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import UserView from "./userView";
+import CommonRowMenu from "@/components/common/CommonRowMenu";
 
 export default function Users() {
   const { toast } = useToast();
@@ -336,65 +337,52 @@ export default function Users() {
           setIsModalOpen={(value: boolean) =>
             setIsUserModalOpenInfo({ open: value, type: "create", info: {} })
           }
-          actions={(row: any) => {
-            return (
-              <>
+      actions={(row: any) => (
+  <CommonRowMenu
+    items={[
+      {
+        key: "view",
+        label: "View ",
+        icon: <EyeIcon size={16} />,
+        onClick: () =>
+          setIsUserModalOpenInfo({
+            open: true,
+            type: "view",
+            info: row,
+          }),
+      },
+      {
+        key: "edit",
+        label: "Edit ",
+        icon: <EditIcon size={16} />,
+        onClick: () =>
+          setIsUserModalOpenInfo({
+            open: true,
+            type: "edit",
+            info: row,
+          }),
+        show:
+          Number(row.role_id) !==
+          roles.find((role) => role.slug === "super-admin")?.id,
+      },
+      {
+        key: "delete",
+        label: "Delete ",
+        icon: <Trash2 size={16} />,
+        danger: true,
+        onClick: () =>
+          setIsUserDeleteModalOpenInfo({
+            open: true,
+            info: row,
+          }),
+        show:
+          Number(row.role_id) !==
+          roles.find((role) => role.slug === "super-admin")?.id,
+      },
+    ]}
+  />
+)}
 
-                {(
-               <Box className="   grid grid-cols-2       
-    sm:flex sm:gap-1 
-     justify-center">          <IconButton
-                      size="xs"
-                      // mr={2}
-                       title="View"
-                      aria-label="View"
-                      onClick={() =>
-                        setIsUserModalOpenInfo({
-                          open: true,
-                          type: "view",
-                          info: row,
-                        })
-                      }
-                    >
-                      <EyeIcon />
-                    </IconButton>
-                    {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
-                      size="xs"
-                      // mr={2}
-                       title="Edit"
-                      aria-label="Edit"
-                      onClick={() =>
-                        setIsUserModalOpenInfo({
-                          open: true,
-                          type: "edit",
-                          info: row,
-                        })
-                      }
-                    >
-                      <EditIcon />
-                    </IconButton>}
-
-                    {
-                      Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id &&
-                      <IconButton
-                        size="xs"
-                        // mr={2}
-                        colorScheme="red"
-                        
-                         title="Delete"
-                        aria-label="Delete"
-                        onClick={() => {
-                          setIsUserDeleteModalOpenInfo({ open: true, info: row });
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </IconButton>}
-
-                  </Box>
-                )}
-              </>
-            );
-          }}
 
         />
         <CommonModal

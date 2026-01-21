@@ -21,6 +21,7 @@ import OrganizationForm from "./organizationForm";
 import OrganizationView from "./organizationView";
 import { Constant } from "@/lib/constant";
 import building from "@/lib/images/building.webp";
+import CommonRowMenu from "@/components/common/CommonRowMenu";
 
 
 export default function Organization() {
@@ -353,50 +354,38 @@ export default function Organization() {
           setIsModalOpen={(value: boolean) =>
             setIsOrganizationModalOpenInfo({ open: value, type: "create", info: {} })
           }
-          actions={(row: any) => {
-            return (
-              <>
+    actions={(row: any) => (
+  <CommonRowMenu
+    items={[
+      {
+        key: "view",
+        label: "View ",
+        icon: <EyeIcon size={16} />,
+        onClick: () =>
+          setIsOrganizationModalOpenInfo({
+            open: true,
+            type: "view",
+            info: row,
+          }),
+      },
+      {
+        key: "edit",
+        label: "Edit ",
+        icon: <EditIcon size={16} />,
+        onClick: () =>
+          setIsOrganizationModalOpenInfo({
+            open: true,
+            type: "edit",
+            info: row,
+          }),
+        show:
+          Number(row.role_id) !==
+          roles.find((role) => role.slug === "super-admin")?.id,
+      },
+    ]}
+  />
+)}
 
-                {(
-                 <Box className="   grid grid-cols-2       
-    sm:flex sm:gap-1 
-    justify-center">          <IconButton
-                      size="xs"
-                      // mr={2}
-                       title="View"
-                      aria-label="View"
-                      onClick={() =>
-                        setIsOrganizationModalOpenInfo({
-                          open: true,
-                          type: "view",
-                          info: row,
-                        })
-                      }
-                    >
-                      <EyeIcon />
-                    </IconButton>
-                    {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin")?.id && <IconButton
-                      size="xs"
-                      // mr={2}
-                       title="Edit"
-                      aria-label="Edit"
-                      onClick={() =>
-                        setIsOrganizationModalOpenInfo({
-                          open: true,
-                          type: "edit",
-                          info: row,
-                        })
-                      }
-                    >
-                      <EditIcon />
-                    </IconButton>}
-
-
-                  </Box>
-                )}
-              </>
-            );
-          }}
 
         />
         <CommonModal

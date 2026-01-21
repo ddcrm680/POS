@@ -18,6 +18,7 @@ import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import TerritoryMasterForm from "./territoryMasterForm";
 import { territoryMasterMockData } from "@/lib/mockData";
+import CommonRowMenu from "@/components/common/CommonRowMenu";
 
 export default function TerritoryMaster() {
   const { toast } = useToast();
@@ -30,14 +31,14 @@ export default function TerritoryMaster() {
   const [filters, setFilters] = useState({
     status: "",
   });
-const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [lastPage, setLastPage] = useState(1);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
   const [isListLoading, setIsListLoading] = useState(true);
- const [isTerritoryDeleteModalInfo, setIsTerritoryDeleteModalOpenInfo] = useState<{ open: boolean, info: any }>({
+  const [isTerritoryDeleteModalInfo, setIsTerritoryDeleteModalOpenInfo] = useState<{ open: boolean, info: any }>({
     open: false,
     info: {}
   });
@@ -215,7 +216,7 @@ const [isLoading, setIsLoading] = useState(false);
           per_page: perPage,
           page,
           search,
-          status:filters.status
+          status: filters.status
         });
 
       const mappedTerritory = res.data
@@ -269,64 +270,55 @@ const [isLoading, setIsLoading] = useState(false);
             // }
           }}
           setIsModalOpen={(value: boolean) => { navigate(`/master/territory/manage`) }}
-          actions={(row: any) => {
-            return (
-              <>
+          actions={(row: any) => (
+            <CommonRowMenu
+              items={[
+                {
+                  key: "edit",
+                  label: "Edit ",
+                  icon: <EditIcon size={16} />,
+                  onClick: () =>
+                    navigate(`/master/territory/manage?id=${row.id}&mode=edit`),
+                  show:
+                    Number(row.role_id) !==
+                    roles.find((role) => role.slug === "super-admin")?.id,
+                },
+                {
+                  key: "delete",
+                  label: "Delete ",
+                  icon: <Trash2 size={16} />,
+                  danger: true,
+                  onClick: () =>
+                    setIsTerritoryDeleteModalOpenInfo({
+                      open: true,
+                      info: row,
+                    }),
+                  show:
+                    Number(row.role_id) !==
+                    roles.find((role) => role.slug === "super-admin")?.id &&
+                    !row.store,
+                },
+              ]}
+            />
+          )}
 
-                {(
-                    <Box className="   grid grid-cols-2       
-    sm:flex sm:gap-1 
-    justify-center">     {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
-                      size="xs"
-                      // mr={2}
-                       title="Edit"
-                      aria-label="Edit"
-                      onClick={() => {
-                        navigate(`/master/territory/manage?id=${row.id}&mode=edit`)
-
-                      }
-                      }
-                    >
-                      <EditIcon />
-                    </IconButton>}
-
-                    {
-                      Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && !row.store &&
-                      <IconButton
-                        size="xs"
-                        // mr={2}
-                        colorScheme="red"
-                         title="Delete"
-                        aria-label="Delete"
-                        onClick={() => {
-                          setIsTerritoryDeleteModalOpenInfo({ open: true, info: row });
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </IconButton>}
-
-                  </Box>
-                )}
-              </>
-            );
-          }}
 
         />
-         <CommonDeleteModal
-                width="330px"
-                maxWidth="330px"
-                isOpen={isTerritoryDeleteModalInfo.open}
-                title="Delete Territory"
-                description={`Are you sure you want to delete this territory? This action cannot be undone.`}
-                confirmText="Delete"
-                cancelText="Cancel"
-                isLoading={isLoading}
-                onCancel={() =>
-                  setIsTerritoryDeleteModalOpenInfo({ open: false, info: {} })
-                }
-                onConfirm={TerritoryDeleteHandler}
-              />
-      
+        <CommonDeleteModal
+          width="330px"
+          maxWidth="330px"
+          isOpen={isTerritoryDeleteModalInfo.open}
+          title="Delete Territory"
+          description={`Are you sure you want to delete this territory? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          isLoading={isLoading}
+          onCancel={() =>
+            setIsTerritoryDeleteModalOpenInfo({ open: false, info: {} })
+          }
+          onConfirm={TerritoryDeleteHandler}
+        />
+
       </CardContent>
     </Card>
   );

@@ -14,6 +14,7 @@ import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { franchiseTableMockData, organizationMockData } from "@/lib/mockData";
 import { organizationFormType, storeFormApi } from "@/lib/types";
 import { useLocation } from "wouter";
+import CommonRowMenu from "@/components/common/CommonRowMenu";
 
 export default function Store() {
   const { toast } = useToast();
@@ -40,7 +41,7 @@ export default function Store() {
 
   const columns = useMemo(() => [
     {
-      key: "created_at", label: "Created On", align: "center", width: "100px", render: (_value: any,) => {
+      key: "created_at", label: "Created On", align: "center", width: "120px", render: (_value: any,) => {
 
         return (
           <Box className="flex flex-col justify-center items-center">
@@ -56,14 +57,14 @@ export default function Store() {
     {
       key: "name",
       label: "Store name",
-      width: "150px",
+      width: "140px",
 
     },
     {
       key: "email", label: "Email", width: "150px",
 
     },
-   
+
     {
       key: "territory_id", label: "Location", width: "150px",
     },
@@ -72,8 +73,8 @@ export default function Store() {
     },
 
     {
-      key: "opening_date", label: "Opening date",  align: "center", width: "150px",
-       render: (_value: any,) => {
+      key: "opening_date", label: "Opening date", align: "center", width: "180px",
+      render: (_value: any,) => {
 
         return (
           <Box className="flex flex-col justify-center items-center">
@@ -101,7 +102,7 @@ export default function Store() {
           ]}
         />
       ),
-      width: "150px",
+      width: "100px",
       render: (value: string, _row: any,) => {
         const isActive = value;
 
@@ -126,7 +127,7 @@ export default function Store() {
 
   const StoreStatusUpdateHandler = useCallback(async (u: any) => {
     try {
-      const newStatus =!u.is_active;
+      const newStatus = !u.is_active;
 
       setStores(prevUsers => {
 
@@ -231,44 +232,29 @@ export default function Store() {
 
           }
           }
-          actions={(row: any) => {
-            return (
-              <>
-
-                {(
-                   <Box className="   grid grid-cols-2       
-    sm:flex sm:gap-1 
-    justify-center">      <IconButton
-                      size="xs"
-                      // mr={2}
-                      title="View"
-                      aria-label="View"
-                      onClick={() =>
-                        navigate(`/master/stores/manage?id=${row.id}&mode=view`)
-                      }
-                    >
-                      <EyeIcon />
-                    </IconButton>
-                    {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
-                      size="xs"
-                      // mr={2}
-                      
-                      title="Edit"
-                      aria-label="Edit"
-                      onClick={() =>
-                        navigate(`/master/stores/manage?id=${row.id}&mode=edit`)
-                      }
-                    >
-                      <EditIcon />
-                    </IconButton>}
-
-
-                  </Box>
-                )}
-              </>
-            );
-          }}
-
+          actions={(row: any) => (
+            <CommonRowMenu
+              items={[
+                {
+                  key: "view",
+                  label: "View ",
+                  icon: <EyeIcon size={16} />,
+                  onClick: () =>
+                    navigate(`/master/stores/manage?id=${row.id}&mode=view`),
+                },
+                {
+                  key: "edit",
+                  label: "Edit ",
+                  icon: <EditIcon size={16} />,
+                  onClick: () =>
+                    navigate(`/master/stores/manage?id=${row.id}&mode=edit`),
+                  show:
+                    Number(row.role_id) !==
+                    roles.find((role) => role.slug === "super-admin")?.id,
+                },
+              ]}
+            />
+          )}
         />
 
       </CardContent>

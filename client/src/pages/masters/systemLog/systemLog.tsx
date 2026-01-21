@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
+import CommonRowMenu from "@/components/common/CommonRowMenu";
 
 export default function SystemLog() {
   const [systemLogMetaInfo, setSystemLogMetaInfo] = useState<systemLogMetaInfoType>({
@@ -336,49 +337,38 @@ export default function SystemLog() {
             setIsServicePlanModalOpenInfo({ open: value, type: "create", info: {} })
           }
 
-          actions={(row: any) => {
-            return (
-              <>
+         actions={(row: any) => (
+  <CommonRowMenu
+    items={[
+      {
+        key: "view",
+        label: "View",
+        icon: <EyeIcon size={16} />,
+        onClick: () =>
+          setIsServicePlanModalOpenInfo({
+            open: true,
+            type: "view",
+            info: row,
+          }),
+      },
+      {
+        key: "delete",
+        label: "Delete",
+        icon: <Trash2 size={16} />,
+        danger: true,
+        onClick: () =>
+          setIsSystemLogDeleteModalOpenInfo({
+            open: true,
+            info: row,
+          }),
+        show:
+          Number(row.role_id) !==
+          roles.find((role) => role.slug === "super-admin")?.id,
+      },
+    ]}
+  />
+)}
 
-                {(
-                   <Box className="   grid grid-cols-2       
-    sm:flex sm:gap-1 
-     justify-center">     <IconButton
-                      size="xs"
-                      // mr={2}
-                       title="View"
-                      aria-label="View"
-                      onClick={() =>
-                        setIsServicePlanModalOpenInfo({
-                          open: true,
-                          type: "view",
-                          info: row
-                        })
-                      }
-                    >
-                      <EyeIcon />
-                    </IconButton>
-
- {
-                      Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id &&
-                      <IconButton
-                        size="xs"
-                        // mr={2}
-                        colorScheme="red"
-                         title="Delete"
-                        aria-label="Delete"
-                        onClick={() => {
-                          setIsSystemLogDeleteModalOpenInfo({ open: true, info: row });
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </IconButton>}
-
-                  </Box>
-                )}
-              </>
-            );
-          }}
         />
         <CommonModal
           isOpen={isServicePlanModalOpenInfo.open}

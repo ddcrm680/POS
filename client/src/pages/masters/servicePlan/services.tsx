@@ -18,6 +18,7 @@ import { categoryType, planName, servicePlanMockResponse, vehicleType } from "@/
 import ServiceForm from "./serviceForm";
 import { serviceFormType, serviceMetaInfoType, UserFormType } from "@/lib/types";
 import ServicePlanView from "./servicePlanView";
+import CommonRowMenu from "@/components/common/CommonRowMenu";
 
 export default function Services() {
   const { toast } = useToast();
@@ -418,50 +419,38 @@ export default function Services() {
           setIsModalOpen={(value: boolean) =>
             setIsServicePlanModalOpenInfo({ open: value, type: "create", info: {} })
           }
-          actions={(row: any) => {
-            return (
-              <>
+      actions={(row: any) => (
+  <CommonRowMenu
+    items={[
+      {
+        key: "view",
+        label: "View ",
+        icon: <EyeIcon size={16} />,
+        onClick: () =>
+          setIsServicePlanModalOpenInfo({
+            open: true,
+            type: "view",
+            info: row,
+          }),
+      },
+      {
+        key: "edit",
+        label: "Edit ",
+        icon: <EditIcon size={16} />,
+        onClick: () =>
+          setIsServicePlanModalOpenInfo({
+            open: true,
+            type: "edit",
+            info: row,
+          }),
+        show:
+          Number(row.role_id) !==
+          roles.find((role) => role.slug === "super-admin")?.id,
+      },
+    ]}
+  />
+)}
 
-                {(
-                    <Box className="   grid grid-cols-2       
-    sm:flex sm:gap-1 
-    justify-center">     <IconButton
-                      size="xs"
-                      // mr={2}
-                       title="View"
-                      aria-label="View"
-                      onClick={() =>
-                        setIsServicePlanModalOpenInfo({
-                          open: true,
-                          type: "view",
-                          info: row,
-                        })
-                      }
-                    >
-                      <EyeIcon />
-                    </IconButton>
-                    {Number(row.role_id) !== roles.find((role) => role.slug === "super-admin").id && <IconButton
-                      size="xs"
-                      // mr={2}
-                       title="Edit"
-                      aria-label="Edit"
-                      onClick={() =>
-                        setIsServicePlanModalOpenInfo({
-                          open: true,
-                          type: "edit",
-                          info: row,
-                        })
-                      }
-                    >
-                      <EditIcon />
-                    </IconButton>}
-
-
-                  </Box>
-                )}
-              </>
-            );
-          }}
 
         />
         <CommonModal

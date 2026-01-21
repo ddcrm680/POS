@@ -360,7 +360,7 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
                       <IconButton
                         size="xs"
                         // mr={2}
-                        title="Cancel"
+                        title="Cancel "
                         colorScheme="red"
                         aria-label="Cancel"
                         onClick={() =>

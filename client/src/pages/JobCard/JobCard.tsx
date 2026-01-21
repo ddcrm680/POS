@@ -22,6 +22,7 @@ import { mapColumnsForCustomerView } from "@/lib/helper";
 import { Checkbox } from "@radix-ui/react-checkbox";
 
 import whatsap from "@/lib/images/whatsap.webp"
+import CommonRowMenu from "@/components/common/CommonRowMenu";
 export default function JobCard({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
   const { toast } = useToast();
   const { roles } = useAuth();
@@ -411,107 +412,83 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             setIsModalOpen={(value: boolean) => {
               navigate(`/job-cards/manage`)
             }}
-            actions={(row: any) => {
-              return (
-                <>
+            actions={(row: any) => (
+              <CommonRowMenu
+                items={[
+                   {
+                                        key: "print",
+                                        label: "Print Job Card",
+                                        icon: <PrinterIcon size={16} />,
+                                        onClick: () => { },
 
-                  {(
-                    <Box className="   grid grid-cols-2       
-    sm:flex sm:gap-1 
-    justify-center">      {canShowAction('print', allowedActions) && <IconButton
-                        size="xs"
-                        // mr={2}
-                        disabled
-                        aria-label="Print"
-                        onClick={() => { }
-                        }
-                      >
-                        <PrinterIcon />
-                      </IconButton>}
+                                        show: canShowAction("print", allowedActions),
+                                        disabled: true
+                                    },
+                  /* VIEW */
+                  {
+                    key: "view",
+                    label: "View ",
+                    icon: <EyeIcon size={16} />,
+                    onClick: () => navigate(`/job-cards/view?id=${row.id}`),
+                    show: canShowAction("view", allowedActions),
+                  },
 
-                      {
-                        canShowAction('view', allowedActions) && <IconButton
-                          size="xs"
-                          // mr={2}
-                          title="View"
-                          aria-label="View"
-                          onClick={() => {
-                            navigate(`/job-cards/view?id=${row.id}`)
-                          }
-                          }
-                        >
-                          <EyeIcon />
-                        </IconButton  >
-                      }
-                      {canShowAction('edit', allowedActions) && row.status === 'created' && (
-                        <IconButton
-                          size="xs"
-                          // mr={2}
-                          title="Edit"
-                          aria-label="Edit"
-                          onClick={() =>
-                            navigate(`/job-cards/manage?id=${row.id}&mode=edit`)
-                          }
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      )}
+                  /* EDIT */
+                  {
+                    key: "edit",
+                    label: "Edit ",
+                    icon: <EditIcon size={16} />,
+                    onClick: () =>
+                      navigate(`/job-cards/manage?id=${row.id}&mode=edit`),
+                    show:
+                      canShowAction("edit", allowedActions) &&
+                      row.status === "created",
+                  },
 
-                      {
-                        canShowAction('delete', allowedActions) &&
+                  /* SEND VIA WHATSAPP */
+                  {
+                    key: "whatsapp",
+                    label: "Send via WhatsApp",
+                    icon: <Image src={whatsap} className="w-4 h-4" />,
+                    onClick: () =>
+                      setSendModal({
+                        open: true,
+                        jobCard: { ...row, sendType: "whatsap" },
+                      }),
+                    show: roleView.admin || roleView.store,
+                  },
 
-                        row.status === 'created' && <IconButton
-                          size="xs"
-                          // mr={2}
-                          title="Cancel"
-                          colorScheme="red"
-                          aria-label="Cancel"
-                          onClick={() => {
-                            setIsJobCardDeleteModalOpenInfo({ open: true, info: row });
-                          }}
-                        >
-                          <XCircle size={16} />
-                        </IconButton>}
-                  
-                       {(roleView.admin || roleView.store) && <IconButton
-                                                size="xs"
-                                                title="Send Job Card via WhatsApp"
-                                                aria-label="Send Job Card via WhatsApp"
-                                                onClick={() => {
-                                                    setSendModal({
-                                                        open: true,
-                                                        jobCard: {
-                                                            ...row,
-                                                            sendType:"whatsap"
-                                                        }
-                                                    });
-                                                }}
-                                            >
-                                                <Image src={whatsap} className="w-[18px] h-[18px]" />
-                                            </IconButton>
-                                            }
-                                            {(roleView.admin || roleView.store) && <IconButton
-                                                size="xs"
-                                                title="Send Job Card via Mail"
-                                                aria-label="Send Job Card via Mail"
-                                                onClick={() => {
-                                                    setSendModal({
-                                                        open: true,
-                                                        jobCard: {
-                                                            ...row,
-                                                            sendType:"mail"
-                                                        }
-                                                    });
-                                                }}
-                                            >
-                                                <Mail size={16} />
-                                            </IconButton>
-                                            }
-                    </Box>
-                  )}
-                </>
-              );
-            }}
+                  /* SEND VIA MAIL */
+                  {
+                    key: "mail",
+                    label: "Send via Mail",
+                    icon: <Mail size={16} />,
+                    onClick: () =>
+                      setSendModal({
+                        open: true,
+                        jobCard: { ...row, sendType: "mail" },
+                      }),
+                    show: roleView.admin || roleView.store,
+                  },
+
+                  /* CANCEL */
+                  {
+                    key: "cancel",
+                    label: "Cancel Job Card",
+                    icon: <XCircle size={16} />,
+                    danger: true,
+                    onClick: () =>
+                      setIsJobCardDeleteModalOpenInfo({
+                        open: true,
+                        info: row,
+                      }),
+                    show:
+                      canShowAction("delete", allowedActions) &&
+                      row.status === "created",
+                  },
+                ]}
+              />
+            )}
 
           />
 
@@ -520,7 +497,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             maxWidth="330px"
             isOpen={sendModal.open || isJobCardDeleteModalInfo.open}
             title={`${sendModal.open ? "Send Job Card " : "Cancel Job Card"}`}
-            description={`Are you sure you want to ${sendModal.open ? 'send' : 'cancel'} this job card ${sendModal.open ? sendModal?.jobCard?.sendType==="whatsap" ?'via Whatsapp':"via Mail":" "}? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
+            description={`Are you sure you want to ${sendModal.open ? 'send' : 'cancel'} this job card ${sendModal.open ? sendModal?.jobCard?.sendType === "whatsap" ? 'via Whatsapp' : "via Mail" : " "}? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
             confirmText={`Yes, ${sendModal.open ? 'Send' : 'Cancel'}`}
             cancelText="No"
             loadingText={`${sendModal.open ? 'Sending' : 'Cancelling'}...`}

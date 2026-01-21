@@ -11,7 +11,7 @@ import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, ge
 import { InvoicePaymentFormValues, organizationFormType, reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Image, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, Mail, PrinterIcon, Send, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
+import { EditIcon, EllipsisVertical, EyeIcon, Mail, PrinterIcon, Send, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { canShowAction, formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
@@ -21,6 +21,7 @@ import { customerMockData, invoiceMockData, jobCardMockData, territoryMasterMock
 import InvoicePaymentForm from "./InvoicePaymentForm";
 import { mapColumnsForCustomerView } from "@/lib/helper";
 
+import CommonRowMenu from "@/components/common/CommonRowMenu";
 export default function Invoice({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
     const { toast } = useToast();
     const { roles } = useAuth();
@@ -64,8 +65,8 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
     const PER_PAGE = 10;
     const InvoiceDeleteHandler = async () => {
         try {
-                 console.log('came here delete');
-            
+            console.log('came here delete');
+
             setIsLoading(true);
 
             await cancelInvoice({ id: invoiceDeleteModalOpenInfo?.info?.id });
@@ -90,7 +91,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
     const InvoiceSendHandler = async () => {
         try {
             console.log('came here invoice');
-            
+
             setIsLoading(true);
 
             await invoiceSend(sendModal);
@@ -345,10 +346,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
     };
 
     const allowedActions = hideColumnListInCustomer?.actionShowedList;
-useEffect(()=>{
-    console.log(sendModal,invoiceDeleteModalOpenInfo,'invoiceDeleteModalOpenInfo');
-    
-},[sendModal,invoiceDeleteModalOpenInfo])
+
     return (
         <div className={`${noPadding ? "" : "p-3"}`}>
             {!noTitle && <div className="mb-6">
@@ -386,125 +384,72 @@ useEffect(()=>{
                             setPage(1); // reset page on new search
                             // }
                         }}
-                        actions={(row: any) => {
-                            return (
-                                <>
+                        actions={(row: any) => (
+                            <CommonRowMenu
+                                items={[
+                                    {
+                                        key: "print",
+                                        label: "Print ",
+                                        icon: <PrinterIcon size={16} />,
+                                        onClick: () => { },
 
-                                    {(
-                                        <Box className="   grid grid-cols-2       
-    sm:flex sm:gap-1 
-    justify-center">    {canShowAction('print', allowedActions) && <IconButton
-                                                size="xs"
-                                                // mr={2}
-                                                aria-label="Print"
-                                                disabled
-                                                onClick={() => { }
-                                                }
-                                            >
-                                                <PrinterIcon />
-                                            </IconButton>}
-                                            {canShowAction('view', allowedActions) && <IconButton
-                                                size="xs"
-                                                // mr={2}
-                                                title="View"
-                                                aria-label="View"
-                                                onClick={() => {
-                                                    navigate(`/invoices/view?id=${row.id}`)
+                                        show: canShowAction("print", allowedActions),
+                                        disabled: true
+                                    },
+                                    {
+                                        key: "view",
+                                        label: "View ",
+                                        icon: <EyeIcon size={16} />,
+                                        onClick: () => navigate(`/invoices/view?id=${row.id}`),
+                                        show: canShowAction("view", allowedActions),
+                                    },
+                                    {
+                                        key: "edit",
+                                        label: "Edit ",
+                                        icon: <EditIcon size={16} />,
+                                        onClick: () =>
+                                            navigate(`/invoices/manage?id=${row.id}&mode=edit`),
+                                        show: canShowAction("edit", allowedActions) && row.status === "issued",
+                                    },
+                                    {
+                                        key: "whatsapp",
+                                        label: "Send via WhatsApp",
+                                        icon: <Image src={whatsap} className="w-4 h-4" />,
+                                        onClick: () =>
+                                            setSendModal({ open: true, invoice: { ...row, sendType: "whatsap" } }),
+                                        show: roleView.admin || roleView.store,
+                                    },
+                                    {
+                                        key: "mail",
+                                        label: "Send via Mail",
+                                        icon: <Mail size={16} />,
+                                        onClick: () =>
+                                            setSendModal({ open: true, invoice: { ...row, sendType: "mail" } }),
+                                        show: roleView.admin || roleView.store,
+                                    },
+                                    {
+                                        key: "payment",
+                                        label: "Add Payment",
+                                        icon: <Wallet size={16} />,
+                                        onClick: () =>
+                                            setIsInvoicePaymentModalOpenInfo({ open: true, info: row }),
+                                        show:
+                                            canShowAction("Wallet", allowedActions) &&
+                                            (row.status === "issued" || row.status === "partially_paid"),
+                                    },
+                                    {
+                                        key: "cancel",
+                                        label: "Cancel Invoice",
+                                        icon: <XCircle size={16} />,
+                                        danger: true,
+                                        onClick: () =>
+                                            setIsInvoiceDeleteModalOpenInfo({ open: true, info: row }),
+                                        show: canShowAction("delete", allowedActions) && row.status === "issued",
+                                    },
+                                ]}
+                            />
+                        )}
 
-                                                }
-                                                }
-                                            >
-                                                <EyeIcon />
-                                            </IconButton>}
-                                            {
-                                                canShowAction('edit', allowedActions) && row.status == 'issued' &&
-                                                <IconButton
-                                                    size="xs"
-                                                    // mr={2}
-                                                    title="Edit"
-                                                    aria-label="Edit"
-                                                    onClick={() => {
-                                                        navigate(`/invoices/manage?id=${row.id}&mode=edit`)
-
-                                                    }
-                                                    }
-                                                >
-                                                    <EditIcon />
-                                                </IconButton>}
-
-
-
-
-                                            {
-
-                                                canShowAction('Wallet', allowedActions) && (row?.status === "partially_paid" || row.status == 'issued') &&
-                                                <IconButton
-                                                    size="xs"
-                                                    // mr={2}
-                                                    colorScheme="red"
-                                                    aria-label="Wallet"
-
-                                                    title="Wallet"
-                                                    onClick={() => {
-                                                        setIsInvoicePaymentModalOpenInfo({ open: true, info: row });
-                                                    }}
-                                                >
-                                                    <Wallet size={16} />
-                                                </IconButton>}
-                                            {
-
-                                                canShowAction('delete', allowedActions) && row.status == 'issued' && <IconButton
-                                                    size="xs"
-                                                    // mr={2}
-                                                    title="Cancel"
-                                                    colorScheme="red"
-                                                    aria-label="Cancel"
-                                                    onClick={() => {
-                                                        setIsInvoiceDeleteModalOpenInfo({ open: true, info: row });
-                                                    }}
-                                                >
-                                                    <XCircle size={16} />
-                                                </IconButton>}
-                                            {(roleView.admin || roleView.store) && <IconButton
-                                                size="xs"
-                                                title="Send Invoice via WhatsApp"
-                                                aria-label="Send Invoice via WhatsApp"
-                                                onClick={() => {
-                                                    setSendModal({
-                                                        open: true,
-                                                        invoice: {
-                                                            ...row,
-                                                            sendType:"whatsap"
-                                                        }
-                                                    });
-                                                }}
-                                            >
-                                                <Image src={whatsap} className="w-[18px] h-[18px]" />
-                                            </IconButton>
-                                            }
-                                            {(roleView.admin || roleView.store) && <IconButton
-                                                size="xs"
-                                                title="Send Invoice via Mail"
-                                                aria-label="Send Invoice via Mail"
-                                                onClick={() => {
-                                                    setSendModal({
-                                                        open: true,
-                                                        invoice: {
-                                                            ...row,
-                                                            sendType:"mail"
-                                                        }
-                                                    });
-                                                }}
-                                            >
-                                                <Mail size={16} />
-                                            </IconButton>
-                                            }
-
-                                        </Box>
-                                    )}
-                                </>
-                            );
-                        }}
 
                     />
                     <CommonModal
@@ -544,20 +489,20 @@ useEffect(()=>{
                         isOpen={sendModal.open || invoiceDeleteModalOpenInfo.open}
                         title={`${sendModal.open ? "Send Invoice " : "Cancel Invoice"}`}
                         description={`Are you sure you want to ${sendModal.open ? 'send' : 'cancel'} this invoice 
-                        ${sendModal.open ? sendModal?.invoice?.sendType==="whatsap" ?'via Whatsapp':"via Mail":""}? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
+                        ${sendModal.open ? sendModal?.invoice?.sendType === "whatsap" ? 'via Whatsapp' : "via Mail" : ""}? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
                         confirmText={`Yes, ${sendModal.open ? 'Send' : 'Cancel'}`}
                         cancelText="No"
                         loadingText={`${sendModal.open ? 'Sending' : 'Cancelling'}...`}
                         isLoading={isLoading}
                         onCancel={() => {
-                                setSendModal({ open: false, invoice: {} })
+                            setSendModal({ open: false, invoice: {} })
 
-                                setIsInvoiceDeleteModalOpenInfo({ open: false, info: {} })
+                            setIsInvoiceDeleteModalOpenInfo({ open: false, info: {} })
                         }
                         }
                         onConfirm={() => {
-                            console.log(sendModal,'sendModal');
-                            
+                            console.log(sendModal, 'sendModal');
+
                             if (sendModal.open) {
                                 InvoiceSendHandler()
                             } else {
