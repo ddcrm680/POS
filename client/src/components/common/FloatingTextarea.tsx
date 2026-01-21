@@ -37,8 +37,9 @@ export function FloatingTextarea({
             <Textarea
               {...field}
               disabled={isView}
-              pt="8px"
-               pl="18px"
+              pt="10px"
+               pl="12px"
+               fontSize={'12px'}
                rows={rows}
                minH={'45px'}
                  pr="18px"
@@ -74,17 +75,18 @@ export function FloatingTextarea({
 }
 const floatingLabelStyle = defineStyle({
   position: "absolute",
-  left: "12px",
-  top: "12px",
-  fontSize: "sm",
+  left: "10px",
+  top: "11px",
+  fontSize: "xs",
   background: "white",
   paddingInline: "4px",
   pointerEvents: "none",
   transition: "all 0.2s ease",
   zIndex: 1,
+  color: "gray.500",
 
   "&[data-float]": {
     top: "-6px",
-    fontSize: "xs",
+    fontSize: "10px",
   },
 })

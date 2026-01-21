@@ -16,7 +16,7 @@ export function FloatingRHFSelect({
   options,
   isMulti = false,
   isDisabled = false,
-  isClear=false,
+  isClear = false,
   isRequired = false,
   creatable = false,
   onValueChange
@@ -56,7 +56,7 @@ export function FloatingRHFSelect({
             : null
 
         return (
-          <Box position="relative"  w="full">
+          <Box position="relative" w="full">
             {/* FLOATING LABEL */}
             <Text
               position="absolute"
@@ -111,13 +111,17 @@ export function FloatingRHFSelect({
                 groupHeading: base => ({
                   ...base,
                   fontWeight: 600,
-                  fontSize: "12px",
+                  fontSize: "11px",
                   color: "#2d3748",
+                  padding: "4px 8px",
                 }),
+
                 control: (base, state) => ({
                   ...base,
-                  minHeight: "44px",
-                  paddingTop: "10px",
+                  minHeight: "38px",
+                  height: "38px",
+                  paddingTop: "4px",
+                  fontSize: "13px",
                   borderColor: error
                     ? "#e53e3e"
                     : state.isFocused
@@ -126,12 +130,54 @@ export function FloatingRHFSelect({
                   boxShadow: "none",
                 }),
 
-                menuPortal: (base) => ({
+                valueContainer: base => ({
                   ...base,
-                  zIndex: 999999, // 🔥 ABOVE ALL FLOATING LABELS
+                  padding: "0 8px",
                 }),
 
-                menu: (base) => ({
+                input: base => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                  fontSize: "13px",
+                }),
+
+                singleValue: base => ({
+                  ...base,
+                  fontSize: "13px",
+                }),
+
+                multiValue: base => ({
+                  ...base,
+                  fontSize: "12px",
+                  height: "22px",
+                }),
+
+                multiValueLabel: base => ({
+                  ...base,
+                  fontSize: "12px",
+                  padding: "0 4px",
+                }),
+
+                multiValueRemove: base => ({
+                  ...base,
+                  padding: "0 4px",
+                }),
+
+                option: (base, state) => ({
+                  ...base,
+                  fontSize: "13px",
+                  padding: "6px 10px",
+                  backgroundColor: state.isFocused ? "#edf2f7" : "white",
+                  color: "#1a202c",
+                }),
+
+                menuPortal: base => ({
+                  ...base,
+                  zIndex: 999999,
+                }),
+
+                menu: base => ({
                   ...base,
                   zIndex: 999999,
                 }),

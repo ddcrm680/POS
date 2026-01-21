@@ -51,24 +51,26 @@ export function FloatingField({
 
         return (
           <Box position="relative" w="full">
-            <Input
-              {...field}
-              {...inputProps}
-              type={inputType}
-              h="44px"
-              disabled={disabled}
-              pt="18px"
-              pr="18px"
-              pl="18px"
-              pb="8px"
-              border="1px solid"
-              borderColor={error ? "red.500" : "#e1e7ef"}
-              _focus={{ borderColor: error ? "red.500" : "blue.500" }}
-              _disabled={{
-                bg: "gray.50",
-                cursor: "not-allowed",
-                opacity: 0.7,
-              }}
+          <Input
+  {...field}
+  {...inputProps}
+  type={inputType}
+  h="38px"
+  fontSize="13px"
+  lineHeight="1.4"
+  disabled={disabled}
+  pt="14px"
+  pb="6px"
+  pl="10px"
+  pr="10px"
+  border="1px solid"
+  borderColor={error ? "red.500" : "#e1e7ef"}
+  _focus={{ borderColor: error ? "red.500" : "blue.500" }}
+  _disabled={{
+    bg: "gray.50",
+    cursor: "not-allowed",
+    opacity: 0.7,
+  }}
 
               /* 🔒 MOBILE NUMBER RULE */
               inputMode={isMobileField ? "numeric" : inputProps.inputMode}
@@ -166,17 +168,18 @@ export function FloatingField({
 
 const floatingLabelStyle = defineStyle({
   position: "absolute",
-  left: "12px",
-  top: "12px",
-  fontSize: "sm",
+  left: "10px",
+  top: "11px",
+  fontSize: "xs",
   background: "white",
   paddingInline: "4px",
   pointerEvents: "none",
   transition: "all 0.2s ease",
   zIndex: 1,
+  color: "gray.500",
 
   "&[data-float]": {
     top: "-6px",
-    fontSize: "xs",
+    fontSize: "10px",
   },
 })

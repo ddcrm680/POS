@@ -930,11 +930,11 @@ export default function InvoiceForm() {
 
             {/* Plans */}
             <Card className="p-4 lg:col-span-3">
-              <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-2 items-center">
+              <CardTitle className=" text-sm font-semibold  text-gray-700 flex gap-4 items-center">
                 Billing Info
               </CardTitle>
               <Form {...form}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
 
                   <FloatingRHFSelect
                     name="billing_to"
@@ -995,12 +995,12 @@ export default function InvoiceForm() {
                   />}
                 </div>
 
-                <div className="mt-3">
+                <div className="mt-4">
                   <FloatingTextarea
 
                     isView={isView}
                     name="billing_address"
-                    rows={2}
+                    rows={1}
                     label="Billing Address"
                     control={form.control}
                     isRequired
