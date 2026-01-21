@@ -424,33 +424,35 @@ export async function fetchUnassignedStoreList() {
   throw new Error(response.data?.message || "Failed to fetch unassigned store list");
 }
 export async function getPaymentsList({
-  apiLink,param
-
+  apiLink, param
 }: {
-  apiLink:string
-  param:{
-
-  per_page: number;
-  page: number;
-  search: string;
-  payment_mode?: string;
-  
-  status?: string | number;
+  apiLink: string
+  param: {
+    per_page: number;
+    page: number;
+    search: string;
+    payment_mode?: string;
+    from_date?: string
+    to_date?: string
+    status?: string | number;
   }
 
 }) {
   try {
     const params = new URLSearchParams({
       page: String(param.page),
-      search:param.search,
+      search: param.search,
       per_page: String(param.per_page)
     });
 
     if (param.payment_mode) params.append("payment_mode", String(param.payment_mode));
     if (param.status !== "") params.append("status", String(param.status));
 
+    if (param.from_date) params.append("from_date", String(param.from_date));
+    if (param.to_date) params.append("to_date", String(param.to_date));
+
     const response: any = await api.get(
-    apiLink?`${apiLink}?${params.toString()}`:  `/api/payments?${params.toString()}`
+      apiLink ? `${apiLink}?${params.toString()}` : `/api/payments?${params.toString()}`
     );
 
     if (response?.data?.success === true) {
@@ -724,7 +726,7 @@ export async function getJobCard({
     if (param.consumer) params.append("consumer", String(param.consumer));
 
     const response: any = await api.get(
-      apiLink ?`${apiLink}?${params.toString()}` :
+      apiLink ? `${apiLink}?${params.toString()}` :
         `/api/job-cards?${params.toString()}`,
     );
 
@@ -1126,8 +1128,8 @@ export async function jobCardSend(info: any) {
 }
 export async function invoiceSend(info: any) {
   try {
-   
-  const response: any = await api.post(
+
+    const response: any = await api.post(
       `/api/invoice/${info.invoice.id}/send?type=${info.invoice.sendType}`,
     );
     if (response?.data?.success === true) {
@@ -1298,7 +1300,7 @@ export async function getInvoiceList({
 
   try {
     const response: any = await api.get(
-     apiLink? `${apiLink}?${params.toString()}`: `/api/invoices?${params.toString()}`,
+      apiLink ? `${apiLink}?${params.toString()}` : `/api/invoices?${params.toString()}`,
     );
 
     if (response?.data?.success === true) {

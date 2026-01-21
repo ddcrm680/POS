@@ -123,7 +123,7 @@ export default function SystemLog() {
     {
       key: "description", label: "Description", width: "150px",
       render: (_value: any,) => {
-      
+
         return (
           <span
           >
@@ -303,6 +303,7 @@ export default function SystemLog() {
                   containerClassName="relative z-[9999]"
                   inputClassName="
           w-[220px]
+              !text-[12px] !h-8
           border rounded-md
           py-2 px-3
           text-sm
@@ -313,7 +314,7 @@ export default function SystemLog() {
 
               <Button
                 onClick={() => fetchSystemLog()}
-                className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] text-white"
+                className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] text-white !text-[12px] !h-8"
               >
                 Apply
               </Button>
@@ -337,37 +338,37 @@ export default function SystemLog() {
             setIsServicePlanModalOpenInfo({ open: value, type: "create", info: {} })
           }
 
-         actions={(row: any) => (
-  <CommonRowMenu
-    items={[
-      {
-        key: "view",
-        label: "View",
-        icon: <EyeIcon size={16} />,
-        onClick: () =>
-          setIsServicePlanModalOpenInfo({
-            open: true,
-            type: "view",
-            info: row,
-          }),
-      },
-      {
-        key: "delete",
-        label: "Delete",
-        icon: <Trash2 size={16} />,
-        danger: true,
-        onClick: () =>
-          setIsSystemLogDeleteModalOpenInfo({
-            open: true,
-            info: row,
-          }),
-        show:
-          Number(row.role_id) !==
-          roles.find((role) => role.slug === "super-admin")?.id,
-      },
-    ]}
-  />
-)}
+          actions={(row: any) => (
+            <CommonRowMenu
+              items={[
+                {
+                  key: "view",
+                  label: "View",
+                  icon: <EyeIcon size={16} />,
+                  onClick: () =>
+                    setIsServicePlanModalOpenInfo({
+                      open: true,
+                      type: "view",
+                      info: row,
+                    }),
+                },
+                {
+                  key: "delete",
+                  label: "Delete",
+                  icon: <Trash2 size={16} />,
+                  danger: true,
+                  onClick: () =>
+                    setIsSystemLogDeleteModalOpenInfo({
+                      open: true,
+                      info: row,
+                    }),
+                  show:
+                    Number(row.role_id) !==
+                    roles.find((role) => role.slug === "super-admin")?.id,
+                },
+              ]}
+            />
+          )}
 
         />
         <CommonModal
@@ -401,19 +402,19 @@ export default function SystemLog() {
 
         </CommonModal>
         <CommonDeleteModal
-                  width="330px"
-                  maxWidth="330px"
-                  isOpen={isSystemLogDeleteModalInfo.open}
-                  title="Delete System Log"
-                  description={`Are you sure you want to delete this system log? This action cannot be undone.`}
-                  confirmText="Delete"
-                  cancelText="Cancel"
-                  isLoading={isLoading}
-                  onCancel={() =>
-                    setIsSystemLogDeleteModalOpenInfo({ open: false, info: {} })
-                  }
-                  onConfirm={SystemLogDeleteHandler}
-                />
+          width="330px"
+          maxWidth="330px"
+          isOpen={isSystemLogDeleteModalInfo.open}
+          title="Delete System Log"
+          description={`Are you sure you want to delete this system log? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          isLoading={isLoading}
+          onCancel={() =>
+            setIsSystemLogDeleteModalOpenInfo({ open: false, info: {} })
+          }
+          onConfirm={SystemLogDeleteHandler}
+        />
       </CardContent>
     </Card>
   );

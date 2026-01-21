@@ -19,8 +19,10 @@ import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, invoiceMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import InvoicePaymentForm from "../Invoices/InvoicePaymentForm";
 import { mapColumnsForCustomerView } from "@/lib/helper";
+import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
+import { Button } from "@/components/ui/button";
 
-export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer = { list: [], actionShowedList: [] }, noPadding = false, apiLink = "" }: reusableComponentType) {
+export default function PaymentsPage({ noTitle = false, hideColumnListInCustomer = { list: [], actionShowedList: [] }, noPadding = false, apiLink = "" }: reusableComponentType) {
   const { toast } = useToast();
   const { roles } = useAuth();
   const [payments, setPayments] = useState<Array<any>>([]);
@@ -30,6 +32,10 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
   const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: { value: string, label: string }[], payment_mode: { value: string, label: string }[] }>({
     status: [],
     payment_mode: []
+  });
+  const [dateRange, setDateRange] = useState<DateValueType>({
+    startDate: null,
+    endDate: null,
   });
   const [, navigate] = useLocation();
   const [filters, setFilters] = useState({
@@ -99,7 +105,7 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
       render: (value: string) => (
         <Box className="flex flex-col">
           <span className="font-medium">{formatDate(value)}</span>
-         
+
         </Box>
       ),
     },
@@ -134,7 +140,7 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
       key: "remarks",
       label: "Notes",
       width: "130px",
- render: (value: any) => (
+      render: (value: any) => (
         <span> {value ?? "-"}</span>
       ),
     },
@@ -207,7 +213,13 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
             page,
             search,
             status: filters.status,
-            payment_mode: filters.payment_mode
+            payment_mode: filters.payment_mode,
+            from_date: dateRange?.startDate
+              ? dateRange?.startDate.toISOString().slice(0, 10)
+              : undefined,
+            to_date: dateRange?.endDate
+              ? dateRange?.endDate.toISOString().slice(0, 10)
+              : undefined,
           }
 
         });
@@ -236,23 +248,27 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
   function resetFilter() {
     setSearch('')
     setPage(1)
+    setDateRange({
+      startDate: null,
+      endDate: null,
+    })
     setFilters({
       status: "",
       payment_mode: ""
     })
   }
-  
-      const resolvedColumns = useMemo(() => {
-          const list = hideColumnListInCustomer?.list;
-  
-          // 🔓 No config → show all columns
-          if (!Array.isArray(list) || list.length === 0) {
-              return columns;
-          }
-  
-          return mapColumnsForCustomerView(columns, list);
-      }, [columns, hideColumnListInCustomer]);
-      const allowedActions = hideColumnListInCustomer?.actionShowedList;
+
+  const resolvedColumns = useMemo(() => {
+    const list = hideColumnListInCustomer?.list;
+
+    // 🔓 No config → show all columns
+    if (!Array.isArray(list) || list.length === 0) {
+      return columns;
+    }
+
+    return mapColumnsForCustomerView(columns, list);
+  }, [columns, hideColumnListInCustomer]);
+  const allowedActions = hideColumnListInCustomer?.actionShowedList;
 
   const OrganizationCommonHandler = async (
     value: InvoicePaymentFormValues,
@@ -330,7 +346,7 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
       <Card className="w-full">
         <CardContent>
           <CommonTable
-         columns={resolvedColumns}
+            columns={resolvedColumns}
             isClear={true}
             data={payments}
             isAdd={false}
@@ -340,6 +356,38 @@ export default function PaymentsPage({ noTitle = false,hideColumnListInCustomer 
             isLoading={isListLoading}
             total={total}
             hasNext={has_next}
+            filtersSlot={
+              <div className="flex items-end gap-3 relative z-50">
+                <div className="flex flex-col gap-1 relative z-[9999]">
+                  <Datepicker
+                    placeholder="From date       -      To date"
+                    value={dateRange}
+                    onChange={(val) => {
+                      setDateRange(val);
+                      setPage(1);
+                    }}
+                    showShortcuts
+                    popoverDirection="down"
+                    containerClassName="relative z-[9999]"
+                    inputClassName="
+          w-[220px]
+          !text-[12px] !h-8
+          border rounded-md
+          py-2 px-3
+          text-sm
+          focus:ring-1 focus:ring-red-500
+        "
+                  />
+                </div>
+
+                <Button
+                  onClick={() => fetchPayments()}
+                  className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] text-white !text-[12px] !h-8"
+                >
+                  Apply
+                </Button>
+              </div>
+            }
             tabType=""
             tabDisplayName="Payments"
             page={page}
