@@ -459,8 +459,8 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                                 </IconButton>}
                                             {(roleView.admin || roleView.store) && <IconButton
                                                 size="xs"
-                                                title="Send Job Card"
-                                                aria-label="Send Job Card"
+                                                title="Send Invoice"
+                                                aria-label="Send Invoice"
                                                 onClick={() => {
                                                     setSendModal({
                                                         open: true,
