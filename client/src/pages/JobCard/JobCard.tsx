@@ -10,8 +10,8 @@ import { useLocation } from "wouter";
 import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getJobCard, jobCardCancel, jobCardSend, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
-import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, PrinterIcon, Send, Trash2, XCircle } from "lucide-react";
+import { Badge, Box, IconButton, Image, Switch } from "@chakra-ui/react";
+import { EditIcon, EyeIcon, Mail, PrinterIcon, Send, Trash2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { canShowAction, formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
@@ -21,6 +21,7 @@ import { jobCardStatusList } from "@/lib/constant";
 import { mapColumnsForCustomerView } from "@/lib/helper";
 import { Checkbox } from "@radix-ui/react-checkbox";
 
+import whatsap from "@/lib/images/whatsap.webp"
 export default function JobCard({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
   const { toast } = useToast();
   const { roles } = useAuth();
@@ -96,7 +97,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
     try {
       setIsLoading(true);
 
-      await jobCardSend(sendModal?.jobCard?.id);
+      await jobCardSend(sendModal);
       toast({ title: `Send Job Card`, description: "Job Card send successfully", variant: "success", });
 
     } catch (err: any) {
@@ -471,20 +472,41 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                         >
                           <XCircle size={16} />
                         </IconButton>}
-                      {(roleView.admin || roleView.store) && <IconButton
-                        size="xs"
-                        title="Send Job Card"
-                        aria-label="Send Job Card"
-                        onClick={() => {
-                          setSendModal({
-                            open: true,
-                            jobCard: row
-                          });
-                        }}
-                      >
-                        <Send size={16} />
-                      </IconButton>
-                      }
+                  
+                       {(roleView.admin || roleView.store) && <IconButton
+                                                size="xs"
+                                                title="Send Job Card via WhatsApp"
+                                                aria-label="Send Job Card via WhatsApp"
+                                                onClick={() => {
+                                                    setSendModal({
+                                                        open: true,
+                                                        jobCard: {
+                                                            ...row,
+                                                            sendType:"whatsap"
+                                                        }
+                                                    });
+                                                }}
+                                            >
+                                                <Image src={whatsap} className="w-[18px] h-[18px]" />
+                                            </IconButton>
+                                            }
+                                            {(roleView.admin || roleView.store) && <IconButton
+                                                size="xs"
+                                                title="Send Job Card via Mail"
+                                                aria-label="Send Job Card via Mail"
+                                                onClick={() => {
+                                                    setSendModal({
+                                                        open: true,
+                                                        jobCard: {
+                                                            ...row,
+                                                            sendType:"mail"
+                                                        }
+                                                    });
+                                                }}
+                                            >
+                                                <Mail size={16} />
+                                            </IconButton>
+                                            }
                     </Box>
                   )}
                 </>
@@ -498,7 +520,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             maxWidth="330px"
             isOpen={sendModal.open || isJobCardDeleteModalInfo.open}
             title={`${sendModal.open ? "Send Job Card " : "Cancel Job Card"}`}
-            description={`Are you sure you want to ${sendModal.open ? 'send' : 'cancel'} this job card? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
+            description={`Are you sure you want to ${sendModal.open ? 'send' : 'cancel'} this job card ${sendModal.open ? sendModal?.jobCard?.sendType==="whatsap" ?'via Whatsapp':"via Mail":" "}? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
             confirmText={`Yes, ${sendModal.open ? 'Send' : 'Cancel'}`}
             cancelText="No"
             loadingText={`${sendModal.open ? 'Sending' : 'Cancelling'}...`}
@@ -512,7 +534,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             }
             }
             onConfirm={() => {
-              if (sendModal) {
+              if (sendModal.open) {
                 JobCardSendHandler()
               } else {
                 JobCardDeleteHandler()

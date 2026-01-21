@@ -1107,10 +1107,10 @@ export async function jobCardCancel(id: any) {
     throw response;
   }
 }
-export async function jobCardSend(id: any) {
+export async function jobCardSend(info: any) {
   try {
     const response: any = await api.post(
-      `/api/job-cards/${id}/send`,
+      `/api/job-cards/${info.jobCard.id}/send?type=${info.jobCard.sendType}`,
     );
 
     if (response?.data?.success === true) {
@@ -1124,12 +1124,12 @@ export async function jobCardSend(id: any) {
     throw response;
   }
 }
-export async function invoiceSend(id: any) {
+export async function invoiceSend(info: any) {
   try {
-    const response: any = await api.post(
-      `/api/invoice/${id}/send`,
+   
+  const response: any = await api.post(
+      `/api/invoice/${info.invoice.id}/send?type=${info.invoice.sendType}`,
     );
-
     if (response?.data?.success === true) {
       return response.data.data; // customer object
     }

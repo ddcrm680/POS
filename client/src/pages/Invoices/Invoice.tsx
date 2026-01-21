@@ -10,12 +10,13 @@ import { useLocation } from "wouter";
 import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, invoiceSend, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { InvoicePaymentFormValues, organizationFormType, reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
-import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, PrinterIcon, Send, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
+import { Badge, Box, IconButton, Image, Switch } from "@chakra-ui/react";
+import { EditIcon, EyeIcon, Mail, PrinterIcon, Send, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { canShowAction, formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
+import whatsap from "@/lib/images/whatsap.webp"
 import { customerMockData, invoiceMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import InvoicePaymentForm from "./InvoicePaymentForm";
 import { mapColumnsForCustomerView } from "@/lib/helper";
@@ -50,7 +51,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
         info: {}
     });
 
-    const [sendModal, setSendModal] = useState<any>({ open: false, jobCard: {} })
+    const [sendModal, setSendModal] = useState<any>({ open: false, invoice: {} })
     const [roleView, setRoleView] = useState<{
         store: boolean,
         admin: boolean,
@@ -63,6 +64,8 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
     const PER_PAGE = 10;
     const InvoiceDeleteHandler = async () => {
         try {
+                 console.log('came here delete');
+            
             setIsLoading(true);
 
             await cancelInvoice({ id: invoiceDeleteModalOpenInfo?.info?.id });
@@ -86,9 +89,11 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
     };
     const InvoiceSendHandler = async () => {
         try {
+            console.log('came here invoice');
+            
             setIsLoading(true);
 
-            await invoiceSend(sendModal?.jobCard?.id);
+            await invoiceSend(sendModal);
             toast({ title: `Send Invoice`, description: "Invoice send successfully", variant: "success", });
 
         } catch (err: any) {
@@ -101,7 +106,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                 variant: "destructive",
             });
         } finally {
-            setSendModal({ open: false, jobCard: {} });
+            setSendModal({ open: false, invoice: {} });
             setIsLoading(false);
         }
     };
@@ -340,7 +345,10 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
     };
 
     const allowedActions = hideColumnListInCustomer?.actionShowedList;
-
+useEffect(()=>{
+    console.log(sendModal,invoiceDeleteModalOpenInfo,'invoiceDeleteModalOpenInfo');
+    
+},[sendModal,invoiceDeleteModalOpenInfo])
     return (
         <div className={`${noPadding ? "" : "p-3"}`}>
             {!noTitle && <div className="mb-6">
@@ -459,16 +467,36 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                                 </IconButton>}
                                             {(roleView.admin || roleView.store) && <IconButton
                                                 size="xs"
-                                                title="Send Invoice"
-                                                aria-label="Send Invoice"
+                                                title="Send Invoice via WhatsApp"
+                                                aria-label="Send Invoice via WhatsApp"
                                                 onClick={() => {
                                                     setSendModal({
                                                         open: true,
-                                                        jobCard: row
+                                                        invoice: {
+                                                            ...row,
+                                                            sendType:"whatsap"
+                                                        }
                                                     });
                                                 }}
                                             >
-                                                <Send size={16} />
+                                                <Image src={whatsap} className="w-[18px] h-[18px]" />
+                                            </IconButton>
+                                            }
+                                            {(roleView.admin || roleView.store) && <IconButton
+                                                size="xs"
+                                                title="Send Invoice via Mail"
+                                                aria-label="Send Invoice via Mail"
+                                                onClick={() => {
+                                                    setSendModal({
+                                                        open: true,
+                                                        invoice: {
+                                                            ...row,
+                                                            sendType:"mail"
+                                                        }
+                                                    });
+                                                }}
+                                            >
+                                                <Mail size={16} />
                                             </IconButton>
                                             }
 
@@ -515,21 +543,22 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                         maxWidth="330px"
                         isOpen={sendModal.open || invoiceDeleteModalOpenInfo.open}
                         title={`${sendModal.open ? "Send Invoice " : "Cancel Invoice"}`}
-                        description={`Are you sure you want to ${sendModal.open ? 'send' : 'cancel'} this invoice? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
+                        description={`Are you sure you want to ${sendModal.open ? 'send' : 'cancel'} this invoice 
+                        ${sendModal.open ? sendModal?.invoice?.sendType==="whatsap" ?'via Whatsapp':"via Mail":""}? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
                         confirmText={`Yes, ${sendModal.open ? 'Send' : 'Cancel'}`}
                         cancelText="No"
                         loadingText={`${sendModal.open ? 'Sending' : 'Cancelling'}...`}
                         isLoading={isLoading}
                         onCancel={() => {
-                            if (sendModal) {
-                                setSendModal({ open: false, jobCard: {} })
+                                setSendModal({ open: false, invoice: {} })
 
-                            } else
                                 setIsInvoiceDeleteModalOpenInfo({ open: false, info: {} })
                         }
                         }
                         onConfirm={() => {
-                            if (sendModal) {
+                            console.log(sendModal,'sendModal');
+                            
+                            if (sendModal.open) {
                                 InvoiceSendHandler()
                             } else {
                                 InvoiceDeleteHandler()
