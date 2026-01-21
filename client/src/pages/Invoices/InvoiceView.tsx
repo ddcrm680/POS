@@ -26,6 +26,7 @@ import { Info } from "@/components/common/viewInfo";
 import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
 
 
 export default function InvoiceView() {
@@ -374,6 +375,11 @@ export default function InvoiceView() {
         cancelled: "bg-red-100 text-red-700  border-red-700",
         "partially_paid": "bg-blue-100 text-blue-700  border-blue-700",
     };
+      const { user, } = useAuth();
+    
+      const isStoreManager =
+        user?.role === 'store-manager'
+    
     return (
         <div className=" mx-auto p-3 space-y-3">
             {/* Header */}
@@ -438,7 +444,7 @@ export default function InvoiceView() {
                         <div className="p-4 text-sm "><Loader /></div>
                     </div></Card> : <>
                         {/* Top Info */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className={`grid grid-cols-1  ${isStoreManager ? 'md:grid-cols-2 lg:grid-cols-4':'md:grid-cols-2'} gap-3`}>
                             {invoiceView?.customer && <Card className="p-4">
                                 <CardTitle className=" text-sm font-semibold mb-3 text-gray-700 flex gap-2 items-center">
                                     Customer Detail
