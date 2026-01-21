@@ -448,6 +448,8 @@ export default function InvoiceForm() {
           {
             key: "igst_amount",
             label: "IGST",
+            
+            width: "120px",
             render: (_: any, row: any) => (
               <span>
                 ₹ {row.igst_amount}
@@ -479,8 +481,8 @@ export default function InvoiceForm() {
                   mr={2}
                   colorScheme="red"
                   // disabled={plans.length <= 1}
-                   title="Delete"
-                        aria-label="Delete"
+                  title="Delete"
+                  aria-label="Delete"
                   onClick={() => removePlan(row.id)}
                 >
                   <Trash2 size={16} />
@@ -582,9 +584,9 @@ export default function InvoiceForm() {
         setIsInfoLoading(false);
       }
     };
-    if (id)
+    if (id || jobCardId )
       loadInvoice();
-  }, [id]);
+  }, [id, jobCardId,mode]);
   const clearPlanCellError = (rowIndex: number, field: string) => {
     setPlanErrors(prev => {
       const next = { ...prev };
