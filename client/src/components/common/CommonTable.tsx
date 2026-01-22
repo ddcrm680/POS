@@ -10,6 +10,7 @@ import { Loader } from "./loader";
 import CommonModal from "./CommonModal";
 import { vehicleCardItem, vehicleType } from "@/lib/types";
 import { VehicleCardInfo } from "@/pages/masters/vehicleMaster/vehicleCardInfo";
+import { toTitleCase } from "@/lib/helper";
 
 export default function CommonTable({
   columns,
@@ -162,24 +163,22 @@ export default function CommonTable({
           <Table.Header className="sticky top-0 z-20 bg-gray-50 backdrop-blur border-b">
             <Table.Row className="!bg-gray-100 border-b border-gray-200">
               {columns.map((col: any) => (
-                <Table.ColumnHeader
-                  key={col.key}
-                  textAlign={col.align || "start"}
-                  width={col.width}
-                  className="
-  !py-2 !px-3
-  text-xs font-semibold uppercase tracking-wide
-  text-gray-600
-"
-                >
-                  {col.label}
-                </Table.ColumnHeader>
+           <Table.ColumnHeader
+  key={col.key}
+  textAlign={col.align || "start"}
+  width={col.width}
+  className="!py-2 !px-3 text-xs font-semibold tracking-wide text-gray-600"
+>
+  {typeof col.label === "string"
+    ? toTitleCase(col.label)
+    : col.label}
+</Table.ColumnHeader>
               ))}
 
               {actions && (
                 <Table.ColumnHeader
                   width="100px"
-                  className="sticky right-0 z-30 bg-inherit text-xs font-semibold text-center   text-gray-600 uppercase"
+                  className="sticky right-0 z-30 bg-inherit text-xs font-semibold text-center   text-gray-600 "
                 >
                   Actions
                 </Table.ColumnHeader>
