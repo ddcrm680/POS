@@ -300,7 +300,7 @@ export const hideColumnListInCustomer = {
 
 
     ],
-    actionShowedList: ['print', 'edit', 'delete']
+    actionShowedList: ['print', 'edit', 'delete','print','download']
   },
   invoice: {
     list: [
@@ -325,7 +325,7 @@ export const hideColumnListInCustomer = {
         label: "Status"
       }
     ],
-    actionShowedList: ['print', 'edit', 'delete']
+    actionShowedList: ['print', 'edit', 'delete','print','download']
   },
   payment: {
     list: [

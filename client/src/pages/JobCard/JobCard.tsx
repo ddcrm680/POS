@@ -7,18 +7,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getJobCard, jobCardCancel, jobCardSend, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCommonPrintDownload, getJobCard, jobCardCancel, jobCardSend, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Image, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, Mail, PrinterIcon, Send, Trash2, XCircle } from "lucide-react";
+import { DownloadIcon, EditIcon, EyeIcon, Mail, PrinterIcon, Send, Trash2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { canShowAction, formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import { jobCardStatusList } from "@/lib/constant";
-import { mapColumnsForCustomerView } from "@/lib/helper";
+import { mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
 import { Checkbox } from "@radix-ui/react-checkbox";
 
 import whatsap from "@/lib/images/whatsap.webp"
@@ -373,6 +373,13 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
   }
   const [sendModal, setSendModal] = useState<any>({ open: false, jobCard: {} })
   const allowedActions = hideColumnListInCustomer?.actionShowedList;
+  async function commonPreviewHandler(type: string, row: any) {
+    const res = await getCommonPrintDownload(row.id,'jobcard');
+    if (type === "print") {
+      // assuming API returns raw HTML string
+      openHtmlInNewTabAndPrint(res, type.toUpperCase(), 'Job Card', row.job_card_number);
+    }
+  }
   return (
     <div className={`${noPadding ? "" : "p-3"}`}>
       {!noTitle && <div className="mb-6">
@@ -415,15 +422,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             actions={(row: any) => (
               <CommonRowMenu
                 items={[
-                   {
-                                        key: "print",
-                                        label: "Print Job Card",
-                                        icon: <PrinterIcon size={16} />,
-                                        onClick: () => { },
 
-                                        show: canShowAction("print", allowedActions),
-                                        disabled: true
-                                    },
                   /* VIEW */
                   {
                     key: "view",
@@ -444,7 +443,26 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                       canShowAction("edit", allowedActions) &&
                       row.status === "created",
                   },
+                  {
+                    key: "print",
+                    label: "Print ",
+                    icon: <PrinterIcon size={16} />,
+                    onClick: () => {
+                      commonPreviewHandler('print', row)
+                    },
 
+                    show: canShowAction("print", allowedActions),
+                  },
+                  {
+                    key: "download",
+                    label: "Download ",
+                    icon: <DownloadIcon size={16} />,
+                    onClick: () => {
+                      commonPreviewHandler('download', row)
+                    },
+                    show: canShowAction("download", allowedActions),
+                    disabled: true
+                  },
                   /* SEND VIA WHATSAPP */
                   {
                     key: "whatsapp",

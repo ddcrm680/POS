@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getInvoiceList, invoiceSend, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCommonPrintDownload, getInvoiceList, invoiceSend, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { InvoicePaymentFormValues, organizationFormType, reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Image, Switch } from "@chakra-ui/react";
-import { EditIcon, EllipsisVertical, EyeIcon, Mail, PrinterIcon, Send, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
+import { DownloadIcon, EditIcon, EllipsisVertical, EyeIcon, Mail, PrinterIcon, Send, Trash2, Wallet, Wallet2, XCircle } from "lucide-react";
 import CommonModal from "@/components/common/CommonModal";
 import { canShowAction, formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
@@ -19,7 +19,7 @@ import { ColumnFilter } from "@/components/common/ColumnFilter";
 import whatsap from "@/lib/images/whatsap.webp"
 import { customerMockData, invoiceMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import InvoicePaymentForm from "./InvoicePaymentForm";
-import { mapColumnsForCustomerView } from "@/lib/helper";
+import { mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
 
 import CommonRowMenu from "@/components/common/CommonRowMenu";
 export default function Invoice({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
@@ -346,7 +346,14 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
     };
 
     const allowedActions = hideColumnListInCustomer?.actionShowedList;
+    async function commonPreviewHandler(type: string, row: any) {
+        const res = await getCommonPrintDownload(row.id, 'invoice');
+        if (type === "print") {
 
+            // assuming API returns raw HTML string
+            openHtmlInNewTabAndPrint(res, type.toUpperCase(),'Invoice',row.invoice_number);
+        }
+    }
     return (
         <div className={`${noPadding ? "" : "p-3"}`}>
             {!noTitle && <div className="mb-6">
@@ -387,15 +394,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                         actions={(row: any) => (
                             <CommonRowMenu
                                 items={[
-                                    {
-                                        key: "print",
-                                        label: "Print ",
-                                        icon: <PrinterIcon size={16} />,
-                                        onClick: () => { },
 
-                                        show: canShowAction("print", allowedActions),
-                                        disabled: true
-                                    },
                                     {
                                         key: "view",
                                         label: "View ",
@@ -410,6 +409,26 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                         onClick: () =>
                                             navigate(`/invoices/manage?id=${row.id}&mode=edit`),
                                         show: canShowAction("edit", allowedActions) && row.status === "issued",
+                                    },
+                                    {
+                                        key: "print",
+                                        label: "Print ",
+                                        icon: <PrinterIcon size={16} />,
+                                        onClick: () => {
+                                            commonPreviewHandler('print', row)
+                                        },
+
+                                        show: canShowAction("print", allowedActions),
+                                    },
+                                    {
+                                        key: "download",
+                                        label: "Download ",
+                                        icon: <DownloadIcon size={16} />,
+                                        onClick: () => {
+                                            commonPreviewHandler('download', row)
+                                        },
+                                        show: canShowAction("download", allowedActions),
+                                        disabled:true
                                     },
                                     {
                                         key: "whatsapp",
