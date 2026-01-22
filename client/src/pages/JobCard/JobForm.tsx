@@ -930,7 +930,7 @@ export default function JobForm() {
                     <div className="p-4 text-sm "><Loader /></div>
                   </div></Card> : <>
                     {(mode !== "view" && mode !== 'edit') && <>
-                      <Card className="mb-6 p-4">
+                      <Card className="mb-4 p-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                           {isAdmin && <div
@@ -998,7 +998,7 @@ export default function JobForm() {
                         {<>
 
                           {/* Customer Lookup Section */}
-                          {isLookupReady && !isLookingUp && customerFound !== null && <Card className="mb-3">
+                          {isLookupReady && !isLookingUp && customerFound !== null && <Card className="mb-4">
 
                             <SectionCard title="Customer Information" className="pb-4 grid gap-4" headingMarginBottom={"mb-0"}>
                               {/* BASIC INFO */}
@@ -1200,7 +1200,7 @@ export default function JobForm() {
                           }</>}
                       </>
                     </>}
-                    {(mode !== 'edit' ? isLookupReady && !isLookingUp : true) && <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+                    {(mode !== 'edit' ? isLookupReady && !isLookingUp : true) && <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
 
 
                       {/* Vehicle Information */}
