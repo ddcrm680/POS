@@ -18,7 +18,7 @@ import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import { jobCardStatusList } from "@/lib/constant";
-import { mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
+import { downloadHtmlAsPdf, mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
 import { Checkbox } from "@radix-ui/react-checkbox";
 
 import whatsap from "@/lib/images/whatsap.webp"
@@ -378,7 +378,13 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
     if (type === "print") {
       // assuming API returns raw HTML string
       openHtmlInNewTabAndPrint(res, type.toUpperCase(), 'Job Card', row.job_card_number);
-    }
+    } else if (type === "download") {
+                downloadHtmlAsPdf(
+                    res,
+                    'Job Card',
+                    row.job_card_number
+                );
+            }
   }
   return (
     <div className={`${noPadding ? "" : "p-3"}`}>
@@ -461,7 +467,6 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                       commonPreviewHandler('download', row)
                     },
                     show: canShowAction("download", allowedActions),
-                    disabled: true
                   },
                   /* SEND VIA WHATSAPP */
                   {

@@ -108,3 +108,44 @@ export function openHtmlInNewTabAndPrint(html: string, title = "Print", printTyp
   `);
   printWindow.document.close();
 }
+export function downloadHtmlAsPdf(
+  html: string,
+  fileType: string,
+  id: string
+) {
+  if (!html) {
+    console.error("No HTML content provided for download");
+    return;
+  }
+
+  // Create full HTML document
+  const fullHtml = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>${fileType} - ${id}</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
+      <body>
+        ${html}
+      </body>
+    </html>
+  `;
+
+  // Create blob
+  const blob = new Blob([fullHtml], { type: "text/html;charset=utf-8;" });
+
+  // Create temp link
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = `${fileType}-${id}.html`;
+  document.body.appendChild(link);
+  link.click();
+
+  // Cleanup
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}

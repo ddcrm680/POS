@@ -19,7 +19,7 @@ import { ColumnFilter } from "@/components/common/ColumnFilter";
 import whatsap from "@/lib/images/whatsap.webp"
 import { customerMockData, invoiceMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import InvoicePaymentForm from "./InvoicePaymentForm";
-import { mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
+import {  downloadHtmlAsPdf, mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
 
 import CommonRowMenu from "@/components/common/CommonRowMenu";
 export default function Invoice({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
@@ -351,7 +351,13 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
         if (type === "print") {
 
             // assuming API returns raw HTML string
-            openHtmlInNewTabAndPrint(res, type.toUpperCase(),'Invoice',row.invoice_number);
+            openHtmlInNewTabAndPrint(res, type.toUpperCase(), 'Invoice', row.invoice_number);
+        } else if (type === "download") {
+            downloadHtmlAsPdf(
+                res,
+                "Invoice",
+                row.invoice_number
+            );
         }
     }
     return (
@@ -428,7 +434,6 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                             commonPreviewHandler('download', row)
                                         },
                                         show: canShowAction("download", allowedActions),
-                                        disabled:true
                                     },
                                     {
                                         key: "whatsapp",
