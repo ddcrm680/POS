@@ -50,7 +50,7 @@ export function FloatingRHFModalSelect({
               position="absolute"
               left="12px"
               top={shouldFloat ? "-6px" : "12px"}
-              fontSize={shouldFloat ? "xs" : "sm"}
+              fontSize={shouldFloat ? "10px" : "12px"}
               color={error ? "red.500" : "gray.500"}
               bg="white"
               px="4px"
@@ -76,29 +76,68 @@ export function FloatingRHFModalSelect({
                 field.onChange(opt ? opt.value : "")
               }}
               styles={{
+                groupHeading: base => ({
+                  ...base,
+                  fontWeight: 600,
+                  fontSize: "11px",
+                  color: "#2d3748",
+                  padding: "4px 8px",
+                }),
+
                 control: (base, state) => ({
                   ...base,
-                  minHeight: "44px",
-                  paddingTop: "10px",
+                  minHeight: "38px",
+                  height: "38px",
+                  paddingTop: "4px",
+                  fontSize: "13px",
                   borderColor: error
                     ? "#e53e3e"
                     : state.isFocused
-                    ? "#3182ce"
-                    : "#e1e7ef",
+                      ? "#3182ce"
+                      : "#e1e7ef",
                   boxShadow: "none",
                 }),
+
+                valueContainer: base => ({
+                  ...base,
+                  padding: "0 8px",
+                }),
+
+                input: base => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                  fontSize: "13px",
+                }),
+
+                singleValue: base => ({
+                  ...base,
+                  fontSize: "13px",
+                }),
+
+                option: (base, state) => ({
+                  ...base,
+                  fontSize: "13px",
+                  padding: "6px 10px",
+                  backgroundColor: state.isFocused ? "#edf2f7" : "white",
+                  color: "#1a202c",
+                }),
+
                 menuPortal: base => ({
                   ...base,
                   zIndex: 999999,
                 }),
+
                 menu: base => ({
                   ...base,
                   zIndex: 999999,
                 }),
+
                 placeholder: () => ({
                   display: "none",
                 }),
               }}
+
             />
 
             {/* ERROR */}

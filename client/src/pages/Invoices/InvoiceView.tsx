@@ -161,7 +161,7 @@ export default function InvoiceView() {
             },
             {
                 key: "discount_amount",
-                label: "	Discount",
+                label: "Discount",
                 width: "120px",
                 render: (value: any) => {
                     return <span> ₹ {value}</span>

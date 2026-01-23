@@ -211,3 +211,110 @@ console.log(row.vehicle_condition=== 'good-condition','vehicle_condition');
 .replace("{{poorChecked}}", row.vehicle_condition === "poor-condition" ? "checked" : "")
 
 }
+export function buildInvoiceHtml(row: any, template: string) {
+  const items = row.invoice_items ?? [];
+  const isCGSTSGST = row.gst_type === "cgst_sgst";
+  const isIGST = row.gst_type === "igst";
+
+  /* ---------------- TAX HEADER ---------------- */
+  const taxHeader = isCGSTSGST
+    ? `<td width="6%">CGST</td><td width="6%">SGST</td>`
+    : `<td width="6%">IGST</td>`;
+
+  /* ---------------- ITEM ROWS ---------------- */
+  const invoiceItemsRows = items
+    .map((item: any, index: number) => {
+      const taxCells = isCGSTSGST
+        ? `
+          <td class="left">
+            <div>₹ ${item.cgst_amount ?? "0.00"} (${item.cgst_percent ?? "0"}%)</div>
+          </td>
+          <td class="left">
+            <div>₹ ${item.sgst_amount ?? "0.00"} (${item.sgst_percent ?? "0"}% )</div>
+          </td>
+        `
+        : `
+          <td class="left">
+            <div>₹ ${item.igst_amount ?? "0.00"} (${item.igst_percent ?? "0"}%)</div>
+          </td>
+        `;
+
+      return `
+        <tr>
+          <td class="left">${index + 1}</td>
+          <td>${item.service_name ?? "-"}</td>
+          <td class="left">${item.sac ?? "-"}</td>
+          <td class="left">${item.qty ?? 1}</td>
+          <td class="left">${item.price ?? "0.00"}</td>
+          <td class="left">${item.discount_percent ?? "0%"}</td>
+          <td class="left">₹ ${item.discount_amount ?? "0.00"}</td>
+          <td class="left">₹ ${item.subAmount ?? "0.00"}</td>
+          ${taxCells}
+          <td class="left">₹ ${item.amount ?? "0.00"}</td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  /* ---------------- TOTALS ---------------- */
+  const subTotal = Number(row.sub_total ?? 0);
+  const discount = Number(row.discount ?? 0);
+  const cgst = Number(row.cgst ?? 0);
+  const sgst = Number(row.sgst ?? 0);
+  const igst = Number(row.igst ?? 0);
+  const taxTotal = cgst + sgst + igst;
+  const totalAmount = subTotal - discount + taxTotal;
+  const received = Number(row.received ?? 0);
+  const balance = totalAmount - received;
+
+  const taxTotalRows = isCGSTSGST
+    ? `
+      <tr><td>CGST Amount :</td><td class="right">₹ ${cgst.toFixed(2)}</td></tr>
+      <tr><td>SGST Amount :</td><td class="right">₹ ${sgst.toFixed(2)}</td></tr>
+    `
+    : `
+      <tr><td>IGST Amount :</td><td class="right">₹ ${igst.toFixed(2)}</td></tr>
+    `;
+
+  /* ---------------- TEMPLATE REPLACEMENTS ---------------- */
+  return template
+    .replace("{{store_name}}", row.store_name ?? "Coating Daddy Pvt. Ltd.")
+    .replace("{{store_address}}", row.store_address ?? "")
+    .replace("{{state}}", row.state ?? "")
+    .replace("{{pincode}}", row.pincode ?? "")
+    .replace("{{store_gstin}}", row.store_gstin ?? "")
+    .replace("{{store_phone}}", row.store_phone ?? "")
+    .replace("{{store_email}}", row.store_email ?? "")
+
+    .replace("{{invoice_no}}", row.invoice_no ?? "")
+    .replace("{{invoice_date}}", row.invoice_date ?? "")
+    .replace("{{payment_mode}}", row.payment_mode ?? "—")
+
+    .replace("{{bill_name}}", row.name ?? "")
+    .replace("{{bill_address}}", row.address ?? "")
+    .replace("{{bill_state}}", row.state ?? "")
+    .replace("{{bill_gstin}}", row.gstin ?? "")
+    
+    .replace("{{bill_phone}}", row.bill_phone ?? "")
+    .replace("{{bill_email}}", row.bill_email ?? "")
+
+    .replace("{{vehicle_type}}", row.vehicle_type ?? "")
+    .replace("{{make}}", row.make ?? "")
+    .replace("{{model}}", row.model ?? "")
+    .replace("{{vehicle_color}}", row.color ?? "")
+    .replace("{{chassis_no}}", row.chasis_no ?? "")
+    .replace("{{reg_no}}", row.reg_no ?? "")
+    .replace("{{coating_studio}}", row.coating_studio ?? "")
+
+    .replace("{{tax_header}}", taxHeader)
+    .replace("{{invoice_items_rows}}", invoiceItemsRows)
+    .replace("{{tax_total_rows}}", taxTotalRows)
+
+    .replace("{{total_items}}", String(row.total_items ?? items.length))
+    .replace("{{sub_total}}", subTotal.toFixed(2))
+    .replace("{{discount}}", discount.toFixed(2))
+    .replace("{{total_amount}}", totalAmount.toFixed(2))
+    .replace("{{received}}", received.toFixed(2))
+    .replace("{{balance}}", balance.toFixed(2))
+    .replace("{{amount_in_words}}", row.amount_in_words ?? "");
+}

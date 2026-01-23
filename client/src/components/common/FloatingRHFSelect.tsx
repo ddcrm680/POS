@@ -62,7 +62,8 @@ export function FloatingRHFSelect({
               position="absolute"
               left="12px"
               top={shouldFloat ? "-6px" : "12px"}
-              fontSize={shouldFloat ? "xs" : "sm"}
+             
+              fontSize={shouldFloat ? "10px" : "12px"}
               color={error ? "red.500" : "gray.500"}
               bg={isDisabled ? "transparent" : "white"}
               px="4px"
