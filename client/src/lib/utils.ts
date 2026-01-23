@@ -466,6 +466,7 @@ export function normalizeInvoiceToEditResponse(api: any) {
 
   // 🔹 INVOICE VIEW → CREATE PREFILL FORMAT
   return {
+    gst_type:api.gst_type,
     customer: {
       bill_to: api.job_card.consumer.name,
       name: api.job_card.consumer.name,

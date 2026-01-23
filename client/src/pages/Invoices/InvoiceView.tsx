@@ -114,15 +114,6 @@ export default function InvoiceView() {
     }>({
         selectedPlanId: "",
     });
-    useEffect(() => {
-        if (!plans.length) return;
-
-        const gstType = isSameState ? "cgst_sgst" : "igst";
-
-        setPlans(prev =>
-            prev.map(plan => calculateInvoiceRow(plan, gstType))
-        );
-    }, [invoiceView]);
 
     const planColumns = useMemo(() => {
 
@@ -249,7 +240,7 @@ export default function InvoiceView() {
                 const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
                 setInvoiceView({ ...mapped, ...rest });
 
-                const gstType = mapped.customer.type === "company" ? "cgst_sgst" : "igst";
+                const gstType =mapped.gst_type == "cgst_sgst"? "cgst_sgst" : "igst";
                 const planCalculated = mapped.plans.map((item: any) =>
                     calculateInvoiceRow(item, gstType)
                 );

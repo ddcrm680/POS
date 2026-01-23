@@ -49,7 +49,6 @@ export default function Sidebar({
   const filterTab = roleView.store
     ? nonAdminTabs : roleView.admin ?
       bottomTabs : defaultBottomTabs;
-  console.log(filterTab, 'filterTab');
 
   return (
     <aside className="h-full bg-card border-r flex flex-col justify-between">

@@ -66,7 +66,6 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
     const PER_PAGE = 10;
     const InvoiceDeleteHandler = async () => {
         try {
-            console.log('came here delete');
 
             setIsLoading(true);
 
@@ -91,7 +90,6 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
     };
     const InvoiceSendHandler = async () => {
         try {
-            console.log('came here invoice');
 
             setIsLoading(true);
 
@@ -358,7 +356,6 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
         let res
         try {
             res = await getInvoiceInfo(row.id);
-            console.log(res, 'resresres');
 
 
             const normalizedData = normalizeInvoiceToCreateResponse(res.data);
@@ -367,8 +364,9 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
             // 👇 existing mapper stays SAME
             const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
 
-            const gstType = mapped.customer.type === "company" ? "cgst_sgst" : "igst";
-            const planCalculated = mapped.plans.map((item: any) =>
+            
+                const gstType =mapped.gst_type == "cgst_sgst"? "cgst_sgst" : "igst";
+               const planCalculated = mapped.plans.map((item: any) =>
                 calculateInvoiceRow(item, gstType)
             );
             invoiceRes = {
@@ -376,7 +374,6 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                 invoiceView: { ...mapped, ...rest },
                 plans: planCalculated
             }
-            console.log(invoiceRes, 'invoiceRes inside');
 
         } catch (e) {
             console.log(e);
@@ -384,7 +381,6 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
             setPrintDownLoadLoading({ type: "", isLoad: false })
         }
 
-        console.log(invoiceRes, 'invoiceRes');
 
         const view = invoiceRes?.invoiceView ?? {};
         const customer = view?.customer ?? {};
@@ -520,7 +516,6 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
 
             amount_in_words: "One Lakh Eighteen Thousand One Rupees Only",
         };
-  console.log(rowData,'wewrtgyhgrfedsres');
         
         const html = buildInvoiceHtml(rowData, InvoiceHtmlTemplate);
 
@@ -704,7 +699,6 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                         }
                         }
                         onConfirm={() => {
-                            console.log(sendModal, 'sendModal');
 
                             if (sendModal.open) {
                                 InvoiceSendHandler()
