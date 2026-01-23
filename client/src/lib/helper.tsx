@@ -149,3 +149,65 @@ export function downloadHtmlAsPdf(
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+
+export function buildJobCardHtml(row: any, template: string) {
+const services = row.opted_services ?? [];
+
+let servicesRows = "";
+
+for (let i = 0; i < services.length; i += 2) {
+  servicesRows += `
+    <tr>
+      <td>
+        <input type="checkbox" checked class="lock">
+        ${services[i]?.plan_name ?? ""}
+      </td>
+      <td>
+        ${
+          services[i + 1]
+            ? `
+              <input type="checkbox" checked class="lock">
+              ${services[i + 1].plan_name}
+            `
+            : ""
+        }
+      </td>
+    </tr>
+  `;
+}
+
+
+
+console.log(row.vehicle_condition=== 'good-condition','vehicle_condition');
+
+  return template
+    .replace("{{job_card_number}}", row.job_card_number ?? "")
+    .replace("{{date}}", row.jobcard_date ?? "")
+    .replace("{{service_location}}",row.state ?? "")
+    .replace("{{customer_name}}", row.name ?? "")
+    .replace("{{address}}", row.address ?? "")
+    .replace("{{phone}}", row.phone ?? "")
+    .replace("{{email}}", row.email ?? "")
+    .replace("{{vehicle_type}}", row.vehicle_type ?? "")
+    .replace("{{make}}", row.make ?? "")
+    .replace("{{model}}", row.model ?? "")
+    .replace("{{color}}", row.color ?? "")
+    .replace("{{year}}", row.year ?? "")
+    .replace("{{reg_no}}", row.reg_no ?? "")
+    .replace("{{chasis_no}}", row.chasis_no ?? "")
+    
+    .replace("{{vehicle_condition}}", row.vehicle_condition ?? "")
+    
+    .replace("{{services_rows}}", servicesRows)
+    .replace("{{isRepainted}}", row.isRepainted ?? "")
+    .replace("{{isSingleStagePaint}}", row.isSingleStagePaint ?? "")
+    .replace("{{isPaintThickness}}", row.isPaintThickness ?? "")
+    .replace("{{store_manager}}", row.store_manager ?? "")
+    .replace("{{isVehicleOlder}}", row.isVehicleOlder ?? "")
+    .replace("{{brandNewChecked}}", row.vehicle_condition === "brand-new" ? "checked" : "")
+.replace("{{goodChecked}}", row.vehicle_condition === "good-condition" ? "checked" : "")
+.replace("{{fairChecked}}", row.vehicle_condition === "fair-condition" ? "checked" : "")
+.replace("{{poorChecked}}", row.vehicle_condition === "poor-condition" ? "checked" : "")
+
+}

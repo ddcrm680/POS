@@ -1,13 +1,13 @@
 // src/components/profile/profile.tsx
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { UseFormSetError } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCommonPrintDownload, getJobCard, jobCardCancel, jobCardSend, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCommonPrintDownload, getCustomerView, getJobCard, getJobCardItem, jobCardCancel, jobCardSend, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Image, Switch } from "@chakra-ui/react";
@@ -18,11 +18,13 @@ import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import { jobCardStatusList } from "@/lib/constant";
-import { downloadHtmlAsPdf, mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
+import { buildJobCardHtml, downloadHtmlAsPdf, mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
 import { Checkbox } from "@radix-ui/react-checkbox";
 
 import whatsap from "@/lib/images/whatsap.webp"
 import CommonRowMenu from "@/components/common/CommonRowMenu";
+import { jobCardHtmlTemplate } from "./template";
+import { Loader } from "@/components/common/loader";
 export default function JobCard({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
   const { toast } = useToast();
   const { roles } = useAuth();
@@ -249,7 +251,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       render: (value: string) => (
         <Badge
           className={`px-3 py-1 text-xs font-medium rounded-full
-  ${value === "created"
+    ${value === "created"
               ? "bg-blue-100 text-blue-700"
               : value === "completed"
                 ? "bg-green-100 text-green-700"
@@ -259,7 +261,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                     ? "bg-red-100 text-red-700"
                     : "bg-gray-100 text-gray-700"
             }
-`}
+  `}
 
         >
           {filterMetaInfo.status.find((item: any) => item.value === value)?.label}
@@ -298,11 +300,11 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
               navigate(`/invoices/manage?jobCardId=${row.id}&mode=create`)
             }}
             className="
-          px-3 py-1 text-xs font-medium
-          rounded-md border border-primary
-          text-primary hover:bg-primary hover:text-white
-          transition
-        "
+            px-3 py-1 text-xs font-medium
+            rounded-md border border-primary
+            text-primary hover:bg-primary hover:text-white
+            transition
+          "
           >
             Create Invoice
           </button>
@@ -373,18 +375,72 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
   }
   const [sendModal, setSendModal] = useState<any>({ open: false, jobCard: {} })
   const allowedActions = hideColumnListInCustomer?.actionShowedList;
+
+  const [printDownLoadLoading, setPrintDownLoadLoading] = useState<any>({
+    type: '',
+    isLoad: false
+  })
   async function commonPreviewHandler(type: string, row: any) {
-    const res = await getCommonPrintDownload(row.id,'jobcard');
+    setPrintDownLoadLoading({ type, isLoad: true })
+    let customerRes
+
+    let jobRes
+    try {
+      customerRes = await getCustomerView(row.consumer_id ?? "");
+      customerRes = customerRes?.data
+
+      jobRes = await getJobCardItem(row ?? "");
+    } catch (e) {
+      console.log(e);
+
+    } finally {
+
+      setPrintDownLoadLoading({ type: "", isLoad: false })
+    }
+
+
+    const rowData = {
+      jobcard_date: formatDate(row.jobcard_date),
+      job_card_number: row.job_card_number,
+      name: customerRes.name,
+      phone: customerRes.phone,
+      address: customerRes.address,
+      state: customerRes.state.name,
+      email: customerRes.email,
+      vehicle_type: row.vehicle_type,
+      make: row.vmake.name,
+      model: row.vmodel.name,
+      color: row.color,
+      year: row.year,
+      reg_no: row.reg_no,
+      chasis_no: row.chasis_no,
+      vehicle_condition: row.vehicle_condition,
+      isRepainted: row.isRepainted,
+      isSingleStagePaint: row.isSingleStagePaint,
+      isPaintThickness: row.isPaintThickness,
+      isVehicleOlder: row.isVehicleOlder,
+      opted_services: jobRes.opted_services,
+      store_manager:row?.store?.name
+
+    }
+    const html = buildJobCardHtml(rowData, jobCardHtmlTemplate);
+
     if (type === "print") {
-      // assuming API returns raw HTML string
-      openHtmlInNewTabAndPrint(res, type.toUpperCase(), 'Job Card', row.job_card_number);
-    } else if (type === "download") {
-                downloadHtmlAsPdf(
-                    res,
-                    'Job Card',
-                    row.job_card_number
-                );
-            }
+      openHtmlInNewTabAndPrint(
+        html,
+        "PRINT",
+        "Job Card",
+        row.job_card_number
+      );
+    }
+
+    if (type === "download") {
+      downloadHtmlAsPdf(
+        html,
+        "Job-Card",
+        row.job_card_number
+      );
+    }
   }
   return (
     <div className={`${noPadding ? "" : "p-3"}`}>
@@ -452,21 +508,24 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                   {
                     key: "print",
                     label: "Print ",
-                    icon: <PrinterIcon size={16} />,
+                    icon: printDownLoadLoading.isLoad ? <Loader isShowLoadingText={false} loaderSize={3} /> : <PrinterIcon size={16} />,
                     onClick: () => {
                       commonPreviewHandler('print', row)
                     },
 
                     show: canShowAction("print", allowedActions),
+                    disabled: printDownLoadLoading.isLoad && printDownLoadLoading.type == "print"
                   },
                   {
                     key: "download",
                     label: "Download ",
-                    icon: <DownloadIcon size={16} />,
+                    icon: printDownLoadLoading.isLoad ? <Loader isShowLoadingText={false} loaderSize={3} /> : <DownloadIcon size={16} />,
                     onClick: () => {
                       commonPreviewHandler('download', row)
                     },
                     show: canShowAction("download", allowedActions),
+
+                    disabled: printDownLoadLoading.isLoad && printDownLoadLoading.type == "download"
                   },
                   /* SEND VIA WHATSAPP */
                   {
