@@ -262,7 +262,7 @@ input[type="checkbox"] {
 <table style="width:100%; margin-top:10px; table-layout:fixed;">
   <tr>
     <!-- LEFT COLUMN -->
-    <td width="100%" valign="top" class="pad-left-0">
+    <td width="100%" valign="top" class="pad-left-0 pad-right-0">
 
       <!-- SRS REQUIRED -->
       <div class="section-head">
