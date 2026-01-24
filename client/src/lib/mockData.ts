@@ -1178,3 +1178,145 @@ export const availablePlansMock = [
     total_amount: 17700,
   },
 ];
+export const mockProducts = [
+  {
+    id: 1,
+    createdAt: "2025-01-10T10:15:00Z",
+    visibility: 1,
+
+    image: "https://picsum.photos/seed/brush/60/60",
+    brand: "Detailing Devils",
+    category: "Detailing Accessories",
+    product: "Brush",
+    hsn: "34021110",
+    gst: 18,
+    qty: 0,
+    uom: "2 ML",
+    salePrice: 32,
+    purchasePrice: 222,
+    type: "Product",
+    store: "ALL",
+    tag: "regular",
+    status: 1,
+
+    onSell: 0,
+    available: 0,
+    totalQty: 0,
+  },
+
+  {
+    id: 2,
+    createdAt: "2025-01-12T14:40:00Z",
+    visibility: 1,
+
+    image: "https://picsum.photos/seed/armor/60/60",
+    brand: "Detailing Devils",
+    category: "Armor Kits",
+    product: "Armor Composite",
+    hsn: "34021110",
+    gst: 18,
+    qty: 50,
+    uom: "100 ML",
+    salePrice: 10000,
+    purchasePrice: 5000,
+    type: "Composite",
+    store: "ALL",
+    tag: "regular",
+    status: 1,
+
+    onSell: 50,
+    available: 0,
+    totalQty: 50,
+  },
+
+  {
+    id: 3,
+    createdAt: "2025-01-15T09:25:00Z",
+    visibility: 0,
+
+    image: "https://picsum.photos/seed/cleaner/60/60",
+    brand: "Detailing Devils",
+    category: "Cleaners",
+    product: "Composite New 2",
+    hsn: "CDOPP",
+    gst: 28,
+    qty: 25,
+    uom: "1 Pkt",
+    salePrice: 7689,
+    purchasePrice: 43243,
+    type: "Composite",
+    store: "ALL",
+    tag: "new",
+    status: 1,
+
+    onSell: 25,
+    available: 25,
+    totalQty: 50,
+  },
+
+  {
+    id: 4,
+    createdAt: "2025-01-18T18:10:00Z",
+    visibility: 1,
+
+    image: "https://picsum.photos/seed/brush2/60/60",
+    brand: "Detailing Devils",
+    category: "Brushes",
+    product: "Composite Product 98",
+    hsn: "CDOPP",
+    gst: 26,
+    qty: 40,
+    uom: "34 Kg",
+    salePrice: 4354353,
+    purchasePrice: 545435,
+    type: "Product",
+    store: "ALL",
+    tag: "regular",
+    status: 1,
+
+    onSell: 3,
+    available: 40,
+    totalQty: 43,
+  },
+];
+
+
+export const filterMetaInfo = {
+  brand: [
+    { label: "Detailing Devils", value: "Detailing Devils" },
+    { label: "Coating Daddy", value: "Coating Daddy" },
+  ],
+
+  category: [
+    { label: "Detailing Accessories", value: "Detailing Accessories" },
+    { label: "Armor Kits", value: "Armor Kits" },
+    { label: "Cleaners", value: "Cleaners" },
+    { label: "Brushes", value: "Brushes" },
+  ],
+
+  type: [
+    { label: "Product", value: "Product" },
+    { label: "Composite", value: "Composite" },
+  ],
+
+  store: [
+    { label: "Red Carpet", value: "RED-CARPET" },
+  ],
+
+  tag: [
+    { label: "Regular", value: "regular" },
+    { label: "Best Seller", value: "best-seller" },
+    { label: "New", value: "new" },
+    { label: "Upcoming", value: "upcoming" },
+  ],
+
+  status: [
+    { label: "Active", value: 1 },
+    { label: "Inactive", value: 0 },
+  ],
+
+  visibility: [
+    { label: "Active", value: 1 },
+    { label: "Inactive", value: 0 },
+  ],
+};

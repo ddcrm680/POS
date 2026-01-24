@@ -51,6 +51,7 @@ export const BottomTabs = ({
           <Link key={tab.path} href={tab.path}>
             <button
               onClick={handleClick}
+                title={tab?.fullLabel || tab?.label}
               data-state={isActive ? "active" : "inactive"}
               className={`
                 group relative flex flex-col items-center justify-center

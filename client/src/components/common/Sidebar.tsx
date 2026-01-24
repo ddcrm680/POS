@@ -96,6 +96,7 @@ export default function Sidebar({
             <div key={tab.id}>
               {/* ===== PARENT ===== */}
               <button
+                title={tab?.fullLabel || tab?.label}
                 onClick={() => {
                   localStorage.setItem("sidebar_active_parent", tab.id);
                   if (tab.path === "/master") {
@@ -164,6 +165,7 @@ export default function Sidebar({
                     return (
                       <button
                         key={child.id}
+                          title={child.fullLabel || child.label}
                         onClick={() => {
                           navigate(child.path);
                           onClose?.();

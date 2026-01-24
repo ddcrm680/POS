@@ -218,11 +218,13 @@ export interface TabItem {
   path: string;
   icon: React.ComponentType<any>;
   label: string;
+    fullLabel?:string
   defaultChildId?: string
   badge?: number;
   children?: {
     id: string;
     path: string;
+    fullLabel?:string
     label: string;
   }[];
 }

@@ -36,6 +36,7 @@ import PaymentsPage from "@/pages/Payments/payments";
 import CustomerView from "./pages/Customer/CustomerView";
 import JobCardView from "./pages/JobCard/JobCardView";
 import InvoiceView from "./pages/Invoices/InvoiceView";
+import Products from "./pages/Products/products";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -55,6 +56,8 @@ export function Router() {
       <Route path="/store-details" component={() => <ProtectedRoute component={StoreDetails} />} />
       <Route path="/profile" component={() => <ProtectedRoute component={ProfileDetails} />} />
       <Route path="/master" component={() => <ProtectedRoute component={Master} 
+      />} />
+        <Route path="/products" component={() => <ProtectedRoute component={Products} 
       />} />
         <Route path="/stores" component={() => <ProtectedRoute component={StoreList} 
       />} />

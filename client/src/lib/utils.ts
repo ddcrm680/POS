@@ -568,3 +568,12 @@ export function canShowAction(
 
   return allowedActions.includes(action);
 }
+export const withFullLabel = (tabs: TabItem[]): TabItem[] =>
+  tabs.map((tab) => ({
+    ...tab,
+    fullLabel: tab.fullLabel ?? tab.label,
+    children: tab.children?.map((child) => ({
+      ...child,
+      fullLabel: child.fullLabel ?? child.label,
+    })),
+  }));

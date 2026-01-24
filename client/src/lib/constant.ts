@@ -25,8 +25,10 @@ import {
   Key,
   BarChart3,
   Wallet,
-  Briefcase
+  Briefcase,
+  Truck
 } from "lucide-react";
+import { withFullLabel } from "./utils";
 
 export const Constant = {
   REACT_APP_BASE_URL: 'https://pos.detailingdevils.com',
@@ -132,14 +134,21 @@ export const STORE_MANAGEMENT_ROUTES = [
   "/master/stores",
   "/master/stores/manage",
 ];
-export const nonAdminTabs: TabItem[] = [
+export const nonAdminTabs: TabItem[] = withFullLabel([
   {id:"home", path: "/home", icon: Home, label: "Dashboard" },
   {id:"manager", path: "/manager", icon: Settings, label: "Manager" },
   {id:"appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
   {id:"facility-management", path: "/facility-management", icon: Building, label: "Facility" },
   {id:"employee-management", path: "/employee-management", icon: UserCheck, label: "Team" },
 
+   {
+    id: "Products",
+    path: "/products",
+    icon: Package,
+    fullLabel:"Products Management",
+    label: "Products Mgmt",
 
+  },
   {id:"customers", path: "/customers", icon: Users, label: "Customers" },
   {id:"job-cards", path: "/job-cards", icon: ClipboardList, label: "Job Card" },
 
@@ -147,8 +156,8 @@ export const nonAdminTabs: TabItem[] = [
 
   {id:"payments", path: "/payments", icon: Wallet, label: "Payments" },
   {id:"inventory", path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
-];
-export const bottomTabs: TabItem[] = [
+]);
+export const bottomTabs: TabItem[] =withFullLabel( [
   { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },
 
   {
@@ -156,18 +165,26 @@ export const bottomTabs: TabItem[] = [
     path: "/stores",
     icon: Store,
     defaultChildId: "store",
-    label: "Store Management",
+    fullLabel:"Store Management",
+    label: "Store Mgmt",
     children: [
       { id: "store", path: "/stores", label: "Store List" },
       { id: "facility", path: "/facility-management", label: "Facility" },
     ],
+  },
+   {
+    id: "Products",
+    path: "/products",
+    icon: Package,
+    fullLabel:"Products Management",
+    label: "Products Mgmt",
+
   },
   {
     id: "master",
     path: "/master",
     icon: Layers,
     label: "Master",
-
   },
 
   { id: "customers", path: "/customers", icon: Users, label: "Customers" },
@@ -192,11 +209,11 @@ export const bottomTabs: TabItem[] = [
       { id: "team", path: "/employee-management", label: "Team" },
     ],
   },
-];
-export const defaultBottomTabs: TabItem[] = [
+]);
+export const defaultBottomTabs: TabItem[] = withFullLabel([
   { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },
 
-];
+]);
 
 export const quickActions = [
   { id: "new-job", label: "New Job Card", emoji: "📋", color: "bg-primary hover:bg-primary/90" },
@@ -213,6 +230,11 @@ export const masterTabList = [
 
   { id: "vehicleMaster", label: "Vehicle Master", emoji: Car, color: "bg-blue-600 hover:bg-blue-700" },
   { id: "systemLog", label: "System Log", emoji: FileText, color: "bg-blue-600 hover:bg-blue-700" },
+
+];
+export const productsTabList = [
+  { id: "products-listing", label: "Products Listing", emoji: Package , color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "transfer-stock", label: "Transfer Stock", emoji: Truck , color: "bg-blue-600 hover:bg-blue-700" },
 
 ];
 export const profileMenu = [
