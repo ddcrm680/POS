@@ -27,6 +27,8 @@ import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
+import { buildInvoiceHtml, openHtmlInNewTabAndPrint } from "@/lib/helper";
+import { InvoiceHtmlTemplate } from "./template";
 
 
 export default function InvoiceView() {
@@ -161,8 +163,8 @@ export default function InvoiceView() {
             {
                 key: "sub_amount",
                 label: "Sub Amount",
-                
-        width: "120px",
+
+                width: "120px",
                 render: (v: number) => `₹ ${v ?? "-"}`,
             },
 
@@ -171,7 +173,7 @@ export default function InvoiceView() {
                     {
                         key: "cgst_amount",
                         label: "CGST",
-                             width: "120px",
+                        width: "120px",
                         render: (_: any, row: any) => (
                             <span>
                                 ₹ {row.cgst_amount}
@@ -184,7 +186,7 @@ export default function InvoiceView() {
                     {
                         key: "sgst_amount",
                         label: "SGST",
-                             width: "120px",
+                        width: "120px",
                         render: (_: any, row: any) => (
                             <span>
                                 ₹ {row.sgst_amount}
@@ -199,7 +201,7 @@ export default function InvoiceView() {
                     {
                         key: "igst_amount",
                         label: "IGST",
-                             width: "120px",
+                        width: "120px",
                         render: (_: any, row: any) => (
                             <span>
                                 ₹ {row.igst_amount}
@@ -214,8 +216,8 @@ export default function InvoiceView() {
             {
                 key: "total_amount",
                 label: "Amount",
-                
-        width: "120px",
+
+                width: "120px",
                 render: (v: number) => `₹ ${v ?? "-"}`,
             },
         ];
@@ -238,9 +240,9 @@ export default function InvoiceView() {
                 const { consumer, job_card, store, payments, items, ...rest } = res?.data
                 // 👇 existing mapper stays SAME
                 const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
-                setInvoiceView({ ...mapped, ...rest });
+                setInvoiceView({ ...mapped, ...rest, jobCardFullInfo: job_card });
 
-                const gstType =mapped.gst_type == "cgst_sgst"? "cgst_sgst" : "igst";
+                const gstType = mapped.gst_type == "cgst_sgst" ? "cgst_sgst" : "igst";
                 const planCalculated = mapped.plans.map((item: any) =>
                     calculateInvoiceRow(item, gstType)
                 );
@@ -373,11 +375,169 @@ export default function InvoiceView() {
         cancelled: "bg-red-100 text-red-700  border-red-700",
         "partially_paid": "bg-blue-100 text-blue-700  border-blue-700",
     };
-      const { user, } = useAuth();
-    
-      const isStoreManager =
+    const { user, } = useAuth();
+
+    const isStoreManager =
         user?.role === 'store-manager'
-    
+    async function commonPreviewHandler(type: string, row: any) {
+
+        let invoiceRes: any
+        try {
+
+            invoiceRes = {
+                invoice_number: invoiceNumber,
+                invoiceView: invoiceView,
+                plans: plans
+            }
+
+        } catch (e) {
+            console.log(e);
+        }
+
+        const view = invoiceRes?.invoiceView ?? {};
+        const customer = view?.customer ?? {};
+        const vehicle = view?.vehicle ?? {};
+        const store = view?.store ?? {};
+        const plansInfo = invoiceRes?.plans ?? [];
+
+        const subTotal = plansInfo.reduce(
+            (sum: any, p: any) => sum + Number(p.sub_amount || 0),
+            0
+        );
+        const totalItems = plansInfo.reduce(
+            (sum: any, p: any) => sum + Number(p.qty || 1),
+            0
+        );
+        const discountTotal = plansInfo.reduce(
+            (sum: any, p: any) => sum + Number(p.discount_amount || 0),
+            0
+        );
+
+        const cgstTotal = plansInfo.reduce(
+            (sum: any, p: any) => sum + Number(p.cgst_amount || 0),
+            0
+        );
+
+        const sgstTotal = plansInfo.reduce(
+            (sum: any, p: any) => sum + Number(p.sgst_amount || 0),
+            0
+        );
+
+        const igstTotal = plansInfo.reduce(
+            (sum: any, p: any) => sum + Number(p.igst_amount || 0),
+            0
+        );
+
+        const grandTotal =
+            subTotal + cgstTotal + sgstTotal + igstTotal;
+
+        const costSummary = {
+            subTotal: +subTotal.toFixed(2),
+            discountTotal: +discountTotal.toFixed(2),
+            cgstTotal: +cgstTotal.toFixed(2),
+            sgstTotal: +sgstTotal.toFixed(2),
+            igstTotal: +igstTotal.toFixed(2),
+            totalItems,
+            grandTotal: +grandTotal.toFixed(2),
+
+
+        }
+
+        const rowData = {
+            /* ---------------- COMPANY ---------------- */
+            store_name: store?.name,
+            store_address: "Plot No. B-14/15, Noida Sector 1",
+            state: "Uttar Pradesh",
+            pincode: "201301",
+            store_gstin: "09AAGCC8962J1Z2",
+            store_phone: "917290004718",
+            store_email: "sales@coatingdaddy.com",
+
+            /* ---------------- INVOICE META ---------------- */
+            invoice_no: `#${invoiceRes?.invoice_number}`,
+            invoice_date: formatDate(view?.invoice_date)
+            ,
+
+            payment_mode: view?.payment_mode ?? "",
+
+            /* ---------------- BILL TO ---------------- */
+            name: customer?.name ?? "",
+            phone: customer?.phone ?? "",
+            email: customer?.email ?? "",
+            address: customer?.address ?? "",
+
+            billingState: view?.billing_state?.name ?? "",
+            gstin: customer?.gst ?? "NA",
+            bill_name: view?.billing_name,
+            bill_address: view?.billing_address,
+            bill_state: view?.billing_state?.name,
+            bill_gstin: view?.billing_gstin,
+
+            bill_phone: view?.billing_phone,
+            bill_email: view?.billing_email,
+            /* ---------------- VEHICLE ---------------- */
+            vehicle_type: invoiceRes?.invoiceView?.jobCardFullInfo?.vehicle_type ?? "—",
+            make: invoiceRes?.invoiceView?.jobCardFullInfo?.vmake.name ?? "—",
+            model: invoiceRes?.invoiceView?.jobCardFullInfo?.vmodel.name ?? "—",
+            color: invoiceRes?.invoiceView?.jobCardFullInfo?.color ?? "—",
+            chasis_no: invoiceRes?.invoiceView?.jobCardFullInfo?.chassisNo ?? "—",
+            reg_no: invoiceRes?.invoiceView?.jobCardFullInfo?.reg_no ?? "—",
+            coating_studio: store?.name ?? "—",
+
+            /* ---------------- ITEMS ---------------- */
+            invoice_items: plansInfo.map((p: any) => ({
+                service_name: p.invoice_name ?? p.plan_name,
+                sac: p.sac ?? "—",
+                qty: p.qty ?? 1,
+
+                price: Number(p.price ?? 0),
+                discount_amount: Number(p.discount_amount ?? 0),
+                discount_percent: `${Number(p.discount_percent ?? 0)}%`,
+
+                subAmount: Number(p.sub_amount ?? p.price ?? 0),
+
+                /* TAX PER ITEM */
+                cgst_percent: Number(p.cgst_percent ?? p.cgst ?? 0),
+                cgst_amount: Number(p.cgst_amount ?? 0),
+
+                sgst_percent: Number(p.sgst_percent ?? p.sgst ?? 0),
+                sgst_amount: Number(p.sgst_amount ?? 0),
+
+                igst_percent: Number(p.igst_percent ?? p.gst ?? 0),
+                igst_amount: Number(p.igst_amount ?? 0),
+
+                amount: Number(p.total_amount ?? 0),
+            })),
+
+            /* ---------------- TOTALS (FROM costSummary) ---------------- */
+            total_items: costSummary.totalItems,
+
+            sub_total: costSummary.subTotal,
+            discount: costSummary.discountTotal,
+
+            cgst: costSummary.cgstTotal,
+            sgst: costSummary.sgstTotal,
+            igst: costSummary.igstTotal,
+
+            total_amount: costSummary.grandTotal,
+            received:  invoiceRes?.invoiceView?.paid_amount,
+
+            balance:
+                invoiceRes?.invoiceView?.total_due,
+
+            gst_type: view?.gst_type,
+
+            amount_in_words: "One Lakh Eighteen Thousand One Rupees Only",
+        };
+
+        const html = buildInvoiceHtml(rowData, InvoiceHtmlTemplate);
+
+        if (type === "print") {
+            openHtmlInNewTabAndPrint(
+                html,
+                type.toUpperCase(), 'Invoice', row.invoice_number);
+        }
+    }
     return (
         <div className=" mx-auto p-3 space-y-3">
             {/* Header */}
@@ -414,8 +574,8 @@ export default function InvoiceView() {
                         <IconButton
                             size="xs"
                             // mr={2}
-                             title="Edit"
-                      aria-label="Edit"
+                            title="Edit"
+                            aria-label="Edit"
                             onClick={() => {
                                 navigate(`/invoices/manage?id=${invoiceView.id}&mode=edit`)
                             }
@@ -427,8 +587,9 @@ export default function InvoiceView() {
                         size="xs"
                         // mr={2}
                         aria-label="Print"
-                        disabled
-                        onClick={() => { }
+                        onClick={() => {
+                            commonPreviewHandler('print', invoiceView.id)
+                        }
                         }
                     >
                         <PrinterIcon />
@@ -442,7 +603,7 @@ export default function InvoiceView() {
                         <div className="p-4 text-sm "><Loader /></div>
                     </div></Card> : <>
                         {/* Top Info */}
-                        <div className={`grid grid-cols-1  ${isStoreManager ? 'md:grid-cols-2 lg:grid-cols-4':'md:grid-cols-2'} gap-3`}>
+                        <div className={`grid grid-cols-1  ${isStoreManager ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-2'} gap-3`}>
                             {invoiceView?.customer && <Card className="p-4">
                                 <CardTitle className=" text-sm font-semibold mb-3 text-gray-700 flex gap-2 items-center">
                                     Customer Detail

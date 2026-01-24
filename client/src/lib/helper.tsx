@@ -63,7 +63,6 @@ export function toTitleCase(text: string): string {
     .join(" ");
 }
 export function openHtmlInNewTabAndPrint(html: string, title = "Print", printType: string, id: string) {
-  console.log(id, 'id');
 
   if (!html) {
     console.error("No HTML content provided for printing");
@@ -152,39 +151,37 @@ export function downloadHtmlAsPdf(
 
 
 export function buildJobCardHtml(row: any, template: string) {
-const services = row.opted_services ?? [];
+  const services = row.opted_services ?? [];
 
-let servicesRows = "";
+  let servicesRows = "";
 
-for (let i = 0; i < services.length; i += 2) {
-  servicesRows += `
+  for (let i = 0; i < services.length; i += 2) {
+    servicesRows += `
     <tr>
       <td>
         <input type="checkbox" checked class="lock">
         ${services[i]?.plan_name ?? ""}
       </td>
       <td>
-        ${
-          services[i + 1]
-            ? `
+        ${services[i + 1]
+        ? `
               <input type="checkbox" checked class="lock">
               ${services[i + 1].plan_name}
             `
-            : ""
-        }
+        : ""
+      }
       </td>
     </tr>
   `;
-}
+  }
 
 
 
-console.log(row.vehicle_condition=== 'good-condition','vehicle_condition');
 
   return template
     .replace("{{job_card_number}}", row.job_card_number ?? "")
     .replace("{{date}}", row.jobcard_date ?? "")
-    .replace("{{service_location}}",row.state ?? "")
+    .replace("{{service_location}}", row.state ?? "")
     .replace("{{customer_name}}", row.name ?? "")
     .replace("{{address}}", row.address ?? "")
     .replace("{{phone}}", row.phone ?? "")
@@ -196,9 +193,9 @@ console.log(row.vehicle_condition=== 'good-condition','vehicle_condition');
     .replace("{{year}}", row.year ?? "")
     .replace("{{reg_no}}", row.reg_no ?? "")
     .replace("{{chasis_no}}", row.chasis_no ?? "")
-    
+
     .replace("{{vehicle_condition}}", row.vehicle_condition ?? "")
-    
+
     .replace("{{services_rows}}", servicesRows)
     .replace("{{isRepainted}}", row.isRepainted ?? "")
     .replace("{{isSingleStagePaint}}", row.isSingleStagePaint ?? "")
@@ -206,9 +203,9 @@ console.log(row.vehicle_condition=== 'good-condition','vehicle_condition');
     .replace("{{store_manager}}", row.store_manager ?? "")
     .replace("{{isVehicleOlder}}", row.isVehicleOlder ?? "")
     .replace("{{brandNewChecked}}", row.vehicle_condition === "brand-new" ? "checked" : "")
-.replace("{{goodChecked}}", row.vehicle_condition === "good-condition" ? "checked" : "")
-.replace("{{fairChecked}}", row.vehicle_condition === "fair-condition" ? "checked" : "")
-.replace("{{poorChecked}}", row.vehicle_condition === "poor-condition" ? "checked" : "")
+    .replace("{{goodChecked}}", row.vehicle_condition === "good-condition" ? "checked" : "")
+    .replace("{{fairChecked}}", row.vehicle_condition === "fair-condition" ? "checked" : "")
+    .replace("{{poorChecked}}", row.vehicle_condition === "poor-condition" ? "checked" : "")
 
 }
 export function buildInvoiceHtml(row: any, template: string) {
@@ -256,24 +253,14 @@ export function buildInvoiceHtml(row: any, template: string) {
     })
     .join("");
 
-  /* ---------------- TOTALS ---------------- */
-  const subTotal = Number(row.sub_total ?? 0);
-  const discount = Number(row.discount ?? 0);
-  const cgst = Number(row.cgst ?? 0);
-  const sgst = Number(row.sgst ?? 0);
-  const igst = Number(row.igst ?? 0);
-  const taxTotal = cgst + sgst + igst;
-  const totalAmount = subTotal - discount + taxTotal;
-  const received = Number(row.received ?? 0);
-  const balance = totalAmount - received;
 
   const taxTotalRows = isCGSTSGST
     ? `
-      <tr><td>CGST Amount :</td><td class="right">₹ ${cgst.toFixed(2)}</td></tr>
-      <tr><td>SGST Amount :</td><td class="right">₹ ${sgst.toFixed(2)}</td></tr>
+      <tr><td>CGST Amount :</td><td class="right">₹ ${row?.cgst}</td></tr>
+      <tr><td>SGST Amount :</td><td class="right">₹ ${row?.sgst}</td></tr>
     `
     : `
-      <tr><td>IGST Amount :</td><td class="right">₹ ${igst.toFixed(2)}</td></tr>
+      <tr><td>IGST Amount :</td><td class="right">₹ ${row?.igst}</td></tr>
     `;
 
   /* ---------------- TEMPLATE REPLACEMENTS ---------------- */
@@ -294,7 +281,7 @@ export function buildInvoiceHtml(row: any, template: string) {
     .replace("{{bill_address}}", row.address ?? "")
     .replace("{{bill_state}}", row.state ?? "")
     .replace("{{bill_gstin}}", row.gstin ?? "")
-    
+
     .replace("{{bill_phone}}", row.bill_phone ?? "")
     .replace("{{bill_email}}", row.bill_email ?? "")
 
@@ -311,10 +298,10 @@ export function buildInvoiceHtml(row: any, template: string) {
     .replace("{{tax_total_rows}}", taxTotalRows)
 
     .replace("{{total_items}}", String(row.total_items ?? items.length))
-    .replace("{{sub_total}}", subTotal.toFixed(2))
-    .replace("{{discount}}", discount.toFixed(2))
-    .replace("{{total_amount}}", totalAmount.toFixed(2))
-    .replace("{{received}}", received.toFixed(2))
-    .replace("{{balance}}", balance.toFixed(2))
+    .replace("{{sub_total}}", row?.sub_total.toString())
+    .replace("{{discount}}", row?.discount.toString())
+    .replace("{{total_amount}}", row?.total_amount.toString())
+    .replace("{{received}}", row?.received.toString())
+    .replace("{{balance}}", row?.balance.toString())
     .replace("{{amount_in_words}}", row.amount_in_words ?? "");
 }
