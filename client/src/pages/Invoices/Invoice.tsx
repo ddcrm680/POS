@@ -432,6 +432,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
         }
       
         const rowData = {
+            billing_type:view?.billing_type,
             /* ---------------- COMPANY ---------------- */
             store_name: store?.name,
             store_address: "Plot No. B-14/15, Noida Sector 1",

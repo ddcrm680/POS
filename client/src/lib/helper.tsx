@@ -211,12 +211,15 @@ export function buildJobCardHtml(row: any, template: string) {
 export function buildInvoiceHtml(row: any, template: string) {
   const items = row.invoice_items ?? [];
   const isCGSTSGST = row.gst_type === "cgst_sgst";
-  const isIGST = row.gst_type === "igst";
 
   /* ---------------- TAX HEADER ---------------- */
   const taxHeader = isCGSTSGST
     ? `<td width="6%">CGST</td><td width="6%">SGST</td>`
     : `<td width="6%">IGST</td>`;
+const billGstHtml =
+  row?.billing_type === "company" && row?.gstin
+    ? `GST No.: ${row.gstin}`
+    : "";
 
   /* ---------------- ITEM ROWS ---------------- */
   const invoiceItemsRows = items
@@ -303,5 +306,6 @@ export function buildInvoiceHtml(row: any, template: string) {
     .replace("{{total_amount}}", row?.total_amount.toString())
     .replace("{{received}}", row?.received.toString())
     .replace("{{balance}}", row?.balance.toString())
+    .replace("{{bill_gst_block}}", billGstHtml)
     .replace("{{amount_in_words}}", row.amount_in_words ?? "");
 }

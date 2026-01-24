@@ -110,7 +110,7 @@ border:none}
     {{bill_name}}<br>
     {{bill_address}}<br>
     {{bill_state}}<br>
-   GST No.: {{bill_gstin}}
+  {{bill_gst_block}}
   </td>
 
   <td style="width:35%; vertical-align:top; padding-right:10px;" class="right" >
