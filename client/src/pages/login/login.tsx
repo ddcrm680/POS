@@ -75,6 +75,7 @@ export default function LoginPage() {
         description: Constant.login.loginSuccessMessage,
         variant: "success",
       });
+      localStorage.removeItem('sidebar_active_parent')
       setLocation("/home");
     } catch (err: any) {
       console.error(err);

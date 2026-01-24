@@ -26,7 +26,9 @@ export default function NotFound() {
           {/* 👇 Go Home Button */}
           <div className="mt-6">
             <Button
-              onClick={() => setLocation("/home")}
+              onClick={() =>{
+                localStorage.removeItem('sidebar_active_parent')
+                setLocation("/home")}}
               className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex items-center gap-2 mx-auto"
             >
               <ArrowLeft size={16} />
