@@ -102,6 +102,9 @@ export default function Sidebar({
                   if (tab.path === "/master") {
                     localStorage.removeItem("master_active_tab");
                   }
+                     if (tab.path === "/products") {
+            localStorage.removeItem("product_active_tab");
+          }
                   if (tab.children) {
                     setOpenParent(expanded ? null : tab.id);
 

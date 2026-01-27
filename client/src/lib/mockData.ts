@@ -1356,3 +1356,51 @@ export const measurementTypeOptions = [
   { label: "Kg", value: "kg" },
   { label: "Gm", value: "gm" },
 ];
+// src/lib/mockData.ts
+
+export const transferProductsMockData = [
+  {
+    id: 1,
+    created_at: "2026-01-24T10:30:00Z",
+    created_by: "Detailing Devils",
+    franchise: "DD Haldwani",
+    store_id:6,
+    phone: "7006885861",
+    transfer_id: "#4",
+    transferred_qty: 1,
+    total_amount: 0,
+  },
+  {
+    id: 2,
+    created_at: "2024-10-01T12:15:00Z",
+    created_by: "Detailing Devils",
+    franchise: "DD Haldwani",
+    phone: "9555695695",
+    store_id:6,
+    transfer_id: "#3",
+    transferred_qty: 5,
+    total_amount: 0,
+  },
+  {
+    id: 3,
+    created_at: "2024-09-28T09:45:00Z",
+    created_by: "Detailing Devils",
+    franchise: "DD Haldwani",
+    phone: "9634647878",
+    transfer_id: "#2",
+    store_id:6,
+    transferred_qty: 1,
+    total_amount: 0,
+  },
+  {
+    id: 4,
+    created_at: "2024-09-28T09:20:00Z",
+    created_by: "Detailing Devils",
+    franchise: "DD Haldwani",
+    phone: "7290004718",
+    transfer_id: "#1",
+    store_id:6,
+    transferred_qty: 1,
+    total_amount: 0,
+  },
+];

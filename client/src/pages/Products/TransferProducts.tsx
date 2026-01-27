@@ -1,28 +1,20 @@
 // src/components/profile/profile.tsx
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { UseFormSetError } from "react-hook-form";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getConsumer, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
-import { TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
-import { Box, IconButton, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, Trash2 } from "lucide-react";
-import CommonModal from "@/components/common/CommonModal";
-import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
-import CommonDeleteModal from "@/components/common/CommonDeleteModal";
-import { ColumnFilter } from "@/components/common/ColumnFilter";
-import { customerMockData, territoryMasterMockData } from "@/lib/mockData";
-import CommonRowMenu from "@/components/common/CommonRowMenu";
+import { Box, IconButton } from "@chakra-ui/react";
+import { EyeIcon } from "lucide-react";
+import { formatDate, formatTime } from "@/lib/utils";
+import { transferProductsMockData } from "@/lib/mockData";
 
 export default function TransferProducts() {
   const { toast } = useToast();
   const { roles } = useAuth();
-  const [customers, setCustomers] = useState<Array<any>>([]);
+const [transferProduct,setTransferProduct] = useState(transferProductsMockData);
   const [perPage, setPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [has_next, setHasNext] = useState(false)
@@ -37,108 +29,100 @@ export default function TransferProducts() {
   const [page, setPage] = useState(1);
 
   const [isListLoading, setIsListLoading] = useState(true);
-  const [isCustomerDeleteModalInfo, setIsCustomerDeleteModalOpenInfo] = useState<{ open: boolean, info: any }>({
-    open: false,
-    info: {}
-  });
+
   const PER_PAGE = 10;
-  const CustomerDeleteHandler = async () => {
-    try {
-      setIsLoading(true);
 
-      // await DeleteCustomer(isCustomerDeleteModalInfo?.info?.id);
-      // toast({ title: `Delete Customer`, description: "Customer deleted successfully", variant: "success", });
+const columns = useMemo(() => [
 
-      fetchCustomer(false)
-
-    } catch (err: any) {
-
-      toast({
-        title: "Error",
-        description:
-          err?.response?.data?.message ||
-          err.message || `Failed to delete territory`,
-        variant: "destructive",
-      });
-    } finally {
-      setIsCustomerDeleteModalOpenInfo({ open: false, info: {} });
-      setIsLoading(false);
-    }
-  };
-  const columns = useMemo(() => [
-    /* ================= CREATED ON ================= */
-    {
-      key: "created_at",
-      label: " Created On",
-      align: "center",
-      width: "140px",
-      render: (value: string, row: any) => (
+  /* ================= DATE / CREATED BY ================= */
+  {
+    key: "created_at",
+    label: "Created On",
+    width: "180px",
+    align:"center",
+    render: (value: string, row: any) => (
         <Box className="flex flex-col justify-center items-center">
-          <span className="font-bold  ">
-            {formatDate(value)}
-          </span>
-          <span className="text-sm font-medium  text-gray-700">
-            {formatTime(value)}
-          </span></Box>
-      ),
-    },
+            <span className="font-bold  ">
+              {formatDate(value)}
+            </span>
+            <span className="text-sm font-medium  text-gray-700">
+              {formatTime(value)}
+            </span></Box>
+    ),
+  },
 
-    /* ================= NAME ================= */
-    {
-      key: "name",
-      label: "Name",
-      width: "100px",
-    },
+  /* ================= FRANCHISE ================= */
+  {
+    key: "franchise",
+    label: "Store",
+    width: "180px",
+    render: (val: string,row:any) => (
+      <span className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={()=>{
+              localStorage.removeItem('sidebar_active_parent')
+              localStorage.setItem('sidebar_active_parent','stores')
+              navigate(`/master/stores/manage?id=${row?.store_id}&mode=view`)
+      }}>
+        {val}
+      </span>
+    ),
+  },
 
-    /* ================= MOBILE ================= */
-    {
-      key: "phone",
-      label: "Mobile No.",
-      width: "150px",
+  /* ================= CONTACT ================= */
+  {
+    key: "phone",
+    label: "Contact No.",
+    width: "180px",
+  },
 
-    },
-    {
-      key: "email",
-      label: "Email",
-      width: "160px",
+  /* ================= TRANSFER ID ================= */
+  {
+    key: "transfer_id",
+    label: "Transfer ID",
+    width: "180px",
+    render: (val: string) => (
+      <span className="text-blue-600 font-medium cursor-pointer hover:underline">
+        {val}
+      </span>
+    ),
+  },
 
-    },
+  /* ================= QTY ================= */
+  {
+    key: "transferred_qty",
+    label: "Transferred Qty",
+    width: "180px",
+    // align: "right",
+  },
 
-    /* ================= VEHICLE TYPE ================= */
-    {
-      key: "address",
-      label: " Address",
-      width: "160px",
-
-    },
-
-    /* ================= INTERESTED IN ================= */
-
-
+  /* ================= AMOUNT ================= */
+  {
+    key: "total_amount",
+    label: "Total Amount",
+    width: "180px",
+    // align: "right",
+    render: (val: number) => `₹ ${val.toFixed(2)}`,
+  },
+], []);
 
 
 
-  ], []);
-
-
-
-  const fetchCustomer = async (isLoaderHide = false) => {
+  const fetchTransferProduct = async (isLoaderHide = false) => {
     try {
       if (!isLoaderHide)
         setIsListLoading(true);
-      const res =
-        await getConsumer({
-          per_page: perPage,
-          page,
-          search,
-          status: filters.status
-        });
+      // const res =
+      //   await getTransferProduct({
+      //     per_page: perPage,
+      //     page,
+      //     search,
+      //     status: filters.status
+      //   });
 
-      const mappedTerritory = res.data
-      setHasNext(res.meta.has_next)
-      setTotal(res.meta.total)
-      setCustomers(mappedTerritory);
-      setLastPage(res.meta.last_page);
+      // const mappedTerritory = res.data
+      // setHasNext(res.meta.has_next)
+      // setTotal(res.meta.total)
+      setTransferProduct(transferProductsMockData);
+      // setLastPage(res.meta.last_page);
     } catch (e) {
       console.error(e);
 
@@ -149,7 +133,7 @@ export default function TransferProducts() {
   };
 
   useEffect(() => {
-    fetchCustomer(false);
+    fetchTransferProduct(false);
   }, [search, page, perPage, filters]);
   function resetFilter() {
     setSearch('')
@@ -159,23 +143,14 @@ export default function TransferProducts() {
     })
   }
   return (
-    <div className="p-3">
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold">Customer Management</h1>
-            <p className="text-muted-foreground text-sm">
-              Comprehensive customer analytics and management dashboard
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="">
+     
       <Card className="w-full">
         <CardContent>
           <CommonTable
             columns={columns}
             isClear={false}
-            data={customers}
+            data={transferProduct}
             isAdd={true}
             perPage={perPage}
             setPerPage={setPerPage}
@@ -184,7 +159,7 @@ export default function TransferProducts() {
             total={total}
             hasNext={has_next}
             tabType=""
-            tabDisplayName="Customer"
+            tabDisplayName="Transfer Stock"
             page={page}
             setPage={setPage}
             lastPage={lastPage}
@@ -196,44 +171,30 @@ export default function TransferProducts() {
               // }
             }}
             setIsModalOpen={(value: boolean) => {
-              localStorage.removeItem('sidebar_active_parent')
-              navigate(`/job-cards/manage`)
+              // localStorage.removeItem('sidebar_active_parent')
+              // navigate(`/job-cards/manage`)
             }}
             actions={(row: any) => (
-              <CommonRowMenu
-                items={[
-                  {
-                    key: "view",
-                    label: "View ",
-                    icon: <EyeIcon size={16} />,
-                    onClick: () => navigate(`/customers/view?id=${row.id}`),
-                  },
-                  {
-                    key: "edit",
-                    label: "Edit ",
-                    icon: <EditIcon size={16} />,
-                    onClick: () =>
-                      navigate(`/customers/manage?id=${row.id}&mode=edit`),
-                  },
-                 
-                ]}
-              />
+              <Box className="gap-0">
+                                {row.status !== "cancelled" ? (
+                                    <IconButton
+                                        size="xs"
+                                        // mr={2}
+                                        title="View "
+
+                                        aria-label="View"
+                                        onClick={() => {
+                                            //   setIsPaymentDeleteModalOpenInfo({ open: true, info: row })
+                                        }}
+                                    >
+                                        <EyeIcon size={16} />
+                                    </IconButton>
+                                ) : (
+                                    "-"
+                                )}
+                            </Box>
             )}
 
-          />
-          <CommonDeleteModal
-            width="330px"
-            maxWidth="330px"
-            isOpen={isCustomerDeleteModalInfo.open}
-            title="Delete Customer"
-            description={`Are you sure you want to delete this customer? This action cannot be undone.`}
-            confirmText="Delete"
-            cancelText="Cancel"
-            isLoading={isLoading}
-            onCancel={() =>
-              setIsCustomerDeleteModalOpenInfo({ open: false, info: {} })
-            }
-            onConfirm={CustomerDeleteHandler}
           />
 
         </CardContent>

@@ -121,7 +121,8 @@ export default function NotificationDropdown() {
               onClick={() => {
                 localStorage.removeItem("sidebar_active_parent");
                 localStorage.removeItem("master_active_tab");
-
+ 
+            localStorage.removeItem("product_active_tab");
                 readAll();
                 setOpen(false); // ✅ CLOSE DROPDOWN
                 navigate("/notifications");

@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
 import ProductsListing from "./ProductListing";
+import TransferProducts from "./TransferProducts";
 
 const Product_TAB_KEY = "product_active_tab";
 
@@ -100,7 +101,7 @@ text-lg font-semibold
               </TabsContent>
 
               <TabsContent value="transfer-stock">
-                <ProductsListing />
+                <TransferProducts />
               </TabsContent>
 
             </Tabs>

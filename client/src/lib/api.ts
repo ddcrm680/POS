@@ -718,6 +718,42 @@ export async function getConsumer({
     throw error;
   }
 }
+export async function getTransferProduct({
+  page,
+  search,
+  status,
+  per_page
+}: {
+  per_page?: number;
+  page?: number;
+  search?: string;
+  status?: string | number;
+}) {
+  try {
+    const params = new URLSearchParams();
+
+    if (page !== undefined) params.append("page", String(page));
+    if (per_page !== undefined) params.append("per_page", String(per_page));
+    if (search) params.append("search", search);
+    if (status) params.append("status", String(status));
+
+    const response: any = await api.get(
+      `/api/transfer-product?${params.toString()}`,
+    );
+
+    if (response?.data?.success === true) {
+      return response.data; // customer object
+    }
+
+    return null;
+  } catch (error: any) {
+    // 404 / not found → treat as new customer
+    if (error?.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
 export async function getJobCard({
   apiLink,
   param

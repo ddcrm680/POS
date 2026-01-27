@@ -42,6 +42,10 @@ export const BottomTabs = ({
 
         const handleClick = () => {
            localStorage.removeItem("sidebar_active_parent");
+           
+            if (tab.path === "/products") {
+            localStorage.removeItem("product_active_tab");
+          }
           if (tab.path === "/master") {
             localStorage.removeItem("master_active_tab");
           }
