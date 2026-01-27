@@ -556,7 +556,7 @@ export default function TransferProductForm() {
 
                                             {/* Vehicle Information */}
                                             <Card>
-                                                <SectionCard title="Item Detail" className="pb-3 p-4">
+                                                <SectionCard title="Item Information" className="pb-3 p-4">
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-4">
                                                         <FloatingRHFSelect
                                                             name="category"
