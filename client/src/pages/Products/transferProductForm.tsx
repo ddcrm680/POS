@@ -414,9 +414,9 @@ export default function TransferProductForm() {
             },
             {
                 key: "salePrice",
-                label: "Rate",
+                label: "Price (₹)",
                 width: "100px",
-                render: (v: string) => v ?? "-",
+                render: (v: number) => `₹ ${v}`,
             },
             {
                 key: "qty",
@@ -454,13 +454,13 @@ export default function TransferProductForm() {
 
                                     // ❌ qty < 1 → keep error
                                     if (qty < 1) {
-                                      
+
                                         qty = 1;
                                     }
 
                                     // ❌ qty > available → keep error
                                     else if (qty > available) {
-                                       
+
                                         qty = available; // 🔒 cap
                                     }
 
@@ -543,6 +543,27 @@ export default function TransferProductForm() {
         );
     }, [productFormList, form]);
 
+    const totalCounter = useMemo(() => {
+        const subTotal = productFormList.reduce(
+            (sum, p) => sum + Number(p.salePrice || 0),
+            0
+        );
+        const totalItems = productFormList.reduce(
+            (sum, p) => sum + Number(p.qty || 1),
+            0
+        );
+
+
+        const grandTotal =
+            subTotal
+
+        return {
+            subTotal: +subTotal.toFixed(2),
+            totalItems,
+            grandTotal: +grandTotal.toFixed(2),
+
+        };
+    }, [productFormList]);
     return (
         <>
             <div className=" mx-auto px-3 sm:px-3 py-3 space-y-3">
@@ -717,7 +738,15 @@ export default function TransferProductForm() {
 
                                             {/* Vehicle Information */}
                                             <Card>
-                                                <SectionCard title="Item Information" className="pb-3 p-4">
+                                                <SectionCard
+                                                    title={
+                                                        <div className="flex items-center gap-2">
+                                                            <span>Item Details</span>
+
+                                                        </div>
+                                                    }
+                                                >
+
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-4">
                                                         <FloatingRHFSelect
                                                             name="category"
@@ -838,39 +867,75 @@ export default function TransferProductForm() {
                                                                 }
                                                             }}
                                                         />
+
+                                                    </div>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 pb-4">
                                                         <FloatingTextarea
                                                             control={form.control}
                                                             isView
+                                                            minH='36px'
                                                             name="description"
                                                             label="Description"
                                                         />
-                                                        <Button
-                                                            type="button"
-                                                            className="h-8 text-xs w-fit"
-                                                            onClick={() => addProductHandler()}
-                                                        >
-                                                            Add Product
-                                                        </Button>
 
+                                                        <Button type="button" size="sm" onClick={addProductHandler} className="w-fit">
+                                                            Add Item
+                                                        </Button>
                                                     </div>
                                                     {productFormList.length > 0 && (
                                                         <div className="flex flex-col ">
-                                                            <CommonTable
-                                                                columns={productColumns}
-                                                                data={productFormList}
-                                                                searchable={false}
-                                                                isAdd={false}
-                                                                isLoading={false}
-                                                                total={productFormList.length}
-                                                                page={1}
-                                                                lastPage={1}
-                                                                hasNext={false}
-                                                            />
-                                                            {form.formState.errors.items && (
-                                                                <p className="text-xs text-red-500 mt-1">
-                                                                    {form.formState.errors.items.message}
-                                                                </p>
+                                                            <div className="">
+                                                                <div className="flex items-center justify-between ">
+                                                                    <h4 className="text-sm font-semibold text-gray-700">
+                                                                        Transfer Items
+                                                                    </h4>
+
+                                                                </div>
+
+                                                                <CommonTable
+                                                                    columns={productColumns}
+                                                                    data={productFormList}
+                                                                    searchable={false}
+                                                                    isAdd={false}
+                                                                    isTotal={false}
+                                                                    isLoading={false}
+                                                                    total={productFormList.length}
+                                                                />
+                                                            </div>
+
+                                                            {productFormList.length > 0 && (
+                                                                <div className="flex md:justify-end my-4">
+                                                                    <div className="w-[300px] text-xs space-y-2">
+
+                                                                        <div className="flex justify-between">
+                                                                            <span className="text-muted-foreground">
+                                                                                Total Items :
+                                                                            </span>
+                                                                            <span className="font-medium">
+                                                                                {totalCounter.totalItems}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div className="flex justify-between">
+                                                                            <span className="text-muted-foreground">
+                                                                                Sub Total Amount:
+                                                                            </span>
+                                                                            <span className="font-medium">
+                                                                                ₹ {totalCounter.subTotal}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div className="flex justify-between font-semibold border-t pt-2">
+                                                                            <span>Grand Total :</span>
+                                                                            <span>
+                                                                                ₹ {totalCounter?.grandTotal}
+                                                                            </span>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
                                                             )}
+
                                                         </div>
                                                     )}
 
@@ -889,7 +954,7 @@ export default function TransferProductForm() {
                                         variant="outline"
                                         disabled={isLoading || isInfoLoading}
                                         className={'hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'}
-                                        onClick={() => navigate("/job-cards")}
+                                        onClick={() => navigate("/products")}
                                     >
                                         {'Cancel'}
                                     </Button>

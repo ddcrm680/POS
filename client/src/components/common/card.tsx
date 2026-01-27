@@ -4,19 +4,29 @@ export const SectionCard = ({
   title,
   children,
   className,
-  headingMarginBottom = "mb-4"
+  headingMarginBottom = "mb-4",
 }: {
-  title?: string;
+  title?: React.ReactNode; // ✅ FIX HERE
   children: React.ReactNode;
   className?: string;
-  headingMarginBottom?:string
+  headingMarginBottom?: string;
 }) => (
   <div
     className={cn(
-      "bg-white  rounded-xl p-4 pb-0",
+      "bg-white rounded-xl p-4 pb-0",
       className
-    )} >
-  {title &&  <h3 className={`text-sm font-semibold ${headingMarginBottom} text-gray-700`}>{title}</h3>}
+    )}
+  >
+    {title && (
+      <h3
+        className={cn(
+          "text-sm font-semibold text-gray-700",
+          headingMarginBottom
+        )}
+      >
+        {title}
+      </h3>
+    )}
     {children}
   </div>
 );
