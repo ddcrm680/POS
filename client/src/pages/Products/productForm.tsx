@@ -118,14 +118,6 @@ export default function ProductForm() {
                         </SectionCard>
                     </Card>
 
-                    {/* DESCRIPTION */}
-                    <Card>
-                        <SectionCard className="pb-4" title="Product Description">
-                            <RichTextEditor name="description" label="Product Description" isRequired control={form.control} />
-
-                        </SectionCard>
-                    </Card>
-
                     {/* DIMENSIONS & FEATURES */}
                     <Card>
                         <SectionCard className="pb-4" title="More Details">
