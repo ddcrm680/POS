@@ -353,7 +353,7 @@ export const productCountSchema = (initialValues: any) =>
         return { message: "Invalid count" };
       }),
 
-    remarks:  z.string()
+    remarks: z.string()
       .trim()
       .min(10, "Remarks must be at least 10 characters")
       .max(300, "Remarks must not exceed 300 characters")
@@ -904,59 +904,78 @@ export const JobCardOnlySchema = z.object({
     .min(1, "Service date is required"),
 });
 
-export const TransferProductSchema = z.object({
-  /* ================= STORE INFO ================= */
+export const TransferProductSchema = z
+  .object({
   store_id: z.string().min(1, "Store is required"),
 
-  name: z.string().min(1, "Name is required"),
-  phone: z.string().min(10, "Valid contact number is required"),
-  email: z.string().email("Invalid email address"),
-  address: z.string().min(5, "Address is required"),
-  shipping_address: z.string().min(5, "Shipping address is required"),
+    name: z.string().min(1),
+    phone: z.string().min(10),
+    email: z.string().email(),
+    address: z.string().min(5),
+    shipping_address: z.string(),
+    organization: z.string().min(1),
+    transfer_date: z.string().min(1),
+    state_id: z.string().min(1),
 
-  organization: z.string().min(1, "Organization is required"),
+    // 🧱 BUILDER FIELDS (optional now)
+    category: z.string().optional(),
+    brand: z.string().optional(),
+    product_id: z.string().optional(),
+    measurement: z.string().optional(),
+    qty: z.string().optional(),
+    in_stock: z.coerce.number().optional(),
+    rate: z.coerce.number().optional(),
+    description: z.string().optional(),
 
-  transfer_date: z
-    .string()
-    .min(1, "Transfer date is required"),
+    // ✅ TABLE ITEMS (source of truth)
+    items: z
+      .array(
+        z.object({
+          product_id: z.string(),
+          qty: z.number().min(1),
+        })
+      )
+      .min(1, "At least one product is required"),
+  })
+  .superRefine((data, ctx) => {
+    /** 🧠 CASE 1: NO ITEMS YET → VALIDATE BUILDER */
+    if (data.items.length === 0) {
+      if (!data.category) {
+        ctx.addIssue({ path: ["category"], message: "Category is required", code: "custom" });
+      }
+      if (!data.brand) {
+        ctx.addIssue({ path: ["brand"], message: "Brand is required", code: "custom" });
+      }
+      if (!data.product_id) {
+        ctx.addIssue({ path: ["product_id"], message: "Product is required", code: "custom" });
+      }
+      if (!data.measurement) {
+        ctx.addIssue({ path: ["measurement"], message: "Measurement is required", code: "custom" });
+      }
 
-  /* ================= ITEM DETAIL ================= */
-  category: z.string().min(1, "Category is required"),
+      const qty = Number(data.qty);
+      const stock = Number(data.in_stock ?? 0);
 
-  brand: z.string().min(1, "Brand is required"),
+      if (!qty || qty < 1) {
+        ctx.addIssue({
+          path: ["qty"],
+          message: "Quantity must be greater than 0",
+          code: "custom",
+        });
+      } else if (qty > stock) {
+        ctx.addIssue({
+          path: ["qty"],
+          message: `Quantity cannot exceed available stock (${stock})`,
+          code: "custom",
+        });
+      }
+    }
 
-  product_id: z.string().min(1, "Product is required"),
+    /** 🧠 CASE 2: ITEMS EXIST → IGNORE BUILDER COMPLETELY */
+    // No validation here — table is source of truth
+  });
 
-  measurement: z.string().min(1, "Measurement is required"), // auto-filled
-  in_stock: z.coerce.number().optional(), // auto-filled
-  rate: z.coerce.number().optional(), // auto-filled
 
-    state_id: z
-      .string()
-      .min(1, "Please select state"),
-
-  qty: z
-    .coerce
-    .string()
-    .min(1, "Quantity must be greater than 0"),
-
-  description: z.string().optional(),
-
-})
-.superRefine((data, ctx) => {
-  /* ================= STOCK VALIDATION ================= */
-  if (
-    typeof data.in_stock === "number" &&
-    typeof data.qty === "number" &&
-    data.qty > data.in_stock
-  ) {
-    ctx.addIssue({
-      path: ["qty"],
-      message: `Quantity cannot exceed available stock (${data.in_stock})`,
-      code: z.ZodIssueCode.custom,
-    });
-  }
-});
 
 export type TransferProductFormValues = z.infer<typeof TransferProductSchema>;
 

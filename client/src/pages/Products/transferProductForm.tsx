@@ -1,45 +1,18 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useForm, UseFormSetError } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { type Customer, type Vehicle, JobServiceOption, JobCard, option, ServiceCard, JobCardFormUnion, storeFormApi, TransferProductFormValues } from "@/lib/types";
+import { option, ServiceCard, TransferProductFormValues } from "@/lib/types";
 import {
-    User,
-    Phone,
-    Mail,
-    Car,
-    Key,
-    MapPin,
-    Calculator,
-    Search,
-    Plus,
-    UserPlus,
-    CheckCircle,
-    ArrowRight,
-    DollarSign,
-    Percent,
-    Receipt,
-    Clock,
     Loader2,
     ChevronLeft,
-    Check
+    Info,
+    Trash2
 } from "lucide-react";
-import { z } from "zod";
-import POSLayout from "@/components/layout/pos-layout";
-import InlineCustomerForm from "@/components/forms/inline-customer-form";
-import ServiceHistoryPanel from "@/components/customer/service-history-panel";
 import { useLocation, useSearchParams } from "wouter";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
@@ -47,16 +20,16 @@ import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { SectionCard } from "@/components/common/card";
 import { Loader } from "@/components/common/loader";
 import { FloatingDateField } from "@/components/common/FloatingDateField";
-import { cn, findIdByName } from "@/lib/utils";
-import { consumerSave, consumerUpdate, fetchCityList, fetchOrganizationsList, fetchStateList, fetchStoreById, fetchStoreCrispList, fetchStoresList, getJobCardItem, getServiceOptionByTypeVehicle, jobCardMetaInfo, jobCardModelInfo, jobFormSubmission, lookupCustomerByPhone } from "@/lib/api";
-import { JobCardOnlySchema, NewJobCardSchema, TransferProductSchema } from "@/lib/schema";
+import { findIdByName } from "@/lib/utils";
+import { fetchOrganizationsList, fetchStateList, fetchStoreById, fetchStoreCrispList, getJobCardItem, jobCardMetaInfo } from "@/lib/api";
+import { TransferProductSchema } from "@/lib/schema";
 import { useAuth } from "@/lib/auth";
-import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { decryptQuery } from "@/lib/crypto";
 import { brandOptions, categoryOptions, mockProducts } from "@/lib/mockData";
+import CommonTable from "@/components/common/CommonTable";
+import { Box, IconButton } from "@chakra-ui/react";
 
 export default function TransferProductForm() {
-    const [step, setStep] = useState(1);
     const [, navigate] = useLocation();
     const lastFetchedStoreIdRef = useRef<string | null>(null);
 
@@ -99,7 +72,6 @@ export default function TransferProductForm() {
             description: "",
         },
     });
-    const selectedStoreId = form.watch("store_id");
 
 
     const { toast } = useToast();
@@ -109,20 +81,11 @@ export default function TransferProductForm() {
         setCountryList(countries)
     }, [countries])
 
-    const [services, setServices] = useState<ServiceCard[]>([]);
-    const [loadingServices, setLoadingServices] = useState(false);
     const [isLookingUp, setIsLookingUp] = useState(false);
-    const [customerFound, setCustomerFound] = useState<boolean | null>(null);
-    const disablePhone = customerFound === true;
     const [countryList, setCountryList] = useState<
         { id: number; name: string; slug?: string }[]
     >([]);
     const [states, setStates] = useState<any[]>([]);
-    const [cities, setCities] = useState<any[]>([]);
-    const [gstStates, setGstStates] = useState<any[]>([]);
-    const [gstCities, setGstCities] = useState<any[]>([]);
-    const [loadingGstState, setLoadingGstState] = useState(false);
-    const [loadingGstCity, setLoadingGstCity] = useState(false);
 
     const [meta, setMeta] = useState({
         vehicleCompanies: [] as option[],
@@ -135,70 +98,82 @@ export default function TransferProductForm() {
 
         loadingModels: false,
     });
-    const isGstHydratingRef = useRef(false);
     const { user, } = useAuth();
-    const toSelectOptions = <T extends { value: any; label: string }>(
-        list: T[] = []
-    ) =>
-        list.map(item => ({
-            label: item.label,
-            value: String(item.value), // 🔑 force string
-        }));
-    useEffect(() => {
-        const loadMeta = async () => {
-            const data = await jobCardMetaInfo();
-            if (!data) return;
-            const value = {
 
-                vehicleCompanies: toSelectOptions(data.vehicleCompanies),
-                vehicleTypes: toSelectOptions(data.vehicleTypes),
-                serviceTypes: toSelectOptions(data.serviceTypes),
-                years: toSelectOptions(data.years),
-                srsCondition: toSelectOptions(data.srsCondition),
-            }
+    function addProductHandler() {
+        const v = form.getValues();
 
-            setMeta(prev => (({ ...prev, ...value })));
-        };
-
-        loadMeta();
-    }, []);
-
-    const [initialValues, setInitialValues] = useState<any | null>(null)
-    const fetchJobFormInfo = async () => {
-        try {
-            setIsInfoLoading(true);
-            const res =
-                await getJobCardItem({ id: id ?? "" });
-
-            setInitialValues(res)
-        } catch (e) {
-            console.error(e);
-
-        } finally {
-            setIsInfoLoading(false);
+        if (!v.category) {
+            form.setError("category", { message: "Select category first" });
+            return;
         }
-    };
-    useEffect(() => {
-        if (id) {
-            fetchJobFormInfo();
-
+        if (!v.brand) {
+            form.setError("brand", { message: "Select brand first" });
+            return;
         }
-    }, [id]);
+        if (!v.product_id) {
+            form.setError("product_id", { message: "Select product first" });
+            return;
+        }
+        if (!v.measurement) {
+            form.setError("measurement", { message: "Measurement missing" });
+            return;
+        }
 
+        const qty = Number(v.qty);
+        if (!qty || qty < 1) {
+            form.setError("qty", { message: "Qty must be greater than 0" });
+            return;
+        }
+        if (qty > selectedProduct.available) {
+            form.setError("qty", {
+                message: `Max available stock is ${selectedProduct.available}`,
+            });
+            return;
+        }
 
-    const onSubmit = (data: TransferProductFormValues) => {
+        // duplicate check
+        if (productFormList.some(p => p.id === selectedProduct.id)) {
+            toast({
+                title: "Already added",
+                description: "This product is already in the list",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        setProductFormList(prev => [
+            ...prev,
+            {
+                id: selectedProduct.id,
+                product: selectedProduct.product,
+                uom: selectedProduct.uom,
+                available: selectedProduct.available,
+                salePrice: selectedProduct.salePrice,
+                qty: String(qty),
+            },
+        ]);
+
+        form.resetField("category");
+        form.resetField("brand");
+        form.resetField("product_id");
+        form.resetField("measurement");
+        form.resetField("qty");
+        form.resetField("rate");
+        form.resetField("description");
+        form.resetField("in_stock");
+    }
+
+    const onSubmit = () => {
     };
-    const [isJobCardSubmissionDeleteModalInfo, setIsJobCardSubmissionModalOpenInfo] = useState<{ open: boolean, info: any }>({
-        open: false,
-        info: {}
-    });
 
     const isAdmin =
         user?.role === "admin" || user?.role === "super-admin";
 
 
-    const isHydratingJobRef = useRef(false);
-    async function handleJobCardSubmission(values: TransferProductFormValues) {
+    async function handleTransferProductSubmission(values: TransferProductFormValues) {
+
+
         setIsLoading(true);
 
         try {
@@ -255,8 +230,6 @@ export default function TransferProductForm() {
 
         paramsHydratedRef.current = true;
     }, [paramPhone, paramStoreId, form]);
-    const customerMobile = form.watch("phone");
-    const store_id = form.watch("store_id");
 
 
     const [storeList, setStoreList] = useState<
@@ -277,7 +250,6 @@ export default function TransferProductForm() {
             console.error(e);
         }
     };
-    const [selectedStore, setSelectedStore] = useState<any>(null);
     const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
@@ -288,7 +260,6 @@ export default function TransferProductForm() {
         category: string,
         brand: string
     ) => {
-        console.log(products, category, brand, 'brandbrand');
 
         return products.filter(
             p => p.category === category && p.brand === brand && p.visibility === 1
@@ -301,20 +272,16 @@ export default function TransferProductForm() {
         }
     }, [isAdmin]);
     useEffect(() => {
-        console.log('stay outside');
 
         if ((!mode)) {
-            console.log('came inside mode');
 
             const hydrateLocation = async () => {
                 try {
                     const countryId = findIdByName(countryList, '101');
-                    console.log(countryId, countryList, 'countryId');
 
                     if (!countryId) return;
 
                     const stateList = await fetchStateList(countryId);
-                    console.log(stateList, 'stateList');
 
                     setStates(stateList);
 
@@ -326,36 +293,45 @@ export default function TransferProductForm() {
         }
 
 
-    }, [mode, initialValues, countryList]);
+    }, [mode, countryList]);
 
     const fetchStoreInfo = async (id: string) => {
         try {
-            setIsLookingUp(true)
-            const res =
-                await fetchStoreById(id);
+            setIsLookingUp(true);
 
-            console.log(res, 'mappedStores');
-            const info = res?.data
-            if (Object.keys(res?.data).length > 0) {
-                form.setValue("name", info?.name);
-                form.setValue("phone", info?.phone);
+            const res = await fetchStoreById(id);
+            const info = res?.data;
 
-                form.setValue("email", info?.email);
-                form.setValue("address", info?.registered_address);
+            if (info && Object.keys(info).length > 0) {
+                form.setValue("name", info.name, { shouldValidate: true });
+                form.setValue("phone", info.phone, { shouldValidate: true });
+                form.setValue("email", info.email, { shouldValidate: true });
+                form.setValue("address", info.registered_address, { shouldValidate: true });
+                form.setValue("shipping_address", info.shipping_address, { shouldValidate: true });
+                form.setValue("organization", String(info.organization?.id), { shouldValidate: true });
+                form.setValue("state_id", String(info.state), { shouldValidate: true });
+                form.setValue(
+                    "transfer_date",
+                    new Date().toISOString().split("T")[0],
+                    { shouldValidate: true }
+                );
 
-                form.setValue("shipping_address", info?.shipping_address);
-                form.setValue("organization", String(info?.organization?.id));
-                form.setValue("state_id", String(info?.state));
-
-                form.setValue("transfer_date", new Date()
-                    .toISOString()
-                    .split("T")[0]);
+                // 🔑 CLEAR ERRORS FOR THESE FIELDS
+                form.clearErrors([
+                    "name",
+                    "phone",
+                    "email",
+                    "address",
+                    "shipping_address",
+                    "organization",
+                    "state_id",
+                    "transfer_date",
+                ]);
             }
         } catch (e) {
             console.error(e);
-
         } finally {
-            setIsLookingUp(false)
+            setIsLookingUp(false);
         }
     };
 
@@ -366,7 +342,6 @@ export default function TransferProductForm() {
                 await fetchOrganizationsList({
                 });
             const mappedUsers = res.data
-            console.log(mappedUsers, res, 'mappedUsers');
 
             setOrganizations(mappedUsers);
         } catch (e) {
@@ -382,6 +357,192 @@ export default function TransferProductForm() {
             lastFetchedStoreIdRef.current = null;
         }
     }, [form.watch("store_id")]);
+    const [productFormList, setProductFormList] = useState<{
+        id: string
+        product: string,
+        uom: string
+        available: string
+        salePrice: string
+        qty: string
+
+    }[]>([])
+    function removeProduct(planId: number) {
+        setProductFormList((prev: any) => prev.filter((p: any) => p.id !== planId));
+    }
+
+    const [planErrors, setPlanErrors] = useState<Record<string, string>>({});
+
+    const getPlanCellError = (rowIndex: number, field: string) => {
+        return planErrors[`items.${rowIndex}.${field}`];
+    };
+    const CellError = ({ message }: { message?: string }) => {
+        if (!message) return null;
+
+        return (
+            <div className="absolute right-[-14px] top-1/2 -translate-y-1/2 group " title={message}>
+                <Info className="w-3 h-3 text-red-500 cursor-pointer" />
+
+            </div>
+        );
+    };
+    const clearPlanCellError = (rowIndex: number, field: string) => {
+        setPlanErrors(prev => {
+            const next = { ...prev };
+            delete next[`items.${rowIndex}.${field}`];
+            return next;
+        });
+    };
+    const productColumns = useMemo(() => {
+        return [
+            {
+                key: "product",
+                label: "Product",
+                align: "center",
+                width: "180px",
+            },
+            {
+                key: "uom",
+                label: "Measurement",
+                width: "150px",
+                render: (v: string) => v ?? "-",
+            },
+            {
+                key: "available",
+                label: "In Stock",
+                width: "150px",
+                render: (v: string) => v ?? "-",
+            },
+            {
+                key: "salePrice",
+                label: "Rate",
+                width: "100px",
+                render: (v: string) => v ?? "-",
+            },
+            {
+                key: "qty",
+                label: "Transfer Qty",
+                align: "center",
+                width: "150px",
+                render: (_: any, row: any, rowIndex: number) => {
+                    const error = getPlanCellError(rowIndex, "qty");
+
+                    return (
+                        <div className="relative flex justify-center">
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                value={row.qty}
+                                className={`
+            w-16 border rounded px-1 py-0.5 text-xs text-center
+            ${error ? "border-red-500" : ""}
+          `}
+                                onChange={(e) => {
+                                    let value = e.target.value.replace(/\D/g, "");
+
+                                    // allow empty while typing
+                                    if (value === "") {
+                                        setProductFormList(prev =>
+                                            prev.map(p =>
+                                                p.id === row.id ? { ...p, qty: "" } : p
+                                            )
+                                        );
+                                        return;
+                                    }
+
+                                    let qty = Number(value);
+                                    const available = Number(row.available);
+
+                                    // ❌ qty < 1 → keep error
+                                    if (qty < 1) {
+                                      
+                                        qty = 1;
+                                    }
+
+                                    // ❌ qty > available → keep error
+                                    else if (qty > available) {
+                                       
+                                        qty = available; // 🔒 cap
+                                    }
+
+                                    // ✅ qty valid → NOW remove error
+                                    else {
+                                        clearPlanCellError(rowIndex, "qty");
+                                    }
+
+                                    setProductFormList(prev =>
+                                        prev.map(p =>
+                                            p.id === row.id
+                                                ? { ...p, qty: String(qty) }
+                                                : p
+                                        )
+                                    );
+                                }}
+
+                                onBlur={() => {
+                                    let qty = Number(row.qty);
+                                    const available = Number(row.available);
+
+                                    if (!qty || qty < 1) qty = 1;
+                                    if (qty > available) qty = available;
+
+                                    setProductFormList(prev =>
+                                        prev.map(p =>
+                                            p.id === row.id
+                                                ? { ...p, qty: String(qty) }
+                                                : p
+                                        )
+                                    );
+                                }}
+                            />
+
+                            <CellError message={error} />
+                        </div>
+                    );
+                },
+            },
+            {
+                key: "action",
+                label: "Action",
+                width: "150px",
+                render: (_: any, row: any) => (
+                    <Box className="gap-3">
+                        <IconButton
+                            size="xs"
+                            mr={2}
+                            colorScheme="red"
+                            // disabled={plans.length <= 1}
+                            title="Delete"
+                            aria-label="Delete"
+                            onClick={() => removeProduct(row.id)}
+                        >
+                            <Trash2 size={16} />
+                        </IconButton>
+                    </Box>
+                ),
+            },
+
+
+        ];
+    }, [
+        isView,
+        productFormList.length,
+        setProductFormList,
+        removeProduct,
+    ]);
+    useEffect(() => {
+        form.setValue(
+            "items",
+            productFormList.map(p => ({
+                product_id: String(p.id),
+                qty: Number(p.qty),
+            })),
+            {
+                shouldValidate: true,
+                shouldDirty: true,
+            }
+        );
+    }, [productFormList, form]);
+
     return (
         <>
             <div className=" mx-auto px-3 sm:px-3 py-3 space-y-3">
@@ -565,8 +726,13 @@ export default function TransferProductForm() {
                                                             control={form.control}
                                                             options={categoryOptions}
                                                             onValueChange={() => {
-                                                                form.resetField("brand");
+                                                                form.clearErrors("category"); // 🔑
                                                                 form.resetField("product_id");
+                                                                form.resetField("measurement");
+                                                                form.resetField("qty");
+                                                                form.resetField("rate");
+                                                                form.resetField("description");
+                                                                form.resetField("in_stock");
                                                                 setFilteredProducts([]);
                                                                 setSelectedProduct(null);
                                                             }}
@@ -579,8 +745,19 @@ export default function TransferProductForm() {
                                                             control={form.control}
                                                             options={brandOptions}
                                                             onValueChange={(brand) => {
+                                                                form.clearErrors("brand"); // 🔑
+                                                                form.resetField("product_id");
+                                                                form.resetField("measurement");
+                                                                form.resetField("qty");
+                                                                form.resetField("rate");
+                                                                form.resetField("description");
+                                                                form.resetField("in_stock");
                                                                 const category = form.getValues("category");
-                                                                const products = getProductsByBrand(mockProducts, category, brand as string);
+                                                                const products = getProductsByBrand(
+                                                                    mockProducts,
+                                                                    category ?? "",
+                                                                    brand as string
+                                                                );
                                                                 setFilteredProducts(products);
                                                             }}
                                                         />
@@ -595,19 +772,23 @@ export default function TransferProductForm() {
                                                                 value: String(p.id),
                                                             }))}
                                                             onValueChange={(id) => {
+                                                                form.clearErrors("product_id"); // 🔑
+                                                                form.resetField("measurement");
+                                                                form.resetField("qty");
+                                                                form.resetField("rate");
+                                                                form.resetField("description");
+                                                                form.resetField("in_stock");
+
                                                                 const product = mockProducts.find(p => String(p.id) === id);
                                                                 if (!product) return;
 
                                                                 setSelectedProduct(product);
-                                                                console.log(product, 'productproduct');
 
                                                                 form.setValue("in_stock", product.available);
                                                                 form.setValue("measurement", product.uom);
-
-                                                                form.setValue("qty", '1');
+                                                                form.setValue("qty", "1");
                                                                 form.setValue("rate", product.salePrice);
                                                                 form.setValue("description", product.description);
-                                                                form.clearErrors("qty");
                                                             }}
                                                         />
                                                         <FloatingRHFSelect
@@ -639,18 +820,21 @@ export default function TransferProductForm() {
                                                         />
 
                                                         <FloatingField
+
+                                                            isDisabled={!form.watch("product_id")}
                                                             name="qty"
                                                             label="Qty"
                                                             isRequired
                                                             control={form.control}
                                                             onChange={(e) => {
                                                                 const val = Number(e.target.value);
-                                                                if (val > selectedProduct.available) {
+
+                                                                if (selectedProduct && val > selectedProduct.available) {
                                                                     form.setError("qty", {
                                                                         message: `Max available stock is ${selectedProduct.available}`,
                                                                     });
                                                                 } else {
-                                                                    form.clearErrors("qty");
+                                                                    form.clearErrors("qty"); // 🔑
                                                                 }
                                                             }}
                                                         />
@@ -660,12 +844,40 @@ export default function TransferProductForm() {
                                                             name="description"
                                                             label="Description"
                                                         />
+                                                        <Button
+                                                            type="button"
+                                                            className="h-8 text-xs w-fit"
+                                                            onClick={() => addProductHandler()}
+                                                        >
+                                                            Add Product
+                                                        </Button>
 
                                                     </div>
+                                                    {productFormList.length > 0 && (
+                                                        <div className="flex flex-col ">
+                                                            <CommonTable
+                                                                columns={productColumns}
+                                                                data={productFormList}
+                                                                searchable={false}
+                                                                isAdd={false}
+                                                                isLoading={false}
+                                                                total={productFormList.length}
+                                                                page={1}
+                                                                lastPage={1}
+                                                                hasNext={false}
+                                                            />
+                                                            {form.formState.errors.items && (
+                                                                <p className="text-xs text-red-500 mt-1">
+                                                                    {form.formState.errors.items.message}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    )}
 
 
 
                                                 </SectionCard>
+
                                             </Card>
 
 
@@ -685,7 +897,19 @@ export default function TransferProductForm() {
                                     {(
                                         <Button type="button"
                                             disabled={isLoading || isInfoLoading}
-                                            onClick={form.handleSubmit(handleJobCardSubmission,)}
+                                            onClick={form.handleSubmit(
+                                                handleTransferProductSubmission,
+                                                (errors) => {
+                                                    // 🔥 items error → show toast
+                                                    if (errors.items && form.watch("store_id")) {
+                                                        toast({
+                                                            title: "Product Item Required",
+                                                            description: "Please add at least one product before submitting",
+                                                            variant: "info",
+                                                        });
+                                                    }
+                                                }
+                                            )}
                                             className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] h-8 text-xs">
                                             {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
                                             {isLoading
@@ -698,7 +922,7 @@ export default function TransferProductForm() {
                         </form>
                     </Form>
                 </div>
-                
+
             </div>
         </>
     );
