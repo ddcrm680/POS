@@ -799,8 +799,8 @@ export const StoreSchema = z.object({
   shipping_address: z
     .string()
     .trim()
-    .min(10, "Address must be at least 10 characters")
-    .max(255, "Address must not exceed 255 characters"),
+    .min(10, "Shipping address must be at least 10 characters")
+    .max(255, "Shipping address must not exceed 255 characters"),
   territory_id: z.string().min(1, "Please select location"),
   phone: z.string().max(15),
   gstin_file: fileOrPath
@@ -906,16 +906,34 @@ export const JobCardOnlySchema = z.object({
 
 export const TransferProductSchema = z
   .object({
-  store_id: z.string().min(1, "Store is required"),
+    store_id: z.string().min(1, "Store is required"),
 
-    name: z.string().min(1),
-    phone: z.string().min(10),
-    email: z.string().email(),
-    address: z.string().min(5),
-    shipping_address: z.string(),
+    name: z
+      .string()
+      .trim()
+      .min(5, "Store name must be at least 5 characters")
+      .max(100, "Store name must not exceed 100 characters"),
+
+    phone: z.string().min(10).max(15),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .trim()
+      .email("Please enter a valid email address"),
+    address: z
+      .string()
+      .trim()
+      .min(10, "Address must be at least 10 characters")
+      .max(255, "Address must not exceed 255 characters"),
+    shipping_address: z
+      .string()
+      .trim()
+      .min(10, "Shipping address must be at least 10 characters")
+      .max(255, "Shipping address must not exceed 255 characters"),
     organization: z.string().min(1),
-    transfer_date: z.string().min(1),
-    state_id: z.string().min(1),
+    transfer_date: z.string()
+    .min(1, "Transfer date is required"),
+    state_id: z.string().min(1, "Please select state"),
 
     // 🧱 BUILDER FIELDS (optional now)
     category: z.string().optional(),
