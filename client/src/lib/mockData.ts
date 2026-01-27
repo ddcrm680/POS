@@ -1320,3 +1320,39 @@ export const filterMetaInfo = {
     { label: "Inactive", value: 0 },
   ],
 };
+export const categoryOptions = [
+  { label: "Armor Kits", value: "armor-kits" },
+  { label: "Brushes", value: "brushes" },
+  { label: "Cleaners", value: "cleaners" },
+  { label: "Detailing Accessories", value: "detailing-accessories" },
+];
+
+export const brandOptions = [
+  { label: "Coating Daddy", value: "coating-daddy" },
+  { label: "Detailing Devils", value: "detailing-devils" },
+];
+
+export const storeOptions = [
+  { label: "All Franchise", value: "all-franchise" },
+  { label: "Red Carpet", value: "red-carpet" },
+  { label: "Exclusive", value: "exclusive" },
+];
+
+export const productTagOptions = [
+  { label: "New", value: "new" },
+  { label: "Regular", value: "regular" },
+  { label: "Upcoming", value: "upcoming" },
+  { label: "Best Seller", value: "best-seller" },
+];
+
+export const productTypeOptions = [
+  { label: "Product", value: "product" },
+  { label: "Composite", value: "composite" },
+];
+
+export const measurementTypeOptions = [
+  { label: "Ltr", value: "ltr" },
+  { label: "ML", value: "ml" },
+  { label: "Kg", value: "kg" },
+  { label: "Gm", value: "gm" },
+];

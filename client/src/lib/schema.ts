@@ -361,6 +361,32 @@ export const productCountSchema = (initialValues: any) =>
       .or(z.literal("")),
   });
 
+export const ProductSchema = z.object({
+  category_id: z.string().min(1, "Category is required"),
+  brand_id: z.string().min(1, "Brand is required"),
+  product_name: z.string().min(1, "Product name is required"),
+  hsn: z.string().optional(),
+  gst: z.coerce.string().min(0),
+  video_url: z.string().url().optional(),
+  tag: z.string().min(1),
+  store: z.string().min(1),
+  type: z.string().min(1),
+
+  measurement_type: z.string().min(1),
+  measurement_value: z.string().min(1),
+  purchase_price: z.coerce.string(),
+  sale_price: z.coerce.string(),
+  stock_qty: z.coerce.string().min(0),
+  composite_items: z.string().optional(),
+  variant_description: z.string().min(1),
+
+  description: z.string().min(1),
+  dimensions: z.string().optional(),
+  features: z.string().optional(),
+
+  images: z.any().refine(v => v?.length > 0, "At least one image required"),
+});
+
 export const passwordSchema = z
   .object({
     currentPassword: z.string().min(8, "Current password must be at least 8 characters").max(32, "Current password must be at most 32 characters")

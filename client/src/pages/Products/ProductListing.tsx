@@ -663,7 +663,7 @@ export default function ProductsListing() {
                         columns={columns}
                         isClear={false}
                         data={products}
-                        isAdd={true}
+                        isAdd={false}
                         perPage={perPage}
                         setPerPage={setPerPage}
                         resetFilter={resetFilter}
@@ -671,7 +671,7 @@ export default function ProductsListing() {
                         total={total}
                         hasNext={has_next}
                         tabType=""
-                        tabDisplayName="Products / Stock"
+                        tabDisplayName="Products "
                         page={page}
                         setPage={setPage}
                         lastPage={lastPage}
@@ -683,31 +683,29 @@ export default function ProductsListing() {
                             // }
                         }}
                         setIsModalOpen={(value: boolean) => {
-                            // localStorage.removeItem('sidebar_active_parent')
-                            // navigate(`/job-cards/manage`)
+                            localStorage.removeItem('sidebar_active_parent')
+                            navigate("/products/product-listing/manage")
                         }}
                         actions={(row: any) => (
-                            <CommonRowMenu
-                                items={[
-                                    {
-                                        key: "view",
-                                        label: "View ",
-                                        icon: <EyeIcon size={16} />,
-                                        onClick: () => {
-                                            // navigate(`/customers/view?id=${row.id}`)
-                                        },
-                                    },
-                                    {
-                                        key: "edit",
-                                        label: "Edit ",
-                                        icon: <EditIcon size={16} />,
-                                        onClick: () => {
-                                            //  navigate(`/customers/manage?id=${row.id}&mode=edit`)
-                                        },
-                                    },
+                            <Box className="gap-0">
+                                {row.status !== "cancelled" ? (
+                                    <IconButton
+                                        size="xs"
+                                        // mr={2}
+                                        title="View "
 
-                                ]}
-                            />
+                                        aria-label="View"
+                                        onClick={() => {
+                                            //   setIsPaymentDeleteModalOpenInfo({ open: true, info: row })
+                                        }}
+                                    >
+                                        <EyeIcon size={16} />
+                                    </IconButton>
+                                ) : (
+                                    "-"
+                                )}
+                            </Box>
+
                         )}
 
                     />
