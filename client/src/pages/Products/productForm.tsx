@@ -15,7 +15,6 @@ import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useSearchParams } from "wouter";
 import { brandOptions, categoryOptions, measurementTypeOptions, productTagOptions, productTypeOptions, storeOptions } from "@/lib/mockData";
-import { RichTextEditor } from "@/components/common/RichTextEditor";
 
 export default function ProductForm() {
 
@@ -131,8 +130,6 @@ export default function ProductForm() {
                     <Card>
                         <SectionCard className="pb-4" title="More Details">
                             <div className="grid md:grid-cols-2 gap-4">
-                                <RichTextEditor name="dimensions" label="Product Dimensions" control={form.control} />
-                                <RichTextEditor name="features" label="Product Features" control={form.control} />
                             </div>
                         </SectionCard>
                     </Card>
