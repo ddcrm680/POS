@@ -903,34 +903,62 @@ export const JobCardOnlySchema = z.object({
     .string()
     .min(1, "Service date is required"),
 });
-// export const JobCardOnlySchema = z
-//   .object({
 
-//     consumer_id: z.string().optional(),
-//     service_type: z.array(z.string()).min(1, "Select at least one service type"),
-//     vehicle_company_id: z.string().min(1),
-//     vehicle_model_id: z.string().min(1),
-//     color: z.string().min(1),
-//     year: z.string().min(1),
-//     reg_no: z.string().min(1),
+export const TransferProductSchema = z.object({
+  /* ================= STORE INFO ================= */
+  store_id: z.string().min(1, "Store is required"),
 
-//     chasis_no: z.string().optional(),
-//     vehicle_condition: z.string().min(1),
+  name: z.string().min(1, "Name is required"),
+  phone: z.string().min(10, "Valid contact number is required"),
+  email: z.string().email("Invalid email address"),
+  address: z.string().min(5, "Address is required"),
+  shipping_address: z.string().min(5, "Shipping address is required"),
 
-//     store_id: z.string().optional(), // 🔑 optional, enforced below
+  organization: z.string().min(1, "Organization is required"),
 
-//     remarks: z.string().optional(),
+  transfer_date: z
+    .string()
+    .min(1, "Transfer date is required"),
 
-//     isRepainted: z.boolean().optional(),
+  /* ================= ITEM DETAIL ================= */
+  category: z.string().min(1, "Category is required"),
 
-//     isSingleStagePaint: z.boolean().optional(),
-//     isPaintThickness: z.boolean().optional(),
-//     isVehicleOlder: z.boolean().optional(),
+  brand: z.string().min(1, "Brand is required"),
 
-//     vehicle_type: z.string().min(1),
-//     service_ids: z.array(z.string()).min(1, "Select at least one service"),
-//     jobcard_date: z.string().min(1, "Service date required"),
-//   })
+  product_id: z.string().min(1, "Product is required"),
+
+  measurement: z.string().min(1, "Measurement is required"), // auto-filled
+  in_stock: z.coerce.number().optional(), // auto-filled
+  rate: z.coerce.number().optional(), // auto-filled
+
+    state_id: z
+      .string()
+      .min(1, "Please select state"),
+
+  qty: z
+    .coerce
+    .string()
+    .min(1, "Quantity must be greater than 0"),
+
+  description: z.string().optional(),
+
+})
+.superRefine((data, ctx) => {
+  /* ================= STOCK VALIDATION ================= */
+  if (
+    typeof data.in_stock === "number" &&
+    typeof data.qty === "number" &&
+    data.qty > data.in_stock
+  ) {
+    ctx.addIssue({
+      path: ["qty"],
+      message: `Quantity cannot exceed available stock (${data.in_stock})`,
+      code: z.ZodIssueCode.custom,
+    });
+  }
+});
+
+export type TransferProductFormValues = z.infer<typeof TransferProductSchema>;
 
 export const NewJobCardSchema = z
   .object({

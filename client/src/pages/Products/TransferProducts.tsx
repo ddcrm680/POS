@@ -171,8 +171,8 @@ const columns = useMemo(() => [
               // }
             }}
             setIsModalOpen={(value: boolean) => {
-              // localStorage.removeItem('sidebar_active_parent')
-              // navigate(`/job-cards/manage`)
+              localStorage.removeItem('sidebar_active_parent')
+              navigate(`/products/transfer-stock/manage`)
             }}
             actions={(row: any) => (
               <Box className="gap-0">

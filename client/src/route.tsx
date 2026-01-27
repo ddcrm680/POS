@@ -38,6 +38,7 @@ import JobCardView from "./pages/JobCard/JobCardView";
 import InvoiceView from "./pages/Invoices/InvoiceView";
 import Products from "./pages/Products/products";
 import ProductForm from "./pages/Products/productForm";
+import TransferStockForm from "./pages/Products/transferProductForm";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -61,6 +62,8 @@ export function Router() {
         <Route path="/products" component={() => <ProtectedRoute component={Products} 
       />} />
        <Route path="/products/product-listing/manage" component={() => <ProtectedRoute component={ProductForm} 
+      />} />
+         <Route path="/products/transfer-stock/manage" component={() => <ProtectedRoute component={TransferStockForm} 
       />} />
         <Route path="/stores" component={() => <ProtectedRoute component={StoreList} 
       />} />

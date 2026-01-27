@@ -1185,8 +1185,8 @@ export const mockProducts = [
     visibility: 1,
 
     image: "https://picsum.photos/seed/brush/60/60",
-    brand: "Detailing Devils",
-    category: "Detailing Accessories",
+    brand: "detailing-devils",
+    category: "detailing-accessories",
     product: "Brush",
     hsn: "34021110",
     gst: 18,
@@ -1194,8 +1194,9 @@ export const mockProducts = [
     uom: "2 ML",
     salePrice: 32,
     purchasePrice: 222,
-    type: "Product",
-    store: "ALL",
+    type: "product",
+    store: "all-franchise",
+    description:"",
     tag: "regular",
     status: 1,
 
@@ -1210,33 +1211,35 @@ export const mockProducts = [
     visibility: 1,
 
     image: "https://picsum.photos/seed/armor/60/60",
-    brand: "Detailing Devils",
-    category: "Armor Kits",
+    brand: "detailing-devils",
+    category: "armor-kits",
     product: "Armor Composite",
     hsn: "34021110",
     gst: 18,
+    description:"",
     qty: 50,
     uom: "100 ML",
     salePrice: 10000,
     purchasePrice: 5000,
-    type: "Composite",
-    store: "ALL",
+    type: "composite",
+    store: "all-franchise",
     tag: "regular",
     status: 1,
 
     onSell: 50,
-    available: 0,
+    available: 4,
     totalQty: 50,
   },
 
   {
     id: 3,
     createdAt: "2025-01-15T09:25:00Z",
-    visibility: 0,
+    visibility: 1,
 
+    description:"test",
     image: "https://picsum.photos/seed/cleaner/60/60",
-    brand: "Detailing Devils",
-    category: "Cleaners",
+    brand: "detailing-devils",
+    category: "cleaners",
     product: "Composite New 2",
     hsn: "CDOPP",
     gst: 28,
@@ -1244,8 +1247,8 @@ export const mockProducts = [
     uom: "1 Pkt",
     salePrice: 7689,
     purchasePrice: 43243,
-    type: "Composite",
-    store: "ALL",
+    type: "composite",
+    store: "all-franchise",
     tag: "new",
     status: 1,
 
@@ -1259,9 +1262,10 @@ export const mockProducts = [
     createdAt: "2025-01-18T18:10:00Z",
     visibility: 1,
 
+    description:"test",
     image: "https://picsum.photos/seed/brush2/60/60",
-    brand: "Detailing Devils",
-    category: "Brushes",
+    brand: "detailing-devils",
+    category: "brushes",
     product: "Composite Product 98",
     hsn: "CDOPP",
     gst: 26,
@@ -1269,8 +1273,8 @@ export const mockProducts = [
     uom: "34 Kg",
     salePrice: 4354353,
     purchasePrice: 545435,
-    type: "Product",
-    store: "ALL",
+    type: "product",
+    store: "all-franchise",
     tag: "regular",
     status: 1,
 
@@ -1281,6 +1285,43 @@ export const mockProducts = [
 ];
 
 
+export const categoryOptions = [
+  { label: "Armor Kits", value: "armor-kits" },
+  { label: "Brushes", value: "brushes" },
+  { label: "Cleaners", value: "cleaners" },
+  { label: "Detailing Accessories", value: "detailing-accessories" },
+];
+
+export const brandOptions = [
+  { label: "Coating Daddy", value: "coating-daddy" },
+  { label: "Detailing Devils", value: "detailing-devils" },
+];
+
+export const storeOptions = [
+  { label: "All Franchise", value: "all-franchise" },
+  { label: "Red Carpet", value: "red-carpet" },
+  { label: "Exclusive", value: "exclusive" },
+];
+
+export const productTagOptions = [
+  { label: "New", value: "new" },
+  { label: "Regular", value: "regular" },
+  { label: "Upcoming", value: "upcoming" },
+  { label: "Best Seller", value: "best-seller" },
+];
+
+export const productTypeOptions = [
+  { label: "Product", value: "product" },
+  { label: "Composite", value: "composite" },
+];
+
+export const measurementTypeOptions = [
+  { label: "Ltr", value: "ltr" },
+  { label: "ML", value: "ml" },
+  { label: "Kg", value: "kg" },
+  { label: "Gm", value: "gm" },
+];
+// src/lib/mockData.ts
 export const filterMetaInfo = {
   brand: [
     { label: "Detailing Devils", value: "Detailing Devils" },
@@ -1320,44 +1361,6 @@ export const filterMetaInfo = {
     { label: "Inactive", value: 0 },
   ],
 };
-export const categoryOptions = [
-  { label: "Armor Kits", value: "armor-kits" },
-  { label: "Brushes", value: "brushes" },
-  { label: "Cleaners", value: "cleaners" },
-  { label: "Detailing Accessories", value: "detailing-accessories" },
-];
-
-export const brandOptions = [
-  { label: "Coating Daddy", value: "coating-daddy" },
-  { label: "Detailing Devils", value: "detailing-devils" },
-];
-
-export const storeOptions = [
-  { label: "All Franchise", value: "all-franchise" },
-  { label: "Red Carpet", value: "red-carpet" },
-  { label: "Exclusive", value: "exclusive" },
-];
-
-export const productTagOptions = [
-  { label: "New", value: "new" },
-  { label: "Regular", value: "regular" },
-  { label: "Upcoming", value: "upcoming" },
-  { label: "Best Seller", value: "best-seller" },
-];
-
-export const productTypeOptions = [
-  { label: "Product", value: "product" },
-  { label: "Composite", value: "composite" },
-];
-
-export const measurementTypeOptions = [
-  { label: "Ltr", value: "ltr" },
-  { label: "ML", value: "ml" },
-  { label: "Kg", value: "kg" },
-  { label: "Gm", value: "gm" },
-];
-// src/lib/mockData.ts
-
 export const transferProductsMockData = [
   {
     id: 1,
