@@ -71,6 +71,16 @@ export type editUserReq = {
     address?: string | undefined;
   };
 }
+
+export type productCountHandler={
+  type:string
+  id:string
+  info:{
+    count:string
+    remarks?:string
+  }
+}
+export type ProductModalInfo={ open: boolean, info: any, type: string, subOpnType: string }
 export type editServicePlanReq = {
 
   info: {
@@ -259,6 +269,10 @@ export type UserFormType = {
   role_id: number;
   address?: string | undefined;
 }
+export type ProductFormType = {
+count:string
+remarks?:string
+}
 export type systemLogType = {
   action: string
   description: string
@@ -292,7 +306,19 @@ export type serviceFormType = {
   description?: string | null;
   raw_materials?: string[];
 };
+export interface ProductModalInterface {
+  roles: any[];
+  id?: string;
+  initialValues: ProductModalInfo;
+  isLoading?: boolean;
+  onClose: () => void;
 
+  // 👇 IMPORTANT
+  onSubmit: (
+    values: ProductFormType,
+    setError: UseFormSetError<ProductFormType>
+  ) => void;
+}
 export interface userFormProp {
   mode: "create" | "edit" | "view";
   roles: any[];

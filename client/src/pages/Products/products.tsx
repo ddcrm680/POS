@@ -7,12 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
-import Store from "../masters/store/store";
-import Users from "../masters/user/users";
-import TransferProducts from "./TransferProducts";
 import ProductsListing from "./ProductListing";
 
-const MASTER_TAB_KEY = "master_active_tab";
+const Product_TAB_KEY = "product_active_tab";
 
 export default function Products() {
   const [activeTab, setActiveTab] = useState<string>("products-listing");
@@ -24,14 +21,14 @@ export default function Products() {
   }, [user])
   /* 🔹 Load tab from localStorage on mount */
   useEffect(() => {
-    const savedTab = localStorage.getItem(MASTER_TAB_KEY);
+    const savedTab = localStorage.getItem(Product_TAB_KEY);
     if (savedTab) {
       setActiveTab(savedTab);
     }
     return () => {
-      const isOnMasterRoute = location.startsWith("/products");
+      const isOnProductRoute = location.startsWith("/products");
 
-      if (!isOnMasterRoute) {
+      if (!isOnProductRoute) {
         setActiveTab("products-listing")
       }
     }
@@ -40,9 +37,9 @@ export default function Products() {
   /* 🔹 Save tab whenever it changes */
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    localStorage.setItem(MASTER_TAB_KEY, value);
+    localStorage.setItem(Product_TAB_KEY, value);
     
-  localStorage.setItem("sidebar_active_parent", "master");
+  localStorage.setItem("sidebar_active_parent", "products");
   };
 
   return (

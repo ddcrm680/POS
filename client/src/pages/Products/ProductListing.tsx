@@ -7,8 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getConsumer, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
-import { TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
+import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getConsumer, ProductCountHelper, SaveUser, UpdateProductStatus, UpdateTerritoryStatus, UpdateUserStatus } from "@/lib/api";
+import { ProductFormType, ProductModalInfo, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
 import { EditIcon, EyeIcon, Trash2 } from "lucide-react";
@@ -19,16 +19,18 @@ import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, filterMetaInfo, mockProducts, territoryMasterMockData } from "@/lib/mockData";
 import CommonRowMenu from "@/components/common/CommonRowMenu";
 import { Kpi } from "../Customer/DashboardCards";
+import ProductSellStockCountHandlerModal from "./ProductSellStockCountHandlerModal";
 
 export default function ProductsListing() {
     const { toast } = useToast();
 
     const { roles } = useAuth();
     const [products, setProducts] = useState(mockProducts);
-    const [productListingModalInfo, setProductListingModalInfo] = useState<{ open: boolean, info: any, type: string }>({
+    const [productListingModalInfo, setProductListingModalInfo] = useState<ProductModalInfo>({
         open: false,
         info: {},
-        type: ""
+        type: "",
+        subOpnType: ""
     });
     const [perPage, setPerPage] = useState(10);
     const [total, setTotal] = useState(0);
@@ -79,12 +81,115 @@ export default function ProductsListing() {
             setIsLoading(false);
         }
     };
+    const qtyBtnBase =
+        "h-5 w-5 flex items-center justify-center rounded-full border text-xs font-semibold transition";
+    const ProductStatusUpdateHandler = useCallback(
+        async (row: any) => {
+            const newValue = row.status === 1 ? 0 : 1;
+
+            try {
+                // optimistic UI update
+                setProducts(prev =>
+                    prev.map(p =>
+                        p.id === row.id ? { ...p, status: newValue } : p
+                    )
+                );
+
+                // await UpdateProductStatus({
+                //     id: row.id,
+                //     status: newValue,
+                //     type: "status", // 👈 KEY
+                // });
+
+                toast({
+                    title: "Status Updated",
+                    description: "Product status updated successfully",
+                    variant: "success",
+                });
+            } catch (err: any) {
+                // rollback
+                setProducts(prev =>
+                    prev.map(p =>
+                        p.id === row.id ? { ...p, status: row.status } : p
+                    )
+                );
+
+                toast({
+                    title: "Error",
+                    description:
+                        err?.response?.data?.message ||
+                        err.message ||
+                        "Failed to update status",
+                    variant: "destructive",
+                });
+            }
+        },
+        []
+    );
+
+    const ProductVisibilityUpdateHandler = useCallback(
+        async (row: any) => {
+            const newValue = row.visibility === 1 ? 0 : 1;
+
+            try {
+                // optimistic UI update
+                setProducts(prev =>
+                    prev.map(p =>
+                        p.id === row.id ? { ...p, visibility: newValue } : p
+                    )
+                );
+
+                // await UpdateProductStatus({
+                //     id: row.id,
+                //     status: newValue,
+                //     type: "visibility", // 👈 KEY
+                // });
+
+                toast({
+                    title: "Visibility Updated",
+                    description: "Product visibility updated successfully",
+                    variant: "success",
+                });
+            } catch (err: any) {
+                // rollback on failure
+                setProducts(prev =>
+                    prev.map(p =>
+                        p.id === row.id ? { ...p, visibility: row.visibility } : p
+                    )
+                );
+
+                toast({
+                    title: "Error",
+                    description:
+                        err?.response?.data?.message ||
+                        err.message ||
+                        "Failed to update visibility",
+                    variant: "destructive",
+                });
+            }
+        },
+        []
+    );
+    const canSellIncr = (row: any) =>
+        row.totalQty - row.onSell > 0;
+
+    const canSellDecr = (row: any) =>
+        row.onSell > 0;
+
+    const canStockIncr = (_row: any) =>
+        true;
+
+    const canStockDecr = (row: any) =>
+        row.available > 0;
+    const qtyBtnDisabled =
+        "opacity-40 cursor-not-allowed hover:bg-transparent";
+
     const columns = useMemo(() => [
         {
             key: "createdAt",
             label: "Created On",
             align: "center",
-            width: "120px",
+            width: "160px",
             render: (_value: any) => (
                 <Box className="flex flex-col justify-center items-center">
                     <span className="font-bold">{formatDate(_value)}</span>
@@ -174,7 +279,7 @@ export default function ProductsListing() {
                     options={[{ label: "All", value: "" }, ...filterMetaInfo.tag]}
                 />
             ),
-            width: "130px",
+            width: "120px",
             render: (value: string) => (
                 <Badge
                     className={`px-3 py-1 text-xs font-medium rounded-full
@@ -209,82 +314,122 @@ export default function ProductsListing() {
         {
             key: "onSell",
             label: "On Sell",
-            width: "120px",
+            width: "100px",
             align: "center",
-            render: (val: number, row: any) => (
-                <div className="flex items-center justify-center gap-2">
-                    <button
-                        className="px-2 py-0.5 bg-rose-500 text-white rounded"
-                        onClick={() =>
-                            setProducts(p =>
-                                p.map(r =>
-                                    r.id === row.id
-                                        ? { ...r, onSell: Math.max(0, r.onSell - 1) }
-                                        : r
-                                )
-                            )
-                        }
-                    >
-                        −
-                    </button>
-                    <span>{val}</span>
-                    <button
-                        className="px-2 py-0.5 bg-indigo-500 text-white rounded"
-                        onClick={() =>
-                            setProducts(p =>
-                                p.map(r =>
-                                    r.id === row.id
-                                        ? { ...r, onSell: r.onSell + 1 }
-                                        : r
-                                )
-                            )
-                        }
-                    >
-                        +
-                    </button>
-                </div>
-            ),
-        },
+            render: (val: number, row: any) => {
+                const disableDecr = !canSellDecr(row);
+                const disableIncr = !canSellIncr(row);
+
+                return (
+                    <div className="flex items-center justify-center gap-2">
+                        <button
+                            disabled={disableDecr}
+                            className={`
+            ${qtyBtnBase}
+            border-rose-200 text-rose-600
+            ${disableDecr ? qtyBtnDisabled : "hover:bg-rose-50"}
+          `}
+                            onClick={() =>
+                                !disableDecr &&
+                                setProductListingModalInfo({
+                                    open: true,
+                                    info: row,
+                                    type: "sell",
+                                    subOpnType: "Decr",
+                                })
+                            }
+                        >
+                            −
+                        </button>
+
+                        <span className="min-w-[24px] text-center text-sm font-medium text-slate-700">
+                            {val}
+                        </span>
+
+                        <button
+                            disabled={disableIncr}
+                            className={`
+            ${qtyBtnBase}
+            border-emerald-200 text-emerald-600
+            ${disableIncr ? qtyBtnDisabled : "hover:bg-emerald-50"}
+          `}
+                            onClick={() =>
+                                !disableIncr &&
+                                setProductListingModalInfo({
+                                    open: true,
+                                    info: row,
+                                    type: "sell",
+                                    subOpnType: "Incr",
+                                })
+                            }
+                        >
+                            +
+                        </button>
+                    </div>
+                );
+            },
+        }
+        ,
 
         {
             key: "available",
             label: "Available Stock",
-            width: "150px",
+            width: "100px",
             align: "center",
-            render: (val: number, row: any) => (
-                <div className="flex items-center justify-center gap-2">
-                    <button
-                        className="px-2 py-0.5 bg-rose-500 text-white rounded"
-                        onClick={() =>
-                            setProducts(p =>
-                                p.map(r =>
-                                    r.id === row.id
-                                        ? { ...r, available: Math.max(0, r.available - 1) }
-                                        : r
-                                )
-                            )
-                        }
-                    >
-                        −
-                    </button>
-                    <span>{val}</span>
-                    <button
-                        className="px-2 py-0.5 bg-indigo-500 text-white rounded"
-                        onClick={() =>
-                            setProducts(p =>
-                                p.map(r =>
-                                    r.id === row.id
-                                        ? { ...r, available: r.available + 1 }
-                                        : r
-                                )
-                            )
-                        }
-                    >
-                        +
-                    </button>
-                </div>
-            ),
-        },
+            render: (val: number, row: any) => {
+                const disableDecr = !canStockDecr(row);
+                const disableIncr = !canStockIncr(row);
+
+                return (
+                    <div className="flex items-center justify-center gap-2">
+                        <button
+                            disabled={disableDecr}
+                            className={`
+            ${qtyBtnBase}
+            border-rose-200 text-rose-600
+            ${disableDecr ? qtyBtnDisabled : "hover:bg-rose-50"}
+          `}
+                            onClick={() =>
+                                !disableDecr &&
+                                setProductListingModalInfo({
+                                    open: true,
+                                    info: row,
+                                    type: "stock",
+                                    subOpnType: "Decr",
+                                })
+                            }
+                        >
+                            −
+                        </button>
+
+                        <span className="min-w-[24px] text-center text-sm font-medium text-slate-700">
+                            {val}
+                        </span>
+
+                        <button
+                            disabled={disableIncr}
+                            className={`
+            ${qtyBtnBase}
+            border-emerald-200 text-emerald-600
+            ${disableIncr ? qtyBtnDisabled : "hover:bg-emerald-50"}
+          `}
+                            onClick={() =>
+                                !disableIncr &&
+                                setProductListingModalInfo({
+                                    open: true,
+                                    info: row,
+                                    type: "stock",
+                                    subOpnType: "Incr",
+                                })
+                            }
+                        >
+                            +
+                        </button>
+                    </div>
+                );
+            },
+        }
+        ,
         {
             key: "visibility",
             label: (
@@ -302,19 +447,17 @@ export default function ProductsListing() {
             render: (val: number, row: any) => (
                 <Switch.Root
                     checked={val === 1}
-                    onCheckedChange={() =>
-                        setProducts(p =>
-                            p.map(r =>
-                                r.id === row.id ? { ...r, visibility: r.visibility ? 0 : 1 } : r
-                            )
-                        )
-                    }
+                    onCheckedChange={() => ProductVisibilityUpdateHandler(row)}
                 >
                     <Switch.HiddenInput />
-                    <Switch.Control bg="#fca5a5" _checked={{ bg: "#22c55e" }} />
+                    <Switch.Control
+                        bg="#fca5a5"
+                        _checked={{ bg: "#22c55e" }}
+                    />
                 </Switch.Root>
             ),
-        },
+        }
+        ,
 
         {
             key: "status",
@@ -333,23 +476,111 @@ export default function ProductsListing() {
             render: (val: number, row: any) => (
                 <Switch.Root
                     checked={val === 1}
-                    onCheckedChange={() =>
-                        setProducts(p =>
-                            p.map(r =>
-                                r.id === row.id ? { ...r, status: r.status ? 0 : 1 } : r
-                            )
-                        )
-                    }
+                    onCheckedChange={() => ProductStatusUpdateHandler(row)}
                 >
                     <Switch.HiddenInput />
-                    <Switch.Control bg="#fca5a5" _checked={{ bg: "#22c55e" }} />
+                    <Switch.Control
+                        bg="#fca5a5"
+                        _checked={{ bg: "#22c55e" }}
+                    />
                 </Switch.Root>
             ),
-        },
+        }
+        ,
     ], [filters, page]);
 
 
+    const ProductCommonCountHandler = async (
+        value: ProductFormType,
+        setError: UseFormSetError<ProductFormType>
+    ) => {
+        try {
+            setIsLoading(true);
+            // await ProductCountHelper({
+            //     id: productListingModalInfo.info.id,
+            //     type: productListingModalInfo.type,
+            //     info: {
+            //         remarks: value.remarks,
+            //         count: value.count
+            //     },
+            // });
+            const count = Number(value.count);
+            const { info, type, subOpnType } = productListingModalInfo;
 
+            setProducts(prev =>
+                prev.map(p => {
+                    if (p.id !== info.id) return p;
+
+                    let updated = { ...p };
+
+                    // ---- SELL LOGIC ----
+                    if (type === "sell") {
+                        if (subOpnType === "Incr") {
+                            updated.onSell = p.onSell + count;
+                        } else {
+                            updated.onSell = p.onSell - count;
+                        }
+                    }
+
+                    // ---- STOCK LOGIC ----
+                    if (type === "stock") {
+                        if (subOpnType === "Incr") {
+                            updated.available = p.available + count;
+                        } else {
+                            updated.available = p.available - count;
+                        }
+                    }
+
+                    // ---- KEEP TOTAL CONSISTENT ----
+                    updated.totalQty = updated.onSell + updated.available;
+
+                    return updated;
+                })
+            );
+
+            toast({
+                title: `Update ${type === "sell" ? "Sell" : "Stock"}`,
+                description: `${type === "sell" ? "Sell" : "Stock"} quantity updated successfully`,
+                variant: "success",
+            });
+
+            setProductListingModalInfo({
+                open: false,
+                info: {},
+                type: "",
+                subOpnType: "",
+            });
+        } catch (err: any) {
+            const apiErrors = err?.response?.data?.errors;
+
+
+            // 👇 THIS IS THE KEY PART
+            if (apiErrors && err?.response?.status === 422) {
+                Object.entries(apiErrors).forEach(([field, messages]) => {
+                    setError(field as keyof ProductFormType, {
+                        type: "server",
+                        message: (messages as string[])[0],
+                    });
+                });
+                return;
+            }
+            if (err?.response?.status === 403) {
+                setProductListingModalInfo({ open: false, info: {}, type: "", subOpnType: "" })
+
+
+            }
+            toast({
+                title: "Error",
+                description:
+                    err?.message ||
+                    `Failed to ${productListingModalInfo.subOpnType === "Incr" ? "increase" : "decrease"} ${productListingModalInfo.type === "sell" ? "sell" : "stock"
+                    } quantity`,
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
 
     const fetchCustomer = async (isLoaderHide = false) => {
@@ -452,8 +683,8 @@ export default function ProductsListing() {
                             // }
                         }}
                         setIsModalOpen={(value: boolean) => {
-                            localStorage.removeItem('sidebar_active_parent')
-                            navigate(`/job-cards/manage`)
+                            // localStorage.removeItem('sidebar_active_parent')
+                            // navigate(`/job-cards/manage`)
                         }}
                         actions={(row: any) => (
                             <CommonRowMenu
@@ -462,14 +693,17 @@ export default function ProductsListing() {
                                         key: "view",
                                         label: "View ",
                                         icon: <EyeIcon size={16} />,
-                                        onClick: () => navigate(`/customers/view?id=${row.id}`),
+                                        onClick: () => {
+                                            // navigate(`/customers/view?id=${row.id}`)
+                                        },
                                     },
                                     {
                                         key: "edit",
                                         label: "Edit ",
                                         icon: <EditIcon size={16} />,
-                                        onClick: () =>
-                                            navigate(`/customers/manage?id=${row.id}&mode=edit`),
+                                        onClick: () => {
+                                            //  navigate(`/customers/manage?id=${row.id}&mode=edit`)
+                                        },
                                     },
 
                                 ]}
@@ -478,17 +712,30 @@ export default function ProductsListing() {
 
                     />
                     <CommonModal
-                        width={'80%'}
-                        maxWidth={'80%'}
+                        width={'35%'}
+                        maxWidth={'35%'}
                         isOpen={productListingModalInfo.open}
-                        onClose={() => setProductListingModalInfo({ open: false, info: {}, type: "" })}
+                        onClose={() => setProductListingModalInfo({ open: false, info: {}, type: "", subOpnType: "" })}
                         title={`Update ${productListingModalInfo.type === "sell" ? "Sell Qty" : "Stock Qty"}`}
                         isLoading={isLoading}
                         primaryText={"Update"}
                         cancelTextClass='hover:bg-[#E3EDF6] hover:text-[#000]'
                         primaryColor="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
                     >
-
+                        <ProductSellStockCountHandlerModal
+                            id="product-form"
+                            initialValues={
+                                productListingModalInfo
+                            }
+                            isLoading={isLoading}
+                            onClose={() =>
+                                setProductListingModalInfo({ open: false, info: {}, type: "", subOpnType: "" })
+                            }
+                            roles={roles}
+                            onSubmit={(values, setError) => {
+                                ProductCommonCountHandler(values, setError);
+                            }}
+                        />
                     </CommonModal>
                     <CommonDeleteModal
                         width="330px"

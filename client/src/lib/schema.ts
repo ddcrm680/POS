@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { serviceFormType, serviceMetaInfoType } from "./types";
+import { ProductModalInfo, serviceFormType, serviceMetaInfoType } from "./types";
 export const CustomerSchema = z.object({
   id: z.string().uuid().default(() => crypto.randomUUID()),
   phoneNumber: z.string().max(15),
@@ -301,6 +301,64 @@ export const userSchema = (mode: "create" | "edit" | "view") =>
       .optional()
       .or(z.literal("")),
 
+  });
+
+export const productCountSchema = (initialValues: any) =>
+  z.object({
+    count: z
+      .string()
+      .min(1, "Count is required")
+      .refine((val) => Number(val) > 0, {
+        message: "Count must be greater than zero",
+      })
+      .refine((val) => {
+        const count = Number(val);
+        const { type, subOpnType, info } = initialValues;
+
+        if (type === "sell") {
+          if (subOpnType === "Incr") {
+            return count <= info.totalQty - info.onSell;
+          }
+          if (subOpnType === "Decr") {
+            return count <= info.onSell;
+          }
+        }
+
+        if (type === "stock" && subOpnType === "Decr") {
+          return count <= info.available;
+        }
+
+        return true;
+      }, (val) => {
+        const { type, subOpnType, info } = initialValues;
+
+        if (type === "sell" && subOpnType === "Incr") {
+          return {
+            message: `Maximum allowed increment: ${info.totalQty - info.onSell}`,
+          };
+        }
+
+        if (type === "sell" && subOpnType === "Decr") {
+          return {
+            message: `Max allowed reduction: ${info.onSell}`,
+          };
+        }
+
+        if (type === "stock" && subOpnType === "Decr") {
+          return {
+            message: `Max allowed reduction: ${info.available}`,
+          };
+        }
+
+        return { message: "Invalid count" };
+      }),
+
+    remarks:  z.string()
+      .trim()
+      .min(10, "Remarks must be at least 10 characters")
+      .max(300, "Remarks must not exceed 300 characters")
+      .optional()
+      .or(z.literal("")),
   });
 
 export const passwordSchema = z
