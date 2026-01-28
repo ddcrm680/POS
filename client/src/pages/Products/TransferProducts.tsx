@@ -79,8 +79,11 @@ const columns = useMemo(() => [
     key: "transfer_id",
     label: "Transfer ID",
     width: "180px",
-    render: (val: string) => (
-      <span className="text-blue-600 font-medium cursor-pointer hover:underline">
+    render: (val: string,row:any) => (
+      <span className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={() => {
+                                            localStorage.removeItem('sidebar_active_parent')
+              navigate(`/products/transfer-stock/view?id=${row.id}`)
+                                        }}>
         {val}
       </span>
     ),
@@ -184,7 +187,8 @@ const columns = useMemo(() => [
 
                                         aria-label="View"
                                         onClick={() => {
-                                            //   setIsPaymentDeleteModalOpenInfo({ open: true, info: row })
+                                            localStorage.removeItem('sidebar_active_parent')
+              navigate(`/products/transfer-stock/view?id=${row.id}`)
                                         }}
                                     >
                                         <EyeIcon size={16} />

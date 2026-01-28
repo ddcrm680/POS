@@ -1407,3 +1407,35 @@ export const transferProductsMockData = [
     total_amount: 0,
   },
 ];
+// mockTransferStockResponse.ts
+export const mockTransferStockResponse = {
+  id: 12,
+  store: {
+    id: "5",
+    name: "DD Haldwani",
+    phone: "9643147619",
+    email: "dd-haldwani@gmail.com",
+    state: { id: "7", name: "Delhi" },
+    address: "SHOP NO- 1 2 3 & 4, SAI REGENCY, NH-33, BALIGUMA, P.S. MGM",
+    shipping_address: "Test address",
+  },
+
+  organization: {
+    id: "2",
+    name: "Detailing Devils",
+  },
+
+  transfer_date: "2026-01-28",
+
+  items: [
+    {
+      product_id: "4",
+      product: "Composite Product 98",
+      image: "https://picsum.photos/seed/brush2/60/60",
+      uom: "34 Kg",
+      available: 40,
+      qty: 1,
+      salePrice: 4354353,
+    },
+  ],
+};

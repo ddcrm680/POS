@@ -237,6 +237,7 @@ export default function TransferProductForm() {
     >([]);
     const fetchStoreList = async () => {
         try {
+            setIsInfoLoading(true)
             const res = await fetchStoreCrispList();
 
             let options = res.data.map((store: any) => ({
@@ -248,6 +249,8 @@ export default function TransferProductForm() {
             setStoreList(options);
         } catch (e) {
             console.error(e);
+        }finally{
+            setIsInfoLoading(false)
         }
     };
     const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
@@ -598,7 +601,7 @@ export default function TransferProductForm() {
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="">
                             {
-                                isInfoLoading && id ?
+                                isInfoLoading  ?
                                     <Card className="mb-4">
                                         <div className="min-h-[150px] flex justify-center items-center">
                                             <div className="p-4 text-sm "><Loader /></div>
@@ -611,7 +614,7 @@ export default function TransferProductForm() {
                                                 {<Card>
 
                                                     {/* Customer Lookup Section */}
-                                                    <SectionCard title="Store Information" className="pb-4">
+                                                    <SectionCard title="Store Info" className="pb-4">
 
                                                         {/* STORE SELECT — ALWAYS VISIBLE */}
                                                         {isAdmin && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -738,7 +741,7 @@ export default function TransferProductForm() {
                                                 <SectionCard
                                                     title={
                                                         <div className="flex items-center gap-2">
-                                                            <span>Item Details</span>
+                                                            <span>Item Info</span>
 
                                                         </div>
                                                     }
