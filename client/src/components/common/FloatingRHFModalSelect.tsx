@@ -115,13 +115,33 @@ export function FloatingRHFModalSelect({
                   margin: 0,
                   padding: 0,
                   fontSize: "13px",
+                  
+                   color: isDisabled ? "#0f1729" : "#1a202c", 
                 }),
 
                 singleValue: base => ({
                   ...base,
                   fontSize: "13px",
+                     color: isDisabled ? "#0f1729" : "#1a202c", 
                 }),
 
+                multiValue: base => ({
+                  ...base,
+                  fontSize: "12px",
+                  height: "22px",
+                    color: isDisabled ? "#0f1729" : "#1a202c", 
+                }),
+
+                multiValueLabel: base => ({
+                  ...base,
+                  fontSize: "12px",
+                  padding: "0 4px",
+                }),
+
+                multiValueRemove: base => ({
+                  ...base,
+                  padding: "0 4px",
+                }),
                 option: (base, state) => ({
                   ...base,
                   fontSize: "13px",

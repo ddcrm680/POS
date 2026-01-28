@@ -145,17 +145,20 @@ export function FloatingRHFSelect({
                   margin: 0,
                   padding: 0,
                   fontSize: "13px",
+                   color: isDisabled ? "#0f1729" : "#1a202c",
                 }),
 
                 singleValue: base => ({
                   ...base,
                   fontSize: "13px",
+                   color: isDisabled ? "#0f1729" : "#1a202c", 
                 }),
 
                 multiValue: base => ({
                   ...base,
                   fontSize: "12px",
                   height: "22px",
+                    color: isDisabled ? "#0f1729" : "#1a202c", 
                 }),
 
                 multiValueLabel: base => ({
