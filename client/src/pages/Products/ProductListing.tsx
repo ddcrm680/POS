@@ -705,7 +705,7 @@ export default function ProductsListing() {
                             // }
                         }}
                         setIsModalOpen={(value: boolean) => {
-                            localStorage.removeItem('sidebar_active_parent')
+                            sessionStorage.removeItem('sidebar_active_parent')
                             navigate("/products/product-listing/manage")
                         }}
                         actions={(row: any) => (
@@ -718,7 +718,7 @@ export default function ProductsListing() {
 
                                         aria-label="View"
                                         onClick={() => {
-                                             localStorage.removeItem('sidebar_active_parent')
+                                             sessionStorage.removeItem('sidebar_active_parent')
                             navigate(`/products/product-listing/view?id=${22}`)
                                         }}
                                     >

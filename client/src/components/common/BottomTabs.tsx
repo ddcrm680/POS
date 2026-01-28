@@ -25,7 +25,7 @@ export const BottomTabs = ({
   const tabs = isDefaultView ? defaultBottomTabs : nonAdminTabs;
 
   const sidebarContext =
-    localStorage.getItem("sidebar_active_parent");
+    sessionStorage.getItem("sidebar_active_parent");
   return (
     <div
       className={
@@ -41,13 +41,13 @@ export const BottomTabs = ({
           (tab.path !== "/" && location.startsWith(tab.path))) && sidebarContext!=='store-details'
 
         const handleClick = () => {
-           localStorage.removeItem("sidebar_active_parent");
+           sessionStorage.removeItem("sidebar_active_parent");
            
             if (tab.path === "/products") {
-            localStorage.removeItem("product_active_tab");
+            sessionStorage.removeItem("product_active_tab");
           }
           if (tab.path === "/master") {
-            localStorage.removeItem("master_active_tab");
+            sessionStorage.removeItem("master_active_tab");
           }
         };
 

@@ -41,7 +41,7 @@ export default function LoginPage() {
 
     if (!isLoading && user) {
       setLocation("/home");
-      localStorage.removeItem('sidebar_active_parent')
+      sessionStorage.removeItem('sidebar_active_parent')
     }
   }, [isLoading, user, setLocation]);
 
@@ -75,7 +75,7 @@ export default function LoginPage() {
         description: Constant.login.loginSuccessMessage,
         variant: "success",
       });
-      localStorage.removeItem('sidebar_active_parent')
+      sessionStorage.removeItem('sidebar_active_parent')
       setLocation("/home");
     } catch (err: any) {
       console.error(err);

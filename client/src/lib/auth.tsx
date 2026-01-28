@@ -206,7 +206,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
   useEffect(() => {
     const handleBackNavigation = () => {
-      localStorage.removeItem("sidebar_active_parent");
+      sessionStorage.removeItem("sidebar_active_parent");
     };
 
     window.addEventListener("popstate", handleBackNavigation);

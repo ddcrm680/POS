@@ -147,7 +147,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
           className="text-[blue] font-medium cursor-pointer hover:underline text-sx "
           onClick={() => {
 
-            localStorage.getItem("sidebar_active_parent",);
+            sessionStorage.removeItem("sidebar_active_parent",);
             navigate(`/job-cards/view?id=${row.id}`)
           }}
         >
@@ -167,7 +167,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
           <span
             className="text-blue-600 font-medium cursor-pointer hover:underline"
             onClick={() => {
-              localStorage.setItem("sidebar_active_parent", "customers");
+              sessionStorage.setItem("sidebar_active_parent", "customers");
               navigate(`/customers/view?id=${row.consumer_id}`)
             }}
           >
@@ -283,7 +283,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             <span
               className="text-[blue] font-medium cursor-pointer hover:underline"
               onClick={() => {
-                localStorage.removeItem('sidebar_active_parent')
+                sessionStorage.removeItem('sidebar_active_parent')
                 navigate(`/invoices/view?id=${row.invoice.id}`)
               }}
             >
@@ -296,7 +296,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
         return (
           <button
             onClick={() => {
-              localStorage.removeItem('sidebar_active_parent')
+              sessionStorage.removeItem('sidebar_active_parent')
               navigate(`/invoices/manage?jobCardId=${row.id}&mode=create`)
             }}
             className="

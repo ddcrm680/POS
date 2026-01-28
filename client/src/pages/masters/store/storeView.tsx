@@ -165,7 +165,7 @@ export default function StoreView() {
       <div className="flex items-center gap-2 mb-4">
         <button
            onClick={() => {
- localStorage.removeItem('sidebar_active_parent')
+ sessionStorage.removeItem('sidebar_active_parent')
               window.history.back()
             }}
           disabled={loading}

@@ -165,7 +165,7 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                     <span
                         className="text-blue-600 font-medium cursor-pointer hover:underline"
                         onClick={() => {
-                            localStorage.setItem("sidebar_active_parent", "customers");
+                            sessionStorage.setItem("sidebar_active_parent", "customers");
                             navigate(`/customers/view?id=${row.consumer_id}`)
                         }}
                     >

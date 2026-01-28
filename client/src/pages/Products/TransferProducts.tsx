@@ -60,8 +60,8 @@ const columns = useMemo(() => [
     width: "180px",
     render: (val: string,row:any) => (
       <span className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={()=>{
-              localStorage.removeItem('sidebar_active_parent')
-              localStorage.setItem('sidebar_active_parent','stores')
+              sessionStorage.removeItem('sidebar_active_parent')
+              sessionStorage.setItem('sidebar_active_parent','stores')
               navigate(`/master/stores/manage?id=${row?.store_id}&mode=view`)
       }}>
         {val}
@@ -83,7 +83,7 @@ const columns = useMemo(() => [
     width: "180px",
     render: (val: string,row:any) => (
       <span className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={() => {
-                                            localStorage.removeItem('sidebar_active_parent')
+                                            sessionStorage.removeItem('sidebar_active_parent')
               navigate(`/products/transfer-stock/view?id=${row.id}`)
                                         }}>
         {val}
@@ -194,7 +194,7 @@ const columns = useMemo(() => [
               // }
             }}
             setIsModalOpen={(value: boolean) => {
-              localStorage.removeItem('sidebar_active_parent')
+              sessionStorage.removeItem('sidebar_active_parent')
               navigate(`/products/transfer-stock/manage`)
             }}
             actions={(row: any) => (
@@ -207,7 +207,7 @@ const columns = useMemo(() => [
 
                                         aria-label="View"
                                         onClick={() => {
-                                            localStorage.removeItem('sidebar_active_parent')
+                                            sessionStorage.removeItem('sidebar_active_parent')
               navigate(`/products/transfer-stock/view?id=${row.id}`)
                                         }}
                                     >

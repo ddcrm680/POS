@@ -214,7 +214,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
             <DropdownMenuContent align="end">
               <DropdownMenuItem data-testid="menu-profile" onClick={() => {
                 
- localStorage.removeItem('sidebar_active_parent')
+ sessionStorage.removeItem('sidebar_active_parent')
                 navigation[1]('/profile'); }}>
                 <User className="mr-2 h-4 w-4" />
                 Profile
@@ -224,7 +224,7 @@ export default function POSLayout({ children }: { children: ReactNode }) {
               </DropdownMenuItem>
 
               {roleView.store && <DropdownMenuItem data-testid="menu-store-details" onClick={() => {
-                localStorage.setItem("sidebar_active_parent", 'store-details');
+                sessionStorage.setItem("sidebar_active_parent", 'store-details');
                 
 
                 navigate(`/master/stores/manage?id=${user?.store_id}&mode=store-detail-view`)

@@ -27,7 +27,7 @@ export default function NotFound() {
           <div className="mt-6">
             <Button
               onClick={() =>{
-                localStorage.removeItem('sidebar_active_parent')
+                sessionStorage.removeItem('sidebar_active_parent')
                 setLocation("/home")}}
               className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] flex items-center gap-2 mx-auto"
             >

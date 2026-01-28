@@ -119,10 +119,10 @@ export default function NotificationDropdown() {
             <button
               className="text-sm text-primary hover:underline"
               onClick={() => {
-                localStorage.removeItem("sidebar_active_parent");
-                localStorage.removeItem("master_active_tab");
+                sessionStorage.removeItem("sidebar_active_parent");
+                sessionStorage.removeItem("master_active_tab");
  
-            localStorage.removeItem("product_active_tab");
+            sessionStorage.removeItem("product_active_tab");
                 readAll();
                 setOpen(false); // ✅ CLOSE DROPDOWN
                 navigate("/notifications");

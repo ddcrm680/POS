@@ -899,7 +899,7 @@ export default function JobForm() {
   <div className="inline-flex items-center gap-4">
           <button
             onClick={() => {
-              localStorage.removeItem('sidebar_active_parent')
+              sessionStorage.removeItem('sidebar_active_parent')
               window.history.back()
             }}
             disabled={isLoading || isInfoLoading}
@@ -1533,7 +1533,7 @@ export default function JobForm() {
           shouldNotCancelOnOverlayClick={true}
           onCancel={() => navigate("/job-cards")}
           onConfirm={() => {
-            localStorage.removeItem('sidebar_active_parent')
+            sessionStorage.removeItem('sidebar_active_parent')
             navigate(`/invoices/manage?jobCardId=${isJobCardSubmissionDeleteModalInfo.info}&mode=create`)
           }}
         />

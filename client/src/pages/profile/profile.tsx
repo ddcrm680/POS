@@ -299,7 +299,7 @@ export default function Profile() {
                 disabled={isLoading}
                 className='hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'
                  onClick={() => {
- localStorage.removeItem('sidebar_active_parent')
+ sessionStorage.removeItem('sidebar_active_parent')
               window.history.back()
             }}
                 data-testid="button-back"

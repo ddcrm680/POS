@@ -167,7 +167,7 @@ export default function TranserProductView() {
 
                     <button
                         onClick={() => {
-                            localStorage.removeItem('sidebar_active_parent')
+                            sessionStorage.removeItem('sidebar_active_parent')
                             window.history.back()
                         }}
                         // disabled={loading}

@@ -17,7 +17,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const { user, roles } = useAuth();
 
-  const sidebarContext = localStorage.getItem("sidebar_active_parent");
+  const sidebarContext = sessionStorage.getItem("sidebar_active_parent");
   const [location, navigate] = useLocation();
   const [openParent, setOpenParent] = useState<string | null>(null);
 
@@ -98,12 +98,12 @@ export default function Sidebar({
               <button
                 title={tab?.fullLabel || tab?.label}
                 onClick={() => {
-                  localStorage.setItem("sidebar_active_parent", tab.id);
+                  sessionStorage.setItem("sidebar_active_parent", tab.id);
                   if (tab.path === "/master") {
-                    localStorage.removeItem("master_active_tab");
+                    sessionStorage.removeItem("master_active_tab");
                   }
                      if (tab.path === "/products") {
-            localStorage.removeItem("product_active_tab");
+            sessionStorage.removeItem("product_active_tab");
           }
                   if (tab.children) {
                     setOpenParent(expanded ? null : tab.id);

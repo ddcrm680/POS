@@ -125,7 +125,7 @@ export default function ConsumerDashboardRedesign() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
-                localStorage.removeItem('sidebar_active_parent')
+                sessionStorage.removeItem('sidebar_active_parent')
                 window.history.back()
               }}
               disabled={isLoading}
@@ -146,7 +146,7 @@ export default function ConsumerDashboardRedesign() {
           <div className="flex gap-2">
             <Button
               onClick={() => {
-                localStorage.removeItem('sidebar_active_parent')
+                sessionStorage.removeItem('sidebar_active_parent')
                 const encryptedStoreId = encryptQuery(customerView.store_id);
 
                 navigate(

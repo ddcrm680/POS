@@ -575,7 +575,7 @@ export default function TransferProductForm() {
                     <div className="inline-flex items-center gap-4">
                         <button
                             onClick={() => {
-                                localStorage.removeItem('sidebar_active_parent')
+                                sessionStorage.removeItem('sidebar_active_parent')
                                 window.history.back()
                             }}
                             disabled={isLoading || isInfoLoading}

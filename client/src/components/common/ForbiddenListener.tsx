@@ -19,7 +19,7 @@ export function ForbiddenListener() {
         description: event.detail?.message ?? "Access denied",
         variant: "destructive",
       });
-      localStorage.removeItem('sidebar_active_parent')
+      sessionStorage.removeItem('sidebar_active_parent')
       // 🧭 Redirect to dashboard
       navigate("/home", { replace: true });
     };

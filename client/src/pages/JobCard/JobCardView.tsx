@@ -96,7 +96,7 @@ export default function JobCardView() {
             <div className="flex items-center gap-2">
                 <button
                     onClick={() => {
-                        localStorage.removeItem("sidebar_active_parent");
+                        sessionStorage.removeItem("sidebar_active_parent");
                         window.history.back();
                     }}
                     className="text-muted-foreground hover:text-foreground"

@@ -51,7 +51,7 @@ export default function ProtectedRoute({
     
     // avoid redirect loop if already on /login
     if (location !== "/login") {
-      localStorage.removeItem('sidebar_active_parent')
+      sessionStorage.removeItem('sidebar_active_parent')
       setLocation(`/login`);
       return null;
     }
@@ -62,7 +62,7 @@ export default function ProtectedRoute({
   // 3) Authenticated user
   // If they manually visit /login while logged in, redirect to /home
   if (location === "/login" || location === "/") {
-    localStorage.removeItem('sidebar_active_parent')
+    sessionStorage.removeItem('sidebar_active_parent')
     setLocation("/home");
     return null;
   }

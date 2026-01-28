@@ -24,9 +24,9 @@ export default function Master() {
   useEffect(() => {
     setIsSuperAdmin(user?.role === Constant.superAdmin)
   }, [user])
-  /* 🔹 Load tab from localStorage on mount */
+  /* 🔹 Load tab from sessionStorage on mount */
   useEffect(() => {
-    const savedTab = localStorage.getItem(MASTER_TAB_KEY);
+    const savedTab = sessionStorage.getItem(MASTER_TAB_KEY);
     if (savedTab) {
       setActiveTab(savedTab);
     }
@@ -42,9 +42,9 @@ export default function Master() {
   /* 🔹 Save tab whenever it changes */
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    localStorage.setItem(MASTER_TAB_KEY, value);
+    sessionStorage.setItem(MASTER_TAB_KEY, value);
     
-  localStorage.setItem("sidebar_active_parent", "master");
+  sessionStorage.setItem("sidebar_active_parent", "master");
   };
 
   return (

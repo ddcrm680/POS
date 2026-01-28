@@ -129,7 +129,7 @@ export default function ProductView() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
-                localStorage.removeItem('sidebar_active_parent')
+                sessionStorage.removeItem('sidebar_active_parent')
                 window.history.back()
               }}
               disabled={isLoading}

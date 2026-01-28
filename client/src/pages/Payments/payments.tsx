@@ -115,7 +115,7 @@ export default function PaymentsPage({ noTitle = false, hideColumnListInCustomer
       width: "130px",
       render: (value: string, row: any) => (
         <span className="text-[blue] font-medium cursor-pointer" onClick={() => {
-          localStorage.removeItem('sidebar_active_parent')
+          sessionStorage.removeItem('sidebar_active_parent')
           navigate(`/invoices/view?id=${row?.invoice?.id}`)
         }
         }>

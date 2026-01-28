@@ -306,7 +306,7 @@ export default function TerritoryMasterForm() {
       <div className="flex items-center gap-2">
         <button
            onClick={() => {
- localStorage.removeItem('sidebar_active_parent')
+ sessionStorage.removeItem('sidebar_active_parent')
               window.history.back()
             }}
              disabled={isLoading}

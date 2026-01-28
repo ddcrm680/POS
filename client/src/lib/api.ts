@@ -51,6 +51,8 @@ function createInstance(): AxiosInstance {
 
           // clear auth
           localStorage.clear();
+
+          sessionStorage.clear()
           cookieStore.removeItem("token");
 
           window.location.href = "/login";
@@ -142,6 +144,7 @@ export async function logout() {
     throw error;
   } finally {
     localStorage.clear();
+    sessionStorage.clear()
     cookieStore.removeItem("token");
   }
 }
