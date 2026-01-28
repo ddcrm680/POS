@@ -780,4 +780,4 @@ export type reusableComponentType={
    }[]
   
   actionShowedList:string[]}
-   apiLink:string}
+   apiLink?:string}

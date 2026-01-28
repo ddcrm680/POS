@@ -696,7 +696,8 @@ export default function ProductsListing() {
 
                                         aria-label="View"
                                         onClick={() => {
-                                            //   setIsPaymentDeleteModalOpenInfo({ open: true, info: row })
+                                             localStorage.removeItem('sidebar_active_parent')
+                            navigate(`/products/product-listing/view?id=${22}`)
                                         }}
                                     >
                                         <EyeIcon size={16} />

@@ -268,7 +268,6 @@ export default function PaymentsPage({ noTitle = false, hideColumnListInCustomer
 
     return mapColumnsForCustomerView(columns, list);
   }, [columns, hideColumnListInCustomer]);
-  const allowedActions = hideColumnListInCustomer?.actionShowedList;
 
   const OrganizationCommonHandler = async (
     value: InvoicePaymentFormValues,

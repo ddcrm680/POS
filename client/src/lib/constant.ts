@@ -26,14 +26,16 @@ import {
   BarChart3,
   Wallet,
   Briefcase,
-  Truck
+  Truck,
+  Info,
+  ShoppingCart
 } from "lucide-react";
 import { withFullLabel } from "./utils";
 
 export const Constant = {
   REACT_APP_BASE_URL: 'https://pos.detailingdevils.com',
   REACT_APP_API_TIMEOUT: 30000,
-  CRYPTO_QUERY_SECRET:"dfdfhregrwtqr32r2r#!@$@r23",
+  CRYPTO_QUERY_SECRET: "dfdfhregrwtqr32r2r#!@$@r23",
   REACT_APP_PUSHER_KEY: "99a4e310f0775a0c4dea",
   REACT_APP_PUSHER_CLUSTER: "ap2",
   superAdmin: "super-admin",
@@ -135,29 +137,29 @@ export const STORE_MANAGEMENT_ROUTES = [
   "/master/stores/manage",
 ];
 export const nonAdminTabs: TabItem[] = withFullLabel([
-  {id:"home", path: "/home", icon: Home, label: "Dashboard" },
-  {id:"manager", path: "/manager", icon: Settings, label: "Manager" },
-  {id:"appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
-  {id:"facility-management", path: "/facility-management", icon: Building, label: "Facility" },
-  {id:"employee-management", path: "/employee-management", icon: UserCheck, label: "Team" },
+  { id: "home", path: "/home", icon: Home, label: "Dashboard" },
+  { id: "manager", path: "/manager", icon: Settings, label: "Manager" },
+  { id: "appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
+  { id: "facility-management", path: "/facility-management", icon: Building, label: "Facility" },
+  { id: "employee-management", path: "/employee-management", icon: UserCheck, label: "Team" },
 
-   {
+  {
     id: "Products",
     path: "/products",
     icon: Package,
-    fullLabel:"Products Management",
+    fullLabel: "Products Management",
     label: "Products Mgmt",
 
   },
-  {id:"customers", path: "/customers", icon: Users, label: "Customers" },
-  {id:"job-cards", path: "/job-cards", icon: ClipboardList, label: "Job Card" },
+  { id: "customers", path: "/customers", icon: Users, label: "Customers" },
+  { id: "job-cards", path: "/job-cards", icon: ClipboardList, label: "Job Card" },
 
-  {id:"invoices", path: "/invoices", icon: FileText, label: "Invoices" },
+  { id: "invoices", path: "/invoices", icon: FileText, label: "Invoices" },
 
-  {id:"payments", path: "/payments", icon: Wallet, label: "Payments" },
-  {id:"inventory", path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
+  { id: "payments", path: "/payments", icon: Wallet, label: "Payments" },
+  { id: "inventory", path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
 ]);
-export const bottomTabs: TabItem[] =withFullLabel( [
+export const bottomTabs: TabItem[] = withFullLabel([
   { id: "dashboard", path: "/home", icon: Home, label: "Dashboard" },
 
   {
@@ -165,18 +167,18 @@ export const bottomTabs: TabItem[] =withFullLabel( [
     path: "/stores",
     icon: Store,
     defaultChildId: "store",
-    fullLabel:"Store Management",
+    fullLabel: "Store Management",
     label: "Store Mgmt",
     children: [
       { id: "store", path: "/stores", label: "Store List" },
       { id: "facility", path: "/facility-management", label: "Facility" },
     ],
   },
-   {
+  {
     id: "Products",
     path: "/products",
     icon: Package,
-    fullLabel:"Products Management",
+    fullLabel: "Products Management",
     label: "Products Mgmt",
 
   },
@@ -233,8 +235,8 @@ export const masterTabList = [
 
 ];
 export const productsTabList = [
-  { id: "products-listing", label: "Products Listing", emoji: Package , color: "bg-blue-600 hover:bg-blue-700" },
-  { id: "transfer-stock", label: "Transfer Stock", emoji: Truck , color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "products-listing", label: "Products Listing", emoji: Package, color: "bg-blue-600 hover:bg-blue-700" },
+  { id: "transfer-stock", label: "Transfer Stock", emoji: Truck, color: "bg-blue-600 hover:bg-blue-700" },
 
 ];
 export const profileMenu = [
@@ -286,7 +288,51 @@ export const TABS = [
   { key: "invoices", label: "Invoices", icon: FileText },
   { key: "payments", label: "Payments", icon: CreditCard },
 ];
-
+export const ProductViewTab = [
+  {
+    key: "overview",
+    label: "Overview",
+    icon: Info, // ℹ️ product details
+  },
+  {
+    key: "item-log",
+    label: "Item Log",
+    icon: ClipboardList, // 📋 history / logs
+  },
+  {
+    key: "online-sold",
+    label: "Online Sold",
+    icon: ShoppingCart, // 🛒 sales
+  },
+  {
+    key: "transfer-to-franchise",
+    label: "Transfer To Franchise",
+    icon: Truck, // 🚚 stock transfer
+  },
+];
+export const hideColumnListInProduct = {
+  transferStock: {
+    list: [
+      {
+        label: "Created On",
+        name: "created_at"
+      },
+      {
+        label: "Store",
+        name: "franchise"
+      },
+      {
+        name: "transfer_id",
+        label: "Transfer ID",
+      },
+      {
+        name: "transferred_qty",
+        label: "Transferred Qty",
+      },
+    ],
+    actionShowedList: ['view']
+  }
+}
 export const hideColumnListInCustomer = {
   jobcard: {
     list: [
@@ -322,7 +368,7 @@ export const hideColumnListInCustomer = {
 
 
     ],
-    actionShowedList: ['print', 'edit', 'delete','print','download']
+    actionShowedList: ['print', 'edit', 'delete', 'print', 'download']
   },
   invoice: {
     list: [
@@ -347,7 +393,7 @@ export const hideColumnListInCustomer = {
         label: "Status"
       }
     ],
-    actionShowedList: ['print', 'edit', 'delete','print','download']
+    actionShowedList: ['print', 'edit', 'delete', 'print', 'download']
   },
   payment: {
     list: [

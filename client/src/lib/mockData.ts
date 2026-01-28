@@ -1361,6 +1361,44 @@ export const filterMetaInfo = {
     { label: "Inactive", value: 0 },
   ],
 };
+// src/lib/mockData.ts
+export const productOverviewMock = {
+  id: 101,
+
+  category: {
+    id: 5,
+    name: "Cleaners",
+  },
+
+  brand: {
+    id: 2,
+    name: "Detailing Devils",
+  },
+
+  product: {
+    name: "ALL PURPOSE CLEANER",
+    image: "https://picsum.photos/seed/cleaner/120/120",
+  },
+
+  /* NEW FIELDS */
+  hsn: "34021110",
+  gst: 18, // %
+  type: "product", // product | composite
+  measurement: "1 Ltr",
+  salePrice: 7689,
+  purchasePrice: 43243,
+  store: "all-franchise",
+  tag: "regular",
+
+  stock_summary: {
+    in_stock: 199833927,
+    on_sale: 0,
+    total_in_stock: 199833927,
+    total_sold: 1,
+  },
+};
+
+
 export const transferProductsMockData = [
   {
     id: 1,
@@ -1436,6 +1474,62 @@ export const mockTransferStockResponse = {
       available: 40,
       qty: 1,
       salePrice: 4354353,
+    },
+  ],
+};
+export const productItemLogMock = {
+  total: 49,
+  per_page: 10,
+  current_page: 1,
+
+  data: [
+    {
+      id: 1,
+     
+    created_at: "2024-09-28T09:45:00Z",
+      updated_by: "Detailing Devils",
+      uom: "1 Ltr",
+      last_qty: 1099833927,
+      updated_qty: -900000000,
+      action: "stock_down",
+      total_qty: 199833927,
+      remark: "",
+    },
+    {
+      id: 2,
+     
+    created_at: "2024-09-28T09:45:00Z",
+      updated_by: "Detailing Devils",
+      uom: "1 Ltr",
+      last_qty: 1999833927,
+      updated_qty: -900000000,
+      action: "stock_down",
+      total_qty: 1099833927,
+      remark: "",
+    },
+    {
+      id: 3,
+     
+    created_at: "2024-09-28T09:45:00Z",
+      updated_by: "Detailing Devils",
+      uom: "1 Ltr",
+      last_qty: 2699833927,
+      updated_qty: -700000000,
+      action: "stock_down",
+      total_qty: 1999833927,
+      remark: "",
+    },
+    {
+      id: 4,
+     
+    created_at: "2024-09-28T09:45:00Z",
+      updated_by: "Detailing Devils",
+      uom: "1 Ltr",
+      last_qty: 10000,
+      updated_qty: 3435678643,
+      action: "stock_up",
+      total_qty: 34356796543,
+      remark: "Initial stock correction",
     },
   ],
 };

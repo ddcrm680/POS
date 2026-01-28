@@ -10,8 +10,10 @@ import { Box, IconButton } from "@chakra-ui/react";
 import { EyeIcon } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils";
 import { transferProductsMockData } from "@/lib/mockData";
+import { reusableComponentType } from "@/lib/types";
+import { mapColumnsForCustomerView } from "@/lib/helper";
 
-export default function TransferProducts() {
+export default function TransferProducts({ noTitle = false, hideColumnListInCustomer = { list: [], actionShowedList: [] }, noPadding = false, apiLink = "" }: reusableComponentType) {
   const { toast } = useToast();
   const { roles } = useAuth();
 const [transferProduct,setTransferProduct] = useState(transferProductsMockData);
@@ -145,16 +147,34 @@ const columns = useMemo(() => [
       status: ""
     })
   }
+  
+    const resolvedColumns = useMemo(() => {
+      const list = hideColumnListInCustomer?.list;
+  
+      // 🔓 No config → show all columns
+      if (!Array.isArray(list) || list.length === 0) {
+        return columns;
+      }
+  console.log(columns, list,'columns, list');
+  
+      return mapColumnsForCustomerView(columns, list);
+    }, [columns, hideColumnListInCustomer]);
+
+    useEffect(()=>{
+      console.log(resolvedColumns,'resolvedColumns');
+      
+    })
   return (
     <div className="">
      
       <Card className="w-full">
         <CardContent>
           <CommonTable
-            columns={columns}
+            columns={resolvedColumns}
             isClear={false}
             data={transferProduct}
-            isAdd={true}
+        
+            isAdd={noTitle ? false : true}
             perPage={perPage}
             setPerPage={setPerPage}
             resetFilter={resetFilter}

@@ -40,6 +40,7 @@ import Products from "./pages/Products/products";
 import ProductForm from "./pages/Products/productForm";
 import TransferStockForm from "./pages/Products/transferProductForm";
 import TranserProductView from "./pages/Products/transferProductView";
+import ProductView from "./pages/Products/ProductView";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -63,6 +64,8 @@ export function Router() {
         <Route path="/products" component={() => <ProtectedRoute component={Products} 
       />} />
        <Route path="/products/product-listing/manage" component={() => <ProtectedRoute component={ProductForm} 
+      />} />
+       <Route path="/products/product-listing/view" component={() => <ProtectedRoute component={ProductView} 
       />} />
          <Route path="/products/transfer-stock/manage" component={() => <ProtectedRoute component={TransferStockForm} 
       />} />
