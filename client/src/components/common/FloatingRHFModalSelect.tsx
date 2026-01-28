@@ -89,18 +89,25 @@ export function FloatingRHFModalSelect({
                   minHeight: "38px",
                   height: "38px",
                   paddingTop: "4px",
+                    backgroundColor: isDisabled ? "#fafafa" : "white",
+               
                   fontSize: "13px",
                   borderColor: error
                     ? "#e53e3e"
                     : state.isFocused
                       ? "#3182ce"
-                      : "#e1e7ef",
+                      :  isDisabled ? "#e1e7ef" : "#e1e7ef",
                   boxShadow: "none",
+                     cursor: isDisabled ? "not-allowed" : "default",
+                  opacity: isDisabled ? 0.7 : 1,
+           
                 }),
 
                 valueContainer: base => ({
                   ...base,
                   padding: "0 8px",
+                    cursor: isDisabled ? "not-allowed" : "text",
+          
                 }),
 
                 input: base => ({
@@ -135,6 +142,20 @@ export function FloatingRHFModalSelect({
 
                 placeholder: () => ({
                   display: "none",
+                }),
+                   indicatorsContainer: base => ({
+                  ...base,
+                  cursor: isDisabled ? "not-allowed" : "pointer",
+                }),
+
+                dropdownIndicator: base => ({
+                  ...base,
+                  cursor: isDisabled ? "not-allowed" : "pointer",
+                }),
+
+                clearIndicator: base => ({
+                  ...base,
+                  cursor: isDisabled ? "not-allowed" : "pointer",
                 }),
               }}
 

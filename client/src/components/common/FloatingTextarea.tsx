@@ -8,9 +8,9 @@ type FloatingTextareaProps = {
   name: string
   label: string
   control: Control<any>
-  minH?:string
+  minH?: string
   isView?: boolean
-  rows?:number
+  rows?: number
   isRequired?: boolean
 }
 
@@ -19,8 +19,8 @@ export function FloatingTextarea({
   label,
   control,
   isView,
-  rows=1,
-  minH='45px',
+  rows = 1,
+  minH = '45px',
   isRequired = false,
 }: FloatingTextareaProps) {
   const [focused, setFocused] = useState(false)
@@ -40,11 +40,11 @@ export function FloatingTextarea({
               {...field}
               disabled={isView}
               pt="10px"
-               pl="12px"
-               fontSize={'12px'}
-               rows={rows}
-               minH={minH}
-                 pr="18px"
+              pl="12px"
+              fontSize={'12px'}
+              rows={rows}
+              minH={minH}
+              pr="18px"
               pb="8px"
               border="1px solid"
               borderColor={error ? "red.500" : "#e1e7ef"}
@@ -53,12 +53,23 @@ export function FloatingTextarea({
               }}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
+              _disabled={{
+                bg:  "#fafafa",
+                opacity: 0.7,
+              }}
             />
 
             <Text
               css={floatingLabelStyle}
               data-float={shouldFloat || undefined}
-              color={error ? "red.500" : "gray.500"}
+              bg={isView ? "gray.50" : "white"}     // ✅ important
+              color={
+                error
+                  ? "red.500"
+                  : isView
+                    ? "gray.500"
+                    : "gray.500"
+              }
             >
               {label}
               {isRequired && <RequiredMark show={!isView} />}

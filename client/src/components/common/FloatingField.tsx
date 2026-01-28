@@ -68,7 +68,6 @@ export function FloatingField({
   _focus={{ borderColor: error ? "red.500" : "blue.500" }}
   _disabled={{
     bg: "gray.50",
-    cursor: "not-allowed",
     opacity: 0.7,
   }}
 
@@ -147,6 +146,7 @@ export function FloatingField({
             {/* Floating label */}
             <Text
               css={floatingLabelStyle}
+                bg={disabled ? "#fafafa" : "white"} 
               data-float={shouldFloat || undefined}
               color={error ? "red.500" : "gray.500"}
             >

@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Info } from "@/components/common/viewInfo";
+import { filterMetaInfo, productTypeOptions, storeOptions } from "@/lib/mockData";
 
 export function Overview({ product }: { product: any }) {
     const InfoIfExists = ({ value, ...props }: any) => {
@@ -48,16 +49,12 @@ export function Overview({ product }: { product: any }) {
                     <InfoIfExists
                         label="Product Type"
                         value={
-                            product?.type === "product"
-                                ? "Product"
-                                : product?.type === "composite"
-                                    ? "Composite"
-                                    : ""
+                          productTypeOptions?.find(item => item.value === product.type)?.label
                         }
                     />
                     <InfoIfExists label="Measurement" value={product?.measurement} />
-                    <InfoIfExists label="Store" value={product?.store} />
-                    <InfoIfExists label="Product Tag" value={product?.tag} />
+                    <InfoIfExists label="Store" value={storeOptions?.find(item => item.value === product?.store)?.label } />
+                    <InfoIfExists label="Product Tag" value={filterMetaInfo?.tag?.find(item => item.value === product?.tag)?.label } />
                 </div>
             </Card>
             {/* RIGHT CARD — PRICING & INVENTORY */}
@@ -67,7 +64,8 @@ export function Overview({ product }: { product: any }) {
                 </h3>
                 <div className="space-y-1">
                     <InfoIfExists
-                        label="In Stock"
+                        label="In Stock" 
+
                         value={product?.stock_summary?.in_stock?.toLocaleString("en-IN")}
                     />
                     <InfoIfExists

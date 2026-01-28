@@ -16,7 +16,7 @@ import CommonModal from "@/components/common/CommonModal";
 import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
-import { customerMockData, filterMetaInfo, mockProducts, territoryMasterMockData } from "@/lib/mockData";
+import { brandOptions, categoryOptions, customerMockData, filterMetaInfo, mockProducts, productTypeOptions, storeOptions, territoryMasterMockData } from "@/lib/mockData";
 import CommonRowMenu from "@/components/common/CommonRowMenu";
 import { Kpi } from "../Customer/DashboardCards";
 import ProductSellStockCountHandlerModal from "./ProductSellStockCountHandlerModal";
@@ -214,6 +214,12 @@ export default function ProductsListing() {
                 />
             ),
             width: "150px",
+             render: (value: string) => (
+                <span >
+                    {brandOptions?.find(item => item.value === value)?.label}
+
+                </span>
+            ),
         },
 
         {
@@ -230,6 +236,12 @@ export default function ProductsListing() {
                 />
             ),
             width: "170px",
+             render: (value: string) => (
+                <span >
+                    {categoryOptions?.find(item => item.value === value)?.label}
+
+                </span>
+            ),
         },
 
         {
@@ -246,7 +258,12 @@ export default function ProductsListing() {
                 />
             ),
             width: "130px",
+  render: (value: string) => (
+                <span >
+                    {productTypeOptions?.find(item => item.value === value)?.label}
 
+                </span>
+            ),
         },
 
         {
@@ -263,7 +280,12 @@ export default function ProductsListing() {
                 />
             ),
             width: "130px",
+  render: (value: string) => (
+                <span >
+                    {storeOptions?.find(item => item.value === value)?.label}
 
+                </span>
+            ),
         },
 
         {

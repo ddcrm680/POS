@@ -1336,12 +1336,14 @@ export const filterMetaInfo = {
   ],
 
   type: [
-    { label: "Product", value: "Product" },
-    { label: "Composite", value: "Composite" },
+    { label: "Product", value: "product" },
+    { label: "Composite", value: "composite" },
   ],
 
   store: [
-    { label: "Red Carpet", value: "RED-CARPET" },
+    
+    { label: "All", value: "all-franchise" },
+    { label: "Red Carpet", value: "red-carpet" },
   ],
 
   tag: [
