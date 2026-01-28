@@ -20,6 +20,9 @@ export default function App() {
   const [serviceDown, setServiceDown] = useState(false);
 
   useEffect(() => {
+    localStorage.removeItem('sidebar_active_parent')
+    localStorage.removeItem('product_active_tab')
+    localStorage.removeItem('master_active_tab')
     return subscribeServiceDown(setServiceDown);
   }, []);
   const content = isAuthPage ? (
