@@ -674,11 +674,7 @@ export default function TransferProductForm() {
                                                                         isRequired
                                                                         control={form.control}
                                                                     />
-                                                                </div>
-
-                                                                {/* META INFO */}
-                                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                                                                    <FloatingRHFSelect
+                                                                     <FloatingRHFSelect
                                                                         name="organization"
                                                                         label="Select Organization"
                                                                         isRequired
@@ -708,6 +704,7 @@ export default function TransferProductForm() {
                                                                         }))}
                                                                     />
                                                                 </div>
+
 
                                                                 {/* ADDRESSES */}
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
