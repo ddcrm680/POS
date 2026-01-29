@@ -28,11 +28,13 @@ export default function ConsumerDashboardRedesign() {
   const [isLoading, setIsLoading] = useState(true);
   const [customer, setCustomer] = useState<any | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [customerView, setCustomerView] = useState<any | null>(null);
 
   const fetchCustomer = async () => {
     try {
       setIsLoading(true);
       const res = await getCustomerDashboardView(id ?? "");
+      setCustomerView(res?.data?.consumer ?? null);
 
       setCustomer(res?.data ?? null);
     } catch (e: any) {
@@ -47,30 +49,12 @@ export default function ConsumerDashboardRedesign() {
 
   useEffect(() => {
     if (id) {
-      fetchCustomerView()
       fetchCustomer();
     }
 
   }, [id]);
 
-  const [customerView, setCustomerView] = useState<any | null>(null);
 
-  const fetchCustomerView = async () => {
-    try {
-      setIsLoading(true);
-      const res = await getCustomerView(id ?? "");
-      setCustomerView(res?.data ?? null);
-
-    } catch (e: any) {
-
-      if (e?.response?.data?.code === 404) {
-        setNotFound(true);
-      }
-      console.error(e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
