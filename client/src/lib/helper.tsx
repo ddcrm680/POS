@@ -1,4 +1,4 @@
-import { Constant, srsConditionList } from "./constant";
+import { Constant,  } from "./constant";
 
 export function mapColumnsForCustomerView(
   baseColumns: any[],
@@ -227,7 +227,7 @@ export function buildJobCardHtml(row: any, template: string) {
   </td>
 </tr>
 `;
-const conditions = srsConditionList ?? [];
+const conditions = row?.srsConditionList ?? [];
 let conditionRows = "";
 
 for (let i = 0; i < conditions.length; i += 2) {
@@ -256,6 +256,10 @@ for (let i = 0; i < conditions.length; i += 2) {
     </tr>
   `;
 }
+const technicianHtml =
+  row.technician && row.technician.trim() !== ""
+    ? `<span style="text-decoration:underline;">${row.technician}</span>`
+    : "________";
 
 // srsConditionList
   return template
@@ -276,7 +280,7 @@ for (let i = 0; i < conditions.length; i += 2) {
     .replace("{{chasis_no}}", row.chasis_no ?? "")
 .replace("{{vehicle_condition_rows}}", conditionRows)
     .replace("{{vehicle_condition}}", row.vehicle_condition ?? "")
-    .replace("{{technician}}",row.technician ?? "________")
+   .replace("{{technician}}", technicianHtml)
     .replace("{{services_rows}}", servicesRows)
     .replace("{{service_vehicle_img}}", `${process.env.REACT_APP_BASE_URL ?? Constant.REACT_APP_BASE_URL}/${row.serviceVehicleImg}`)
     .replace("{{isRepainted}}", isRepainted ?? "")

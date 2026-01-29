@@ -518,7 +518,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                   },
                   {
                     key: "print",
-                    label: "Print ",
+                    label: "Print / Download",
                     icon: printDownLoadLoading.isLoad ? <Loader isShowLoadingText={false} loaderSize={3} /> : <PrinterIcon size={16} />,
                     onClick: () => {
                       commonPreviewHandler('print', row)
@@ -527,17 +527,17 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                     show: canShowAction("print", allowedActions),
                     disabled: printDownLoadLoading.isLoad && printDownLoadLoading.type == "print"
                   },
-                  {
-                    key: "download",
-                    label: "Download ",
-                    icon: printDownLoadLoading.isLoad ? <Loader isShowLoadingText={false} loaderSize={3} /> : <DownloadIcon size={16} />,
-                    onClick: () => {
-                      commonPreviewHandler('download', row)
-                    },
-                    show: canShowAction("download", allowedActions),
+                  // {
+                  //   key: "download",
+                  //   label: "Download ",
+                  //   icon: printDownLoadLoading.isLoad ? <Loader isShowLoadingText={false} loaderSize={3} /> : <DownloadIcon size={16} />,
+                  //   onClick: () => {
+                  //     commonPreviewHandler('download', row)
+                  //   },
+                  //   show: canShowAction("download", allowedActions),
 
-                    disabled: printDownLoadLoading.isLoad && printDownLoadLoading.type == "download"
-                  },
+                  //   disabled: printDownLoadLoading.isLoad && printDownLoadLoading.type == "download"
+                  // },
                   /* SEND VIA WHATSAPP */
                   {
                     key: "whatsapp",

@@ -296,8 +296,9 @@ input[type="checkbox"] {
 
   <!-- NAME -->
   <tr>
-    <td colspan="1">Name : <span style="text-decoration:underline;"> {{technician}}</span> </td>
-    
+<td colspan="1">
+  Name : {{technician}}
+</td>
     <td colspan="1">Time Start : ________</td>
     <td colspan="1">Time Finish : ________</td>
   </tr>
