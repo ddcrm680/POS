@@ -100,7 +100,20 @@ export const RoleList = {
   STORE_MANAGER: 'Store Manager',
 
 }
-
+export const WARRANTY_OPTIONS = [
+  { label: "1 Year", value: 1 },
+  { label: "3 Years", value: 3 },
+  { label: "5 Years", value: 5 },
+  { label: "6 Years", value: 6 },
+  { label: "7 Years", value: 7 },
+  { label: "No Warranty", value: 0 },
+];
+export const srsConditionList = [
+  { value: "brand-new", label: "Brand New" },
+  { value: "good-condition", label: "Good Condition" },
+  { value: "fair-condition", label: "Fair Condition" },
+  { value: "poor-condition", label: "Poor Condition" },
+];
 // Vehicle makes and models
 export const vehicleMakes = ['Honda', 'Toyota', 'Maruti Suzuki', 'Hyundai', 'Tata', 'Mahindra', 'Ford', 'BMW', 'Mercedes-Benz', 'Audi'];
 export const vehicleModels = {

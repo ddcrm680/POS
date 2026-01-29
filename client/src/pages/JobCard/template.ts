@@ -178,8 +178,8 @@ input[type="checkbox"] {
     <!-- LEFT: LOGO -->
    <td style="width:60%; vertical-align:top;" class="pad-left-0">
       <img
-        style="max-width:289px; max-height:300px;"
-        src="https://mycrm.detailingdevils.com/public/organization-files/1709713857.png"
+        style="max-width:289px; max-height:60px;"
+        src="{{logoSrc}}"
       >
     </td>
 
@@ -270,14 +270,7 @@ input[type="checkbox"] {
       </div>
 
       <table class="bordered service-opt" style="width:100%; margin-bottom:10px;">
-        <tr>
-        <td><input type="checkbox" {{brandNewChecked}} class="lock"> 1 (Brand New)</td>
-        <td><input type="checkbox" {{goodChecked}} class="lock"> 2 (Good Condition)</td>
-        </tr>
-        <tr>
-        <td><input type="checkbox" {{fairChecked}} class="lock"> 3 (Fair Condition)</td>
-        <td><input type="checkbox" {{poorChecked}} class="lock"> 4 (Poor Condition)</td>
-        </tr>
+       {{vehicle_condition_rows}}
       </table>
 
       <!-- SERVICES OPTED -->
@@ -303,7 +296,7 @@ input[type="checkbox"] {
 
   <!-- NAME -->
   <tr>
-    <td colspan="1">Name : __________________</td>
+    <td colspan="1">Name : <span style="text-decoration:underline;"> {{technician}}</span> </td>
     
     <td colspan="1">Time Start : ________</td>
     <td colspan="1">Time Finish : ________</td>
@@ -315,18 +308,7 @@ input[type="checkbox"] {
   </tr>
 
   <!-- WARRANTY ROW 1 -->
-  <tr>
-    <td> <input type="checkbox"  class="lock"> 1 Year</td>
-    <td> <input type="checkbox"  class="lock"> 3 Years</td>
-    <td> <input type="checkbox"  class="lock"> 5 Years</td>
-  </tr>
-
-  <!-- WARRANTY ROW 2 -->
-  <tr>
-    <td> <input type="checkbox"  class="lock"> 6 Years</td>
-    <td> <input type="checkbox"  class="lock"> 7 Years</td>
-    <td> <input type="checkbox"  class="lock"> No Warranty</td>
-  </tr>
+{{warranty_rows}}
 
   <!-- SIGNATURE -->
   <tr>
@@ -401,7 +383,7 @@ input[type="checkbox"] {
 
       <!-- AUTHORIZATION -->
       <div style="margin-top:12px; font-weight:bold;">
-        I <u>Detailing Devils Ss</u> Authorize Detailing Devils to service my vehicle.
+        I <u>{{service_customer_name}}</u> Authorize Detailing Devils to service my vehicle.
       </div>
     </td>
     
@@ -429,7 +411,7 @@ input[type="checkbox"] {
   <!-- VEHICLE DIAGRAM -->
   <div class="page-break"></div>
 
- <img style=\"width:800px; margin: auto;\" src=\"https:\/\/mycrm.detailingdevils.com\/public\/assets\/franchise-docs\/franchise-service-plans-diagram\/suv.webp\">
+ <img style=\"width:800px; margin: auto;\" src="{{service_vehicle_img}}">
   <!-- TERMS -->
   <div class="terms">
     <h3>Terms and Conditions</h3>

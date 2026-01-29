@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCommonPrintDownload, getCustomerView, getJobCard, getJobCardItem, jobCardCancel, jobCardSend, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCustomerView, getJobCard, getJobCardItem, getPrint, jobCardCancel, jobCardSend, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Image, Switch } from "@chakra-ui/react";
@@ -385,11 +385,14 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
     let customerRes
 
     let jobRes
+    let info
     try {
-      customerRes = await getCustomerView(row.consumer_id ?? "");
-      customerRes = customerRes?.data
+      
+      info= await getPrint(row,'jobcard')
+      // customerRes = await getCustomerView(row.consumer_id ?? "");
+      customerRes = info?.job_card?.consumer
 
-      jobRes = await getJobCardItem(row ?? "");
+      jobRes = info.job_card
     } catch (e) {
       console.log(e);
 
@@ -400,27 +403,34 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
 
 
     const rowData = {
-      jobcard_date: formatDate(row.jobcard_date),
-      job_card_number: row.job_card_number,
+      
+      serviceVehicleImg:info?.service_diagram,
+      jobcardLogo:jobRes?.store?.organization?.org_image,
+      jobcard_date: formatDate(jobRes.jobcard_date),
+      job_card_number: jobRes.job_card_number,
       name: customerRes.name,
       phone: customerRes.phone,
       address: customerRes.address,
-      state: customerRes.state.name,
+      serviceLocation:jobRes?.store?.name,
+      // state: customerRes.state.name,
       email: customerRes.email,
-      vehicle_type: row.vehicle_type,
-      make: row.vmake.name,
-      model: row.vmodel.name,
-      color: row.color,
-      year: row.year,
-      reg_no: row.reg_no,
-      chasis_no: row.chasis_no,
-      vehicle_condition: row.vehicle_condition,
-      isRepainted: row.isRepainted,
-      isSingleStagePaint: row.isSingleStagePaint,
-      isPaintThickness: row.isPaintThickness,
-      isVehicleOlder: row.isVehicleOlder,
-      opted_services: jobRes.opted_services,
-      store_manager:row?.store?.name
+      vehicle_type: jobRes.vehicle_type,
+      make: jobRes.vmake.name,
+      model: jobRes.vmodel.name,
+      color: jobRes.color,
+      year: jobRes.year,
+      technician:jobRes?.technician?.name,
+      reg_no: jobRes.reg_no,
+      chasis_no: jobRes.chasis_no,
+      vehicle_condition: jobRes.vehicle_condition,
+      isRepainted: jobRes.isRepainted,
+      isSingleStagePaint: jobRes.isSingleStagePaint,
+      isPaintThickness: jobRes.isPaintThickness,
+      isVehicleOlder: jobRes.isVehicleOlder,
+      opted_services: info.opted_services,
+      store_manager:info?.store_manager?.name,
+      warranty_years:info?.warranty_years,
+      srsConditionList:info?.srsCondition
 
     }
     const html = buildJobCardHtml(rowData, jobCardHtmlTemplate);
@@ -442,6 +452,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       );
     }
   }
+
   return (
     <div className={`${noPadding ? "" : "p-3"}`}>
       {!noTitle && <div className="mb-6">
