@@ -299,9 +299,7 @@ export default function InvoiceView() {
             render: (value: string) => (
                 <Box className="flex flex-col">
                     <span className="font-medium">{formatDate(value)}</span>
-                    <span className="text-xs text-muted-foreground">
-                        {formatTime(value)}
-                    </span>
+                    
                 </Box>
             ),
         },
