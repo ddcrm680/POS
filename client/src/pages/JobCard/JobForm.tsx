@@ -625,7 +625,10 @@ export default function JobForm() {
       if (!mode) {
         setIsJobCardSubmissionModalOpenInfo({
           open: true,
-          info: jobRes.id,
+          info: {
+            id: jobRes?.id,
+            job_card_number: jobRes?.job_card_number
+          },
         });
       }
       else {
@@ -896,27 +899,27 @@ export default function JobForm() {
       <div className=" mx-auto px-3 sm:px-3 py-3 space-y-3">
         {/* HEADER */}
         <div className="grid grid-cols-1">
-  <div className="inline-flex items-center gap-4">
-          <button
-            onClick={() => {
-              sessionStorage.removeItem('sidebar_active_parent')
-              window.history.back()
-            }}
-            disabled={isLoading || isInfoLoading}
-            className="text-muted-foreground hover:text-foreground "
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <div>
-            <h1 className="text-lg font-semibold">
-              {isView ? "View Job Card" : id ? "Edit Job Card" : "Create New Job Card"}
-            </h1>
+          <div className="inline-flex items-center gap-4">
+            <button
+              onClick={() => {
+                sessionStorage.removeItem('sidebar_active_parent')
+                window.history.back()
+              }}
+              disabled={isLoading || isInfoLoading}
+              className="text-muted-foreground hover:text-foreground "
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <div>
+              <h1 className="text-lg font-semibold">
+                {isView ? "View Job Card" : id ? "Edit Job Card" : "Create New Job Card"}
+              </h1>
 
+            </div>
           </div>
-        </div>
 
         </div>
-      
+
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 rounded-xl ">
 
 
@@ -1534,7 +1537,7 @@ export default function JobForm() {
           onCancel={() => navigate("/job-cards")}
           onConfirm={() => {
             sessionStorage.removeItem('sidebar_active_parent')
-            navigate(`/invoices/manage?jobCardId=${isJobCardSubmissionDeleteModalInfo.info}&mode=create`)
+            navigate(`/invoices/manage?jobCardId=${isJobCardSubmissionDeleteModalInfo.info.id}&jobCardNo=${isJobCardSubmissionDeleteModalInfo.info.job_card_number}&mode=create`)
           }}
         />
       </div>

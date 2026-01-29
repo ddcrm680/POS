@@ -137,6 +137,7 @@ console.log(invoiceView,'invoiceView');
   const [planErrors, setPlanErrors] = useState<Record<string, string>>({});
 
   const jobCardId = searchParams.get("jobCardId");
+  const jobCardNo=searchParams.get("jobCardNo")
   const [invoiceInfo, setInvoiceInfo] = useState<{
     selectedPlanId: string,
   }>({
@@ -859,7 +860,7 @@ console.log(invoiceView,'invoiceView');
           <ChevronLeft size={18} />
         </button>
 
-        <h1 className="text-lg font-semibold flex-1">Invoice {mode == 'create' ? `of Job Card #${jobCardId}` : `#${invoiceNumber}`}</h1>
+        <h1 className="text-lg font-semibold flex-1">Invoice {mode == 'create' ? `of Job Card #${jobCardNo}` : `#${invoiceNumber}`}</h1>
         {invoiceView?.status && <Badge
           className={
             invoiceView?.status

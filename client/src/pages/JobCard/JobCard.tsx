@@ -297,7 +297,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
           <button
             onClick={() => {
               sessionStorage.removeItem('sidebar_active_parent')
-              navigate(`/invoices/manage?jobCardId=${row.id}&mode=create`)
+              navigate(`/invoices/manage?jobCardId=${row.id}&jobCardNo=${row.job_card_number}&mode=create`)
             }}
             className="
             px-3 py-1 text-xs font-medium
