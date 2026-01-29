@@ -585,7 +585,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             loadingText={`${sendModal.open ? 'Sending' : 'Cancelling'}...`}
             isLoading={isLoading}
             onCancel={() => {
-              if (sendModal) {
+              if (sendModal.open) {
                 setSendModal({ open: false, jobCard: {} })
 
               } else
