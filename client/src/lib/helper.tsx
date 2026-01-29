@@ -175,8 +175,11 @@ export function buildJobCardHtml(row: any, template: string) {
   `;
   }
 
+  const isRepainted = ` <input type="checkbox" ${row?.isRepainted ? 'checked' : ''} class="lock">`
 
-
+  const isSingleStagePaint = ` <input type="checkbox" ${row?.isSingleStagePaint ? 'checked' : ''} class="lock">`
+  const isPaintThickness = ` <input type="checkbox" ${row?.isPaintThickness ? 'checked' : ''} class="lock">`
+  const isVehicleOlder = ` <input type="checkbox" ${row?.isVehicleOlder ? 'checked' : ''} class="lock">`
 
   return template
     .replace("{{job_card_number}}", row.job_card_number ?? "")
@@ -197,11 +200,11 @@ export function buildJobCardHtml(row: any, template: string) {
     .replace("{{vehicle_condition}}", row.vehicle_condition ?? "")
 
     .replace("{{services_rows}}", servicesRows)
-    .replace("{{isRepainted}}", row.isRepainted ?? "")
-    .replace("{{isSingleStagePaint}}", row.isSingleStagePaint ?? "")
-    .replace("{{isPaintThickness}}", row.isPaintThickness ?? "")
+    .replace("{{isRepainted}}", isRepainted ?? "")
+    .replace("{{isSingleStagePaint}}", isSingleStagePaint ?? "")
+    .replace("{{isPaintThickness}}", isPaintThickness ?? "")
     .replace("{{store_manager}}", row.store_manager ?? "")
-    .replace("{{isVehicleOlder}}", row.isVehicleOlder ?? "")
+    .replace("{{isVehicleOlder}}", isVehicleOlder ?? "")
     .replace("{{brandNewChecked}}", row.vehicle_condition === "brand-new" ? "checked" : "")
     .replace("{{goodChecked}}", row.vehicle_condition === "good-condition" ? "checked" : "")
     .replace("{{fairChecked}}", row.vehicle_condition === "fair-condition" ? "checked" : "")
@@ -216,10 +219,10 @@ export function buildInvoiceHtml(row: any, template: string) {
   const taxHeader = isCGSTSGST
     ? `<td width="6%">CGST</td><td width="6%">SGST</td>`
     : `<td width="6%">IGST</td>`;
-const billGstHtml =
-  row?.billing_type === "company" && row?.gstin
-    ? `GST No.: ${row.gstin}`
-    : "";
+  const billGstHtml =
+    row?.billing_type === "company" && row?.gstin
+      ? `GST No.: ${row.gstin}`
+      : "";
 
   /* ---------------- ITEM ROWS ---------------- */
   const invoiceItemsRows = items

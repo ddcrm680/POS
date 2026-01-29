@@ -316,16 +316,16 @@ input[type="checkbox"] {
 
   <!-- WARRANTY ROW 1 -->
   <tr>
-    <td><span class="checkbox"></span> 1 Year</td>
-    <td><span class="checkbox"></span> 3 Years</td>
-    <td><span class="checkbox"></span> 5 Years</td>
+    <td> <input type="checkbox"  class="lock"> 1 Year</td>
+    <td> <input type="checkbox"  class="lock"> 3 Years</td>
+    <td> <input type="checkbox"  class="lock"> 5 Years</td>
   </tr>
 
   <!-- WARRANTY ROW 2 -->
   <tr>
-    <td><span class="checkbox"></span> 6 Years</td>
-    <td><span class="checkbox"></span> 7 Years</td>
-    <td><span class="checkbox"></span> No Warranty</td>
+    <td> <input type="checkbox"  class="lock"> 6 Years</td>
+    <td> <input type="checkbox"  class="lock"> 7 Years</td>
+    <td> <input type="checkbox"  class="lock"> No Warranty</td>
   </tr>
 
   <!-- SIGNATURE -->
@@ -363,21 +363,21 @@ input[type="checkbox"] {
      <table style="width:100%; margin-bottom:10px;">
         <tr>
             <td width="50%">
-                <span class="checkbox {{isRepainted}}"></span>
+               {{isRepainted}}
                 <b>Repainted Vehicle</b>
             </td>
             <td width="50%">
-                <span class="checkbox {{isSingleStagePaint}}"></span>
+              {{isSingleStagePaint}}
                 <b>Single Stage Paint</b>
             </td>
         </tr>
     <tr>
     <td>
-      <span class="checkbox {{isPaintThickness}}"></span>
+      {{isPaintThickness}}
       <b>Paint Thickness Below 2 MIL</b>
     </td>
     <td>
-      <span class="checkbox {{isVehicleOlder}}"></span>
+    {{isVehicleOlder}}
       <b>Vehicle older than 5 Years</b>
     </td>
   </tr>
