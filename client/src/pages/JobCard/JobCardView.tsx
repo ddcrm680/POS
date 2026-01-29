@@ -7,6 +7,7 @@ import { useLocation, useSearchParams } from "wouter";
 import { Loader } from "@/components/common/loader";
 import { getJobCardItem, jobCardMetaInfo, jobCardModelInfo } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
+import { srsConditionList } from "@/lib/constant";
 
 export default function JobCardView() {
     const [, navigate] = useLocation();
@@ -132,7 +133,7 @@ export default function JobCardView() {
                                 <InfoIfExists label="Make Year" value={card?.year} />
                                 <InfoIfExists label="Registration No" value={card?.reg_no} />
                                 <InfoIfExists label="Chassis No" value={card?.chasis_no} />
-                                <InfoIfExists label="SRS Condition" value={card?.vehicle_condition} />
+                                <InfoIfExists label="SRS Condition" value={srsConditionList?.find((item)=>item.value==card?.vehicle_condition)?.label} />
 
                                 <InfoIfExists label="Remark" value={card?.remarks} />
                             </div>
