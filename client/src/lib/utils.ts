@@ -490,7 +490,7 @@ export function normalizeInvoiceToEditResponse(api: any) {
 
     jobcard: {
       jobcard_date: formatDate2(job.jobcard_date),
-      edited_date: new Date(job.updated_at).toLocaleString(),
+      edited_date: formatDate2(job.updated_at)
     },
 
     plans: (api?.invoice_data?.items || []).map((item: any) => ({

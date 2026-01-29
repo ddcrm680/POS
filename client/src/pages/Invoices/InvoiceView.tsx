@@ -11,7 +11,7 @@ import { Box } from "@chakra-ui/react";
 import { invoiceSchema } from "@/lib/schema";
 import { createInvoice, fetchStateList, getInvoiceInfo, getInvoiceInfoByJobCardPrefill, getInvoicePayments } from "@/lib/api";
 import { EditIcon, PrinterIcon, Trash2 } from "lucide-react";
-import { calculateInvoiceRow, formatDate, formatStatusLabel, formatTime, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, normalizeInvoiceToEditResponse, } from "@/lib/utils";
+import { calculateInvoiceRow, formatDate, formatDate2, formatStatusLabel, formatTime, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, normalizeInvoiceToEditResponse, } from "@/lib/utils";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
@@ -240,7 +240,7 @@ export default function InvoiceView() {
                 const { consumer, job_card, store, payments, items, ...rest } = res?.data
                 // 👇 existing mapper stays SAME
                 const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
-                setInvoiceView({ ...mapped, ...rest, jobCardFullInfo: job_card });
+                setInvoiceView({ ...mapped, ...rest,...({ updated_at: formatDate2(res?.data?.updated_at) }) , jobCardFullInfo: job_card });
 
                 const gstType = mapped.gst_type == "cgst_sgst" ? "cgst_sgst" : "igst";
                 const planCalculated = mapped.plans.map((item: any) =>
@@ -634,7 +634,7 @@ export default function InvoiceView() {
                                 </CardTitle>
                                 <div className="space-y-2">
                                     <InfoIfExists label="Service Date" value={invoiceView?.jobcard.jobcard_date} />
-                                    <InfoIfExists label="Edited Date" value={invoiceView?.jobcard.edited_date} />
+                                    <InfoIfExists label="Edited Date" value={invoiceView?.updated_at} />
                                 </div>
                             </Card>}
                             {invoiceView?.vehicle && <Card className="p-4">

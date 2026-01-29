@@ -11,7 +11,7 @@ import { Box } from "@chakra-ui/react";
 import { invoiceSchema } from "@/lib/schema";
 import { createInvoice, fetchStateList, getInvoiceInfo, getInvoiceInfoByJobCardPrefill, getInvoicePayments } from "@/lib/api";
 import { Trash2, Info } from "lucide-react";
-import { calculateInvoiceRow, formatDate, formatTime, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, normalizeInvoiceToEditResponse, } from "@/lib/utils";
+import { calculateInvoiceRow, formatDate, formatDate2, formatTime, mapInvoiceApiToPrefilledViewModel, normalizeInvoiceToCreateResponse, normalizeInvoiceToEditResponse, } from "@/lib/utils";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
@@ -55,6 +55,7 @@ export default function InvoiceForm() {
   );
   const isSameState = useMemo(() => {
     const storeStateId = invoiceView?.store?.state_id
+console.log(invoiceView,'invoiceView');
 
     return billingStateId && storeStateId &&
       billingStateId === storeStateId
@@ -448,7 +449,7 @@ export default function InvoiceForm() {
           {
             key: "igst_amount",
             label: "IGST",
-            
+
             width: "120px",
             render: (_: any, row: any) => (
               <span>
@@ -525,7 +526,7 @@ export default function InvoiceForm() {
         // 👇 existing mapper stays SAME
         const mapped = mode === "edit" ? normalizeInvoiceToEditResponse(normalizedData) : mapInvoiceApiToPrefilledViewModel(normalizedData);
 
-        setInvoiceView(mapped);
+        setInvoiceView({ ...mapped, ...({ updated_at: mode === "edit" ? formatDate2(res?.data?.invoice_data?.updated_at ): "" }) });
 
         const gstType = mapped.customer.type === "company" ? "cgst_sgst" : "igst";
         const planCalculated = mapped.plans.map((item: any) => {
@@ -584,9 +585,9 @@ export default function InvoiceForm() {
         setIsInfoLoading(false);
       }
     };
-    if (id || jobCardId )
+    if (id || jobCardId)
       loadInvoice();
-  }, [id, jobCardId,mode]);
+  }, [id, jobCardId, mode]);
   const clearPlanCellError = (rowIndex: number, field: string) => {
     setPlanErrors(prev => {
       const next = { ...prev };
@@ -747,7 +748,7 @@ export default function InvoiceForm() {
       render: (value: string) => (
         <Box className="flex flex-col">
           <span className="font-medium">{formatDate(value)}</span>
-          
+
         </Box>
       ),
     },
@@ -921,7 +922,7 @@ export default function InvoiceForm() {
                 </CardTitle>
                 <div className="space-y-2">
                   <InfoIfExists label="Service Date" value={invoiceView?.jobcard.jobcard_date} />
-                  <InfoIfExists label="Edited Date" value={invoiceView?.jobcard.edited_date} />
+                  <InfoIfExists label="Edited Date" value={invoiceView?.updated_at } />
                 </div>
               </Card>}
             </div>
