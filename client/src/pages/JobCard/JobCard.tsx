@@ -18,7 +18,7 @@ import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import { jobCardStatusList, mailMessageTemplate } from "@/lib/constant";
-import { buildJobCardHtml, buildJobCardMailMessage, downloadHtmlAsPdf, mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
+import {  buildJobCardMailMessage, downloadHtmlAsPdf, mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
 import { Checkbox } from "@radix-ui/react-checkbox";
 
 import whatsap from "@/lib/images/whatsap.webp"

@@ -1,38 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import building from '@/lib/images/building.webp'
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as Dialog from "@radix-ui/react-dialog";
-import { IconButton } from "@chakra-ui/react";
 
 import { Form } from "@/components/ui/form";
-import {
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Box } from "@chakra-ui/react";
-import { Constant } from "@/lib/constant";
-import { warrantyType } from "@/lib/mockData";
-import { InvoicePaymentFormProp, InvoicePaymentFormValues, InvoicePaymentValues, MailValues, organizationFormType, SendMailFormProp, serviceFormProp, serviceFormType, userFormProp, UserFormType } from "@/lib/types";
-import { createInvoicePaymentSchema, MailSchema, organizationSchema, servicePlanSchema, userSchema } from "@/lib/schema";
-import RHFSelect from "@/components/RHFSelect";
-import { Textarea } from "@/components/ui/textarea";
-import { unknown } from "zod";
-import { useAuth } from "@/lib/auth";
-import { fetchCityList, fetchStateList, getInfo, getInvoicePayments,  } from "@/lib/api";
-import { Pencil, Trash2, X } from "lucide-react";
-import { findIdByName } from "@/lib/utils";
-import { RequiredMark } from "@/components/common/RequiredMark";
+import { MailValues, SendMailFormProp } from "@/lib/types";
+import { MailSchema } from "@/lib/schema";
+import { getInfo,  } from "@/lib/api";
 import { SectionCard } from "@/components/common/card";
 import { FloatingField } from "@/components/common/FloatingField";
-import { FloatingRHFModalSelect } from "@/components/common/FloatingRHFModalSelect"
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
 import { Loader } from "@/components/common/loader";
 import { MultiEmailInput } from "@/components/common/MultiEmailInput";
