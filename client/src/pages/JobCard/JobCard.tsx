@@ -374,7 +374,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
 
       toast({
         title: "Send Job card",
-        description: `Job card send successfully via ${sendJobCardModalOpenInfo.type === "mail" ? "mail" : "whatsapp"}`,
+        description: `Job card send successfully via ${sendJobCardModalOpenInfo.type === "email" ? "mail" : "whatsapp"}`,
         variant: "success",
       });
       setSendJobCardModalOpenInfo({ open: false, type: "", info: {} });
