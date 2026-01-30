@@ -80,11 +80,9 @@ export default function InvoicePaymentForm({
 
             const res =
                 await getInvoicePayments(initialValues ?? "");
-            console.log(res.data, 'res.data');
 
             const mappedData = res.data
             setPaymentMode(res.payment_modes)
-            console.log(mappedData, 'mappedData');
 
             form.setValue("grand_total", mappedData.grand_total);
 

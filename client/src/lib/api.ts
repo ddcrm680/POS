@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { Constant } from "./constant";
 import { cookieStore } from "./cookie";
-import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, productCountHandler, SaveInvoicePaymentPayload, serviceFormType, storeFormType, TerritoryFormRequestValues, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
+import { editOrganizationReq, editServicePlanReq, editUserReq, organizationFormType, productCountHandler, SaveInvoicePaymentPayload, sendMailReq, serviceFormType, storeFormType, TerritoryFormRequestValues, TerritoryFormValues, TerritoryMasterApiType, UserFormType } from "./types";
 import { DateRangeType, DateValueType } from "react-tailwindcss-datepicker";
 import { setServiceDown } from "./systemStatus";
 import { mockNotifications } from "./mockData";
@@ -312,6 +312,7 @@ export async function EditUser(editFormValue: editUserReq) {
 
   }
 }
+
 export async function ProductCountHelper(productCountData: productCountHandler) {
 
   try {
@@ -1451,6 +1452,40 @@ export async function getInvoiceInfoByJobCardPrefill(data: any) {
     }
     throw new Error(
       response?.data?.message || "Failed to get invoice info"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function getMailInfo(id: number | string) {
+  try {
+    const response: any = await api.get(
+      `/api/job-cards/${id}/mail`
+    );
+
+    if (response?.data?.success === true) {
+      return response.data;
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to fetch mail info"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function getPhoneInfo(id: number | string) {
+  try {
+    const response: any = await api.get(
+      `/api/job-cards/${id}/phone`
+    );
+
+    if (response?.data?.success === true) {
+      return response.data;
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to fetch phone info"
     );
   } catch (response: any) {
     throw response;

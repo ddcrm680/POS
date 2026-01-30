@@ -114,6 +114,30 @@ export const srsConditionList = [
   { value: "fair-condition", label: "Fair Condition" },
   { value: "poor-condition", label: "Poor Condition" },
 ];
+
+export const mailMessageTemplate=`Dear {{consumer_name}},<br><br>
+
+We hope you are doing well.<br><br>
+
+Please find attached the <b>Job Card (No. {{job_card_number}})</b> for the services carried out on <b>{{service_date}}</b>.<br><br>
+
+This job card contains the details of the work performed on your vehicle. If you have any questions or require any clarification regarding the services mentioned, please feel free to contact us.<br><br>
+
+<b>Important Note:</b><br>
+Please ensure that you collect your invoice and get your warranty registered online from the studio where you availed the service. Detailing Devils does not provide any warranty and will not be responsible or liable for warranty claims if the warranty is not registered online.<br><br>
+
+You can check your warranty status using the link below:<br>
+<a href="https://mycrm.detailingdevils.com/check-warranty" target="_blank">
+https://mycrm.detailingdevils.com/check-warranty
+</a>
+<br><br>
+
+Kind regards,<br><br>
+
+<b>{{store_name}}</b><br>
+Phone: +91 {{store_phone}}<br>
+Website: www.detailingdevils.com
+`
 // Vehicle makes and models
 export const vehicleMakes = ['Honda', 'Toyota', 'Maruti Suzuki', 'Hyundai', 'Tata', 'Mahindra', 'Ford', 'BMW', 'Mercedes-Benz', 'Audi'];
 export const vehicleModels = {

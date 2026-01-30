@@ -302,7 +302,34 @@ export const userSchema = (mode: "create" | "edit" | "view") =>
       .or(z.literal("")),
 
   });
+export const MailSchema = z.object({
+  to: z
+    .array(
+      z.string().email("Invalid email address")
+    )
+    .min(1, "At least one recipient email is required")
+    .refine(
+      emails => emails.every(e => e.includes("@")),
+      {
+        message: "One or more recipient addresses are invalid",
+      }
+    ),
+  subject: z
+    .string()
+    .trim()
+    .min(5, "Subject must be at least 5 characters")
+    .max(50, "Subject must not exceed 50 characters"),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Message must be at least 10 characters")
 
+});
+export const whatsappSchema = z.object({
+  phone: z
+    .string()
+    .regex(/^\d{10}$/, "Whatsapp No. must be exactly 10 digits"),
+});
 export const productCountSchema = (initialValues: any) =>
   z.object({
     count: z
@@ -932,7 +959,7 @@ export const TransferProductSchema = z
       .max(255, "Shipping address must not exceed 255 characters"),
     organization: z.string().min(1),
     transfer_date: z.string()
-    .min(1, "Transfer date is required"),
+      .min(1, "Transfer date is required"),
     state_id: z.string().min(1, "Please select state"),
 
     // 🧱 BUILDER FIELDS (optional now)

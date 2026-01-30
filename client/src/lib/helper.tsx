@@ -1,4 +1,5 @@
 import { Constant,  } from "./constant";
+import { formatDate2 } from "./utils";
 
 export function mapColumnsForCustomerView(
   baseColumns: any[],
@@ -396,4 +397,22 @@ export function buildInvoiceHtml(row: any, template: string) {
     .replace("{{balance}}", row?.balance.toString())
     .replace("{{bill_gst_block}}", billGstHtml)
     .replace("{{amount_in_words}}", row.amount_in_words ?? "");
+}
+
+export function buildJobCardMailMessage(
+  template: string,
+  row: any
+) {
+  return template
+    .replace("{{consumer_name}}", row.consumer?.name ?? "")
+    .replace("{{job_card_number}}", row.job_card_number ?? "")
+    .replace(
+      "{{service_date}}",
+      row.jobcard_date
+        ? formatDate2(row.jobcard_date)
+        : ""
+    )
+    .replace("{{store_name}}", row.store?.name ?? "")
+    .replace("{{store_phone}}", row.store?.phone ?? "")
+    .replace("{{store_email}}", row.store?.email ?? "");
 }

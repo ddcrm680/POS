@@ -1,5 +1,5 @@
 import { Control, ControllerRenderProps, UseFormSetError } from "react-hook-form";
-import { createInvoicePaymentSchema, CustomerSchema, InsertCustomerSchema, JobCardOnlySchema, JobCardSchema, loginSchema, NewCustomerSchema, NewJobCardSchema, passwordSchema, posJobSchema, profileSchema, TransferProductSchema, userSchema, VehicleSchema } from "./schema";
+import { createInvoicePaymentSchema, CustomerSchema, InsertCustomerSchema, JobCardOnlySchema, JobCardSchema, loginSchema, MailSchema, NewCustomerSchema, NewJobCardSchema, passwordSchema, posJobSchema, profileSchema, TransferProductSchema, userSchema, VehicleSchema, whatsappSchema } from "./schema";
 import z from "zod";
 import { ReactNode } from "react";
 
@@ -71,7 +71,18 @@ export type editUserReq = {
     address?: string | undefined;
   };
 }
-
+export interface sendMail {
+    to: string[];
+    subject?: string | null
+    message: string;
+  }
+  export interface updatedMailProp extends sendMail{
+    id:string
+  }
+export type sendMailReq = {
+  id: string;
+  info:sendMail;
+}
 export type productCountHandler={
   type:string
   id:string
@@ -371,7 +382,36 @@ export type InvoicePaymentFormValues = {
   payment_date: string;
   remarks?: string;
 };
+export interface sendWhatsapValues{
+  phone:string
+}
+export interface updatedWhatsapValue extends sendWhatsapValues{
+  id:string
+}
+export interface SendMailFormProp {
+  id?: string;
 
+  initialValues?:updatedMailProp;
+  isLoading?: boolean;
+  onClose: () => void;
+  // 👇 IMPORTANT
+  onSubmit: (
+    values: sendMail,
+    setError: UseFormSetError<sendMail>
+  ) => void;
+}
+export interface SendWhatsapptFormProp {
+  id?: string;
+
+  initialValues?:updatedWhatsapValue;
+  isLoading?: boolean;
+  onClose: () => void;
+  // 👇 IMPORTANT
+  onSubmit: (
+    values: sendWhatsapValues,
+    setError: UseFormSetError<sendWhatsapValues>
+  ) => void;
+}
 export interface InvoicePaymentFormProp {
   mode: "create" | "edit" | "view";
   roles: any[];
@@ -755,6 +795,9 @@ export type JobCardFormValues = z.infer<typeof NewJobCardSchema>;
 export type InvoicePaymentValues = z.infer<
   ReturnType<typeof createInvoicePaymentSchema>
 >;
+
+export type MailValues = z.infer<typeof MailSchema>;
+export type WhatsappValues = z.infer<typeof whatsappSchema>;
 export type GstType = "igst" | "cgst_sgst";
 export type JobCardOnlyFormValues = z.infer<typeof JobCardOnlySchema>;
 export type JobCardFormUnion = JobCardFormValues | JobCardOnlyFormValues;

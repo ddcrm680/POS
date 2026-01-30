@@ -17,8 +17,8 @@ import { canShowAction, formatAndTruncate, formatDate, formatTime } from "@/lib/
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { ColumnFilter } from "@/components/common/ColumnFilter";
 import { customerMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
-import { jobCardStatusList } from "@/lib/constant";
-import { buildJobCardHtml, downloadHtmlAsPdf, mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
+import { jobCardStatusList, mailMessageTemplate } from "@/lib/constant";
+import { buildJobCardHtml, buildJobCardMailMessage, downloadHtmlAsPdf, mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
 import { Checkbox } from "@radix-ui/react-checkbox";
 
 import whatsap from "@/lib/images/whatsap.webp"
@@ -26,6 +26,8 @@ import CommonRowMenu from "@/components/common/CommonRowMenu";
 import { jobCardHtmlTemplate } from "./template";
 import { Loader } from "@/components/common/loader";
 import { GlobalLoader } from "@/components/common/GlobalLoader";
+import SendOnWhatsappForm from "./SendOnWhatsappForm";
+import SendMailtForm from "./SendMailtForm";
 export default function JobCard({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
   const { toast } = useToast();
   const { roles } = useAuth();
@@ -42,6 +44,11 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
     store: false,
     admin: false,
     default: false
+  });
+  const [sendJobCardModalOpenInfo, setSendJobCardModalOpenInfo] = useState<{ open: boolean, type: string, info: any }>({
+    open: false,
+    type: 'create',
+    info: {}
   });
   const [filters, setFilters] = useState({
     status: "",
@@ -97,27 +104,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       setIsLoading(false);
     }
   };
-  const JobCardSendHandler = async () => {
-    try {
-      setIsLoading(true);
-
-      await jobCardSend(sendModal);
-      toast({ title: `Send Job Card`, description: "Job Card send successfully", variant: "success", });
-
-    } catch (err: any) {
-
-      toast({
-        title: "Error",
-        description:
-          err?.response?.data?.message ||
-          err.message || `Failed to send jobcard`,
-        variant: "destructive",
-      });
-    } finally {
-      setSendModal({ open: false, jobCard: {} });
-      setIsLoading(false);
-    }
-  };
+ 
   const [filterMetaInfo, setFilterMetaInfo] = useState<{ status: { value: string, label: string }[] }>({
     status: []
   });
@@ -374,7 +361,55 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       consumer_id: ""
     })
   }
-  const [sendModal, setSendModal] = useState<any>({ open: false, jobCard: {} })
+  const SendCommonHandler = async (
+    value: any,
+    setError: UseFormSetError<any>
+  ) => {
+    try {
+      setIsLoading(true);
+      console.log(value,'valuevaluevalue');
+      
+      // await jobCardSend(sendJobCardModalOpenInfo);
+
+      toast({
+        title: "Send Job card",
+        description: `Job card send successfully via ${sendJobCardModalOpenInfo.type === "mail" ? "mail" : "whatsapp"}`,
+        variant: "success",
+      });
+      setSendJobCardModalOpenInfo({ open: false, type: "", info: {} });
+
+    } catch (err: any) {
+      const apiErrors = err?.response?.data?.errors;
+
+
+      // 👇 THIS IS THE KEY PART
+      if (apiErrors && err?.response?.status === 422) {
+        Object.entries(apiErrors).forEach(([field, messages]) => {
+          setError(field as keyof UserFormType, {
+            type: "server",
+            message: (messages as string[])[0],
+          });
+        });
+        return;
+      }
+      if (err?.response?.status === 403) {
+
+
+        setSendJobCardModalOpenInfo({ open: false, type: "create", info: {} });
+      }
+      toast({
+        title: "Error",
+        description:
+          err?.response?.data?.message ||
+          err.message ||
+          `Failed to send
+          } job card`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const allowedActions = hideColumnListInCustomer?.actionShowedList;
 
   const [rowLoading, setRowLoading] = useState<{
@@ -500,9 +535,13 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                     label: "Send via WhatsApp",
                     icon: <Image src={whatsap} className="w-4 h-4" />,
                     onClick: () =>
-                      setSendModal({
+                      setSendJobCardModalOpenInfo({
                         open: true,
-                        jobCard: { ...row, sendType: "whatsap" },
+                        type: "whatsapp",
+                        info: {
+                          id:row.id,
+                          phone: row?.consumer?.phone
+                        },
                       }),
                     show: roleView.admin || roleView.store,
                   },
@@ -513,13 +552,24 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                     label: "Send via Mail",
                     icon: <Mail size={16} />,
                     onClick: () =>
-                      setSendModal({
+                      setSendJobCardModalOpenInfo({
                         open: true,
-                        jobCard: { ...row, sendType: "mail" },
+                        type: "mail",
+                        info: {
+                           id:row.id,
+                          // 👇 TO field (consumer email)
+                          to:row.consumer?.email ? [row.consumer?.email ]:[],
+
+                          // 👇 Subject
+                          subject: `Job Card #${row.job_card_number}`,
+
+                          // 👇 Message body
+                          message: buildJobCardMailMessage(mailMessageTemplate, row),
+                        },
                       }),
                     show: roleView.admin || roleView.store,
-                  },
-
+                  }
+,
                   /* CANCEL */
                   {
                     key: "cancel",
@@ -540,31 +590,64 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             )}
 
           />
+          <CommonModal
+            width="40%"
+            maxWidth="40%"
+            isOpen={sendJobCardModalOpenInfo.open}
+            onClose={() => setSendJobCardModalOpenInfo({ open: false, info: {}, type: "" })}
+            title={sendJobCardModalOpenInfo.type === 'whatsapp' ? "Send via whatsapp" : "Send via mail"}
+            isLoading={isLoading}
+            primaryText={"Save"}
+            cancelTextClass='hover:bg-[#E3EDF6] hover:text-[#000]'
+            primaryColor="bg-[#FE0000] hover:bg-[rgb(238,6,6)]"
+          >
+            {
+              sendJobCardModalOpenInfo.type === 'whatsapp' ?
+                <SendOnWhatsappForm
+                  id="whatsapp-form"
+                  initialValues={
+                    sendJobCardModalOpenInfo.info
+                  }
+                  isLoading={isLoading}
+                  onClose={() =>
+                    setSendJobCardModalOpenInfo({ open: false, info: {}, type: "" })
+                  }
+                  onSubmit={(values, setError) => {
+                    SendCommonHandler(values, setError);
+                  }}
+                />
+                : <SendMailtForm
+                  id="mail-form"
+                  initialValues={
+                    sendJobCardModalOpenInfo.info
+                  }
+                  isLoading={isLoading}
+                  onClose={() =>
+                    setSendJobCardModalOpenInfo({ open: false, info: {}, type: "" })
+                  }
+                  onSubmit={(values, setError) => {
+                    SendCommonHandler(values, setError);
+                  }}
+                />
 
+            }
+          </CommonModal>
           <CommonDeleteModal
             width="330px"
             maxWidth="330px"
-            isOpen={sendModal.open || isJobCardDeleteModalInfo.open}
-            title={`${sendModal.open ? "Send Job Card " : "Cancel Job Card"}`}
-            description={`Are you sure you want to ${sendModal.open ? 'send' : 'cancel'} this job card ${sendModal.open ? sendModal?.jobCard?.sendType === "whatsap" ? 'via Whatsapp' : "via Mail" : " "}? ${sendModal.open ? '' : 'This action cannot be undone.'}`}
-            confirmText={`Yes, ${sendModal.open ? 'Send' : 'Cancel'}`}
+            isOpen={isJobCardDeleteModalInfo.open}
+            title={`Cancel Job Card`}
+            description={`Are you sure you want to cancel this job card ? 'This action cannot be undone.'}`}
+            confirmText={`Cancel`}
             cancelText="No"
-            loadingText={`${sendModal.open ? 'Sending' : 'Cancelling'}...`}
+            loadingText={`Cancelling...`}
             isLoading={isLoading}
             onCancel={() => {
-              if (sendModal.open) {
-                setSendModal({ open: false, jobCard: {} })
-
-              } else
-                setIsJobCardDeleteModalOpenInfo({ open: false, info: {} })
+              setIsJobCardDeleteModalOpenInfo({ open: false, info: {} })
             }
             }
             onConfirm={() => {
-              if (sendModal.open) {
-                JobCardSendHandler()
-              } else {
-                JobCardDeleteHandler()
-              }
+              JobCardDeleteHandler()
             }}
           />
 
