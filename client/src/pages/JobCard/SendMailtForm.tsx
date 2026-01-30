@@ -101,7 +101,8 @@ export default function SendMailtForm({
                                 <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                                     <FloatingField
                                         name="email_to"
-                                        label="To"
+                                   label="To (write email, press Enter to add)"
+
                                         control={form.control}
                                         isRequired
                                         render={({ field }) => (
