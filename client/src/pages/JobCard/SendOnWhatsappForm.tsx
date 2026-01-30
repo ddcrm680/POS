@@ -18,8 +18,9 @@ import { SendWhatsapptFormProp, WhatsappValues } from "@/lib/types";
 import { whatsappSchema } from "@/lib/schema";
 import { RequiredMark } from "@/components/common/RequiredMark";
 import { SectionCard } from "@/components/common/card";
-import { getPhoneInfo } from "@/lib/api";
+import { getInfo, getPhoneInfo } from "@/lib/api";
 import { Loader } from "@/components/common/loader";
+import { FloatingField } from "@/components/common/FloatingField";
 
 export default function SendOnWhatsappForm({
     id,
@@ -44,7 +45,7 @@ export default function SendOnWhatsappForm({
                 setIsDataLoading(true);
 
             const res =
-                await getPhoneInfo(initialValues?.id ?? "");
+                await getInfo(initialValues?.id ?? "",'whatsapp');
 
             const mappedData = res.data
             form.setValue("phone", mappedData.phone);
@@ -58,12 +59,9 @@ export default function SendOnWhatsappForm({
     };
 
     useEffect(() => {
-        form.reset({
-            phone: "",
-            ...initialValues,
-        });
-        //   if (initialValues)
-        //       fetchMailInfo(false);
+    
+          if (initialValues)
+              fetchMailInfo(false);
     }, [initialValues]);
     return (
         <Form {...form}>
@@ -80,29 +78,15 @@ export default function SendOnWhatsappForm({
                                         </div> :    <div className="pb-4  max-h-[60vh] overflow-y-auto">
                         <SectionCard className="mt-0">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="phone"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel style={{ color: "#000" }}>Whatsapp No.<RequiredMark show={true} /></FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    inputMode="numeric"
-                                                    maxLength={10}
-                                                    placeholder="Enter whatsapp no."
-                                                    onChange={(e) => {
-                                                        let value = e.target.value.replace(/\D/g, "");
-                                                        if (value.startsWith("0")) value = value.replace(/^0+/, "");
-                                                        field.onChange(value);
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                 <FloatingField
+                                                                        name="phone"
+                                                                        label="Whatsapp No."
+                                                                        isRequired={true}
+                                                                        type="text"
+                                                                        control={form.control}
+                                                                    />
+                                
+                              
                             </div>
                         </SectionCard>
 

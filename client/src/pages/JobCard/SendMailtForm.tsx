@@ -26,7 +26,7 @@ import RHFSelect from "@/components/RHFSelect";
 import { Textarea } from "@/components/ui/textarea";
 import { unknown } from "zod";
 import { useAuth } from "@/lib/auth";
-import { fetchCityList, fetchStateList, getInvoicePayments, getMailInfo } from "@/lib/api";
+import { fetchCityList, fetchStateList, getInfo, getInvoicePayments,  } from "@/lib/api";
 import { Pencil, Trash2, X } from "lucide-react";
 import { findIdByName } from "@/lib/utils";
 import { RequiredMark } from "@/components/common/RequiredMark";
@@ -63,10 +63,10 @@ export default function SendMailtForm({
                 setIsDataLoading(true);
 
             const res =
-                await getMailInfo(initialValues?.id ?? "");
+                await getInfo(initialValues?.id ?? "",'email');
 
             const mappedData = res.data
-            form.setValue("to", mappedData.to);
+            form.setValue("to", mappedData.email_to);
             form.setValue("message", mappedData.message);
             form.setValue("subject", mappedData.subject);
         } catch (e) {
@@ -79,14 +79,14 @@ export default function SendMailtForm({
     };
 
     useEffect(() => {
-        form.reset({
-            to: [],
-            message: "",
-            ...initialValues,
-            subject: initialValues?.subject ?? "",
-        });
-        // if (initialValues)
-        //     fetchMailInfo(false);
+        // form.reset({
+        //     to: [],
+        //     message: "",
+        //     ...initialValues,
+        //     subject: initialValues?.subject ?? "",
+        // });
+        if (initialValues)
+            fetchMailInfo(false);
     }, [initialValues]);
     return (
         <Form {...form}>
@@ -103,61 +103,34 @@ export default function SendMailtForm({
                         </div> : <div className="pb-4  max-h-[60vh] overflow-y-auto">
                             <SectionCard className="mt-0">
                                 <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                                    <FormField
-                                        control={form.control}
+                                    <FloatingField
                                         name="to"
+                                        label="To"
+                                        control={form.control}
+                                        isRequired
                                         render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel style={{ color: "#000" }}>
-                                                    To <RequiredMark show />
-                                                </FormLabel>
-
-                                                <FormControl>
-                                                    <MultiEmailInput
-                                                        value={field.value ?? []}
-                                                        onChange={field.onChange}
-                                                    />
-                                                </FormControl>
-
-                                                <FormMessage />
-                                            </FormItem>
+                                            <MultiEmailInput
+                                                value={field.value ?? []}
+                                                onChange={field.onChange}
+                                            />
                                         )}
                                     />
 
-                                    <FormField
-                                        control={form.control}
 
+                                    <FloatingField
                                         name="subject"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel style={{ color: "#000" }}>Subject<RequiredMark show={true} /></FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} placeholder="Enter subject" readOnly />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
+                                        label="Subject"
+                                        isRequired={true}
+                                        type="text"
                                         control={form.control}
+                                    />
 
+                                    <FloatingTextarea
+                                        isRequired
                                         name="message"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel style={{ color: "#000" }}>Message<RequiredMark show={true} /></FormLabel>
-                                                <FormControl>
-                                                    <Textarea
-                                                        {...field}
-                                                        className="h-[150px]"
-                                                        placeholder="Enter message"
-                                                        minLength={10}
-                                                        readOnly
-                                                    // maxLength={300}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
+                                        rows={6}
+                                        label="Message"
+                                        control={form.control}
                                     />
 
                                 </div>

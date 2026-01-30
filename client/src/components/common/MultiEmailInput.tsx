@@ -10,11 +10,10 @@ type Props = {
   placeholder?: string;
   disabled?: boolean;
 };
-
 export function MultiEmailInput({
   value,
   onChange,
-  placeholder = "To: email address",
+  placeholder = "",
   disabled,
 }: Props) {
   const [input, setInput] = useState("");
@@ -22,8 +21,6 @@ export function MultiEmailInput({
   const addEmail = () => {
     const email = input.trim().toLowerCase();
     if (!email) return;
-
-    // allow adding even if invalid (shown as red)
     if (value.includes(email)) return;
 
     onChange([...value, email]);
@@ -34,15 +31,22 @@ export function MultiEmailInput({
     onChange(value.filter(v => v !== email));
   };
 
+  const hasChips = value.length > 0;
+
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-2 min-h-[35x]",
+        "flex flex-wrap items-center gap-2 min-h-[38px]",
         "rounded-md border px-3 py-1.5",
         "focus-within:ring-2 focus-within:ring-ring focus-within:border-ring",
         disabled && "opacity-50 cursor-not-allowed"
       )}
     >
+      {/* LEFT SPACER (only when empty) */}
+      {!hasChips && (
+        <span className="inline-block w-6 shrink-0" />
+      )}
+
       {/* EMAIL CHIPS */}
       {value.slice(0, 2).map(email => {
         const valid = isValidEmail(email);
@@ -61,10 +65,7 @@ export function MultiEmailInput({
             <button
               type="button"
               onClick={() => removeEmail(email)}
-              className={cn(
-                "rounded hover:bg-black/5",
-                valid ? "text-black" : "text-black"
-              )}
+              className="rounded hover:bg-black/5"
             >
               <X size={12} />
             </button>
@@ -93,18 +94,19 @@ export function MultiEmailInput({
             removeEmail(value[value.length - 1]);
           }
         }}
-        placeholder={value.length ? "" : placeholder}
-         className="
-    flex-1 min-w-[160px] h-[25px]
-    bg-transparent text-sm
-    outline-none border-none ring-0
-    focus:outline-none focus:ring-0 focus:border-none
-    placeholder:text-muted-foreground
-  "
+        placeholder={hasChips ? "" : placeholder}
+        className="
+          flex-1 min-w-[160px] h-[25px]
+          bg-transparent text-sm
+          outline-none border-none ring-0
+          focus:outline-none focus:ring-0 focus:border-none
+          placeholder:text-muted-foreground
+        "
       />
     </div>
   );
 }
+
 
 /* helper */
 const isValidEmail = (email: string) =>

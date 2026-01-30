@@ -1,39 +1,43 @@
-"use client"
+"use client";
 
-import {
-  Box,
-  Input,
-  Text,
-  defineStyle,
-} from "@chakra-ui/react"
-import { Controller, Control } from "react-hook-form"
-import { useState } from "react"
-import { RequiredMark } from "./RequiredMark"
+import { Box, Input, Text, defineStyle } from "@chakra-ui/react";
+import { Controller, Control } from "react-hook-form";
+import { useState } from "react";
+import { RequiredMark } from "./RequiredMark";
 
 type FloatingFieldProps = {
-  name: string
-  label: string
-  control: Control<any>
-  isView?: boolean
-  maxAmount?: string
-  isRequired?: boolean
-  isDisabled?: boolean
-  type?: string
-} & Omit<React.ComponentProps<typeof Input>, "name">
+  name: string;
+  label: string;
+  control: Control<any>;
+  isView?: boolean;
+    maxAmount?: string
+  isRequired?: boolean;
+  isDisabled?: boolean;
+  type?: string;
+
+  /** 👇 Custom field renderer (MultiEmailInput, Select, etc.) */
+  render?: (args: {
+    field: any;
+    disabled: boolean;
+    error?: string;
+  }) => React.ReactNode;
+} & Omit<React.ComponentProps<typeof Input>, "name">;
 
 export function FloatingField({
   name,
   label,
   control,
   isDisabled = false,
+  
+  maxAmount,
   isView,
   isRequired = false,
-  maxAmount,
   type = "text",
+  render,
   ...inputProps
 }: FloatingFieldProps) {
-  const [focused, setFocused] = useState(false)
-  const [inputType, setInputType] = useState(type)
+  const [focused, setFocused] = useState(false);
+  const [inputType, setInputType] = useState(type);
 
   const disabled = isView || isDisabled
   const isMobileField = name === "search_mobile" || name === "phone" || name === "billing_phone" || name == "company_contact_no";
@@ -43,33 +47,39 @@ export function FloatingField({
       name={name}
       control={control}
       render={({ field, fieldState }) => {
-        const { error } = fieldState
-        if (name === 'opening_date') { }
+        const error = fieldState.error?.message;
 
-        const shouldFloat =
-          focused || (field.value && String(field.value).length > 0)
+        const hasValue = Array.isArray(field.value)
+          ? field.value.length > 0
+          : !!field.value;
+
+        const shouldFloat = focused || hasValue;
 
         return (
           <Box position="relative" w="full">
-          <Input
-  {...field}
-  {...inputProps}
-  type={inputType}
-  h="38px"
-  fontSize="13px"
+            {/* ================= FIELD ================= */}
+            {render ? (
+              render({ field, disabled, error })
+            ) : (
+              <Input
+                {...field}
+                {...inputProps}
+                type={inputType}
+                h="38px"
+                fontSize="13px"
   lineHeight="1.4"
-  disabled={disabled}
-  pt="14px"
-  pb="6px"
-  pl="10px"
-  pr="10px"
-  border="1px solid"
-  borderColor={error ? "red.500" : "#e1e7ef"}
+                disabled={disabled}
+                pt="14px"
+                pb="6px"
+                pl="10px"
+                pr="10px"
+                border="1px solid"
+                borderColor={error ? "red.500" : "#e1e7ef"}
   _focus={{ borderColor: error ? "red.500" : "blue.500" }}
-  _disabled={{
-    bg: "gray.50",
-    opacity: 0.7,
-  }}
+                _disabled={{
+                  bg: "gray.50",
+                  opacity: 0.7,
+                }}
 
               /* 🔒 MOBILE NUMBER RULE */
               inputMode={isMobileField ? "numeric" : inputProps.inputMode}
@@ -132,38 +142,38 @@ export function FloatingField({
               }}
 
               onBlur={(e) => {
-                setFocused(false);
-                field.onBlur();
+                  setFocused(false);
+                  field.onBlur();
                 if (type === "date" && !field.value) {
                   setInputType("text");
                 }
                 inputProps.onBlur?.(e);
-              }}
-            />
+                }}
+              />
+            )}
 
-
-
-            {/* Floating label */}
+            {/* ================= FLOATING LABEL ================= */}
             <Text
               css={floatingLabelStyle}
-                bg={disabled ? "#fafafa" : "white"} 
               data-float={shouldFloat || undefined}
-              color={error ? "red.500" : "gray.500"}
+              bg={disabled ? "#fafafa" : "white"}
+              color={"gray.500"}
             >
               {label}
               {isRequired && <RequiredMark show={!disabled} />}
             </Text>
 
+            {/* ================= ERROR ================= */}
             {error && (
               <Text mt="1" fontSize="xs" color="red.500">
-                {error.message}
+                {error}
               </Text>
             )}
           </Box>
-        )
+        );
       }}
     />
-  )
+  );
 }
 
 const floatingLabelStyle = defineStyle({
@@ -182,4 +192,4 @@ const floatingLabelStyle = defineStyle({
     top: "-6px",
     fontSize: "10px",
   },
-})
+});

@@ -1183,7 +1183,7 @@ export async function jobCardCancel(id: any) {
 export async function jobCardSend(info: any) {
   try {
     const response: any = await api.post(
-      `/api/job-cards/${info.jobCard.id}/send?type=${info.jobCard.sendType}`,
+      `/api/job-cards/${info.jobCard.id}/send?type=${info.type}`,
     );
 
     if (response?.data?.success === true) {
@@ -1457,10 +1457,10 @@ export async function getInvoiceInfoByJobCardPrefill(data: any) {
     throw response;
   }
 }
-export async function getMailInfo(id: number | string) {
+export async function getInfo(id: number | string,type:string) {
   try {
     const response: any = await api.get(
-      `/api/job-cards/${id}/mail`
+      `/api/job-cards/${id}/share-preview?channel=${type}`
     );
 
     if (response?.data?.success === true) {
