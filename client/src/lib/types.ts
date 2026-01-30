@@ -72,7 +72,7 @@ export type editUserReq = {
   };
 }
 export interface sendMail {
-    to: string[];
+    email_to: string[];
     subject?: string | null
     message: string;
   }
@@ -390,7 +390,7 @@ export interface updatedWhatsapValue extends sendWhatsapValues{
 }
 export interface SendMailFormProp {
   id?: string;
-
+open:boolean
   initialValues?:updatedMailProp;
   isLoading?: boolean;
   onClose: () => void;
@@ -402,7 +402,7 @@ export interface SendMailFormProp {
 }
 export interface SendWhatsapptFormProp {
   id?: string;
-
+open:boolean
   initialValues?:updatedWhatsapValue;
   isLoading?: boolean;
   onClose: () => void;

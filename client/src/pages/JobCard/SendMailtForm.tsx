@@ -42,13 +42,14 @@ export default function SendMailtForm({
     onClose,
     initialValues,
     isLoading = false,
+    open,
     onSubmit,
 }: SendMailFormProp) {
 
     const form = useForm<MailValues>({
         resolver: zodResolver(MailSchema),
         defaultValues: {
-            to: [],
+            email_to: [],
             message: "",
             ...initialValues,
 
@@ -66,7 +67,7 @@ export default function SendMailtForm({
                 await getInfo(initialValues?.id ?? "",'email');
 
             const mappedData = res.data
-            form.setValue("to", mappedData.email_to);
+            form.setValue("email_to", mappedData.email_to);
             form.setValue("message", mappedData.message);
             form.setValue("subject", mappedData.subject);
         } catch (e) {
@@ -79,13 +80,7 @@ export default function SendMailtForm({
     };
 
     useEffect(() => {
-        // form.reset({
-        //     to: [],
-        //     message: "",
-        //     ...initialValues,
-        //     subject: initialValues?.subject ?? "",
-        // });
-        if (initialValues)
+        if (id)
             fetchMailInfo(false);
     }, [initialValues]);
     return (
@@ -104,7 +99,7 @@ export default function SendMailtForm({
                             <SectionCard className="mt-0">
                                 <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                                     <FloatingField
-                                        name="to"
+                                        name="email_to"
                                         label="To"
                                         control={form.control}
                                         isRequired

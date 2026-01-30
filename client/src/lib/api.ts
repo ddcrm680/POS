@@ -1180,10 +1180,13 @@ export async function jobCardCancel(id: any) {
     throw response;
   }
 }
-export async function jobCardSend(info: any) {
+export async function jobCardSend(data: any) {
   try {
+    const {id,...rest}=data.info
+    console.log(rest,'restrestrest');
+    
     const response: any = await api.post(
-      `/api/job-cards/${info.jobCard.id}/send?type=${info.type}`,
+      `/api/job-cards/${data.info.id}/share`,{...rest,channel:data.type}
     );
 
     if (response?.data?.success === true) {

@@ -47,7 +47,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
   });
   const [sendJobCardModalOpenInfo, setSendJobCardModalOpenInfo] = useState<{ open: boolean, type: string, info: any }>({
     open: false,
-    type: 'create',
+    type: '',
     info: {}
   });
   const [filters, setFilters] = useState({
@@ -367,9 +367,10 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
   ) => {
     try {
       setIsLoading(true);
-      console.log(value,'valuevaluevalue');
-      
-      // await jobCardSend(sendJobCardModalOpenInfo);
+      const updatedPayload={...sendJobCardModalOpenInfo,info:{...sendJobCardModalOpenInfo.info,...value}}
+
+      console.log(updatedPayload,'valuevaluevalue');
+      await jobCardSend(updatedPayload);
 
       toast({
         title: "Send Job card",
@@ -554,7 +555,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                     onClick: () =>
                       setSendJobCardModalOpenInfo({
                         open: true,
-                        type: "mail",
+                        type: "email",
                         info: {
                            id:row.id,
                           // 👇 TO field (consumer email)
@@ -605,6 +606,8 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
               sendJobCardModalOpenInfo.type === 'whatsapp' ?
                 <SendOnWhatsappForm
                   id="whatsapp-form"
+                   open={sendJobCardModalOpenInfo.open}
+                 
                   initialValues={
                     sendJobCardModalOpenInfo.info
                   }
@@ -618,6 +621,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                 />
                 : <SendMailtForm
                   id="mail-form"
+                  open={sendJobCardModalOpenInfo.open}
                   initialValues={
                     sendJobCardModalOpenInfo.info
                   }

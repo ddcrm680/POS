@@ -26,6 +26,7 @@ export default function SendOnWhatsappForm({
     id,
     onClose,
     initialValues,
+    open,
     isLoading = false,
     onSubmit,
 }: SendWhatsapptFormProp) {
@@ -60,9 +61,9 @@ export default function SendOnWhatsappForm({
 
     useEffect(() => {
     
-          if (initialValues)
+          if (open)
               fetchMailInfo(false);
-    }, [initialValues]);
+    }, [open]);
     return (
         <Form {...form}>
             <form

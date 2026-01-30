@@ -303,7 +303,7 @@ export const userSchema = (mode: "create" | "edit" | "view") =>
 
   });
 export const MailSchema = z.object({
-  to: z
+  email_to: z
     .array(
       z.string().email("Invalid email address")
     )
