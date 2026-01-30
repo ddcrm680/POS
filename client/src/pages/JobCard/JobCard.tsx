@@ -23,7 +23,6 @@ import { Checkbox } from "@radix-ui/react-checkbox";
 
 import whatsap from "@/lib/images/whatsap.webp"
 import CommonRowMenu from "@/components/common/CommonRowMenu";
-import { jobCardHtmlTemplate } from "./template";
 import { Loader } from "@/components/common/loader";
 import { GlobalLoader } from "@/components/common/GlobalLoader";
 import SendOnWhatsappForm from "./SendOnWhatsappForm";
