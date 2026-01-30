@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCustomerView, getJobCard, getJobCardItem, getPrint, jobCardCancel, jobCardSend, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCommon, getCustomerView, getJobCard, getJobCardItem, jobCardCancel, jobCardSend, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Image, Switch } from "@chakra-ui/react";
@@ -25,6 +25,7 @@ import whatsap from "@/lib/images/whatsap.webp"
 import CommonRowMenu from "@/components/common/CommonRowMenu";
 import { jobCardHtmlTemplate } from "./template";
 import { Loader } from "@/components/common/loader";
+import { GlobalLoader } from "@/components/common/GlobalLoader";
 export default function JobCard({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
   const { toast } = useToast();
   const { roles } = useAuth();
@@ -376,80 +377,23 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
   const [sendModal, setSendModal] = useState<any>({ open: false, jobCard: {} })
   const allowedActions = hideColumnListInCustomer?.actionShowedList;
 
-  const [printDownLoadLoading, setPrintDownLoadLoading] = useState<any>({
-    type: '',
-    isLoad: false
-  })
-  async function commonPreviewHandler(type: string, row: any) {
-    setPrintDownLoadLoading({ type, isLoad: true })
-    let customerRes
+  const [rowLoading, setRowLoading] = useState<{
+    [key: string]: boolean;
+  }>({});
 
-    let jobRes
-    let info
+  async function commonPreviewHandler(type: "print" | "download", row: any) {
+    const key = `${type}-${row.id}`;
+
+    setRowLoading(prev => ({ ...prev, [key]: true }));
+
     try {
-      
-      info= await getPrint(row,'jobcard')
-      // customerRes = await getCustomerView(row.consumer_id ?? "");
-      customerRes = info?.job_card?.consumer
-
-      jobRes = info.job_card
+      await getCommon(row, type, 'job-cards');
     } catch (e) {
-      console.log(e);
-
+      console.error(e);
     } finally {
+      console.log('comes here');
 
-      setPrintDownLoadLoading({ type: "", isLoad: false })
-    }
-
-
-    const rowData = {
-      
-      serviceVehicleImg:info?.service_diagram,
-      jobcardLogo:jobRes?.store?.organization?.org_image,
-      jobcard_date: formatDate(jobRes.jobcard_date),
-      job_card_number: jobRes.job_card_number,
-      name: customerRes.name,
-      phone: customerRes.phone,
-      address: customerRes.address,
-      serviceLocation:jobRes?.store?.name,
-      // state: customerRes.state.name,
-      email: customerRes.email,
-      vehicle_type: jobRes.vehicle_type,
-      make: jobRes.vmake.name,
-      model: jobRes.vmodel.name,
-      color: jobRes.color,
-      year: jobRes.year,
-      technician:jobRes?.technician?.name,
-      reg_no: jobRes.reg_no,
-      chasis_no: jobRes.chasis_no,
-      vehicle_condition: jobRes.vehicle_condition,
-      isRepainted: jobRes.isRepainted,
-      isSingleStagePaint: jobRes.isSingleStagePaint,
-      isPaintThickness: jobRes.isPaintThickness,
-      isVehicleOlder: jobRes.isVehicleOlder,
-      opted_services: info.opted_services,
-      store_manager:info?.store_manager?.name,
-      warranty_years:info?.warranty_years,
-      srsConditionList:info?.srsCondition
-
-    }
-    const html = buildJobCardHtml(rowData, jobCardHtmlTemplate);
-
-    if (type === "print") {
-      openHtmlInNewTabAndPrint(
-        html,
-        "PRINT",
-        "Job Card",
-        row.job_card_number
-      );
-    }
-
-    if (type === "download") {
-      downloadHtmlAsPdf(
-        html,
-        "Job-Card",
-        row.job_card_number
-      );
+      setRowLoading(prev => ({ ...prev, [key]: false }));
     }
   }
 
@@ -494,6 +438,11 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
             }}
             actions={(row: any) => (
               <CommonRowMenu
+                isAsyncLoading={
+                  !!rowLoading[`print-${row.id}`] ||
+                  !!rowLoading[`download-${row.id}`]
+                }
+                closeKey={`${row.id}-${!!rowLoading[`print-${row.id}`] || !!rowLoading[`download-${row.id}`]}`}
                 items={[
 
                   /* VIEW */
@@ -518,26 +467,33 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
                   },
                   {
                     key: "print",
-                    label: "Print / Download",
-                    icon: printDownLoadLoading.isLoad ? <Loader isShowLoadingText={false} loaderSize={3} /> : <PrinterIcon size={16} />,
-                    onClick: () => {
-                      commonPreviewHandler('print', row)
-                    },
-
+                    actionType: "print",
+                    label: "Print",
+                    icon: rowLoading[`print-${row.id}`] ? (
+                      <Loader isShowLoadingText={false} loaderSize={3} />
+                    ) : (
+                      <PrinterIcon size={16} />
+                    ),
+                    onClick: () => commonPreviewHandler("print", row),
                     show: canShowAction("print", allowedActions),
-                    disabled: printDownLoadLoading.isLoad && printDownLoadLoading.type == "print"
-                  },
-                  // {
-                  //   key: "download",
-                  //   label: "Download ",
-                  //   icon: printDownLoadLoading.isLoad ? <Loader isShowLoadingText={false} loaderSize={3} /> : <DownloadIcon size={16} />,
-                  //   onClick: () => {
-                  //     commonPreviewHandler('download', row)
-                  //   },
-                  //   show: canShowAction("download", allowedActions),
+                    disabled: rowLoading[`print-${row.id}`],
+                  }
+                  ,
+                  {
+                    key: "download",
 
-                  //   disabled: printDownLoadLoading.isLoad && printDownLoadLoading.type == "download"
-                  // },
+                    actionType: "download",
+                    label: "Download",
+                    icon: rowLoading[`download-${row.id}`] ? (
+                      <Loader isShowLoadingText={false} loaderSize={3} />
+                    ) : (
+                      <DownloadIcon size={16} />
+                    ),
+                    onClick: () => commonPreviewHandler("download", row),
+                    show: canShowAction("download", allowedActions),
+                    disabled: rowLoading[`download-${row.id}`],
+                  }
+                  ,
                   /* SEND VIA WHATSAPP */
                   {
                     key: "whatsapp",

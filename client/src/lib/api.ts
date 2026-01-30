@@ -1264,22 +1264,61 @@ export async function getJobCardItem(data: any) {
     throw response;
   }
 }
-
-export async function getPrint(row: any, type: string) {
+export async function getCommon(row: any, type: string, module: string) {
   try {
+    // ================= DOWNLOAD (PDF) =================
+    if (type === "download") {
+      const response = await api.get(
+        `api/${module}/${row.id}/download`,
+        {
+          responseType: "blob", // ✅ IMPORTANT
+        }
+      );
 
-const response: any = await api.get(
-  `api/job-cards/${row.id}/print`,
-);
+      const blob = new Blob([response.data], {
+        type: "application/pdf",
+      });
 
-if (response?.data?.success === true) {
-  return response.data.data; 
-}
-throw new Error(
-  response?.data?.message || `Failed to get  ${type==='invoice' ? "invoice":"job card"} slip`
-);
-  } catch (response: any) {
-    throw response;
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `job-card-${row.job_card_number || row.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ================= PRINT (HTML) =================
+    if (type === "print") {
+      const response = await api.get(
+        `api/${module}/${row.id}/print`,
+        {
+          responseType: "text",
+        }
+      );
+
+      let html = response.data;
+
+      html += `
+        <script>
+          window.onload = function () {
+            window.print();
+          };
+        </script>
+      `;
+
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+
+      window.open(url, "_blank");
+    }
+
+  } catch (error) {
+    console.error("Print/Download error:", error);
+    throw error;
   }
 }
 export async function getJobCardPrefillData(data: any) {

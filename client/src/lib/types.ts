@@ -404,6 +404,29 @@ export interface organizationFormProp {
     setError: UseFormSetError<organizationFormType>
   ) => void;
 }
+export type GlobalLoaderProps = {
+  isShowLoadingText?: boolean;
+  color?: string;
+  bgColor?: string;   // NEW
+};
+export type CommonMenuItem = {
+  key: string;
+  label: string;
+  icon?: React.ReactNode;
+  onClick: () => void;
+  show?: boolean;
+  danger?: boolean;
+  disabled?: boolean;
+
+  actionType?: "print" | "download"; // 👈 NEW (only for these cases)
+};
+
+export type CommonRowMenuProps = {
+  items: CommonMenuItem[];
+  width?: number;
+  isAsyncLoading?: boolean;
+  closeKey?: string ; // 👈 NEW
+};
 export interface systemLogProp {
   mode: "create" | "edit" | "view";
   roles: any[];

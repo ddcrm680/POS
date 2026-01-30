@@ -3,29 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { EllipsisVertical } from "lucide-react";
-
-export type CommonMenuItem = {
-  key: string;
-  label: string;
-  icon?: React.ReactNode;
-  onClick: () => void;
-  show?: boolean;
-  danger?: boolean;
-  disabled?: boolean;
-};
-
-type Props = {
-  items: CommonMenuItem[];
-  width?: number;
-};
-
-export default function CommonRowMenu({ items, width = 190 }: Props) {
+import { CommonRowMenuProps } from "@/lib/types";
+export default function CommonRowMenu({ items, width = 190, closeKey, isAsyncLoading }: CommonRowMenuProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
-
+  useEffect(() => {
+    if (closeKey?.includes('false'))
+      setOpen(false);
+  }, [closeKey]);
   /* ----------------------------------------
    * Calculate position (UP / DOWN)
    * -------------------------------------- */
@@ -49,18 +37,19 @@ export default function CommonRowMenu({ items, width = 190 }: Props) {
   /* ----------------------------------------
    * Close on outside click
    * -------------------------------------- */
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        !triggerRef.current?.contains(e.target as Node) &&
-        !menuRef.current?.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+useEffect(() => {
+  const handler = (e: MouseEvent) => {
+    if (
+      !triggerRef.current?.contains(e.target as Node) &&
+      !menuRef.current?.contains(e.target as Node)
+    ) {
+      setOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handler);
+  return () => document.removeEventListener("mousedown", handler);
+}, []);
 
   /* ----------------------------------------
    * Filter visible items
@@ -71,7 +60,8 @@ export default function CommonRowMenu({ items, width = 190 }: Props) {
     <>
       <button
         ref={triggerRef}
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen((v: any) =>{ 
+          return !isAsyncLoading ? true : !v})}
         title="More actions"
         className="p-1 rounded hover:bg-gray-100"
       >
@@ -97,7 +87,10 @@ export default function CommonRowMenu({ items, width = 190 }: Props) {
                 disabled={item.disabled}
                 onClick={() => {
                   item.onClick();
-                  setOpen(false);
+                  // ❌ Do NOT close immediately for print/download
+                  if (item.actionType !== "print" && item.actionType !== "download") {
+                    setOpen(false);
+                  }
                 }}
                 className={`flex items-center gap-3 w-full px-3 py-2 text-sm
                   hover:bg-gray-100 text-left
