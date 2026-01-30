@@ -46,7 +46,7 @@ export default function SendOnWhatsappForm({
                 setIsDataLoading(true);
 
             const res =
-                await getInfo(initialValues?.id ?? "",'whatsapp');
+                await getInfo(initialValues?.id ?? "", 'whatsapp');
 
             const mappedData = res.data
             form.setValue("phone", mappedData.phone);
@@ -60,10 +60,10 @@ export default function SendOnWhatsappForm({
     };
 
     useEffect(() => {
-    
-          if (open)
-              fetchMailInfo(false);
-    }, [open]);
+        if(initialValues?.id)
+        fetchMailInfo(false);
+    }, [initialValues?.id]);
+
     return (
         <Form {...form}>
             <form
@@ -73,25 +73,25 @@ export default function SendOnWhatsappForm({
                 )}
             >
                 {
-                 isDataLoading ?
-                                        <div className="min-h-[150px] flex justify-center items-center">
-                                            <div className="p-3 text-sm "><Loader /></div>
-                                        </div> :    <div className="pb-4  max-h-[60vh] overflow-y-auto">
-                        <SectionCard className="mt-0">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                 <FloatingField
-                                                                        name="phone"
-                                                                        label="Whatsapp No."
-                                                                        isRequired={true}
-                                                                        type="text"
-                                                                        control={form.control}
-                                                                    />
-                                
-                              
-                            </div>
-                        </SectionCard>
+                    isDataLoading ?
+                        <div className="min-h-[150px] flex justify-center items-center">
+                            <div className="p-3 text-sm "><Loader /></div>
+                        </div> : <div className="pb-4  max-h-[60vh] overflow-y-auto">
+                            <SectionCard className="mt-0">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <FloatingField
+                                        name="phone"
+                                        label="Whatsapp No."
+                                        isRequired={true}
+                                        type="text"
+                                        control={form.control}
+                                    />
 
-                    </div>
+
+                                </div>
+                            </SectionCard>
+
+                        </div>
 
                 }
 
@@ -99,7 +99,7 @@ export default function SendOnWhatsappForm({
                 {
                     <div className="">
                         <div className="flex justify-end gap-3 pb-4 pr-4  border-t pt-[24px]">
-                             <Button
+                            <Button
                                 variant="outline"
                                 disabled={isLoading || isDataLoading}
                                 className={'hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'}

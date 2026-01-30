@@ -79,10 +79,11 @@ export default function SendMailtForm({
         }
     };
 
-    useEffect(() => {
-        if (id)
-            fetchMailInfo(false);
-    }, [initialValues]);
+  useEffect(() => {
+    if(initialValues?.id)
+  fetchMailInfo(false);
+}, [initialValues?.id]);
+
     return (
         <Form {...form}>
             <form

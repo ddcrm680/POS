@@ -1462,6 +1462,8 @@ export async function getInvoiceInfoByJobCardPrefill(data: any) {
 }
 export async function getInfo(id: number | string,type:string) {
   try {
+    console.log(type,id,'typetypetype');
+    
     const response: any = await api.get(
       `/api/job-cards/${id}/share-preview?channel=${type}`
     );

@@ -396,7 +396,7 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       if (err?.response?.status === 403) {
 
 
-        setSendJobCardModalOpenInfo({ open: false, type: "create", info: {} });
+        setSendJobCardModalOpenInfo({ open: false, type: "", info: {} });
       }
       toast({
         title: "Error",
@@ -432,7 +432,10 @@ export default function JobCard({ noTitle = false, noPadding = false, apiLink = 
       setRowLoading(prev => ({ ...prev, [key]: false }));
     }
   }
-
+useEffect(()=>{
+  console.log(sendJobCardModalOpenInfo,'sendJobCardModalOpenInfo');
+  
+},[sendJobCardModalOpenInfo])
   return (
     <div className={`${noPadding ? "" : "p-3"}`}>
       {!noTitle && <div className="mb-6">
