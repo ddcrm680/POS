@@ -8,7 +8,7 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { MailValues, SendMailFormProp } from "@/lib/types";
 import { MailSchema } from "@/lib/schema";
-import { getInfo,  } from "@/lib/api";
+import { getInfo, } from "@/lib/api";
 import { SectionCard } from "@/components/common/card";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
@@ -42,7 +42,7 @@ export default function SendMailtForm({
                 setIsDataLoading(true);
 
             const res =
-                await getInfo(initialValues?.id ?? "",'email');
+                await getInfo(initialValues?.id ?? "", 'email');
 
             const mappedData = res.data
             form.setValue("email_to", mappedData.email_to);
@@ -57,10 +57,10 @@ export default function SendMailtForm({
         }
     };
 
-  useEffect(() => {
-    if(initialValues?.id)
-  fetchMailInfo(false);
-}, [initialValues?.id]);
+    useEffect(() => {
+        if (initialValues?.id)
+            fetchMailInfo(false);
+    }, [initialValues?.id]);
 
     return (
         <Form {...form}>
@@ -79,7 +79,7 @@ export default function SendMailtForm({
                                 <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                                     <FloatingField
                                         name="email_to"
-                                   label="To (write email, press Enter to add)"
+                                        label="To (write email, press Enter to add)"
 
                                         control={form.control}
                                         isRequired
@@ -94,7 +94,7 @@ export default function SendMailtForm({
 
                                     <FloatingField
                                         name="subject"
-                                        readOnly
+                                        isDisabled
                                         label="Subject"
                                         isRequired={true}
                                         type="text"
@@ -105,7 +105,7 @@ export default function SendMailtForm({
                                         isRequired
                                         name="message"
                                         rows={6}
-                                        isReadOnly={true}
+                                        isView={true}
                                         label="Message"
                                         control={form.control}
                                     />
