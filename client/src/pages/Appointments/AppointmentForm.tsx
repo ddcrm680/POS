@@ -343,11 +343,11 @@ export default function AppointmentForm() {
 
       const { role, ...rest } = values
 
-      if (mode === "edit") {
-        await appointmentUpdate(rest);
-      } else {
-        await appointmentSave(rest);
-      }
+      // if (mode === "edit") {
+      //   await appointmentUpdate(rest);
+      // } else {
+      //   await appointmentSave(rest);
+      // }
 
 
       toast({
@@ -355,6 +355,7 @@ export default function AppointmentForm() {
         description: !mode ? "Appointment created successfully" : "Appointment updated successfully",
         variant: "success",
       });
+      navigate('/new-appointments')
       // ✅ Open invoice modal
     } catch (err: any) {
       const apiErrors = err?.response?.data?.errors;
