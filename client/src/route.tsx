@@ -41,6 +41,9 @@ import ProductForm from "./pages/Products/productForm";
 import TransferStockForm from "./pages/Products/transferProductForm";
 import TranserProductView from "./pages/Products/transferProductView";
 import ProductView from "./pages/Products/ProductView";
+import NewAppointmentsPage from "./pages/Appointments/appointments";
+import AppointmentForm from "./pages/Appointments/AppointmentForm";
+import AppointmentView from "./pages/Appointments/viewAppointment";
 export function Router() {
     const [isDefaultView, setIsDefaultView] = useState<boolean>(false);
   
@@ -81,23 +84,22 @@ export function Router() {
       />} />
       <Route path="/invoices/manage" component={() => <ProtectedRoute component={InvoiceForm} />} />
  
- 
       {/* <Route path="/master/stores" component={() => <ProtectedRoute component={Store} 
       />} /> */}
        <Route path="/master/territory/manage" component={() => <ProtectedRoute component={TerritoryMasterForm} />} />
      <Route path="/job-cards/manage" component={() => <ProtectedRoute component={JobForm} />} />
-  
       <Route path="/master/stores/manage" component={() => <ProtectedRoute component={StoreFormHandler} />} />
-      
       {/* <Route path="/test" component={() => <ProtectedRoute component={ManagerDashboard} />} /> */}
       <Route path="/manager" component={() => <ProtectedRoute component={ManagerDashboard} />} />
       <Route path="/customers" component={() => <ProtectedRoute component={Customer} />} />
-      
       <Route path="/invoices/view" component={() => <ProtectedRoute component={InvoiceView} />} />
       <Route path="/job-cards/view" component={() => <ProtectedRoute component={JobCardView} />} />
       <Route path="/customers/view" component={() => <ProtectedRoute component={CustomerView} />} />
         <Route path="/customers/manage" component={() => <ProtectedRoute component={CustomerForm} />} />
       <Route path="/job-cards" component={() => <ProtectedRoute component={JobCard} />} />
+      <Route path="/new-appointments/view" component={() => <ProtectedRoute component={AppointmentView} />} />
+      <Route path="/new-appointments/manage" component={() => <ProtectedRoute component={AppointmentForm} />} />
+      <Route path="/new-appointments" component={() => <ProtectedRoute component={NewAppointmentsPage} />} />
       <Route path="/appointments" component={() => <ProtectedRoute component={AppointmentsPage} />} />
       <Route path="/facility-management" component={() => <ProtectedRoute component={FacilityManagement} />} />
       <Route path="/employee-management" component={() => <ProtectedRoute component={EmployeeManagement} />} />

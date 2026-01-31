@@ -115,7 +115,7 @@ export const srsConditionList = [
   { value: "poor-condition", label: "Poor Condition" },
 ];
 
-export const mailMessageTemplate=`Dear {{consumer_name}},<br><br>
+export const mailMessageTemplate = `Dear {{consumer_name}},<br><br>
 
 We hope you are doing well.<br><br>
 
@@ -193,6 +193,8 @@ export const nonAdminTabs: TabItem[] = withFullLabel([
 
   { id: "invoices", path: "/invoices", icon: FileText, label: "Invoices" },
 
+  { id: "new-appointments", path: "/new-appointments", icon: Calendar, label: "New Appointments" },
+
   { id: "payments", path: "/payments", icon: Wallet, label: "Payments" },
   { id: "inventory", path: "/inventory", icon: Package, label: "Inventory", badge: 2 },
 ]);
@@ -233,6 +235,8 @@ export const bottomTabs: TabItem[] = withFullLabel([
 
   { id: "payments", path: "/payments", icon: Wallet, label: "Payments" },
   { id: "appointments", path: "/appointments", icon: Calendar, label: "Appointments" },
+
+  { id: "new-appointments", path: "/new-appointments", icon: Calendar, label: "New Appointments" },
 
   { id: "inventory", path: "/inventory", icon: Package, label: "Inventory" },
 
@@ -454,6 +458,7 @@ export const hideColumnListInCustomer = {
     actionShowedList: []
   },
 }
+// src/lib/mockData.ts
 
 export const appointmentMockData = [
   {
@@ -463,14 +468,14 @@ export const appointmentMockData = [
     title: "Ceramic Coating",
 
     consumer: {
-      id: 101,
-      name: "Rahul Sharma",
+      id: 22,
+      name: "Alex",
       phone: "9876543210",
     },
 
     store: {
-      id: 1,
-      name: "Andheri Studio",
+      id: 6,
+      name: "DD Haldwani",
     },
 
     appointment_type: "service",
@@ -497,14 +502,14 @@ export const appointmentMockData = [
     title: "Paint Inspection",
 
     consumer: {
-      id: 102,
-      name: "Amit Verma",
+      id: 22,
+      name: "Alex",
       phone: "9988776655",
     },
 
     store: {
-      id: 1,
-      name: "Andheri Studio",
+      id: 6,
+      name: "DD Haldwani",
     },
 
     appointment_type: "inspection",
@@ -531,14 +536,14 @@ export const appointmentMockData = [
     title: "Full Body Wash",
 
     consumer: {
-      id: 103,
-      name: "Neha Kapoor",
+      id: 22,
+      name: "Alex",
       phone: "9123456789",
     },
 
     store: {
-      id: 2,
-      name: "Bandra Studio",
+      id: 6,
+      name: "DD Haldwani",
     },
 
     appointment_type: "service",
@@ -559,3 +564,23 @@ export const appointmentMockData = [
   },
 ];
 
+export const appointmentFilterMeta = {
+  type: [
+    { label: "Service", value: "service" },
+    { label: "Inspection", value: "inspection" },
+    { label: "Demo", value: "demo" },
+    { label: "Consultation", value: "consultation" },
+    { label: "Follow Up", value: "follow_up" },
+  ],
+  priority: [
+    { label: "Normal", value: "normal" },
+    { label: "Urgent", value: "urgent" },
+    { label: "Critical", value: "critical" },
+  ],
+  status: [
+    { label: "Pending", value: "pending" },
+    { label: "Confirmed", value: "confirmed" },
+    { label: "Cancelled", value: "cancelled" },
+    { label: "No Show", value: "no_show" },
+  ],
+};

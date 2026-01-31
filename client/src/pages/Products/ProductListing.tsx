@@ -649,7 +649,7 @@ export default function ProductsListing() {
     }
     return (
         <div className="">
-            <div className="mb-6">
+            <div className="mb-3    ">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <>
                         <Kpi

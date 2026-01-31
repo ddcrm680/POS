@@ -5,40 +5,32 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { getConsumer } from "@/lib/api";
+import { DeleteAppointment, getAppointment, getConsumer } from "@/lib/api";
 import { ProductModalInfo, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton } from "@chakra-ui/react";
-import { EyeIcon } from "lucide-react";
+import { EditIcon, EyeIcon, Trash2 } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
 import { Kpi } from "../Customer/DashboardCards";
-import { appointmentMockData } from "@/lib/constant";
+import { appointmentFilterMeta, appointmentMockData } from "@/lib/constant";
+import { ColumnFilter } from "@/components/common/ColumnFilter";
+import CommonRowMenu from "@/components/common/CommonRowMenu";
 
 export default function NewAppointmentsPage() {
   const { toast } = useToast();
 
-const [appointments, setAppointments] = useState(appointmentMockData);
+  const [appointments, setAppointments] = useState(appointmentMockData);
   const { roles } = useAuth();
-  const [productListingModalInfo, setProductListingModalInfo] = useState<ProductModalInfo>({
-    open: false,
-    info: {},
-    type: "",
-    subOpnType: ""
-  });
-  
+
   const [perPage, setPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [has_next, setHasNext] = useState(false)
   const [, navigate] = useLocation();
   const [filters, setFilters] = useState({
-    brand: "",
-    category: "",
     type: "",
-    store: "",
-    tag: "",
+    priority: "",
     status: "",
-    visibility: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -47,20 +39,21 @@ const [appointments, setAppointments] = useState(appointmentMockData);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const [isListLoading, setIsListLoading] = useState(true);
-  const [isCustomerDeleteModalInfo, setIsCustomerDeleteModalOpenInfo] = useState<{ open: boolean, info: any }>({
+  const [isListLoading, setIsListLoading] = useState(false);
+  const [isAppointmentDeleteModalOpenInfo, setIsAppointmentDeleteModalOpenInfo] = useState<{ open: boolean, info: any }>({
     open: false,
     info: {}
   });
+
   const PER_PAGE = 10;
-  const CustomerDeleteHandler = async () => {
+  const AppointmentDeleteHandler = async () => {
     try {
       setIsLoading(true);
 
-      // await DeleteCustomer(isCustomerDeleteModalInfo?.info?.id);
-      // toast({ title: `Delete Customer`, description: "Customer deleted successfully", variant: "success", });
+      // await DeleteAppointment(isAppointmentDeleteModalOpenInfo?.info?.id);
+      toast({ title: `Delete Appointment`, description: "Appointment deleted successfully", variant: "success", });
 
-      fetchCustomer(false)
+      fetchAppointment(false)
 
     } catch (err: any) {
 
@@ -68,136 +61,186 @@ const [appointments, setAppointments] = useState(appointmentMockData);
         title: "Error",
         description:
           err?.response?.data?.message ||
-          err.message || `Failed to delete territory`,
+          err.message || `Failed to delete appointment`,
         variant: "destructive",
       });
     } finally {
-      setIsCustomerDeleteModalOpenInfo({ open: false, info: {} });
+      setIsAppointmentDeleteModalOpenInfo({ open: false, info: {} });
       setIsLoading(false);
     }
   };
 
-const columns = useMemo(() => [
-  {
-    key: "created_at",
-    label: "Created On",
-    align: "center",
-    width: "160px",
-    render: (val: string) => (
-      <Box className="flex flex-col items-center">
-        <span className="font-semibold">{formatDate(val)}</span>
-        <span className="text-sm text-gray-600">{formatTime(val)}</span>
-      </Box>
-    ),
-  },
+  const columns = useMemo(() => [
+    {
+      key: "created_at",
+      label: "Created On",
+      align: "center",
+      width: "150px",
+      render: (val: string) => (
+        <Box className="flex flex-col items-center">
+          <span className="font-semibold">{formatDate(val)}</span>
+          <span className="text-sm text-gray-600">{formatTime(val)}</span>
+        </Box>
+      ),
+    },
 
-  {
-    key: "title",
-    label: "Title",
-    width: "180px",
-  },
+    {
+      key: "scheduled_at",
+      label: "Scheduled At",
+      width: "150px",
+      render: (val: string) => (
+        <div className="flex flex-col">
+          <span>{formatDate(val)}</span>
+          <span className="text-xs text-gray-500">{formatTime(val)}</span>
+        </div>
+      ),
+    },
+    {
+      key: "title",
+      label: "Title",
+      width: "180px",
+    },
 
-  {
-    key: "consumer",
-    label: "Customer",
-    width: "180px",
-    render: (val: any) => (
-      <div className="flex flex-col">
-        <span className="font-medium">{val?.name}</span>
-        <span className="text-xs text-gray-500">{val?.phone}</span>
-      </div>
-    ),
-  },
+    {
+      key: "consumer",
+      label: "Customer",
+      width: "180px",
+      render: (value: any) => (
 
-  {
-    key: "store",
-    label: "Store",
-    width: "150px",
-    render: (val: any) => val?.name,
-  },
+        <div className="flex flex-col leading-tight">
+          {/* Customer Name */}
+          <span
+            className="text-blue-600 font-medium cursor-pointer hover:underline"
+            onClick={() => {
+              sessionStorage.setItem("sidebar_active_parent", "customers");
+              navigate(`/customers/view?id=${value.id}`)
+            }}
+          >
+            {value?.name ?? "-"}
+          </span>
 
-  {
-    key: "appointment_type",
-    label: "Type",
-    width: "120px",
-    render: (val: string) => (
-      <Badge className="capitalize">{val}</Badge>
-    ),
-  },
+          {/* Phone Number */}
+          {value?.phone && (
+            <span className="text-xs text-muted-foreground mt-0.5">
+              {value.phone}
+            </span>
+          )}
+        </div>
+      ),
+    },
 
-  {
-    key: "priority",
-    label: "Priority",
-    width: "120px",
-    render: (val: string) => (
-      <Badge
-        colorScheme={
-          val === "critical"
-            ? "red"
-            : val === "urgent"
-            ? "orange"
-            : "gray"
-        }
-        className="capitalize"
-      >
-        {val}
-      </Badge>
-    ),
-  },
+    {
+      key: "store",
+      label: "Store",
+      width: "150px",
+      render: (val: any) => <span className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={() => {
+        sessionStorage.removeItem('sidebar_active_parent')
+        sessionStorage.setItem('sidebar_active_parent', 'stores')
+        navigate(`/master/stores/manage?id=${val?.id}&mode=view`)
+      }}>
+        {val.name}
+      </span>,
+    },
 
-  {
-    key: "status",
-    label: "Status",
-    width: "120px",
-    render: (val: string) => (
-      <Badge
-        colorScheme={
-          val === "confirmed"
-            ? "green"
-            : val === "pending"
-            ? "yellow"
-            : "gray"
-        }
-        className="capitalize"
-      >
-        {val}
-      </Badge>
-    ),
-  },
+    {
+      key: "appointment_type",
+      label: (
+        <ColumnFilter
+          label="Type"
+          value={filters.type}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, type: val }));
+            setPage(1);
+          }}
+          options={[{ label: "All", value: "" }, ...appointmentFilterMeta.type]}
+        />
+      ),
+      width: "140px",
+      render: (value: string) => appointmentFilterMeta.type.find(i => i.value === value)?.label
+      ,
+    },
+    {
+      key: "priority",
+      label: (
+        <ColumnFilter
+          label="Priority"
+          value={filters.priority}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, priority: val }));
+            setPage(1);
+          }}
+          options={[{ label: "All", value: "" }, ...appointmentFilterMeta.priority]}
+        />
+      ),
+      width: "140px",
+      render: (value: string) => (
+        <Badge
+          className={`px-3 py-1 text-xs font-medium rounded-full capitalize
+        ${value === "critical"
+              ? "bg-red-100 text-red-700"
+              : value === "urgent"
+                ? "bg-orange-100 text-orange-700"
+                : "bg-gray-100 text-gray-700"
+            }
+      `}
+        >
+          {appointmentFilterMeta.priority.find(i => i.value === value)?.label}
+        </Badge>
+      ),
+    },
+    {
+      key: "status",
+      label: (
+        <ColumnFilter
+          label="Status"
+          value={filters.status}
+          onChange={(val) => {
+            setFilters(f => ({ ...f, status: val }));
+            setPage(1);
+          }}
+          options={[{ label: "All", value: "" }, ...appointmentFilterMeta.status]}
+        />
+      ),
+      width: "140px",
+      render: (value: string) => (
+        <Badge
+          className={`px-3 py-1 text-xs font-medium rounded-full capitalize
+        ${value === "pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : value === "confirmed"
+                ? "bg-green-100 text-green-700"
+                : value === "cancelled"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-gray-100 text-gray-700"
+            }
+      `}
+        >
+          {appointmentFilterMeta.status.find(i => i.value === value)?.label}
+        </Badge>
+      ),
+    },
 
-  {
-    key: "scheduled_at",
-    label: "Scheduled At",
-    width: "170px",
-    render: (val: string) => (
-      <div className="flex flex-col">
-        <span>{formatDate(val)}</span>
-        <span className="text-xs text-gray-500">{formatTime(val)}</span>
-      </div>
-    ),
-  },
 
-  {
-    key: "estimated_value",
-    label: "Amount",
-    width: "120px",
-    align: "right",
-    render: (val: number) => `₹${val?.toLocaleString()}`,
-  },
-], []);
+    {
+      key: "estimated_value",
+      label: "Amount",
+      width: "10px",
+      render: (val: number) => `₹${val?.toLocaleString()}`,
+    },
+  ], []);
 
 
-  const fetchCustomer = async (isLoaderHide = false) => {
+  const fetchAppointment = async (isLoaderHide = false) => {
     try {
-      if (!isLoaderHide)
-        setIsListLoading(true);
-      const res =
-        await getConsumer({
-          per_page: perPage,
-          page,
-          search,
-          status: filters.status
-        });
+      // if (!isLoaderHide)
+      //   setIsListLoading(true);
+      // const res =
+      //   await getAppointment({
+      //     per_page: perPage,
+      //     page,
+      //     search,
+      //     status: filters.status
+      //   });
 
       // const mappedTerritory = res.data
       // setHasNext(res.meta.has_next)
@@ -214,19 +257,15 @@ const columns = useMemo(() => [
   };
 
   useEffect(() => {
-    fetchCustomer(false);
+    // fetchAppointment(false);
   }, [search, page, perPage, filters]);
   function resetFilter() {
     setSearch('')
     setPage(1)
     setFilters({
-      brand: "",
-      category: "",
       type: "",
-      store: "",
-      tag: "",
+      priority: "",
       status: "",
-      visibility: "",
     })
   }
   return (
@@ -282,7 +321,7 @@ const columns = useMemo(() => [
         <CardContent>
           <CommonTable
             columns={columns}
-            isClear={false}
+            isClear={true}
             data={appointments}
             isAdd={true}
             perPage={perPage}
@@ -305,46 +344,56 @@ const columns = useMemo(() => [
             }}
             setIsModalOpen={(value: boolean) => {
               sessionStorage.removeItem('sidebar_active_parent')
-              navigate("/products/product-listing/manage")
+              navigate("/new-appointments/manage")
             }}
             actions={(row: any) => (
-              <Box className="gap-0">
-                {row.status !== "cancelled" ? (
-                  <IconButton
-                    size="xs"
-                    // mr={2}
-                    title="View "
-
-                    aria-label="View"
-                    onClick={() => {
-                      sessionStorage.removeItem('sidebar_active_parent')
-                      navigate(`/products/product-listing/view?id=${22}`)
-                    }}
-                  >
-                    <EyeIcon size={16} />
-                  </IconButton>
-                ) : (
-                  "-"
-                )}
-              </Box>
-
+              <CommonRowMenu
+                items={[
+                  {
+                    key: "view",
+                    label: "View ",
+                    icon: <EyeIcon size={16} />,
+                    onClick: () => navigate(`/new-appointments/view?id=${row.id}`)
+                     
+                  },
+                  {
+                    key: "edit",
+                    label: "Edit ",
+                    icon: <EditIcon size={16} />,
+                    onClick: () =>
+                       navigate(`/new-appointments/manage?id=${row.id}&mode=edit`),
+                    show:
+                      Number(row.role_id) !==
+                      roles.find((role) => role.slug === "super-admin")?.id,
+                  },
+                  {
+                    key: "delete",
+                    label: "Delete",
+                    icon: <Trash2 size={16} />,
+                    danger: true,
+                    onClick: () =>
+                      setIsAppointmentDeleteModalOpenInfo({
+                        open: true,
+                        info: row,
+                      }),
+                  },
+                ]}
+              />
             )}
-
           />
-         
           <CommonDeleteModal
             width="330px"
             maxWidth="330px"
-            isOpen={isCustomerDeleteModalInfo.open}
-            title="Delete Customer"
-            description={`Are you sure you want to delete this customer? This action cannot be undone.`}
+            isOpen={isAppointmentDeleteModalOpenInfo.open}
+            title="Delete Appointment"
+            description={`Are you sure you want to delete this appointment ? This action cannot be undone.`}
             confirmText="Delete"
             cancelText="Cancel"
             isLoading={isLoading}
             onCancel={() =>
-              setIsCustomerDeleteModalOpenInfo({ open: false, info: {} })
+              setIsAppointmentDeleteModalOpenInfo({ open: false, info: {} })
             }
-            onConfirm={CustomerDeleteHandler}
+            onConfirm={AppointmentDeleteHandler}
           />
 
         </CardContent>

@@ -272,6 +272,18 @@ export async function DeleteUser(id: string) {
     throw error;
   }
 }
+export async function DeleteAppointment(id: string) {
+  try {
+    const response = await api.delete(`/api/delete-appointment/${id}`);
+
+    if (response.data?.success === true) {
+      return response.data.data;
+    }
+  } catch (error) {
+    console.error("Delete appointment failed", error);
+    throw error;
+  }
+}
 export async function DeleteSystemLog(id: string) {
   try {
     const response = await api.delete(`/api/admin/delete-logs/${id}`);
@@ -485,6 +497,33 @@ export async function getPaymentsList({
   } catch (response: any) {
     throw response;
   }
+}
+
+export async function getAppointment({
+  page,
+  search,
+  status,
+  per_page
+}: {
+  per_page: number;
+  page: number;
+  search: string;
+  status?: string | number;
+}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    search,
+    per_page: String(per_page)
+  });
+
+  if (status !== "") params.append("status", String(status));
+
+  const response = await api.get(`/api/admin/users?${params.toString()}`);
+
+  if (response?.data?.success === true) {
+    return response.data;
+  }
+  throw new Error("Failed to fetch appointment list");
 }
 export async function fetchUserList({
   page,
