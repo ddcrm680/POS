@@ -1,25 +1,18 @@
 // src/components/profile/profile.tsx
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { UseFormSetError } from "react-hook-form";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { DeleteTerritory, DeleteUser, EditUser, fetchUserList, getConsumer, ProductCountHelper, SaveUser, UpdateProductStatus, UpdateTerritoryStatus, UpdateUserStatus } from "@/lib/api";
-import { ProductFormType, ProductModalInfo, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
+import { getConsumer } from "@/lib/api";
+import { ProductModalInfo, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
-import { Badge, Box, IconButton, Switch } from "@chakra-ui/react";
-import { EditIcon, EyeIcon, Trash2 } from "lucide-react";
-import CommonModal from "@/components/common/CommonModal";
-import { formatAndTruncate, formatDate, formatTime } from "@/lib/utils";
+import { Badge, Box, IconButton } from "@chakra-ui/react";
+import { EyeIcon } from "lucide-react";
+import { formatDate, formatTime } from "@/lib/utils";
 import CommonDeleteModal from "@/components/common/CommonDeleteModal";
-import { ColumnFilter } from "@/components/common/ColumnFilter";
-import { brandOptions, categoryOptions, customerMockData, filterMetaInfo, mockProducts, productTypeOptions, storeOptions, territoryMasterMockData } from "@/lib/mockData";
-import CommonRowMenu from "@/components/common/CommonRowMenu";
 import { Kpi } from "../Customer/DashboardCards";
-import ProductSellStockCountHandlerModal from "../Products/ProductSellStockCountHandlerModal";
 import { appointmentMockData } from "@/lib/constant";
 
 export default function NewAppointmentsPage() {

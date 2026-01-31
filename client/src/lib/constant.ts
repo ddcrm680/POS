@@ -454,3 +454,108 @@ export const hideColumnListInCustomer = {
     actionShowedList: []
   },
 }
+
+export const appointmentMockData = [
+  {
+    id: 1,
+    created_at: "2026-02-01T10:15:00",
+
+    title: "Ceramic Coating",
+
+    consumer: {
+      id: 101,
+      name: "Rahul Sharma",
+      phone: "9876543210",
+    },
+
+    store: {
+      id: 1,
+      name: "Andheri Studio",
+    },
+
+    appointment_type: "service",
+
+    scheduled_at: "2026-02-02T10:30:00",
+    estimated_duration: 150,
+
+    status: "pending",
+    priority: "normal",
+
+    vehicle: {
+      company: "Honda",
+      model: "City",
+      reg_no: "MH12AB1234",
+    },
+
+    estimated_value: 12000,
+  },
+
+  {
+    id: 2,
+    created_at: "2026-02-01T11:40:00",
+
+    title: "Paint Inspection",
+
+    consumer: {
+      id: 102,
+      name: "Amit Verma",
+      phone: "9988776655",
+    },
+
+    store: {
+      id: 1,
+      name: "Andheri Studio",
+    },
+
+    appointment_type: "inspection",
+
+    scheduled_at: "2026-02-02T11:00:00",
+    estimated_duration: 60,
+
+    status: "confirmed",
+    priority: "urgent",
+
+    vehicle: {
+      company: "Hyundai",
+      model: "Creta",
+      reg_no: "MH14XY8899",
+    },
+
+    estimated_value: 2500,
+  },
+
+  {
+    id: 3,
+    created_at: "2026-02-01T12:05:00",
+
+    title: "Full Body Wash",
+
+    consumer: {
+      id: 103,
+      name: "Neha Kapoor",
+      phone: "9123456789",
+    },
+
+    store: {
+      id: 2,
+      name: "Bandra Studio",
+    },
+
+    appointment_type: "service",
+
+    scheduled_at: "2026-02-02T12:30:00",
+    estimated_duration: 45,
+
+    status: "confirmed",
+    priority: "critical",
+
+    vehicle: {
+      company: "BMW",
+      model: "X5",
+      reg_no: "MH01BM4321",
+    },
+
+    estimated_value: 5000,
+  },
+];
+
