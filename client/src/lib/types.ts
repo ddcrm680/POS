@@ -59,7 +59,14 @@ export interface FacilityMetric {
   status: 'good' | 'warning' | 'critical';
   trend?: 'up' | 'down' | 'stable';
 }
-
+export type MailInputProps = {
+  value: string[];
+  onChange: (emails: string[]) => void;
+  placeholder?: string;
+  error?: string;
+  disabled?: boolean;
+  onPendingChange?: (pending: string) => void; // 👈 NEW
+};
 export type editUserReq = {
   id: string;
   info: {

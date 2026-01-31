@@ -35,6 +35,7 @@ export default function SendMailtForm({
             subject: initialValues?.subject ?? "",
         },
     });
+    const [pendingToEmail, setPendingToEmail] = useState("");
 
     const [isDataLoading, setIsDataLoading] = useState(false);
     const fetchMailInfo = async (isLoaderHide = false) => {
@@ -47,8 +48,9 @@ export default function SendMailtForm({
 
             const mappedData = res.data
 
-            form.setValue("email_cc", mappedData.email_cc);
-            form.setValue("email_to",[ mappedData.email_to]);
+            form.setValue("email_cc", mappedData.email_cc??[]);
+            form.setValue("email_to", mappedData.email_to ?? []);
+
             form.setValue("message", mappedData.message);
             form.setValue("subject", mappedData.subject);
         } catch (e) {
@@ -64,14 +66,24 @@ export default function SendMailtForm({
         if (initialValues?.id)
             fetchMailInfo(false);
     }, [initialValues?.id]);
+console.log(form.formState.errors,'formState');
 
     return (
         <Form {...form}>
             <form
                 id={id}
-                onSubmit={form.handleSubmit((values) =>
-                    onSubmit(values, form.setError)
-                )}
+                onSubmit={form.handleSubmit((values) => {
+                    // ❌ BLOCK SUBMIT if unfinished email exists
+                    if (pendingToEmail.trim()) {
+                        form.setError("email_to", {
+                            type: "manual",
+                            message: "Finish typing the email and press Enter to add it.",
+                        });
+                        return;
+                    }
+
+                    onSubmit(values, form.setError);
+                })}
             >
                 {
                     isDataLoading ?
@@ -83,14 +95,15 @@ export default function SendMailtForm({
                                     <FloatingField
                                         name="email_to"
                                         label="To"
-                                        hint={`Write email, press Enter to add`}
+                                        hint="Write email, press Enter to add"
                                         control={form.control}
                                         isRequired
-                                        render={({ field,error }) => (
+                                        render={({ field, error }) => (
                                             <MultiEmailInput
-                                              error={error} 
                                                 value={field.value ?? []}
                                                 onChange={field.onChange}
+                                                error={error}
+                                                onPendingChange={setPendingToEmail} // 👈 ONLY HERE
                                             />
                                         )}
                                     />
@@ -99,10 +112,10 @@ export default function SendMailtForm({
                                         label="Cc"
                                         control={form.control}
                                         isRequired
-                                        render={({ field,error }) => (
+                                        render={({ field, error }) => (
                                             <MultiEmailInput
-                                              error={error}
-                                            disabled
+                                                error={error}
+                                                disabled
                                                 value={field.value ?? []}
                                                 onChange={field.onChange}
                                             />

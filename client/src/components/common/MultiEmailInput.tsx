@@ -4,21 +4,15 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { isValidEmail } from "@/lib/helper";
+import { MailInputProps } from "@/lib/types";
 
-type Props = {
-  value: string[];
-  onChange: (emails: string[]) => void;
-  placeholder?: string;
-    error?: string;  
-  disabled?: boolean;
-}
 export function MultiEmailInput({
   value,
   onChange,
   placeholder = "",
-  disabled=false,
-  error,
-}: Props) {
+  disabled = false,
+  error, onPendingChange
+}: MailInputProps) {
   const [input, setInput] = useState("");
 
   const addEmail = () => {
@@ -30,6 +24,7 @@ export function MultiEmailInput({
 
     onChange([...value, email]);
     setInput("");
+    onPendingChange?.("");
   };
 
   const removeEmail = (email: string) => {
@@ -38,6 +33,7 @@ export function MultiEmailInput({
   };
 
   const hasChips = value.length > 0;
+  const fullEmailList = value.join(", ");
 
   return (
     <div
@@ -46,7 +42,7 @@ export function MultiEmailInput({
         "flex flex-wrap items-center gap-2 min-h-[38px]",
         "rounded-md border px-3 py-2",
         !disabled &&
-          "focus-within:ring-2 focus-within:ring-ring focus-within:border-ring",
+        "focus-within:ring-2 focus-within:ring-ring focus-within:border-ring",
         disabled
           ? "bg-[#fafafa] opacity-70 "
           : "bg-white",
@@ -88,16 +84,22 @@ export function MultiEmailInput({
 
       {/* +N MORE */}
       {value.length > 2 && (
-        <span className="text-sm text-muted-foreground px-1">
+        <span
+          title={fullEmailList} // 👈 tooltip with all emails
+          className="text-sm text-muted-foreground px-1 cursor-help"
+        >
           +{value.length - 2}
         </span>
       )}
-
       {/* INPUT */}
       <input
         value={input}
         disabled={disabled}
-        onChange={e => setInput(e.target.value)}
+        onChange={e => {
+          setInput(e.target.value);
+          onPendingChange?.(e.target.value); // 👈 notify parent
+        }}
+        // onChange={e => setInput(e.target.value)}
         onKeyDown={e => {
           if (disabled) return;
 
