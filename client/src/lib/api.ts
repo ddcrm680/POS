@@ -1184,6 +1184,24 @@ export async function consumerSave(data: any) {
     throw response;
   }
 }
+export async function appointmentSave(data: any) {
+  try {
+    const response: any = await api.post(
+      `/api/appointment/save`,
+      data
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+
+    throw new Error(
+      response?.data?.message || "Failed to save appointment"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
 export async function getServiceOptionByTypeVehicle(data: any) {
   try {
     const response: any = await api.post(
@@ -1285,6 +1303,23 @@ export async function consumerUpdate(data: any) {
     }
     throw new Error(
       response?.data?.message || "Failed to update consumer"
+    );
+  } catch (response: any) {
+    throw response;
+  }
+}
+export async function appointmentUpdate(data: any) {
+  try {
+    const response: any = await api.post(
+      `/api/appointment/${data.id}/update`,
+      data
+    );
+
+    if (response?.data?.success === true) {
+      return response.data.data; // customer object
+    }
+    throw new Error(
+      response?.data?.message || "Failed to update appointment"
     );
   } catch (response: any) {
     throw response;

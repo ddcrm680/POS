@@ -38,9 +38,9 @@ export function FloatingField({
 }: FloatingFieldProps) {
   const [focused, setFocused] = useState(false);
   const [inputType, setInputType] = useState(type);
-
+const isDateTimeLocal = type === "datetime-local";
   const disabled = isView || isDisabled
-  const isMobileField = name === "search_mobile" || name === "phone" || name === "billing_phone" || name == "company_contact_no";
+  const isMobileField = name === "search_mobile" || name === "phone" || name === "billing_phone" || name == "company_contact_no" ||name==="consumer_mobile";
   return (
     <Controller
 
@@ -64,7 +64,8 @@ export function FloatingField({
               <Input
                 {...field}
                 {...inputProps}
-                type={inputType}
+      type={isDateTimeLocal ? inputType : type}
+placeholder=""
                 h="38px"
                 fontSize="13px"
                 lineHeight="1.4"

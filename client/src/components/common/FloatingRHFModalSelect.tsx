@@ -51,7 +51,7 @@ export function FloatingRHFModalSelect({
               left="12px"
               top={shouldFloat ? "-6px" : "12px"}
               fontSize={shouldFloat ? "10px" : "12px"}
-              color={error ? "red.500" : "gray.500"}
+              color={ "gray.500"}
               bg="white"
               px="4px"
               zIndex={2}

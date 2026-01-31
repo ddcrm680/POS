@@ -1,397 +1,361 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useForm, UseFormSetError } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLocation, useSearchParams } from "wouter";
-
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-
-import { StoreSchema } from "@/lib/schema";
-import { storeFormApi, storeFormType } from "@/lib/types";
+import { Card, CardContent } from "@/components/ui/card";
 import { FloatingField } from "@/components/common/FloatingField";
 import { FloatingTextarea } from "@/components/common/FloatingTextarea";
 import { FloatingRHFSelect } from "@/components/common/FloatingRHFSelect";
 import { SectionCard } from "@/components/common/card";
+import { AppointmentSchema } from "@/lib/schema";
+import { AppointmentFormValues, JobCardFormUnion, option, ServiceCard } from "@/lib/types";
+import { Check, ChevronLeft } from "lucide-react";
+import { useLocation, useSearchParams } from "wouter";
+import { useState, useEffect, useRef } from "react";
 import { Loader } from "@/components/common/loader";
+import { appointmentFilterMeta } from "@/lib/constant";
 import { useAuth } from "@/lib/auth";
-import {
-  baseUrl,
-  EditStore,
-  fetchCityList,
-  fetchStateList,
-  fetchStoreById,
-  fetchTerritoryOrganizationList,
-  SaveStore,
-} from "@/lib/api";
-import { findIdByName, isPdfFile } from "@/lib/utils";
-import { ChevronLeft } from "lucide-react";
+import { appointmentSave, appointmentUpdate, fetchStoreCrispList, getServiceOptionByTypeVehicle, jobCardMetaInfo, jobCardModelInfo } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { storeFormKeys } from "@/lib/constant";
 
 export default function AppointmentForm() {
-  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
   const [, navigate] = useLocation();
+  const [searchParams] = useSearchParams();
 
   const id = searchParams.get("id");
   const mode = searchParams.get("mode");
   const isView = mode === "view";
 
-  const [isLoading, setIsLoading] = useState(false);
-  const form = useForm<storeFormType>({
-    resolver: zodResolver(StoreSchema),
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [services, setServices] = useState<ServiceCard[]>([]);
+  const [loadingServices, setLoadingServices] = useState(false);
+  const form = useForm<AppointmentFormValues>({
+    resolver: zodResolver(AppointmentSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      organization_id: "",
-      territory_id: "",
-      registered_address: "",
-      shipping_address: "",
+      role: user?.role,
+      store_id: "",
+      consumer_mobile: "",
+
+      vehicle_company_id: "",
+      vehicle_model_id: "",
+      vehicle_type: "",
+      color: "",
+      year: "",
+      reg_no: "",
+      service_type: [],
+      service_ids: [],
+
+      appointment_type: "service",
+      scheduled_at: "",
+      scheduled_end_at: "",
+
+      priority: "normal",
+      source: "walk_in",
       notes: "",
-      gst_no: "",
-      pan_no: "",
-      invoice_prefix: "",
-      country: "India",
-      state: "",
-      city: "",
-      pincode: "",
-      opening_date: "",
-      pan_card_file: "",
-      registration_file: "",
-      gstin_file: "",
     },
   });
+
+  const [isLoading, setIsLoading] = useState(false);
   const [isInfoLoading, setIsInfoLoading] = useState(false);
-  const { toast } = useToast();
-  const { control, handleSubmit, watch, setValue } = form;
-  const [initialValues, setInitialValues] = useState<storeFormApi | null>(null)
-  const [filePreview, setFilePreview] = useState<
-    Record<
-      string,
-      {
-        url: string;
-        file?: File;
-      } | null
-    >
-  >({});
+  const startTime = form.watch("scheduled_at");
+  const endTime = form.watch("scheduled_end_at");
 
-  const { countries } = useAuth();
-  const fetchStoreInfo = async () => {
-    try {
-      setIsInfoLoading(true);
-      const res =
-        await fetchStoreById(id ?? "");
-
-      const updatedInfo = { ...res?.data, territory_id: res?.data?.territory?.id ?? "" }
-      setInitialValues(updatedInfo)
-    } catch (e) {
-      console.error(e);
-
-    } finally {
-      setIsInfoLoading(false);
+  const nowIso = () => {
+    const d = new Date();
+    d.setSeconds(0, 0);
+    return d.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
+  };
+  /** set role automatically */
+  useEffect(() => {
+    if (user?.role) {
+      form.setValue("role", user.role);
     }
+  }, [user, form]);
+
+
+  const toggleService = (serviceId: string) => {
+    const newSelection = selectedServices.includes(serviceId)
+      ? selectedServices.filter(id => Number(id) !== Number(serviceId))
+      : [...selectedServices, serviceId];
+
+    setSelectedServices(newSelection);
+    form.setValue("service_ids", newSelection, {
+      shouldValidate: true,
+    });
   };
   useEffect(() => {
-    if (id) {
-      fetchStoreInfo();
+    const loadMeta = async () => {
+      const data = await jobCardMetaInfo();
+      if (!data) return;
+      const value = {
 
-    }
-  }, [id]);
+        vehicleCompanies: toSelectOptions(data.vehicleCompanies),
+        vehicleTypes: toSelectOptions(data.vehicleTypes),
+        serviceTypes: toSelectOptions(data.serviceTypes),
+        years: toSelectOptions(data.years),
+        srsCondition: toSelectOptions(data.srsCondition),
+      }
+
+      setMeta(prev => (({ ...prev, ...value })));
+    };
+
+    loadMeta();
+  }, []);
+
+  const { toast } = useToast();
+  const { countries } = useAuth();
+
+  const [isLookingUp, setIsLookingUp] = useState(false);
+  const [customerFound, setCustomerFound] = useState<boolean | null>(null);
+  const disablePhone = customerFound === true;
   const [countryList, setCountryList] = useState<
     { id: number; name: string; slug?: string }[]
   >([]);
   const [states, setStates] = useState<any[]>([]);
   const [cities, setCities] = useState<any[]>([]);
+  const [gstStates, setGstStates] = useState<any[]>([]);
+  const [gstCities, setGstCities] = useState<any[]>([]);
+  const [loadingGstState, setLoadingGstState] = useState(false);
+  const [loadingGstCity, setLoadingGstCity] = useState(false);
 
-  const [loadingState, setLoadingState] = useState(false);
-  const [loadingCity, setLoadingCity] = useState(false);
+  const [meta, setMeta] = useState({
+    vehicleCompanies: [] as option[],
+    vehicleModels: [] as option[],
+
+    vehicleTypes: [] as option[],
+    serviceTypes: [] as option[],
+    years: [] as option[],
+    srsCondition: [] as option[],
+
+    loadingModels: false,
+  });
+  const toSelectOptions = <T extends { value: any; label: string }>(
+    list: T[] = []
+  ) =>
+    list.map(item => ({
+      label: item.label,
+      value: String(item.value), // 🔑 force string
+    }));
+  const vehicleType = form.watch("vehicle_type");
+  const serviceTypes = form.watch("service_type"); // multi select (string[])
+  useEffect(() => {
+    const loadMeta = async () => {
+      const data = await jobCardMetaInfo();
+      if (!data) return;
+      const value = {
+
+        vehicleCompanies: toSelectOptions(data.vehicleCompanies),
+        vehicleTypes: toSelectOptions(data.vehicleTypes),
+        serviceTypes: toSelectOptions(data.serviceTypes),
+        years: toSelectOptions(data.years),
+        srsCondition: toSelectOptions(data.srsCondition),
+      }
+
+      setMeta(prev => (({ ...prev, ...value })));
+    };
+
+    loadMeta();
+  }, []);
+  useEffect(() => {
+    if (!vehicleType || !serviceTypes?.length) {
+      if (!isHydratingJobRef.current) {
+        setServices([]);
+        setSelectedServices([]);
+        form.setValue("service_ids", []);
+      }
+      return;
+    }
+
+    const loadServices = async () => {
+      setLoadingServices(true);
+
+      const data = await getServiceOptionByTypeVehicle({
+        vehicle_type: vehicleType,
+        service_types: serviceTypes,
+      });
+
+      const normalized = data.map((item: any) => ({
+        id: String(item.id),
+        label: item.service_name,
+        value: String(item.id),
+        price: Number(item.price),
+        description: item.description,
+      }));
+
+      setServices(normalized);
+
+      setLoadingServices(false);
+    };
+
+    loadServices();
+  }, [vehicleType, serviceTypes]);
+  const vehicleCompanyId = form.watch("vehicle_company_id");
+  const hasInitializedModelsRef = useRef(false);
+
+  useEffect(() => {
+    if (!vehicleCompanyId) {
+      setMeta(prev => ({ ...prev, vehicleModels: [] }));
+      return;
+    }
+
+    // 🚫 Skip ONLY hydration-triggered change
+    if (hasInitializedModelsRef.current) {
+      hasInitializedModelsRef.current = false;
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadModels = async () => {
+      setMeta(prev => ({ ...prev, loadingModels: true }));
+
+      try {
+        const models = await jobCardModelInfo(vehicleCompanyId);
+        if (cancelled) return;
+
+        setMeta(prev => ({
+          ...prev,
+          vehicleModels: toSelectOptions(models),
+          loadingModels: false,
+        }));
+
+        // reset model ONLY when user changes make
+        form.setValue("vehicle_model_id", "");
+      } catch {
+        if (!cancelled) {
+          setMeta(prev => ({ ...prev, loadingModels: false }));
+        }
+      }
+    };
+
+    loadModels();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [vehicleCompanyId]);
+  useEffect(() => {
+    form.setValue('role', user?.role);
+  }, [user])
 
   const isHydratingRef = useRef(false);
   useEffect(() => {
 
     setCountryList(countries)
   }, [countries])
-  useEffect(() => {
 
-    if ((mode == "create" || !mode) &&
-      countryList.length) {
-      const hydrateLocation = async () => {
-        // 1️⃣ COUNTRY
-        isHydratingRef.current = true;
-        try {
-          const countryId = findIdByName(countryList, '101');
+  const [initialValues, setInitialValues] = useState<any | null>(null)
 
-          if (!countryId) return;
 
-          form.setValue("country", String(countryId));
+  // useEffect(() => {
 
-          // 2️⃣ STATES
-          setLoadingState(true);
-          const stateList = await fetchStateList(countryId);
-          setStates(stateList);
-          setLoadingState(false);
+  //   if (!initialValues || !countryList.length) return;
+  //   if (mode !== "edit" && mode !== "view") return;
 
-        } catch (e) {
-          console.error(e)
-        } finally {
-          // ✅ hydration completed
-          isHydratingRef.current = false;
-        }
-      };
-      hydrateLocation()
-    }
-    if (
-      (mode !== "edit" && mode !== "view") ||
-      !initialValues ||
-      !countryList.length
-    ) return;
+  //   const hydrate = async () => {
+  //     /* ===== STORE ===== */
+  //     if (isAdmin) {
+  //       form.setValue("store_id", String(initialValues.job_card.store_id));
+  //     }
+  //     form.setValue("consumer_id", String(initialValues.job_card.consumer_id));
+  //     /* ===== JOB CARD ===== */
+  //     form.setValue(
+  //       "jobcard_date",
+  //       initialValues.job_card.jobcard_date
+  //         ? new Date(initialValues.job_card.jobcard_date)
+  //           .toISOString()
+  //           .split("T")[0]
+  //         : ""
+  //     );
 
-    const hydrateLocation = async () => {
-      // 1️⃣ COUNTRY
-      isHydratingRef.current = true;
-      try {
-        const countryId = findIdByName(countryList, initialValues.country);
 
-        if (!countryId) return;
+  //     form.setValue("vehicle_type", initialValues.job_card.vehicle_type);
+  //     hasInitializedModelsRef.current = true;
+  //     form.setValue("vehicle_company_id", String(initialValues.job_card.vehicle_company_id));
+  //     form.setValue("color", initialValues.job_card.color ?? "");
+  //     form.setValue("year", String(initialValues.job_card.year ?? ""));
+  //     form.setValue("reg_no", initialValues.job_card.reg_no ?? "");
+  //     form.setValue("chasis_no", initialValues.job_card.chasis_no ?? "");
+  //     form.setValue("vehicle_condition", initialValues.job_card.vehicle_condition ?? "");
+  //     form.setValue("remarks", initialValues.job_card.remarks ?? "");
 
-        form.setValue("country", String(countryId));
+  //     /* ===== CHECKBOXES ===== */
+  //     form.setValue("isRepainted", Boolean(initialValues.job_card.isRepainted));
+  //     form.setValue("isSingleStagePaint", Boolean(initialValues.job_card.isSingleStagePaint));
+  //     form.setValue("isPaintThickness", Boolean(initialValues.job_card.isPaintThickness));
+  //     form.setValue("isVehicleOlder", Boolean(initialValues.job_card.isVehicleOlder));
 
-        // 2️⃣ STATES
-        setLoadingState(true);
-        const stateList = await fetchStateList(countryId);
-        setStates(stateList);
-        setLoadingState(false);
+  //     /* ===== SERVICES ===== */
+  //     const serviceTypeValues = (initialValues.opted_services || []).map(
+  //       (item: any) => String(item.category_type)
+  //     );
 
-        const stateId = findIdByName(stateList, initialValues.state);
+  //     const serviceIds = (initialValues.job_card.service_ids || []).map(String);
 
-        if (!stateId) return;
 
-        form.setValue("state", String(stateId));
+  //     isHydratingJobRef.current = true;
 
-        // 3️⃣ CITIES
-        setLoadingCity(true);
-        const cityList = await fetchCityList(stateId);
-        setCities(cityList);
-        setLoadingCity(false);
+  //     form.setValue("service_type", serviceTypeValues);
+  //     form.setValue("service_ids", serviceIds);
+  //     setSelectedServices(serviceIds);
 
-        const cityId = findIdByName(cityList, initialValues.city);
-        if (!cityId) return;
+  //     isHydratingJobRef.current = false;
 
-        form.setValue("city", String(cityId));
+  //     /* ===== VEHICLE MODELS ===== */
+  //     const models = await jobCardModelInfo(
+  //       String(initialValues.job_card.vehicle_company_id)
+  //     );
 
-        // ORGANIZATION
-        if (initialValues.organization_id) {
-          form.setValue("organization_id", String(initialValues.organization_id));
-        }
 
-        // TERRITORY
-        if (initialValues.territory_id) {
-          form.setValue("territory_id", String(initialValues.territory_id));
-        }
-      } finally {
-        // ✅ hydration completed
-        isHydratingRef.current = false;
-      }
-    };
+  //     setMeta(prev => ({
+  //       ...prev,
+  //       vehicleModels: toSelectOptions(models),
+  //     }));
 
-    hydrateLocation();
-  }, [mode, initialValues, countryList]);
-  useEffect(() => {
-    if (mode !== "create" || !countryList.length) return;
+  //     form.setValue(
+  //       "vehicle_model_id",
+  //       String(initialValues.job_card.vehicle_model_id)
+  //     );
+  //   };
 
-    const india = countryList.find(c => c.name === "India");
-    if (!india) return;
+  //   hydrate();
+  // }, [initialValues, countryList, mode]);
 
-    form.setValue("country", String(india.id));
-  }, [mode, countryList]);
 
-  const [organizationTerritoryList, setOrganizationTerritoryList] = useState<any>({
-    territories: [],
-    organizations: []
-  });
-  const fetchOrganizationsTerritory = async () => {
+  const onSubmit = (data: AppointmentFormValues) => {
+  };
+
+
+  const isAdmin =
+    user?.role === "admin" || user?.role === "super-admin";
+
+
+  const isHydratingJobRef = useRef(false);
+  async function handleAppointmentSubmission(values: AppointmentFormValues) {
+    setIsLoading(true);
+
     try {
-      const res = await fetchTerritoryOrganizationList();
+      console.log(values, 'valuesvalues');
 
-      setOrganizationTerritoryList({
-        territories: res.territories.map((t: any) => {
-          const isAssigned = t.store_id !== null;
-          const isSelected = String(t.id) === String(selectedTerritoryId);
-
-          return {
-            value: String(t.id),
-            label: isAssigned && !isSelected
-              ? `${t.name} (Assigned)`
-              : t.name,
-            isDisabled: isAssigned && !isSelected,
-          };
-        }),
-        organizations: res.organizations,
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-  const selectedTerritoryId = form.watch("territory_id");
-
-  useEffect(() => {
-    fetchOrganizationsTerritory();
-  }, [selectedTerritoryId]);
-
-
-  /* -------------------- HYDRATE -------------------- */
-  useEffect(() => {
-    if (!initialValues) return;
-
-    const previews: Record<string, string> = {};
-
-    (["pan_card_file", "registration_file", "gstin_file"] as const).forEach(key => {
-      const val = initialValues[key];
-      if (typeof val === "string" && val) {
-        setFilePreview(prev => ({
-          ...prev,
-          [key]: {
-            url: `${baseUrl}/${val}`,
-          },
-        }));
-      }
-    });
-
-    if (mode === "edit" || mode === "view") {
-
-      form.reset({
-        name: initialValues?.name ?? "",
-        email: initialValues?.email ?? "",
-        organization_id: initialValues?.organization_id ?? "",
-        phone: initialValues?.phone ?? "",
-        territory_id: initialValues?.territory_id.toString() ?? "",
-        registered_address: initialValues?.registered_address ?? "",
-
-        shipping_address: initialValues?.shipping_address ?? "",
-        notes: initialValues?.notes ?? "",
-        gst_no: initialValues?.gst_no ?? "",
-        pan_no: initialValues?.pan_no ?? "",
-        invoice_prefix: initialValues?.invoice_prefix ?? "",
-
-        country: initialValues?.country.toString() ?? "",
-        state: initialValues?.state ?? "",
-        city: initialValues?.city ?? "",
-        opening_date: initialValues?.opening_date
-          ? new Date(initialValues.opening_date)
-            .toISOString()
-            .slice(0, 10)
-          : "",
-        // city: initialValues?.city ?? "",
-        pincode: initialValues?.pincode ?? "",
-        pan_card_file: initialValues?.pan_card_file ?? "",
-        registration_file: initialValues?.registration_file ?? "",
-        gstin_file: initialValues?.gstin_file ?? "",
-      });
-    }
-  }, [mode, initialValues, form]);
-  /* -------------------- FILE HANDLER -------------------- */
-  const handleFile = (key: keyof storeFormType, file: File | null) => {
-    if (!file) return;
-
-    form.setValue(key, file, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true,
-    });
-
-    const url = URL.createObjectURL(file);
-
-    setFilePreview(prev => ({
-      ...prev,
-      [key]: {
-        url,
-        file,
-      },
-    }));
-  };
-  const onSubmit = (values: storeFormType) => {
-    StoreCommonHandler(values, form.setError)
-  };
-  const buildOrganizationFormData = (
-    value: storeFormType, id?: string | null,) => {
-    const formData = new FormData();
-
-    if (id) {
-      formData.append("id", String(id));
-    }
-
-    formData.append("name", value.name);
-    formData.append("organization_id", value.organization_id);
-    formData.append("email", value.email);
-    formData.append("gst_no", value.gst_no);
-    formData.append("pan_no", value.pan_no);
-    formData.append("invoice_prefix", value.invoice_prefix);
-    formData.append("country", (value.country) ?? "");
-    formData.append("state", value.state);
-    formData.append("pincode", value.pincode);
-    formData.append("registered_address", value.registered_address);
-    formData.append("shipping_address", value.shipping_address ?? "");
-    formData.append("territory_id", value.territory_id);
-    formData.append("phone", value.phone ?? "");
-    formData.append("opening_date", value.opening_date);
-    formData.append("city", value.city.toString());
-    formData.append("notes", value.notes ?? "");
-    if (value.gstin_file instanceof File) {
-      formData.append("gstin_file", value.gstin_file);
-    }
-
-    if (value.pan_card_file instanceof File) {
-      formData.append("pan_card_file", value.pan_card_file);
-    }
-
-    if (value.registration_file instanceof File) {
-      formData.append("registration_file", value.registration_file);
-    }
-
-
-    return formData;
-  };
-  const StoreCommonHandler = async (
-    value: storeFormType,
-    setError: UseFormSetError<storeFormType>
-  ) => {
-    try {
-
-      setIsLoading(true);
+      const { role, ...rest } = values
 
       if (mode === "edit") {
-        const formData = buildOrganizationFormData(
-          value,
-          id
-        );
-        await EditStore(formData);
-
-        toast({
-          title: "Edit Store",
-          description: "Store updated successfully",
-          variant: "success",
-        });
+        await appointmentUpdate(rest);
       } else {
-        const formData = buildOrganizationFormData(value);
-
-        await SaveStore(formData);
-
-        toast({
-          title: "Add Store",
-          description: "Store added successfully",
-          variant: "success",
-        });
+        await appointmentSave(rest);
       }
-      navigate("/master")
+
+
+      toast({
+        title: !mode ? "Appointment Created" : "Appointment Updated",
+        description: !mode ? "Appointment created successfully" : "Appointment updated successfully",
+        variant: "success",
+      });
+      // ✅ Open invoice modal
     } catch (err: any) {
       const apiErrors = err?.response?.data?.errors;
 
@@ -399,326 +363,382 @@ export default function AppointmentForm() {
       // 👇 THIS IS THE KEY PART
       if (apiErrors && err?.response?.status === 422) {
         Object.entries(apiErrors).forEach(([field, messages]) => {
-          setError(field as keyof storeFormType, {
+          form.setError(field as any, {
             type: "server",
             message: (messages as string[])[0],
           });
         });
         return;
       }
-      if (err?.response?.status === 403) {
-        navigate("/master")
-      }
       toast({
         title: "Error",
         description:
           err?.response?.data?.message ||
           err.message ||
-          `Failed to ${mode === "create" ? "add" : "update"
-          } store`,
+          "Something went wrong",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
+  const [storeList, setStoreList] = useState<
+    { value: string; label: string; isDisabled?: boolean }[]
+  >([]);
+  const fetchStoreList = async () => {
+    try {
+      const res = await fetchStoreCrispList();
+
+      let options = res.data.map((store: any) => ({
+        value: String(store.id),
+        label: store.name,
+      }));
+
+
+      setStoreList(options);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  useEffect(() => {
+    if (isAdmin) {
+      fetchStoreList();
+    }
+  }, [isAdmin]);
   return (
     <div className="mx-auto px-3 py-3 space-y-3">
       {/* HEADER */}
       <div className="inline-flex items-center gap-4">
         <button
-          onClick={() => {
-            sessionStorage.removeItem('sidebar_active_parent')
-            window.history.back()
-          }}
-
+          onClick={() => window.history.back()}
           disabled={isLoading || isInfoLoading}
           className="text-muted-foreground hover:text-foreground"
         >
           <ChevronLeft size={18} />
         </button>
+
         <h1 className="text-lg font-semibold">
-          {isView ? "View Store" : id ? "Edit Store" : "Create New Store"}
+          {isView
+            ? "View Appointment"
+            : id
+              ? "Edit Appointment"
+              : "Create New Appointment"}
         </h1>
       </div>
 
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {
-            isInfoLoading && id ? <div className="min-h-[150px] flex justify-center items-center">
-              <div className="p-3 text-sm "><Loader /></div>
-            </div> :
-              <div>
-                {/* STORE INFO */}
-                <Card className="mb-4 pb-4">
-                  <SectionCard title="Store Information">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* "name", "email", "phone" */}
-                      {[{ label: "Store Name", fieldName: "name", isRequired: true },
-                      { label: "Email", fieldName: "email", isRequired: true },
-                      { label: "Phone", fieldName: "phone", isRequired: false }
-                      ].map((item) => (
-                        <FloatingField
-                          isView={isView}
-                          isRequired={item.isRequired}
-                          name={item.fieldName}
-                          label={item.label}
-                          control={form.control}
-                        />
-                      ))}
-                    </div>
-                  </SectionCard>
-                </Card>
-
-                {/* LOCATION */}
-                <Card className="mb-4 pb-4">
-                  <SectionCard title="Location & Operations">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <FloatingRHFSelect
-                        name="organization_id"
-                        label="Organization"
-                        control={form.control}
-                        isRequired
-                        isDisabled={isView}
-                        options={organizationTerritoryList.organizations.map((o: any) => ({
-                          value: String(o.id),
-                          label: o.org_name,
-                        }))}
-                      />
-                      <FloatingRHFSelect
-                        name="territory_id"
-                        label="Location"
-                        control={form.control}
-                        isRequired
-                        isDisabled={isView}
-                        options={organizationTerritoryList.territories}
-                      />
-                      <FloatingField
-                        name="opening_date"
-                        label="Opening Date"
-                        type="date"
-                        control={form.control}
-                        isRequired
-                        isView={isView}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <FloatingField
-                        name="pincode"
-                        label="Pincode"
-                        control={form.control}
-                        isRequired
-                        isView={isView}
-                      />
-                      <FloatingRHFSelect
-                        name="country"
-                        label="Country"
-                        control={form.control}
-                        isRequired
-                        isDisabled={isView}
-                        options={countryList.map(c => ({
-                          value: String(c.id),
-                          label: c.name,
-                        }))}
-                        onValueChange={async (value) => {
-                          if (isHydratingRef.current) return;
-
-                          setStates([]);
-                          setCities([]);
-                          form.setValue("state", "");
-                          form.setValue("city", "");
-
-                          setLoadingState(true);
-                          const stateList = await fetchStateList(Number(value));
-                          setStates(stateList);
-                          setLoadingState(false);
-                        }}
-                      />
-
-                      <FloatingRHFSelect
-                        name="state"
-                        label="State"
-                        control={form.control}
-                        isRequired
-                        isDisabled={isView || !form.getValues("country")}
-                        options={states.map(s => ({
-                          value: String(s.id),
-                          label: s.name,
-                        }))}
-                        onValueChange={async (value) => {
-                          if (isHydratingRef.current) return;
-
-                          setCities([]);
-                          form.setValue("city", "");
-
-                          setLoadingCity(true);
-                          const cityList = await fetchCityList(Number(value));
-                          setCities(cityList);
-                          setLoadingCity(false);
-                        }}
-                      />
-                      <FloatingRHFSelect
-                        name="city"
-                        label="City"
-                        control={form.control}
-                        isRequired
-                        isDisabled={isView || !form.getValues("state")}
-                        options={cities.map(c => ({
-                          value: String(c.id),
-                          label: c.name,
-                        }))}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      <FloatingTextarea
-                        name="registered_address"
-                        label="Permanent Address"
-                        control={form.control}
-                        isRequired
-                        isView={isView}
-                      />
-
-                      <FloatingTextarea
-                        name="shipping_address"
-                        label="Shipping Address"
-                        control={form.control}
-                        isRequired
-                        isView={isView}
-                      />
-                    </div>
-                  </SectionCard>
-                </Card>
-
-                {/* BILLING */}
-                <Card className="mb-4 pb-4">
-                  <SectionCard title="Billing & Tax">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {storeFormKeys.billingTaxFieldList.map(item => (
-                        <FloatingField
-                          isView={isView}
-                          isRequired={true}
-                          name={item.fieldName}
-                          label={item.label}
-                          control={form.control}
-                        />
-                      ))}
-                    </div>
-                  </SectionCard>
-                </Card>
-
-                {/* DOCUMENTS */}
-                <Card className="mb-4 pb-4">
-                  <SectionCard title="Documents">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {storeFormKeys.file.map((item) => {
-                        const preview = filePreview[item.key];
-
-                        return (
-                          <FormField
-                            key={item.key}
-                            name={item.key as any}
-                            control={form.control}
-                            render={({ fieldState }) => {
-
-                              const hasError = !!fieldState.error;
-                              return (
-                                <FormItem>
-                                  <p className="text-sm font-medium capitalize">
-                                    {item.label}
-                                  </p>
-
-                                  <div className="relative h-32 rounded-lg border bg-gray-50 overflow-hidden group">
-
-                                    {/* PREVIEW */}
-                                    {preview ? (
-                                      isPdfFile(preview.file, preview.url) ? (
-                                        <div className="absolute inset-0  overflow-hidden">
-                                          <iframe
-                                            src={preview.url}
-                                            className="w-[120%] h-[120%] "
-                                            scrolling="no"
-                                          />
-                                        </div>
-                                      ) : (
-                                        <img
-                                          src={preview.url}
-                                          className="w-full h-full object-contain pointer-events-none"
-                                        />
-                                      )
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center">
-                                        <span className="text-xs text-gray-400">No preview</span>
-                                      </div>
-                                    )}
-
-                                  </div>
-
-
-
-                                  {!isView && (
-                                    <Input
-                                      className={hasError ? "border-red-500 focus-visible:ring-red-500" : ""}
-
-                                      type="file"
-                                      onChange={(e) =>
-                                        handleFile(
-                                          item.key as any,
-                                          e.target.files?.[0] ?? null
-                                        )
-                                      }
-                                    />
-                                  )}
-                                  <FormMessage />
-                                </FormItem>
-                              )
-                            }}
-                          />
-                        )
-                      })}
-                    </div>
-                  </SectionCard>
-                </Card>
-
-                {/* NOTES */}
-                <Card className="mb-4 pb-4">
-                  <SectionCard title="Additional Notes">
-                    <FloatingTextarea
-                      name="notes"
-                      label="Notes"
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          {isInfoLoading && id ? (
+            <div className="min-h-[150px] flex justify-center items-center">
+              <Loader />
+            </div>
+          ) : (
+            <>
+              {/* BASIC DETAILS */}
+              <Card className="mb-4 pb-4">
+                <SectionCard title="Appointment Details">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {isAdmin && <FloatingRHFSelect
+                      name="store_id"
+                      label="Select Store"
+                      control={form.control}
+                      isDisabled={isView}
+                      isRequired
+                      options={storeList.map((s: any) => ({
+                        label: s.label,
+                        value: String(s.value),
+                      }))}
+                    />}
+                    <FloatingField
+                      name="consumer_mobile"
+                      label="Customer Mobile"
+                      isRequired
                       isView={isView}
                       control={form.control}
                     />
-                  </SectionCard>
-                </Card>
-              </div>
-          }
+
+                    <FloatingRHFSelect
+                      name="appointment_type"
+                      label="Type"
+                      isRequired
+                      isDisabled={isView}
+                      control={form.control}
+                      options={appointmentFilterMeta.type}
+                    />
+
+                    <FloatingRHFSelect
+                      name="priority"
+                      label="Priority"
+                      isRequired
+                      isDisabled={isView}
+                      control={form.control}
+                      options={appointmentFilterMeta.priority}
+                    />
+                  </div>
+                </SectionCard>
+              </Card>
+
+              {/* VEHICLE INFO */}
+              <Card className="mb-4 pb-4">
+                <SectionCard title="Vehicle Information">
+
+                  {/* MAKE & MODEL */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <FloatingRHFSelect
+                      name="vehicle_company_id"
+                      label="Vehicle Make"
+                      isDisabled={isView}
+                      isRequired
+                      control={form.control}
+                      options={meta.vehicleCompanies}
+                    />
+
+                    <FloatingRHFSelect
+                      name="vehicle_model_id"
+                      label="Vehicle Model"
+                      isRequired
+                      control={form.control}
+                      isDisabled={!meta.vehicleModels.length || isView}
+                      options={meta.vehicleModels}
+                    />
+
+
+                    <FloatingField
+                      name="color"
+                      label="Vehicle Color"
+                      isRequired
+                      isDisabled={isView}
+                      control={form.control}
+                    />
+                    <FloatingRHFSelect
+                      name="year"
+                      label="Make Year"
+                      isDisabled={isView}
+                      isRequired
+                      control={form.control}
+                      options={meta.years}
+                    />
+                  </div>
+
+                  {/* VEHICLE DETAILS */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+
+
+                    <FloatingField
+                      name="reg_no"
+                      label="Registration No"
+                      isRequired
+                      isDisabled={isView}
+                      control={form.control}
+                    />
+                    <FloatingRHFSelect
+                      name="vehicle_type"
+                      label="Vehicle Type"
+                      isDisabled={isView}
+                      isRequired
+                      control={form.control}
+                      options={meta.vehicleTypes}
+                    />
+                    <FloatingRHFSelect
+                      name="service_type"
+                      label="Service Type"
+                      isMulti
+                      isRequired
+                      isDisabled={isView}
+                      control={form.control}
+                      options={meta.serviceTypes}
+                    />
+                  </div>
+
+                  {/* DIVIDER */}
+                  <div className="border-t pt-4 mt-2">
+                    <p className="mb-3 text-sm font-medium text-gray-600">
+                      Select Services <span className="text-red-500">*</span>
+                    </p>
+
+                    {/* LOADING */}
+                    {loadingServices && (
+                      <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+                        <Loader loaderSize={4} isShowLoadingText={false} />
+                        Loading services…
+                      </div>
+                    )}
+
+                    {/* EMPTY STATES */}
+                    {!loadingServices &&
+                      !form.getValues("vehicle_type") &&
+                      form.getValues("service_ids").length === 0 && (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          Select a vehicle and service type to see available services
+                        </p>
+                      )}
+
+                    {!loadingServices &&
+                      services.length === 0 &&
+                      form.getValues("vehicle_type") && (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          No services available for the selected configuration
+                        </p>
+                      )}
+
+                    {/* SERVICES GRID */}
+                    {!loadingServices && services.length > 0 && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {services.map(service => {
+                          const isSelected = selectedServices.includes(service.id);
+
+                          return (
+                            <Card
+                              key={service.id}
+                              onClick={() => !isView && toggleService(service.id)}
+                              className={cn(
+                                "cursor-pointer transition-all border rounded-lg",
+                                isSelected
+                                  ? "border-primary bg-primary/5 shadow-sm"
+                                  : "hover:border-muted-foreground/30"
+                              )}
+                            >
+                              <CardContent className="p-3">
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex items-start gap-2">
+                                    <div
+                                      className={cn(
+                                        "mt-0.5 h-4 w-4 rounded border flex items-center justify-center",
+                                        isSelected
+                                          ? "bg-primary border-primary text-white"
+                                          : "border-muted-foreground"
+                                      )}
+                                    >
+                                      {isSelected && <Check className="h-3 w-3" />}
+                                    </div>
+
+                                    <div>
+                                      <p className="font-semibold text-xs leading-tight">
+                                        {service.label}
+                                      </p>
+                                      <p className="text-[10px] text-muted-foreground mt-1">
+                                        {service.description}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <p className="font-semibold text-xs text-green-600 whitespace-nowrap">
+                                    ₹{service.price}
+                                  </p>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* VALIDATION ERROR */}
+                    <FormMessage className="pt-2 text-xs">
+                      {form.formState.errors.service_ids?.message}
+                    </FormMessage>
+                  </div>
+                </SectionCard>
+              </Card>
+
+              <Card className="mb-4 pb-4">
+                <SectionCard title="Schedule & Source">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {/* START TIME */}
+                    <FloatingField
+                      name="scheduled_at"
+                      label="Start Time"
+                      type="datetime-local"
+                      isRequired
+                      isView={isView}
+                      control={form.control}
+                      min={nowIso()}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        form.setValue("scheduled_at", value, { shouldValidate: true });
+
+                        // clear invalid end time
+                        if (endTime && value && endTime < value) {
+                          form.setValue("scheduled_end_at", "");
+                        }
+                      }}
+                    />
+
+                    {/* END TIME */}
+                    <FloatingField
+                      name="scheduled_end_at"
+                      label="End Time"
+                      type="datetime-local"
+                      isRequired
+                      isView={isView}
+                      isDisabled={!startTime}   // ✅ works now
+                      control={form.control}
+                      min={startTime || nowIso()}
+                    />
+
+                    {/* SOURCE */}
+                    <FloatingRHFSelect
+                      name="source"
+                      label="Appointment Source"
+                      isRequired
+                      isDisabled={isView}
+                      control={form.control}
+                      options={[
+                        { label: "Walk In", value: "walk_in" },
+                        { label: "Phone", value: "phone" },
+                        { label: "WhatsApp", value: "whatsapp" },
+                        { label: "Website", value: "website" },
+                        { label: "Referral", value: "referral" },
+                      ]}
+                    />
+                  </div>
+                </SectionCard>
+              </Card>
+
+
+
+
+              {/* NOTES */}
+              <Card className="mb-4 pb-4">
+                <SectionCard title="Notes">
+                  <FloatingTextarea
+                    name="notes"
+                    label="Notes"
+                    isRequired
+                    isView={isView}
+                    control={form.control}
+                  />
+                </SectionCard>
+              </Card>
+            </>
+          )}
 
           {/* ACTIONS */}
-          {mode !== 'view' && <div className="">
-            <div className="  flex justify-end gap-3">
+          {mode !== 'view' &&
+            <div className="  pb-3 flex justify-end gap-4 mt-3">
               <Button
                 variant="outline"
                 disabled={isLoading || isInfoLoading}
                 className={'hover:bg-[#E3EDF6] hover:text-[#000] h-8 text-xs'}
-                onClick={() => navigate("/master")}
+                onClick={() => navigate("/new-appointments")}
               >
                 {'Cancel'}
               </Button>
-              <Button
-                type="submit"
-                disabled={isLoading || isInfoLoading}
-                className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] h-8 text-xs"
-              >
-                {isLoading && <Loader isShowLoadingText={false} color="#fff" />}
-                {isLoading
-                  ? id ? "Updating..." : "Adding..."
-                  : id ? "Update " : "Add "}
-              </Button>
-            </div></div>}
 
+              {(
+                <Button type="button"
+                  disabled={isLoading || isInfoLoading}
+                  onClick={form.handleSubmit(handleAppointmentSubmission)}
+                  className="bg-[#FE0000] hover:bg-[rgb(238,6,6)] h-8 text-xs">
+                  {isLoading && <Loader color="#fff" isShowLoadingText={false} />}
+                  {isLoading
+                    ? id ? "Updating..." : "Adding..."
+                    : id ? "Update " : "Add "}
+                </Button>
+              )}
+
+            </div>}
         </form>
       </Form>
     </div>

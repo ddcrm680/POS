@@ -1,5 +1,5 @@
 import { Control, ControllerRenderProps, UseFormSetError } from "react-hook-form";
-import { createInvoicePaymentSchema, CustomerSchema, InsertCustomerSchema, JobCardOnlySchema, JobCardSchema, loginSchema, MailSchema, NewCustomerSchema, NewJobCardSchema, passwordSchema, posJobSchema, profileSchema, TransferProductSchema, userSchema, VehicleSchema, whatsappSchema } from "./schema";
+import { AppointmentSchema, createInvoicePaymentSchema, CustomerSchema, InsertCustomerSchema, JobCardOnlySchema, JobCardSchema, loginSchema, MailSchema, NewCustomerSchema, NewJobCardSchema, passwordSchema, posJobSchema, profileSchema, TransferProductSchema, userSchema, VehicleSchema, whatsappSchema } from "./schema";
 import z from "zod";
 import { ReactNode } from "react";
 
@@ -669,6 +669,7 @@ export interface storeFormApi extends storeFormType {
   }
 }
 
+
 export type storeFormType = {
   name: string;
   email: string;
@@ -811,6 +812,7 @@ export type JobCardOnlyFormValues = z.infer<typeof JobCardOnlySchema>;
 export type JobCardFormUnion = JobCardFormValues | JobCardOnlyFormValues;
 export type TransferProductFormValues = z.infer<typeof TransferProductSchema>;
 
+export type AppointmentFormValues = z.infer<typeof AppointmentSchema>;
 export type CustomerFormValues = z.infer<typeof NewCustomerSchema>;
 export type FloatingDateFieldProps = {
   name: string;

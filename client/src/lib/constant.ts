@@ -583,4 +583,11 @@ export const appointmentFilterMeta = {
     { label: "Cancelled", value: "cancelled" },
     { label: "No Show", value: "no_show" },
   ],
+  source:[
+                          { label: "Walk In", value: "walk_in" },
+                          { label: "Phone", value: "phone" },
+                          { label: "WhatsApp", value: "whatsapp" },
+                          { label: "Website", value: "website" },
+                          { label: "Referral", value: "referral" },
+                        ]
 };

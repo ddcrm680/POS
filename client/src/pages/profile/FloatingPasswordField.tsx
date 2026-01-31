@@ -63,7 +63,7 @@ export function FloatingPasswordField({
               <Text
                 css={floatingLabelStyle}
                 data-float={shouldFloat || undefined}
-                color={error ? "red.500" : "gray.500"}
+                color={"gray.500"}
               >
                 {label}
                 {isRequired && <RequiredMark show />}

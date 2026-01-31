@@ -84,7 +84,7 @@ export function FloatingTextarea({
               css={floatingLabelStyle}
               data-float={shouldFloat || undefined}
               bg={disabled ? "gray.50" : "white"}
-              color={error ? "red.500" : "gray.500"}
+              color={"gray.500"}
             >
               {label}
               {isRequired && <RequiredMark show={!disabled} />}

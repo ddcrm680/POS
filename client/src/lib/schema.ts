@@ -1033,6 +1033,105 @@ export const TransferProductSchema = z
   });
 
 
+export const AppointmentSchema = z.object({
+  role: z.string().optional(),
+
+  store_id: z.string().optional(),
+  consumer_mobile: z
+    .string()
+    .regex(/^\d{10}$/, "Enter a valid 10-digit mobile number"),
+  service_type: z
+      .array(z.string())
+      .min(1, "Please select at least one service type"),
+
+  vehicle_company_id: z
+    .string()
+    .min(1, "Please select vehicle make"),
+
+  vehicle_model_id: z
+    .string()
+    .min(1, "Please select vehicle model"),
+
+  color: z
+    .string()
+    .min(1, "Vehicle color is required"),
+
+  year: z
+    .string()
+    .min(1, "Vehicle manufacturing year is required"),
+
+  reg_no: z
+    .string()
+    .min(1, "Registration No is required"),
+  vehicle_type: z
+    .string()
+    .min(1, "Please select vehicle type"),
+
+  service_ids: z
+    .array(z.string())
+    .min(1, "Please select at least one service"),
+
+  appointment_type: z.enum([
+    "service",
+    "demo",
+    "inspection",
+    "consultation",
+    "follow_up",
+  ]),
+
+  scheduled_at: z.string().min(1, "Start time is required"),
+
+  scheduled_end_at: z.string().min(1, "End time is required"),
+
+  priority: z.enum(["normal", "urgent", "critical"]),
+
+  source: z.enum([
+    "walk_in",
+    "phone",
+    "whatsapp",
+    "website",
+    "referral",
+  ]),
+
+  notes: z
+    .string()
+    .trim()
+    .min(10, "Notes must be at least 10 characters")
+    .max(255, "Notes must not exceed 255 characters"),
+
+}).superRefine((data, ctx) => {
+    const start = new Date(data.scheduled_at);
+    const end = new Date(data.scheduled_end_at);
+    const now = new Date();
+
+    if (start < now) {
+      ctx.addIssue({
+        path: ["scheduled_at"],
+        message: "Start time cannot be in the past",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    if (end <= start) {
+      ctx.addIssue({
+        path: ["scheduled_end_at"],
+        message: "End time must be after start time",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    // existing admin/store rule
+    if (
+      ["admin", "super-admin"].includes(data.role ?? "") &&
+      !data.store_id
+    ) {
+      ctx.addIssue({
+        path: ["store_id"],
+        message: "Store is required",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });
 
 export type TransferProductFormValues = z.infer<typeof TransferProductSchema>;
 
