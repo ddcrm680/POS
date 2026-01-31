@@ -10,11 +10,11 @@ type FloatingFieldProps = {
   label: string;
   control: Control<any>;
   isView?: boolean;
-    maxAmount?: string
+  maxAmount?: string
   isRequired?: boolean;
   isDisabled?: boolean;
   type?: string;
-
+  hint?: string; // 
   /** 👇 Custom field renderer (MultiEmailInput, Select, etc.) */
   render?: (args: {
     field: any;
@@ -28,7 +28,7 @@ export function FloatingField({
   label,
   control,
   isDisabled = false,
-  
+  hint,
   maxAmount,
   isView,
   isRequired = false,
@@ -67,7 +67,7 @@ export function FloatingField({
                 type={inputType}
                 h="38px"
                 fontSize="13px"
-  lineHeight="1.4"
+                lineHeight="1.4"
                 disabled={disabled}
                 pt="14px"
                 pb="6px"
@@ -75,79 +75,79 @@ export function FloatingField({
                 pr="10px"
                 border="1px solid"
                 borderColor={error ? "red.500" : "#e1e7ef"}
-  _focus={{ borderColor: error ? "red.500" : "blue.500" }}
+                _focus={{ borderColor: error ? "red.500" : "blue.500" }}
                 _disabled={{
                   bg: "gray.50",
                   opacity: 0.7,
                 }}
 
-              /* 🔒 MOBILE NUMBER RULE */
-              inputMode={isMobileField ? "numeric" : inputProps.inputMode}
-              pattern={isMobileField ? "[0-9]*" : inputProps.pattern}
-              maxLength={isMobileField ? 10 : inputProps.maxLength}
+                /* 🔒 MOBILE NUMBER RULE */
+                inputMode={isMobileField ? "numeric" : inputProps.inputMode}
+                pattern={isMobileField ? "[0-9]*" : inputProps.pattern}
+                maxLength={isMobileField ? 10 : inputProps.maxLength}
 
-              onChange={(e) => {
-                let value = e.target.value;
+                onChange={(e) => {
+                  let value = e.target.value;
 
-                // ❌ prevent leading spaces
-                value = value.replace(/^\s+/, "");
+                  // ❌ prevent leading spaces
+                  value = value.replace(/^\s+/, "");
 
-                if (isMobileField) {
-                  value = value.replace(/\D/g, ""); // numbers only
-                  value = value.replace(/^0+/, ""); // no leading zero
-                  value = value.slice(0, 10);       // max 10 digits
-                }
-                // 💰 RECEIVED AMOUNT RULES
-                if (name === "received_amount") {
-                  // Allow digits + dot only
-                  value = value.replace(/[^0-9.]/g, "");
-
-                  // Prevent multiple dots
-                  const parts = value.split(".");
-                  if (parts.length > 2) return;
-
-                  // Limit decimals to 2 digits
-                  if (parts[1]?.length > 2) {
-                    value = `${parts[0]}.${parts[1].slice(0, 2)}`;
+                  if (isMobileField) {
+                    value = value.replace(/\D/g, ""); // numbers only
+                    value = value.replace(/^0+/, ""); // no leading zero
+                    value = value.slice(0, 10);       // max 10 digits
                   }
+                  // 💰 RECEIVED AMOUNT RULES
+                  if (name === "received_amount") {
+                    // Allow digits + dot only
+                    value = value.replace(/[^0-9.]/g, "");
 
-                  // Prevent leading zeros like 000, 00.50
-                  if (/^0{2,}/.test(value)) {
-                    value = value.replace(/^0+/, "0");
+                    // Prevent multiple dots
+                    const parts = value.split(".");
+                    if (parts.length > 2) return;
+
+                    // Limit decimals to 2 digits
+                    if (parts[1]?.length > 2) {
+                      value = `${parts[0]}.${parts[1].slice(0, 2)}`;
+                    }
+
+                    // Prevent leading zeros like 000, 00.50
+                    if (/^0{2,}/.test(value)) {
+                      value = value.replace(/^0+/, "0");
+                    }
+
+                    // Convert to number safely
+                    const numericValue = Number(value);
+
+                    // Clamp to due amount
+                    if (
+                      maxAmount !== undefined &&
+                      !Number.isNaN(numericValue) &&
+                      numericValue > Number(maxAmount)
+                    ) {
+                      value = String(maxAmount);
+                    }
+
+                    field.onChange(value);
+                    return;
                   }
-
-                  // Convert to number safely
-                  const numericValue = Number(value);
-
-                  // Clamp to due amount
-                  if (
-                    maxAmount !== undefined &&
-                    !Number.isNaN(numericValue) &&
-                    numericValue > Number(maxAmount)
-                  ) {
-                    value = String(maxAmount);
-                  }
-
                   field.onChange(value);
-                  return;
-                }
-                field.onChange(value);
-              }}
+                }}
 
-              onFocus={(e) => {
-                if (disabled) return;
-                setFocused(true);
-                if (type === "date") setInputType("date");
-                inputProps.onFocus?.(e);
-              }}
+                onFocus={(e) => {
+                  if (disabled) return;
+                  setFocused(true);
+                  if (type === "date") setInputType("date");
+                  inputProps.onFocus?.(e);
+                }}
 
-              onBlur={(e) => {
+                onBlur={(e) => {
                   setFocused(false);
                   field.onBlur();
-                if (type === "date" && !field.value) {
-                  setInputType("text");
-                }
-                inputProps.onBlur?.(e);
+                  if (type === "date" && !field.value) {
+                    setInputType("text");
+                  }
+                  inputProps.onBlur?.(e);
                 }}
               />
             )}
@@ -164,11 +164,15 @@ export function FloatingField({
             </Text>
 
             {/* ================= ERROR ================= */}
-            {error && (
+            {error ? (
               <Text mt="1" fontSize="xs" color="red.500">
                 {error}
               </Text>
-            )}
+            ) : hint ? (
+              <Text mt="1" fontSize="xs" color="gray.500">
+                {hint}
+              </Text>
+            ) : null}
           </Box>
         );
       }}

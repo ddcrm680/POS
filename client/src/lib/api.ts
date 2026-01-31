@@ -1182,8 +1182,7 @@ export async function jobCardCancel(id: any) {
 }
 export async function jobCardSend(data: any) {
   try {
-    const {id,...rest}=data.info
-    console.log(rest,'restrestrest');
+    const {id,to,...rest}=data.info
     
     const response: any = await api.post(
       `/api/job-cards/${data.info.id}/share`,{...rest,channel:data.type}

@@ -28,6 +28,7 @@ export default function SendMailtForm({
         resolver: zodResolver(MailSchema),
         defaultValues: {
             email_to: [],
+            email_cc: [],
             message: "",
             ...initialValues,
 
@@ -45,7 +46,9 @@ export default function SendMailtForm({
                 await getInfo(initialValues?.id ?? "", 'email');
 
             const mappedData = res.data
-            form.setValue("email_to", mappedData.email_to);
+
+            form.setValue("email_cc", mappedData.email_cc);
+            form.setValue("email_to",[ mappedData.email_to]);
             form.setValue("message", mappedData.message);
             form.setValue("subject", mappedData.subject);
         } catch (e) {
@@ -79,18 +82,32 @@ export default function SendMailtForm({
                                 <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                                     <FloatingField
                                         name="email_to"
-                                        label="To (write email, press Enter to add)"
-
+                                        label="To"
+                                        hint={`Write email, press Enter to add`}
                                         control={form.control}
                                         isRequired
-                                        render={({ field }) => (
+                                        render={({ field,error }) => (
                                             <MultiEmailInput
+                                              error={error} 
                                                 value={field.value ?? []}
                                                 onChange={field.onChange}
                                             />
                                         )}
                                     />
-
+                                    <FloatingField
+                                        name="email_cc"
+                                        label="Cc"
+                                        control={form.control}
+                                        isRequired
+                                        render={({ field,error }) => (
+                                            <MultiEmailInput
+                                              error={error}
+                                            disabled
+                                                value={field.value ?? []}
+                                                onChange={field.onChange}
+                                            />
+                                        )}
+                                    />
 
                                     <FloatingField
                                         name="subject"

@@ -9,17 +9,21 @@ type Props = {
   value: string[];
   onChange: (emails: string[]) => void;
   placeholder?: string;
+    error?: string;  
   disabled?: boolean;
-};
+}
 export function MultiEmailInput({
   value,
   onChange,
   placeholder = "",
-  disabled,
+  disabled=false,
+  error,
 }: Props) {
   const [input, setInput] = useState("");
 
   const addEmail = () => {
+    if (disabled) return;
+
     const email = input.trim().toLowerCase();
     if (!email) return;
     if (value.includes(email)) return;
@@ -29,6 +33,7 @@ export function MultiEmailInput({
   };
 
   const removeEmail = (email: string) => {
+    if (disabled) return;
     onChange(value.filter(v => v !== email));
   };
 
@@ -37,16 +42,19 @@ export function MultiEmailInput({
   return (
     <div
       className={cn(
+        "items-center",
         "flex flex-wrap items-center gap-2 min-h-[38px]",
         "rounded-md border px-3 py-2",
-        "focus-within:ring-2 focus-within:ring-ring focus-within:border-ring",
-        disabled && "opacity-50 cursor-not-allowed"
+        !disabled &&
+          "focus-within:ring-2 focus-within:ring-ring focus-within:border-ring",
+        disabled
+          ? "bg-[#fafafa] opacity-70 "
+          : "bg-white",
+        error ? "border-red-500" : "border-[#e1e7ef]"   // ✅ KEY LINE
       )}
     >
-      {/* LEFT SPACER (only when empty) */}
-      {!hasChips && (
-        <span className="inline-block w-6 shrink-0" />
-      )}
+      {/* LEFT SPACER */}
+      {!hasChips && <span className="inline-block w-6 shrink-0" />}
 
       {/* EMAIL CHIPS */}
       {value.slice(0, 2).map(email => {
@@ -56,20 +64,24 @@ export function MultiEmailInput({
           <span
             key={email}
             className={cn(
-              "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-sm",
+              "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-sm border",
               valid
-                ? "bg-blue-50 text-blue-700 border border-blue-200"
-                : "bg-red-50 text-red-700 border border-red-200"
+                ? "bg-blue-50 text-blue-700 border-blue-200"
+                : "bg-red-50 text-red-700 border-red-200",
+              disabled && "pointer-events-none"
             )}
           >
             {email}
-            <button
-              type="button"
-              onClick={() => removeEmail(email)}
-              className="rounded hover:bg-black/5"
-            >
-              <X size={12} />
-            </button>
+
+            {!disabled && (
+              <button
+                type="button"
+                onClick={() => removeEmail(email)}
+                className="rounded hover:bg-black/5"
+              >
+                <X size={12} />
+              </button>
+            )}
           </span>
         );
       })}
@@ -87,6 +99,8 @@ export function MultiEmailInput({
         disabled={disabled}
         onChange={e => setInput(e.target.value)}
         onKeyDown={e => {
+          if (disabled) return;
+
           if (e.key === "Enter") {
             e.preventDefault();
             addEmail();
@@ -96,16 +110,16 @@ export function MultiEmailInput({
           }
         }}
         placeholder={hasChips ? "" : placeholder}
-        className="
-          flex-1 min-w-[160px] h-[25px]
-          bg-transparent text-sm
-          outline-none border-none ring-0
-          focus:outline-none focus:ring-0 focus:border-none
-          placeholder:text-muted-foreground
-        "
+        className={cn(
+          "flex-1 min-w-[160px] h-[25px] text-sm bg-transparent",
+          "outline-none border-none ring-0",
+          "focus:outline-none focus:ring-0 focus:border-none",
+          "placeholder:text-muted-foreground",
+        )}
       />
     </div>
   );
 }
+
 
 

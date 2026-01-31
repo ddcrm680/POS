@@ -73,6 +73,7 @@ export type editUserReq = {
 }
 export interface sendMail {
     email_to: string[];
+    email_cc:string[]
     subject?: string | null
     message: string;
   }

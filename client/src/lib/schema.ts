@@ -314,6 +314,18 @@ export const MailSchema = z.object({
         message: "One or more recipient addresses are invalid",
       }
     ),
+  email_cc: z
+    .array(
+      z.string().email("Invalid Cc email address")
+    )
+    .min(1, "At least one Cc recipient is required")
+    .refine(
+      emails => emails.every(e => e.includes("@")),
+      {
+        message: "One or more Cc email addresses are invalid",
+      }
+    ),
+
   subject: z
     .string()
     .trim()
