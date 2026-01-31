@@ -105,7 +105,7 @@ export default function SendMailtForm({
                                         isRequired
                                         name="message"
                                         rows={6}
-                                        isView={true}
+                                        isReadOnly={true}
                                         label="Message"
                                         control={form.control}
                                     />

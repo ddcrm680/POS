@@ -11,6 +11,7 @@ type FloatingTextareaProps = {
   minH?: string
   isView?: boolean
   rows?: number
+  isReadOnly?: boolean
   isRequired?: boolean
 }
 
@@ -18,12 +19,17 @@ export function FloatingTextarea({
   name,
   label,
   control,
-  isView,
+  isReadOnly = false,
+  isView = false,
   rows = 1,
-  minH = '45px',
+  minH = "45px",
   isRequired = false,
+  ...inputProps
 }: FloatingTextareaProps) {
   const [focused, setFocused] = useState(false)
+
+  const disabled = isView          // 👈 VIEW = DISABLED
+  const readOnly = isReadOnly      // 👈 READONLY = READONLY
 
   return (
     <Controller
@@ -31,6 +37,7 @@ export function FloatingTextarea({
       control={control}
       render={({ field, fieldState }) => {
         const { error } = fieldState
+
         const shouldFloat =
           focused || (field.value && String(field.value).length > 0)
 
@@ -38,43 +45,52 @@ export function FloatingTextarea({
           <Box position="relative" w="full">
             <Textarea
               {...field}
-              disabled={isView}
-              pt="10px"
-              pl="12px"
-              fontSize={'12px'}
+              {...inputProps}
               rows={rows}
               minH={minH}
+              pt="10px"
+              pl="12px"
               pr="18px"
               pb="8px"
+              fontSize="12px"
+
+              disabled={disabled}     // ✅ VIEW MODE
+              readOnly={readOnly}     // ✅ READONLY MODE
+
               border="1px solid"
               borderColor={error ? "red.500" : "#e1e7ef"}
               _focus={{
                 borderColor: error ? "red.500" : "blue.500",
               }}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
+
               _disabled={{
-                bg:  "#fafafa",
+                bg: "#fafafa",
                 opacity: 0.7,
               }}
+
+              _readOnly={{
+                bg: "white",
+                cursor: "default",
+              }}
+
+              onFocus={() => {
+                if (!disabled) setFocused(true)
+              }}
+              onBlur={() => setFocused(false)}
             />
 
+            {/* FLOATING LABEL */}
             <Text
               css={floatingLabelStyle}
               data-float={shouldFloat || undefined}
-              bg={isView ? "gray.50" : "white"}     // ✅ important
-              color={
-                error
-                  ? "red.500"
-                  : isView
-                    ? "gray.500"
-                    : "gray.500"
-              }
+              bg={disabled ? "gray.50" : "white"}
+              color={error ? "red.500" : "gray.500"}
             >
               {label}
-              {isRequired && <RequiredMark show={!isView} />}
+              {isRequired && <RequiredMark show={!disabled} />}
             </Text>
 
+            {/* ERROR */}
             {error && (
               <Text mt="1" fontSize="xs" color="red.500">
                 {error.message}
@@ -86,6 +102,7 @@ export function FloatingTextarea({
     />
   )
 }
+
 const floatingLabelStyle = defineStyle({
   position: "absolute",
   left: "10px",
