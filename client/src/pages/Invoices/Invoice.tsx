@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCommon,  getCustomerView, getInvoiceInfo, getInvoiceList, getJobCardItem, invoiceSend, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCommon, getCustomerView, getInvoiceInfo, getInvoiceList, getJobCardItem, invoiceSend, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { InvoicePaymentFormValues, organizationFormType, reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Image, Switch } from "@chakra-ui/react";
@@ -435,30 +435,31 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                     },
                                     {
                                         key: "print",
-                                        label: "Print ",
+                                        actionType: "print",
+                                        label: "Print",
                                         icon: rowLoading[`print-${row.id}`] ? (
                                             <Loader isShowLoadingText={false} loaderSize={3} />
                                         ) : (
                                             <PrinterIcon size={16} />
                                         ),
-                                        onClick: () => {
-                                            commonPreviewHandler('print', row)
-                                        },
-
+                                        onClick: () => commonPreviewHandler("print", row),
                                         show: canShowAction("print", allowedActions),
-                                    },
+                                        disabled: rowLoading[`print-${row.id}`],
+                                    }
+                                    ,
                                     {
                                         key: "download",
-                                        label: "Download ",
+
+                                        actionType: "download",
+                                        label: "Download",
                                         icon: rowLoading[`download-${row.id}`] ? (
                                             <Loader isShowLoadingText={false} loaderSize={3} />
                                         ) : (
                                             <DownloadIcon size={16} />
                                         ),
-                                        onClick: () => {
-                                            commonPreviewHandler('download', row)
-                                        },
+                                        onClick: () => commonPreviewHandler("download", row),
                                         show: canShowAction("download", allowedActions),
+                                        disabled: rowLoading[`download-${row.id}`],
                                     },
                                     {
                                         key: "whatsapp",
