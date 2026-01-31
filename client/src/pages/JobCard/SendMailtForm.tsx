@@ -94,6 +94,7 @@ export default function SendMailtForm({
 
                                     <FloatingField
                                         name="subject"
+                                        readOnly
                                         label="Subject"
                                         isRequired={true}
                                         type="text"
@@ -104,6 +105,7 @@ export default function SendMailtForm({
                                         isRequired
                                         name="message"
                                         rows={6}
+                                        isView={true}
                                         label="Message"
                                         control={form.control}
                                     />
