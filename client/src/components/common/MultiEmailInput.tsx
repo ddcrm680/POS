@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { isValidEmail } from "@/lib/helper";
 
 type Props = {
   value: string[];
@@ -108,6 +109,3 @@ export function MultiEmailInput({
 }
 
 
-/* helper */
-const isValidEmail = (email: string) =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

@@ -271,3 +271,7 @@ export function buildJobCardMailMessage(
     .replace("{{store_phone}}", row.store?.phone ?? "")
     .replace("{{store_email}}", row.store?.email ?? "");
 }
+/* helper */
+
+export const isValidEmail = (email: string) =>
+  /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
