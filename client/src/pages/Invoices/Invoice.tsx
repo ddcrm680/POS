@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCommonPrintDownload, getCustomerView, getInvoiceInfo, getInvoiceList, getJobCardItem, invoiceSend, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
+import { cancelInvoice, DeleteTerritory, DeleteUser, EditUser, fetchUserList, getCommon, getCommonPrintDownload, getCustomerView, getInvoiceInfo, getInvoiceList, getJobCardItem, invoiceSend, saveInvoicePayment, SaveUser, UpdateTerritoryStatus } from "@/lib/api";
 import { InvoicePaymentFormValues, organizationFormType, reusableComponentType, TerritoryMasterApiType, UserApiType, UserFormType, } from "@/lib/types";
 import CommonTable from "@/components/common/CommonTable";
 import { Badge, Box, IconButton, Image, Switch } from "@chakra-ui/react";
@@ -19,10 +19,11 @@ import { ColumnFilter } from "@/components/common/ColumnFilter";
 import whatsap from "@/lib/images/whatsap.webp"
 import { customerMockData, invoiceMockData, jobCardMockData, territoryMasterMockData } from "@/lib/mockData";
 import InvoicePaymentForm from "./InvoicePaymentForm";
-import { buildInvoiceHtml, downloadHtmlAsPdf, mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
+import { downloadHtmlAsPdf, mapColumnsForCustomerView, openHtmlInNewTabAndPrint } from "@/lib/helper";
 
 import CommonRowMenu from "@/components/common/CommonRowMenu";
 import { InvoiceHtmlTemplate } from "./template";
+import { Loader } from "@/components/common/loader";
 export default function Invoice({ noTitle = false, noPadding = false, apiLink = "", hideColumnListInCustomer = { list: [], actionShowedList: [] } }: reusableComponentType) {
     const { toast } = useToast();
     const { roles } = useAuth();
@@ -349,191 +350,27 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
         isLoad: false
     })
     const allowedActions = hideColumnListInCustomer?.actionShowedList;
-    async function commonPreviewHandler(type: string, row: any) {
-        setPrintDownLoadLoading({ type, isLoad: true })
 
-        let invoiceRes: any
-        let res
+    const [rowLoading, setRowLoading] = useState<{
+        [key: string]: boolean;
+    }>({});
+
+    async function commonPreviewHandler(type: "print" | "download", row: any) {
+        const key = `${type}-${row.id}`;
+
+        setRowLoading(prev => ({ ...prev, [key]: true }));
+
         try {
-            res = await getInvoiceInfo(row.id);
-
-
-            const normalizedData = normalizeInvoiceToCreateResponse(res.data);
-
-            const { consumer, job_card, store, payments, items, ...rest } = res?.data
-            // 👇 existing mapper stays SAME
-            const mapped = mapInvoiceApiToPrefilledViewModel(normalizedData);
-
-            
-                const gstType =mapped.gst_type == "cgst_sgst"? "cgst_sgst" : "igst";
-               const planCalculated = mapped.plans.map((item: any) =>
-                calculateInvoiceRow(item, gstType)
-            );
-            invoiceRes = {
-                invoice_number: res?.data?.invoice_number,
-                invoiceView: { ...mapped, ...rest },
-                plans: planCalculated
-            }
-
+            await getCommon(row, type, 'invoices');
         } catch (e) {
-            console.log(e);
+            console.error(e);
         } finally {
-            setPrintDownLoadLoading({ type: "", isLoad: false })
-        }
+            console.log('comes here');
 
-
-        const view = invoiceRes?.invoiceView ?? {};
-        const customer = view?.customer ?? {};
-        const vehicle = view?.vehicle ?? {};
-        const store = view?.store ?? {};
-        const plans = invoiceRes?.plans ?? [];
-
-        const subTotal = plans.reduce(
-            (sum: any, p: any) => sum + Number(p.sub_amount || 0),
-            0
-        );
-        const totalItems = plans.reduce(
-            (sum: any, p: any) => sum + Number(p.qty || 1),
-            0
-        );
-        const discountTotal = plans.reduce(
-            (sum: any, p: any) => sum + Number(p.discount_amount || 0),
-            0
-        );
-
-        const cgstTotal = plans.reduce(
-            (sum: any, p: any) => sum + Number(p.cgst_amount || 0),
-            0
-        );
-
-        const sgstTotal = plans.reduce(
-            (sum: any, p: any) => sum + Number(p.sgst_amount || 0),
-            0
-        );
-
-        const igstTotal = plans.reduce(
-            (sum: any, p: any) => sum + Number(p.igst_amount || 0),
-            0
-        );
-
-        const grandTotal =
-            subTotal + cgstTotal + sgstTotal + igstTotal;
-
-        const costSummary = {
-            subTotal: +subTotal.toFixed(2),
-            discountTotal: +discountTotal.toFixed(2),
-            cgstTotal: +cgstTotal.toFixed(2),
-            sgstTotal: +sgstTotal.toFixed(2),
-            igstTotal: +igstTotal.toFixed(2),
-            totalItems,
-            grandTotal: +grandTotal.toFixed(2),
-
-
-        }
-      
-        const rowData = {
-            billing_type:view?.billing_type,
-            /* ---------------- COMPANY ---------------- */
-            store_name: store?.name,
-            store_address: "Plot No. B-14/15, Noida Sector 1",
-            state: "Uttar Pradesh",
-            pincode: "201301",
-            store_gstin: "09AAGCC8962J1Z2",
-            store_phone: "917290004718",
-            store_email: "sales@coatingdaddy.com",
-
-            /* ---------------- INVOICE META ---------------- */
-            invoice_no: `#${invoiceRes?.invoice_number}`,
-            invoice_date: formatDate(view?.invoice_date)
-            ,
-
-            payment_mode: view?.payment_mode ?? "",
-
-            /* ---------------- BILL TO ---------------- */
-            name: customer?.name ?? "",
-            phone: customer?.phone ?? "",
-            email: customer?.email ?? "",
-            address: customer?.address ?? "",
-
-            billingState: view?.billing_state?.name ?? "",
-            gstin: customer?.gst ?? "NA",
-            bill_name: view?.billing_name,
-            bill_address: view?.billing_address,
-            bill_state: view?.billing_state?.name,
-            bill_gstin: view?.billing_gstin,
-
-            bill_phone: view?.billing_phone,
-            bill_email: view?.billing_email,
-            /* ---------------- VEHICLE ---------------- */
-            vehicle_type: res?.data?.job_card?.vehicle_type ?? "—",
-            make: res?.data?.job_card?.vmake.name ?? "—",
-            model: res?.data?.job_card?.vmodel.name ?? "—",
-            color: res?.data?.job_card?.color ?? "—",
-            chasis_no: res?.job_card?.chassisNo ?? "—",
-            reg_no: res?.data?.job_card?.reg_no ?? "—",
-            coating_studio: store?.name ?? "—",
-
-            /* ---------------- ITEMS ---------------- */
-            invoice_items: plans.map((p: any) => ({
-                service_name: p.invoice_name ?? p.plan_name,
-                sac: p.sac ?? "—",
-                qty: p.qty ?? 1,
-
-                price: Number(p.price ?? 0),
-                discount_amount: Number(p.discount_amount ?? 0),
-                discount_percent: `${Number(p.discount_percent ?? 0)}%`,
-
-                subAmount: Number(p.sub_amount ?? p.price ?? 0),
-
-                /* TAX PER ITEM */
-                cgst_percent: Number(p.cgst_percent ?? p.cgst ?? 0),
-                cgst_amount: Number(p.cgst_amount ?? 0),
-
-                sgst_percent: Number(p.sgst_percent ?? p.sgst ?? 0),
-                sgst_amount: Number(p.sgst_amount ?? 0),
-
-                igst_percent: Number(p.igst_percent ?? p.gst ?? 0),
-                igst_amount: Number(p.igst_amount ?? 0),
-
-                amount: Number(p.total_amount ?? 0),
-            })),
-
-            /* ---------------- TOTALS (FROM costSummary) ---------------- */
-            total_items: costSummary.totalItems,
-
-            sub_total: costSummary.subTotal,
-            discount: costSummary.discountTotal,
-
-            cgst: costSummary.cgstTotal,
-            sgst: costSummary.sgstTotal,
-            igst: costSummary.igstTotal,
-
-            total_amount: costSummary.grandTotal,
-            received: Number(view?.paid_amount ?? 0),
-            balance:
-                costSummary.grandTotal - Number(view?.paid_amount ?? 0),
-
-            gst_type: view?.gst_type,
-
-            amount_in_words: "One Lakh Eighteen Thousand One Rupees Only",
-        };
-        
-        const html = buildInvoiceHtml(rowData, InvoiceHtmlTemplate);
-
-        if (type === "print") {
-            openHtmlInNewTabAndPrint(
-                html,
-                type.toUpperCase(), 'Invoice', row.invoice_number);
-        }
-
-        if (type === "download") {
-            downloadHtmlAsPdf(
-                html,
-                "Invoice",
-                row.invoice_number
-            );
+            setRowLoading(prev => ({ ...prev, [key]: false }));
         }
     }
+
 
     return (
         <div className={`${noPadding ? "" : "p-3"}`}>
@@ -574,6 +411,12 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                         }}
                         actions={(row: any) => (
                             <CommonRowMenu
+                                isAsyncLoading={
+                                    !!rowLoading[`print-${row.id}`] ||
+                                    !!rowLoading[`download-${row.id}`]
+                                }
+                                closeKey={`${row.id}-${!!rowLoading[`print-${row.id}`] || !!rowLoading[`download-${row.id}`]}`}
+
                                 items={[
 
                                     {
@@ -594,7 +437,11 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                     {
                                         key: "print",
                                         label: "Print ",
-                                        icon: <PrinterIcon size={16} />,
+                                        icon: rowLoading[`print-${row.id}`] ? (
+                                            <Loader isShowLoadingText={false} loaderSize={3} />
+                                        ) : (
+                                            <PrinterIcon size={16} />
+                                        ),
                                         onClick: () => {
                                             commonPreviewHandler('print', row)
                                         },
@@ -604,7 +451,11 @@ export default function Invoice({ noTitle = false, noPadding = false, apiLink = 
                                     {
                                         key: "download",
                                         label: "Download ",
-                                        icon: <DownloadIcon size={16} />,
+                                        icon: rowLoading[`download-${row.id}`] ? (
+                                            <Loader isShowLoadingText={false} loaderSize={3} />
+                                        ) : (
+                                            <DownloadIcon size={16} />
+                                        ),
                                         onClick: () => {
                                             commonPreviewHandler('download', row)
                                         },
